@@ -54,6 +54,7 @@
 \RequirePackage{fancyhdr}
 \RequirePackage{graphics}
 \RequirePackage{units}
+\RequirePackage{color}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Changeable Parameters   %
@@ -425,33 +426,28 @@ Graduate Research.
 \if@ugrad
 \renewcommand{\maketitle}%
     {\begin{titlepage}%
-        \vspace*{-20mm}%
+        \vspace*{-30mm}%
         \enlargethispage{\footskip}% no footer on cover
 	\begin{center}%
             \coverpagefont%
             \includegraphics{crest}%
-	    \vskip 0pt plus 8fill
+            \vskip 0pt plus 8fill
 	    {\boldcoverpagefont \ThesisSchoolName\par}%
 	    {\boldcoverpagefont \ThesisFacultyName\par}%
 	    {\boldcoverpagefont The University of New South Wales\par}%
 	    \vskip 0pt plus 8fill%
 	    {\largeboldcoverpagefont \ThesisTitle \par}%
-	    \vskip 0pt plus 5fill%
-            by
-	    \vskip 0pt plus 4fill%
-	    {\largecoverpagefont \ThesisAuthor \par}%
-            \vskip 0pt plus 12fill
+            \vskip 0pt plus 8fill
 	    Thesis submitted as a requirement for the degree of\\[1ex]
             \ThesisDegreeName \par%
-	    \vskip 0pt plus 12fill
-            \begin{tabular}{@{}rl}
-              Submitted: & \ThesisDate \vrule width 0pt depth 10pt\\
-              Supervisor: & \ThesisSupervisorName
-            \end{tabular}
-            \hfill
-            \begin{tabular}{rl@{}}
-              Student ID: & \ThesisAuthorZid \vrule width 0pt depth 10pt\\
-              Topic ID: & \ThesisTopicID
+            \begin{tabular}{ c c c }
+              Edward Webb & z5207215 & Software Engineering \\
+              Allen Wu & z1234567 & Software Engineering \\
+              Daniel Ferraro & z1234567 & Software Engineering\\
+              Daniel Nguyen & z1234567 & Bioinformatics Engineering \\
+              Emily Ngo & z1234567 & Software Engineering \\
+              Rason Chia & z1234567  & Software Engineering \\
+              Rebekah Chow & z1234567 & Software Engineering\\
             \end{tabular}\par
 	\end{center}\par
     \end{titlepage}}%
@@ -463,8 +459,6 @@ Graduate Research.
 	\begin{center}%
           \coverpagefont
           {\largeboldcoverpagefont \ThesisTitle \par}%
-          \vskip 0pt plus 8fill
-          {\largecoverpagefont \ThesisAuthor \par}%
           \vskip 0pt plus 8fill
           { A thesis in fulfillment of the requirements for the degree of \\[2ex]
               \ThesisDegreeName \par}%
@@ -569,14 +563,7 @@ Graduate Research.
      \@titlewidth=\textwidth
      \addtolength{\@titlewidth}{-\wd\@tmpb@x}
      \addtolength{\@titlewidth}{-2.5em}
-     \if@twoside
-       \fancyhead[LE]{\parbox[t]{\@titlewidth}{\emph{\ThesisTitle}}}%
-       \fancyhead[RO]{\parbox[t]{\@titlewidth}{\raggedleft\emph{\ThesisTitle}}}%
-       \fancyhead[LO,RE]{\ThesisAuthor}%
-     \else
-       \fancyhead[R]{\parbox[t]{\@titlewidth}{\raggedleft\emph{\ThesisTitle}}}%
-       \fancyhead[L]{\ThesisAuthor}%
-     \fi
+
   \else
      % hdr thesis
      % set the header to be the chapter name
