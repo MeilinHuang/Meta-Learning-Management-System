@@ -441,13 +441,13 @@ Graduate Research.
 	    Thesis submitted as a requirement for the degree of\\[1ex]
             \ThesisDegreeName \par%
             \begin{tabular}{ c c c }
-              Edward Webb & z5207215 & Software Engineering \\
               Allen Wu & z1234567 & Software Engineering \\
               Daniel Ferraro & z1234567 & Software Engineering\\
               Daniel Nguyen & z1234567 & Bioinformatics Engineering \\
+              Edward Webb & z5207215 & Software Engineering \\
               Emily Ngo & z1234567 & Software Engineering \\
               Rason Chia & z1234567  & Software Engineering \\
-              Rebekah Chow & z1234567 & Software Engineering\\
+              Rebekah Chow & z5160152 & Software Engineering\\
             \end{tabular}\par
 	\end{center}\par
     \end{titlepage}}%
