@@ -4,4 +4,6 @@
 *.lof
 *.lot
 *.toc
+*.docx
+*.tmp
 .DS_Store
