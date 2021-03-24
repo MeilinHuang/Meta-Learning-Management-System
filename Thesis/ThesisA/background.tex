@@ -1,15 +1,37 @@
 \chapter{Background}\label{ch:background}
 
-Every semester, students ask their supervisor how to write their thesis,
-what the requirements are, and what to write in it.  
-This document tries to answer all such questions.
 
-\section{Previous work}
+\section{Comparison table}
 
-Previously, Nooshabadi~\cite{Noo05} has descried style-related thesis
-requirements, Shepherd~\cite{She05} has provided \LaTeX\ templates while
-other academics have discussed contents with their students.  This work
-draws all the relevant information regarding thesis writing into one
-document.  The present template/document is heavily influenced by
-Nooshabadi and Shepherd, incorporating requirements from The Graduate
-Research School~\cite{GRS14} for Higher Degree Research theses.
+
+\begin{table}[ht]
+\centering
+\resizebox{\textwidth}{!}{
+    \begin{tabular}{llllllll}
+    \hline
+    \textbf{Categories}                               & Canvas                & WebCMS                & Moodle                & D2L Brightspace       & OpenLearning                                   & Edmodo                & Google Classroom      \\ \hline
+    \multicolumn{1}{|l|}{Topic Tree}                  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{No}                        & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Account}                     & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Course Pages}                & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Assignments}                 & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Dashboard}                   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{No}                        & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Quizzes/Exams/Tests/Polls}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Forums}                      & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{No (comments system only)} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Multiplatform Access}        & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Accessibility}               & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Grading}                     & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Attendance}                  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{No}                        & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Calendar}                    & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Enrolment}                   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Blogs/Wikis/Discussions}     & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Notifications}               & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Lectures and Tutorials}      & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Third Party Integration}     & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{No (API is provided)}      & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Inbox/Messaging}             & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Gamification/Karma System}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Yes}                       & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{High Quality User Interface} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{No}                        & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Open Source}                 & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{No}                        & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    \multicolumn{1}{|l|}{Data Migration}              & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{No}                        & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline
+    Performance (out of 10)                           &                       &                       &                       &                       & 1                                              &                       &                       \\ \hline
+    \end{tabular}}
+    \end{table}
