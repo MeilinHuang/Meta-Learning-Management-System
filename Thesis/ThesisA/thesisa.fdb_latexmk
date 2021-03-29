@@ -1,0 +1,18 @@
+# Fdb version 3
+["pdflatex"] 1616987125 "thesisa.tex" "thesisa.pdf" "thesisa" 1616987130
+  "/etc/texmf/web2c/texmf.cnf" 1615781593 475 c0e671620eb5563b2130f56340a5fde8 ""
+  "/usr/share/texlive/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty" 1548974385 11128 a53805799bebfed6358fc1658a18e41f ""
+  "/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg" 1465944070 1224 978390e9c2234eab29404bc21b268d1e ""
+  "/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def" 1515537368 17334 520b9b85ad8a2a48eda3f643e27a5179 ""
+  "/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty" 1580683321 16932 04729abe63b66ec59ea56edcd722b058 ""
+  "/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty" 1580683321 3976 d7fa7d81d2870d509d25b17d0245e735 ""
+  "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1581979058 38841 ce3692aa899bb693b90b87eaa5d4d84e ""
+  "/usr/share/texmf/web2c/texmf.cnf" 1581979058 38841 ce3692aa899bb693b90b87eaa5d4d84e ""
+  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1615781600 4791332 8b08b16d45d3d72c0f5e10a9b53de810 ""
+  "thesisa.aux" 1616986572 8 a94a2480d3289e625eea47cd1b285758 ""
+  "thesisa.tex" 1616986887 1399 d539668963e0b9098527225168428ef0 ""
+  "units.sty" 0 -1 0 ""
+  "unswthesis.cls" 1616986863 19641 583b9155fb848179b6757d7f7aee3b96 ""
+  (generated)
+  "thesisa.pdf"
+  "thesisa.log"

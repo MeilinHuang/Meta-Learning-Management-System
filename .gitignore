@@ -5,3 +5,5 @@
 *.lot
 *.toc
 .DS_Store
+*:Zone.identifier
+*:Zone.Identifier
