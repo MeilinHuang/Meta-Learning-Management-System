@@ -444,7 +444,7 @@ Graduate Research.
               Edward Webb & z5207215 & Software Engineering \\
               Allen Wu & z1234567 & Software Engineering \\
               Daniel Ferraro & z1234567 & Software Engineering\\
-              Daniel Nguyen & z1234567 & Bioinformatics Engineering \\
+              David Nguyen & z5166106 & Bioinformatics Engineering \\
               Emily Ngo & z1234567 & Software Engineering \\
               Rason Chia & z1234567  & Software Engineering \\
               Rebekah Chow & z1234567 & Software Engineering\\
