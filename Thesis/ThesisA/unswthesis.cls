@@ -442,7 +442,7 @@ Graduate Research.
             \ThesisDegreeName \par%
             \begin{tabular}{ c c c }
               Edward Webb & z5207215 & Software Engineering \\
-              Allen Wu & z1234567 & Software Engineering \\
+              Allen Wu & z5205003 & Software Engineering \\
               Daniel Ferraro & z1234567 & Software Engineering\\
               Daniel Nguyen & z1234567 & Bioinformatics Engineering \\
               Emily Ngo & z1234567 & Software Engineering \\
