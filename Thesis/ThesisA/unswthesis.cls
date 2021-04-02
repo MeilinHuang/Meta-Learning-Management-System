@@ -445,7 +445,7 @@ Graduate Research.
               Allen Wu & z1234567 & Software Engineering \\
               Daniel Ferraro & z1234567 & Software Engineering\\
               Daniel Nguyen & z1234567 & Bioinformatics Engineering \\
-              Emily Ngo & z1234567 & Software Engineering \\
+              Emily Ngo & z5164090 & Software Engineering \\
               Rason Chia & z1234567  & Software Engineering \\
               Rebekah Chow & z1234567 & Software Engineering\\
             \end{tabular}\par
