@@ -4,14 +4,11 @@
 *.lof
 *.lot
 *.toc
-<<<<<<< HEAD
 *.docx
 *.tmp
-=======
 *.bbl
 *.blg
 *.fdb_latexmk
 *.fls
 *.synctex.gz
->>>>>>> master
 .DS_Store
