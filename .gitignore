@@ -4,6 +4,8 @@
 *.lof
 *.lot
 *.toc
+*.docx
+*.tmp
 *.bbl
 *.blg
 *.fdb_latexmk
