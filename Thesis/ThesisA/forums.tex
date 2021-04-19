@@ -82,26 +82,32 @@ It contains the following categories
     \item Admins can curate forum questions into collections (Won't have)
 \end{enumerate}
 
-% \subsection{System Architecture}
-% Below is the recommended technology stack for implementing this forum system.
-% This stack has been chosen due to ease of use and past experience in developing with these technologies.
+\subsection{Backend Assumptions}
+Since the backend for the Meta LMS is being built out independently to the individual features, the following contains a description of the ideal backend design for the forum component.
 
-% \subsubsection{Frontend}
-% In order to easily achieve the desired user interface, the following technology is recommended
+\subsubsection{Database}
+The main database table required for this component is one to store all the forum posts.
+This would include all the post details including author, title, description, date created and tags.
+It would also need to have a way to keep track of the replies and comments left on the forum post.
+This could either be done by having separate tables for replies and comments, or by storing a list of replies and comments within each forum post entry.
+For each of the forum posts, the author would need to be linked to a user in the user table of the database.
 
-% \begin{enumerate}
-%     \item \textbf{React} - open-source frontend Javascript library
-%     \item \textbf{Material-UI} - React UI framework for quickly building components
-%     \item \textbf{CSS} - style sheet language for styling frontend components
-% \end{enumerate}
+\subsubsection{API}
+In terms of the backend API, the following functionality would be required in order to store, retrieve and update the appropriate data from the database.
 
-% \subsubsection{Backend}
-% To handle the backend tasks, including storing and retrieving data, the following technology is recommended
-
-% \begin{enumerate}
-%     \item \textbf{Node.js} - open-source backend Javascript runtime environment
-%     \item \textbf{PostgreSQL} - open-source database management system
-% \end{enumerate}
+\begin{enumerate}
+    \item Retrieve a list of all forum posts
+    \item Retrieve a list of the pinned posts
+    \item Retrieve a list of posts related to search term
+    \item Retrieve a list of posts related to filter
+    \item Retrieve individual post details for post page (including comments and responses)
+    \item Store new post details
+    \item Store post responses
+    \item Store post comments
+    \item Update post details when author edits post
+    \item Update response when author edits response
+    \item Update pinned post list when admin pins/unpins posts
+\end{enumerate}
 
 \subsection{Project Timeline}
 Below is a rough guideline of some milestones that should be met throughout the year in order to complete this feature on time.
