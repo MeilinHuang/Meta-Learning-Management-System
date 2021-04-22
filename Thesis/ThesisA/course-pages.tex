@@ -13,7 +13,6 @@ The main 3 pages that the course pages will encompass are:
 \end{itemize}
 
 \subsubsection{Main Dashboard/Page}
-The main dashboard/page is the centralised aspect of the course pages.
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.5]{course-pages-main}
@@ -24,19 +23,119 @@ The main dashboard/page is the centralised aspect of the course pages.
     \includegraphics[scale=0.5]{course-pages-main-admin}
     \caption{The admin view of the main dashboard/page}
 \end{figure}
+The main dashboard/page is the centralised aspect of the course pages.
+This page provides users with somewhat of a default home page for a particular course.
+Within this page there will be a main dashboard/feed, a sidebar which links users to different aspects of the course and customisable widgets which provide further functionality. 
+
+The main dashboard/feed acts as the display of all announcements by admins and academics. Admins and academics are able to create announcements in which all users in the corresponding course will be notified.
+The specifics of how the notifications are to be discussed in the notifications component catergory and will not be discussed here. 
+Announcements are crucial to a course as they provide an efficient method of communication between admins, academics and students/users.
+Users creating announcement will be able to attach files and links to better improve the usability of the planned LMS.
+Within each announcement users will also be able to create comments.
+
+The sidebar for the dashboard page is a component within the page that provides the user with the ability to navigate through other aspects of the LMS.
+Currently the components that will be linked in the sidebar are (This is subject to change):
+\begin{itemize}
+    \item Course outline
+    \item Course content
+    \item Topic Tree for the course
+    \item Course Forum
+    \item Lectures and Tutorials
+    \item Assessments (Quizzes/Polls)
+\end{itemize}
+
+The final component of the main page are the customisable widgets. These widgets offer more extensive usability and utility for users of the LMS.
+Some features that they offer are a course progress tracker and a calendar for users to view course due dates. 
+These widgets are planned to be customisable such that they can be placed in different positions are can also be toggled on or off.
+These widgets could also be developed by third party developers willing to create extensions to the functionality of the LMS.
 
 \subsubsection{Course Content Page}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{course-pages-content}
+    \caption{The course content page within the course}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{course-pages-content-admin}
+    \caption{The admin view of the course content page}
+\end{figure}
 The course content page is the area in which content is uploaded by admins or academics and downloaded, viewed or completed by students.
+The course content page will contain content from the topic tree and will be catergorised accordingly. 
+One assumption made for the topic tree component is that the topic tree will be utilised as a database which stores content that can be utilised in courses.
+Course admins would have the ability to select which content to import into the course content page. 
+Another assumption is that the content within the topic tree will be catergorised and this catergorisation will then be imported into the page.
+For example if the admin had catergorised content in the topic tree by weeks then importing it within the course pages will retain the catergorisation method.
+This is to ensure flexibility and usability for admins and users of the LMS.
+Course content involves the topics that will be stored within the topic tree. This can range from lecture slides, tutorial questions, lecture recordings an even quizzes and assignments. 
+
 
 \subsubsection{Course Outline Page}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{course-pages-outline}
+    \caption{The course outline page within the course}
+\end{figure}
 The course outline page is where admins are able to display the course outline for the particular course. 
+The course outline for a course is a crucial aspect that is required for courses so that students and admins can view the plan and outcomes of the course.
+This page will act as the primary page for users to view the course outline of the course. 
+Admins will have the ability to import the course outline their files and thus be able to edit it.
 
 \subsection{Requirements}
+The requirements and use cases for the course pages are outlined below. These are subject to change as further developments within the project proceed.
+These requirements are ranked based according to priority, with high priority requirements being completed first, medium priority implemented after and low priority being completed if there is time.
+\subsubsection{Main Dashboard/Page}
+\begin{enumerate}
+    \item Users can view the announcments within the dashboard \textcolor{Red}{High}
+    \item Admins of the course can create announcments within the dashboard \textcolor{Red}{High}
+    \item Admins can edit the announcements made in the dashboard \textcolor{Blue}{Low}
+    \item Users can make comments on announcments \textcolor{Orange}{Medium}
+    \item Users can click on the links in the sidebar to be directed to the corresponding component \textcolor{Red}{High}
+    \item Admins can edit the sidebar to change what components are linked \textcolor{Orange}{Medium}
+    \item Users can intereact with widgets to enchance their experience with the LMS \textcolor{Blue}{Low}
+    \item Users can toggle on or off specific widgets \textcolor{Blue}{Low}
+\end{enumerate}
 
-\subsection{Functional Requirements}
+\subsubsection{Course Content Page}
+\begin{enumerate}
+    \item Users can view the course content \textcolor{Red}{High}
+    \item Admins can add course content into the page by selecting content from the topic tree \textcolor{Red}{High}
+    \item Users can download the course content \textcolor{Orange}{Medium}
+    \item Course content is catergorised based on how the content is catergorised in the topic tree \textcolor{Blue}{Low}
+\end{enumerate}
 
-\subsection{Timeline}
+\subsubsection{Course Outline Page}
+\begin{enumerate}
+    \item Users can view the course outline of a course \textcolor{Red}{High}
+    \item Admins can upload the course outline \textcolor{Red}{High}
+\end{enumerate}
 
-\subsection{Milestones}
+\subsection{Timeline and Milestones}
+This section will outline the timeline and milestones for the course pages.
+Thesis A primarily focused on the analysis of other competitors in the literature review and the planning of features within each component in thesis B and C.
+Thesis B will focus on the implementation of the course pages as it is a crucial component that will be utilised in other components.
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{thesisB-course-pages}
+    \caption{Thesis B timeline}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{thesisC-course-pages}
+    \caption{Thesis C timeline}
+\end{figure}
+
+Thesis C will focus on the integration of the course pages with other components, such as the topic tree, forums, assessments, lectures and tutorials.
+This term will also finalise all testing, analysis and evaluation of the LMS.
 
 \subsection{Evaluation}
+The evaluation of the course pages will depend on a set criteria.
+This criteria is proposed as followed:
+\begin{itemize}
+    \item Performance - Whether the topic tree feature is fast and responsive
+    \item Accessibility - Can a wide array of users use the topic tree easily (including people with disabilities, etc.)
+    \item UI/UX - Is the feature easy to use and attractive
+    \item Errors - Is the feature bug and error free
+\end{itemize}
+
