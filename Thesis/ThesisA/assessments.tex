@@ -1,5 +1,4 @@
-\chapter{Assessments}\label{ch:assessment}
-
+\section{Assessments}
 \subsection{Overview}
 The Assessment feature consists of a quiz and poll system where the poll can be used as a supplementary tool for the quiz or to be used as a general poll system. Quizzes are a widely used form of assessing students' knowledge about a particular topic or course. It is beneficial to students as it gives a good indication of their understanding of a topic and whether they need to revise more in a particular area. Likewise, it is beneficial to course lecturers as they'll be able to gauge the students' understanding and whether they should change their teaching methods or revise the content with students to resolve difficulties with concepts. Therefore it is an essential in any learning management system to provide quizzes, which most, if not all, learning management systems do. However, some existing quiz systems lack in providing an aesthetic user interface and useful feedback for both parties. Therefore, the Assessment feature aims at:
 \begin{itemize}
@@ -60,78 +59,78 @@ The list of functional requirements' priority level will be determined using the
 
 The MoSCoW method splits requirements based on 4 categories:
 \begin{itemize}
-	\item Must Have
-	\item Should Have
-	\item Could Have
-	\item Won't Have
+	\item \textcolor{Red}{[Must Have]}
+	\item \textcolor{Blue}{[Should Have]}
+	\item \textcolor{Orange}{[Could Have]}
+	\item \textcolor{Green}{[Won't Have]}
 \end{itemize}
 
 A requirements survey was conducted and completed by me and other Thesis A students to gauge what was the priorities for each requirement. The results for the Assessment feature from the survey and my own ideas were combined to form the following functional requirements:
 
 \subsubsection{Quiz creation}
-\begin{itemize}
-	\item Course lecturers can create a quiz
-	\item Course lecturers can add questions to a quiz
-	\item Course lecturers can create different types of quiz questions (multiple-choice, short answer, checkboxes)
-	\item Course lecturers can set up a timer or due date for a quiz
-	\item Course lecturers can add "drag and drop" type questions
-	\item Course lecturers can add "connect the pairs" type questions
-	\item Course lecturers can add media (audio or  video) into a question as the entire question or as a supplementary material to the question
-	\item Course lecturers can create a question bank
-	\item Course lecturers can add a question to a question bank
-	\item Course lecturers can import a question from a question bank
-\end{itemize}
+\begin{enumerate}
+	\item Course lecturers can create a quiz \textcolor{Red}{[Must Have]}
+	\item Course lecturers can add questions to a quiz \textcolor{Red}{[Must Have]}
+	\item Course lecturers can create different types of quiz questions (multiple-choice, short answer, checkboxes) \textcolor{Red}{[Must Have]}
+	\item Course lecturers can set up a timer or due date for a quiz \textcolor{Red}{[Must Have]}
+	\item Course lecturers can add "drag and drop" type questions \textcolor{Orange}{[Could Have]}
+	\item Course lecturers can add "connect the pairs" type questions \textcolor{Orange}{[Could Have]}
+	\item Course lecturers can add media (audio or  video) into a question as the entire question or as a supplementary material to the question \textcolor{Orange}{[Could Have]}
+	\item Course lecturers can create a question bank \textcolor{Blue}{[Should Have]}
+	\item Course lecturers can add a question to a question bank \textcolor{Blue}{[Should Have]}
+	\item Course lecturers can import a question from a question bank \textcolor{Blue}{[Should Have]}
+\end{enumerate}
 
 \subsubsection{Quiz modification/removal}
-\begin{itemize}
-	\item Course lecturers can edit/remove a quiz
-	\item Course lecturers can edit/remove a question
-	\item Course lecturers can remove a question bank
-	\item Course lecturers can remove a question from a question bank
-\end{itemize}
+\begin{enumerate}
+	\item Course lecturers can edit/remove a quiz \textcolor{Red}{[Must Have]}
+	\item Course lecturers can edit/remove a question \textcolor{Red}{[Must Have]}
+	\item Course lecturers can remove a question bank \textcolor{Blue}{[Should Have]}
+	\item Course lecturers can remove a question from a question bank \textcolor{Blue}{[Should Have]}
+\end{enumerate}
 
 \subsubsection{Quiz usage}
-\begin{itemize}
-	\item Students can answer a quiz question
-	\item Students can edit any of their answers during the quiz
-	\item Students can submit a quiz attempt
-	\item Students can manually save their progress at any time
-\end{itemize}
+\begin{enumerate}
+	\item Students can answer a quiz question \textcolor{Red}{[Must Have]}
+	\item Students can edit any of their answers during the quiz \textcolor{Red}{[Must Have]}
+	\item Students can submit a quiz attempt \textcolor{Red}{[Must Have]}
+	\item Students can manually save their progress at any time \textcolor{Blue}{[Should Have]}
+\end{enumerate}
 
 \subsubsection{Poll creation}
-\begin{itemize}
-	\item Course lecturers can create different types of polls 
-	\item Course lecturers can add an option to a poll
-\end{itemize}
+\begin{enumerate}
+	\item Course lecturers can create different types of polls (can vote either 1 option only or multiple options) \textcolor{Red}{[Must Have]}
+	\item Course lecturers can add an option to a poll \textcolor{Red}{[Must Have]}
+\end{enumerate}
 
 \subsubsection{Poll modification/closing}
-\begin{itemize}
-	\item Course lecturers can edit/remove options
-	\item Course lecturers can close polls
-	\item Course lecturers can set a poll closing date
-	\item Course lecturers can close a poll but make results viewable
-\end{itemize}
+\begin{enumerate}
+	\item Course lecturers can edit/remove options \textcolor{Red}{[Must Have]}
+	\item Course lecturers can close polls \textcolor{Red}{[Must Have]}
+	\item Course lecturers can set a poll closing date \textcolor{Blue}{[Should Have]}
+	\item Course lecturers can close a poll but make results viewable \textcolor{Orange}{[Could Have]}
+\end{enumerate}
 
 \subsubsection{Poll usage}
-\begin{itemize}
-	\item Students can vote one or multiple options (depending on poll type)
-	\item Students can add an option (if course lecturer enables the option for it)
-\end{itemize}
+\begin{enumerate}
+	\item Students can vote for one or multiple options (depending on poll type) \textcolor{Red}{[Must Have]}
+	\item Students can add an option (if course lecturer enables the option for it) \textcolor{Orange}{[Could Have]}
+\end{enumerate}
 
 \subsubsection{Viewing quiz results and feedback}
-\begin{itemize}
-	\item Students can view results against their answers
-	\item Students, course lecturers and admins can see how many students selected each answer for a question
-	\item Students can view topic or lecture the question derives from
-	\item Students can view an explanation of the correct answer if the question is answered incorrectly
-\end{itemize}
+\begin{enumerate}
+	\item Students can view results against their answers \textcolor{Blue}{[Should Have]}
+	\item Students, course lecturers and admins can see how many students selected each answer for a question \textcolor{Blue}{[Should Have]}
+	\item Students can view topic or lecture the question derives from \textcolor{Blue}{[Should Have]}
+	\item Students can view an explanation of the correct answer if the question is answered incorrectly \textcolor{Orange}{[Could Have]}
+\end{enumerate}
 
 \subsubsection{Re-usability}
-\begin{itemize}
-	\item Course lecturers can add question to a general question bank
-	\item Course lecturers can import/export quizzes
-	\item Course lecturers can import/export questions
-\end{itemize}
+\begin{enumerate}
+	\item Course lecturers can add a question to a general question bank \textcolor{Blue}{[Should Have]}
+	\item Course lecturers can import/export quizzes \textcolor{Blue}{[Should Have]}
+	\item Course lecturers can import/export questions \textcolor{Blue}{[Should Have]}
+\end{enumerate}
 
 
 \subsection{Non-functional Requirements}
@@ -201,30 +200,30 @@ Since the React frameworks structures content into re-usable, isolated component
 
 \section{Timeline}
 \subsection{Term 1 (Thesis A)}
-Term 1 will mainly focus on literature research, outlining the main and potential features required to achieve the goals of this thesis. 
+Term 1 will mainly focus on literature research, outlining the main and potential features required to achieve the goals of this thesis.\\
 
 \begin{figure}[h!]
-\centering
-\includegraphics[scale=0.4]{term1-timeline}
-\caption{Thesis A Timeline}
+	\centering
+	\includegraphics[scale=0.4]{term1-timeline}
+	\caption{Thesis A Timeline}
 \end{figure}
 
 \subsection{Term 2 (Thesis B)}
-Term 2 will mainly focus on implementation of the core features and ensuring a good design overall before adding any extra features. 
+Term 2 will mainly focus on implementation of the core features and ensuring a good design overall before adding any extra features.\\
 
 \begin{figure}[h!]
-\centering
-\includegraphics[scale=0.4]{term2-timeline}
-\caption{Thesis B Timeline}
+	\centering
+	\includegraphics[scale=0.4]{term2-timeline}
+	\caption{Thesis B Timeline}
 \end{figure}
 
 \subsection{Term 3 (Thesis C)}
-Term 3 will focus on improving the system based on feedback, implementing additional features and doing a final testing on the system to ensure it satisfies requirements. 
+Term 3 will focus on improving the system based on feedback, implementing additional features and doing a final testing on the system to ensure it satisfies requirements.\\
 
 \begin{figure}[h!]
-\centering
-\includegraphics[scale=0.38]{term3-timeline}
-\caption{Thesis C Timeline}
+	\centering
+	\includegraphics[scale=0.38]{term3-timeline}
+	\caption{Thesis C Timeline}
 \end{figure}
 
 
