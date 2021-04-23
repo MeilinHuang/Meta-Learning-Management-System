@@ -1,3 +1,34 @@
-\begin{thebibliography}{}
+\begin{thebibliography}{Opeb}
+
+\bibitem[Ell12]{lmsdefinition}
+Ryann Ellis.
+\newblock Field guide to learning management.
+\newblock {\em ASTD Learning Circuits}, 2012.
+
+\bibitem[Goo]{googleLighthouse}
+Google.
+\newblock Lighthouse - tools for web developers - google developers.
+\newblock \url{https://developers.google.com/web/tools/lighthouse}.
+\newblock Accessed: 2021-04-23.
+
+\bibitem[Opea]{openlearning}
+OpenLearning.
+\newblock About openlearning.
+\newblock
+  https://web.archive.org/web/20121013202446/https://www.openlearning.com/About.
+
+\bibitem[Opeb]{openlearningPricing}
+OpenLearning.
+\newblock Pricing plans for top education business - openlearning.
+\newblock \url{https://solutions.openlearning.com/pricing}.
+\newblock Accessed: 2021-04-23.
+
+\bibitem[Opec]{openlearningCsv}
+OpenLearning.
+\newblock What information can be exported from and where? - statistics and
+  exports - openlearning help community.
+\newblock
+  \url{https://help.openlearning.com/t/365w1v/what-information-can-be-exported-and-from-where}.
+\newblock Accessed: 2021-04-23.
 
 \end{thebibliography}

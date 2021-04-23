@@ -1,6 +1,7 @@
 \documentclass[singlespacing]{unswthesis}
 \usepackage{graphicx}
 \usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
 \graphicspath{ {./images/} }
 
 %%% Class options:
@@ -53,14 +54,14 @@
 \include{introduction}
 \include{background}
 \include{mywork}
-\include{evaluation}
 \include{conclusion}
 
 %% chapters in the ``backmatter'' section do not have chapter numbering
 %% text in the ``backmatter'' is single spaced
 %%\backmatter
 \bibliographystyle{alpha}
-%% \bibliography{pubs} There is any isssue here causing compilation issues
+
+\bibliography{pubs} %There is any isssue here causing compilation issues
 
 % \include{appendix1}
 % \include{appendix2}

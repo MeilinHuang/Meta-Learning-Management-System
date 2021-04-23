@@ -21,9 +21,20 @@ In the above example, pointers, structs and discrete mathematics must be learned
 Specific courses in this new LMS would be created by choosing the topics this new course has, and all course materials under each topic would be imported into the respective topic. This allows for faster creation of courses, and course materials can be reused more easily.\\
 
 \subsection{UI/UX}
-Instead of only a graph view, we opted for a more traditional UI for the topic tree as well. This is because a graph based UI may be unstable and difficult to use compared to a more traditional UI.\\
+The UI for the topic tree involves two different views of the topic tree - a graph view and a traditional view. The graph view will be the focus of the LMS, as it will allow instructors to visualise the prerequisities between topics easily. However if time permits, a traditional interface will be implemented as well in Thesis C, with an option to switch between the two views. This traditional interface will be easier to use for some users, as it is similar to typical interfaces and a graph interface may be too confusing to use.\\
 
-The following is a mockup of a possible UI, and will be changed in the future.\\
+\textbf{Graph Interface}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.6]{topic-tree-graph-view}
+    \caption{Topic Groups Graph UI}
+\end{figure}
+
+This is a mockup of a possible graph UI. Arrows indicate prerequisites, as in this example Memory is required to be learnt in order to learn about Pointers. This will be the default view of the topic tree, and a modal will open to display content for a specific topic when the "View Content" button is clicked. Topics will be grouped together - in this example, "Introduction to Programming" would be the name of this group of topics, and would be represented as a "region" of the topic tree.
+
+\textbf{Traditional Interface}
+The following mockups show what a traditional interface could look like, and will be changed and improved upon in the future.\\
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{topic-tree-groups-list}
@@ -118,12 +129,13 @@ This term, the focus is literature review and planning features for implementati
     \caption{Thesis B Timeline}
 \end{figure}
 
-In Thesis B, the focus is to start implementing the topic tree feature, with core features implemented and mostly usable, and a working database design. \\
+In Thesis B, the focus is to start implementing the topic tree feature, with core features implemented and mostly usable including the graph interface, and a working database design. \\
 
 Database Design will involve designing a schema for the database to store topics and their dependencies. This will most likely involve a graph relationship between topics.\\
-Topic Management involves designing the interface for adding, removing and managing topics and helping develop a backend for this.\\
+Topic Management involves designing the graph interface for adding, removing and managing topics and helping develop a backend for this.\\
 Integration with the rest of the system involves using the topic tree to import content into a course, and export content into the topic tree, etc.\\
 Search involves searching for content, and is not as important as developing the topic management feature.\\
+A graph interface would make it much easier to visualise dependencies between topics, but is not a high priority so the plan is to implement this during Term 2 2021.\\
 
 \begin{figure}[h!]
     \centering
@@ -131,18 +143,18 @@ Search involves searching for content, and is not as important as developing the
     \caption{Thesis C Timeline}
 \end{figure}
 
-In Thesis C, the main focus is to finalise features, fix any bugs that arise, test the feature and its integration with the rest of the system, implement a graph interface and allow topics to be grouped with each other.\\
+In Thesis C, the main focus is to finalise features, fix any bugs that arise, test the feature and its integration with the rest of the system, implement a traditional interface and allow topics to be grouped with each other.\\
 
-A graph interface would make it much easier to visualise dependencies between topics, but is not a high priority so the plan is to implement this during Term 3 2021.\\
+A traditional interface would be easier to use than a graph interface for some users, as it would be more similar to most interfaces used in other software, and would be implemented during Term 3 2021.\\
 
 \newpage
 \subsection{Milestones}
 Major milestones for the topic tree feature include: \\
 \begin{enumerate}
-\item Week 6 Term 2 2021 - Implement a database schema for storing topics and their prerequisites, and set up an interface for topic management.
-\item Week 11 Term 2 2021 - Adding and deleting topic prerequisites/dependencies, a search function and proper integration with the rest of the learning management system
-\item Week 6 Term 3 2021 - Graph interface to easily view prerequisites between topics and topic groups
-\item Week 11 Term 4 2021 - Final Testing and Analysis of the learning management system
+\item Week 6 Term 2 2021 - Implement a database schema for storing topics and their prerequisites, and set up a graph interface for topic management to easily view prerequisites between topics and topic groups.
+\item Week 11 Term 2 2021 - Adding and deleting topic prerequisites/dependencies, a search function and proper integration with the rest of the learning management system.
+\item Week 6 Term 3 2021 - Traditional interface to improve the user experience of the LMS.
+\item Week 11 Term 4 2021 - Final Testing and Analysis of the learning management system.
 \end{enumerate}
 
 \subsection{Evaluation}
