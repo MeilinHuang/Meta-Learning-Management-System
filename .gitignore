@@ -4,4 +4,11 @@
 *.lof
 *.lot
 *.toc
+*.docx
+*.tmp
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
 .DS_Store

@@ -1,6 +1,7 @@
-
-\documentclass[]{unswthesis}
+\documentclass[singlespacing]{unswthesis}
 \usepackage{graphicx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
 \graphicspath{ {./images/} }
 
 %%% Class options:
@@ -44,10 +45,15 @@
 \include{abbreviations}
 
 \tableofcontents
+<<<<<<< HEAD
 \listoffigures  % if required
 \listoftables  % if required
 % \listoffigures  % if required
 % \listoftables  % if required
+=======
+%\listoffigures  % if required
+%\listoftables  % if required
+>>>>>>> master
 
 %% pages in the ``mainmatter'' section have arabic page numbers and chapters are numbered
 \mainmatter
@@ -55,14 +61,14 @@
 \include{introduction}
 \include{background}
 \include{mywork}
-\include{evaluation}
 \include{conclusion}
 
 %% chapters in the ``backmatter'' section do not have chapter numbering
 %% text in the ``backmatter'' is single spaced
-\backmatter
+%%\backmatter
 \bibliographystyle{alpha}
-\bibliography{pubs}
+
+\bibliography{pubs} %There is any isssue here causing compilation issues
 
 \include{appendix1}
 \include{appendix2}
