@@ -1,15 +1,59 @@
-\begin{thebibliography}{Opeb}
+\begin{thebibliography}{Edmb}
+
+\bibitem[Edma]{edmodoLMS}
+Edmodo.
+\newblock Edmodo.
+\newblock \url{https://new.edmodo.com}.
+\newblock Accessed: 2021-03-17.
+
+\bibitem[Edmb]{edmodoGamification}
+Edmodo.
+\newblock Introducing jumpstart activity studio on edmodo.
+\newblock
+  \url{https://go.edmodo.com/introducing-jumpstart-activity-studio-on-edmodo}.
+\newblock Accessed: 2021-03-17.
 
 \bibitem[Ell12]{lmsdefinition}
 Ryann Ellis.
 \newblock Field guide to learning management.
 \newblock {\em ASTD Learning Circuits}, 2012.
 
+\bibitem[eTh]{moodleIntro}
+eThink.
+\newblock What is moodle™? the comprehensive moodle™ learning management
+  system (lms) guide.
+\newblock \url{https://ethinkeducation.com/what-is-moodle-guide/}.
+\newblock Accessed: 2021-03-16.
+
 \bibitem[Goo]{googleLighthouse}
 Google.
 \newblock Lighthouse - tools for web developers - google developers.
 \newblock \url{https://developers.google.com/web/tools/lighthouse}.
 \newblock Accessed: 2021-04-23.
+
+\bibitem[Mooa]{moodleBackupAndRestore}
+Moodle.
+\newblock Backup and restore faq.
+\newblock \url{https://docs.moodle.org/310/en/Backup_and_restore_FAQ}.
+\newblock Accessed: 2021-03-16.
+
+\bibitem[Moob]{moodleBackup}
+Moodle.
+\newblock Course backup.
+\newblock \url{https://docs.moodle.org/310/en/Course_backup}.
+\newblock Accessed: 2021-03-16.
+
+\bibitem[Mooc]{moodleRestore}
+Moodle.
+\newblock Course restore.
+\newblock \url{https://docs.moodle.org/310/en/Course_restoreQ}.
+\newblock Accessed: 2021-03-16.
+
+\bibitem[Mood]{moodleLMS}
+Moodle.
+\newblock Moodle lms.
+\newblock \url{https://moodle.com/lms/}.
+\newblock Accessed: 2021-03-16.
 
 \bibitem[Opea]{openlearning}
 OpenLearning.
@@ -30,5 +74,23 @@ OpenLearning.
 \newblock
   \url{https://help.openlearning.com/t/365w1v/what-information-can-be-exported-and-from-where}.
 \newblock Accessed: 2021-04-23.
+
+\bibitem[Pro]{moscow}
+ProductPlan.
+\newblock Moscow prioritization.
+\newblock \url{https://www.productplan.com/glossary/moscow-prioritization/}.
+\newblock Accessed: 2021-04-30.
+
+\bibitem[SCO]{scormExplained}
+SCORM.com.
+\newblock Scorm explained: In depth review of the scorm elearning standard.
+\newblock \url{https://scorm.com/scorm-explained}.
+\newblock Accessed: 2021-03-20.
+
+\bibitem[Wik]{edmodoAbout}
+Wikipedia.
+\newblock Edmodowikipedia.
+\newblock \url{https://en.wikipedia.org/wiki/Edmodo}.
+\newblock Accessed: 2021-03-17.
 
 \end{thebibliography}
