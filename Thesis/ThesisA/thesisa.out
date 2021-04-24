@@ -1,70 +1,77 @@
 \BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
 \BOOKMARK [1][-]{section.1.1}{Motivation}{chapter.1}% 2
 \BOOKMARK [1][-]{section.1.2}{Learning Management System}{chapter.1}% 3
-\BOOKMARK [0][-]{chapter.2}{Background}{}% 4
-\BOOKMARK [1][-]{section.2.1}{Comparison table}{chapter.2}% 5
-\BOOKMARK [1][-]{section.2.2}{Google Classroom}{chapter.2}% 6
-\BOOKMARK [2][-]{subsection.2.2.1}{Features}{section.2.2}% 7
-\BOOKMARK [2][-]{subsection.2.2.2}{Review}{section.2.2}% 8
-\BOOKMARK [1][-]{section.2.3}{OpenLearning}{chapter.2}% 9
-\BOOKMARK [2][-]{subsection.2.3.1}{Overview}{section.2.3}% 10
-\BOOKMARK [2][-]{subsection.2.3.2}{Home}{section.2.3}% 11
-\BOOKMARK [2][-]{subsection.2.3.3}{Course Home Page}{section.2.3}% 12
-\BOOKMARK [2][-]{subsection.2.3.4}{Performance}{section.2.3}% 13
-\BOOKMARK [2][-]{subsection.2.3.5}{Forum and Commenting}{section.2.3}% 14
-\BOOKMARK [2][-]{subsection.2.3.6}{Data Migration}{section.2.3}% 15
-\BOOKMARK [2][-]{subsection.2.3.7}{Conclusion}{section.2.3}% 16
-\BOOKMARK [1][-]{section.2.4}{Moodle}{chapter.2}% 17
-\BOOKMARK [2][-]{subsection.2.4.1}{Overview}{section.2.4}% 18
-\BOOKMARK [2][-]{subsection.2.4.2}{Dashboard}{section.2.4}% 19
-\BOOKMARK [2][-]{subsection.2.4.3}{Course Pages}{section.2.4}% 20
-\BOOKMARK [2][-]{subsection.2.4.4}{Forums}{section.2.4}% 21
-\BOOKMARK [2][-]{subsection.2.4.5}{Performance and Accessibility}{section.2.4}% 22
-\BOOKMARK [2][-]{subsection.2.4.6}{Data Migration}{section.2.4}% 23
-\BOOKMARK [2][-]{subsection.2.4.7}{Conclusion}{section.2.4}% 24
-\BOOKMARK [1][-]{section.2.5}{Edmodo}{chapter.2}% 25
-\BOOKMARK [2][-]{subsection.2.5.1}{Overview}{section.2.5}% 26
-\BOOKMARK [2][-]{subsection.2.5.2}{Dashboard}{section.2.5}% 27
-\BOOKMARK [2][-]{subsection.2.5.3}{Assignments and quizzes}{section.2.5}% 28
-\BOOKMARK [2][-]{subsection.2.5.4}{Data migration}{section.2.5}% 29
-\BOOKMARK [2][-]{subsection.2.5.5}{Conclusion}{section.2.5}% 30
-\BOOKMARK [1][-]{section.2.6}{WebCMS}{chapter.2}% 31
-\BOOKMARK [2][-]{subsection.2.6.1}{Enrolments}{section.2.6}% 32
-\BOOKMARK [2][-]{subsection.2.6.2}{Course Page Feed}{section.2.6}% 33
-\BOOKMARK [2][-]{subsection.2.6.3}{Email Notifications}{section.2.6}% 34
-\BOOKMARK [2][-]{subsection.2.6.4}{Quiz and Assignment System}{section.2.6}% 35
-\BOOKMARK [2][-]{subsection.2.6.5}{Display Content}{section.2.6}% 36
-\BOOKMARK [2][-]{subsection.2.6.6}{Gradebook and Profile}{section.2.6}% 37
-\BOOKMARK [2][-]{subsection.2.6.7}{Admin Functionalities}{section.2.6}% 38
-\BOOKMARK [2][-]{subsection.2.6.8}{Conclusion}{section.2.6}% 39
-\BOOKMARK [0][-]{chapter.3}{Project Plan}{}% 40
-\BOOKMARK [1][-]{section.3.1}{Topic Tree}{chapter.3}% 41
-\BOOKMARK [2][-]{subsection.3.1.1}{Overview}{section.3.1}% 42
-\BOOKMARK [2][-]{subsection.3.1.2}{UI/UX}{section.3.1}% 43
-\BOOKMARK [2][-]{subsection.3.1.3}{Requirements}{section.3.1}% 44
-\BOOKMARK [2][-]{subsection.3.1.4}{Functional Requirements}{section.3.1}% 45
-\BOOKMARK [2][-]{subsection.3.1.5}{Timeline}{section.3.1}% 46
-\BOOKMARK [2][-]{subsection.3.1.6}{Milestones}{section.3.1}% 47
-\BOOKMARK [2][-]{subsection.3.1.7}{Evaluation}{section.3.1}% 48
-\BOOKMARK [1][-]{section.3.2}{Forums}{chapter.3}% 49
-\BOOKMARK [2][-]{subsection.3.2.1}{Overview}{section.3.2}% 50
-\BOOKMARK [2][-]{subsection.3.2.2}{Requirements}{section.3.2}% 51
-\BOOKMARK [2][-]{subsection.3.2.3}{Backend Assumptions}{section.3.2}% 52
-\BOOKMARK [2][-]{subsection.3.2.4}{Evaluation}{section.3.2}% 53
-\BOOKMARK [2][-]{subsection.3.2.5}{Project Timeline}{section.3.2}% 54
-\BOOKMARK [1][-]{section.3.3}{Assessments}{chapter.3}% 55
-\BOOKMARK [2][-]{subsection.3.3.1}{Overview}{section.3.3}% 56
-\BOOKMARK [2][-]{subsection.3.3.2}{Stakeholders}{section.3.3}% 57
-\BOOKMARK [2][-]{subsection.3.3.3}{Functional Requirements}{section.3.3}% 58
-\BOOKMARK [2][-]{subsection.3.3.4}{Non-functional Requirements}{section.3.3}% 59
-\BOOKMARK [1][-]{section.3.4}{Required Training/Upskilling}{chapter.3}% 60
-\BOOKMARK [2][-]{subsection.3.4.1}{Back-end Assumptions}{section.3.4}% 61
-\BOOKMARK [2][-]{subsection.3.4.2}{Front-end Assumptions}{section.3.4}% 62
-\BOOKMARK [1][-]{section.3.5}{Timeline}{chapter.3}% 63
-\BOOKMARK [2][-]{subsection.3.5.1}{Term 1 \(Thesis A\)}{section.3.5}% 64
-\BOOKMARK [2][-]{subsection.3.5.2}{Term 2 \(Thesis B\)}{section.3.5}% 65
-\BOOKMARK [2][-]{subsection.3.5.3}{Term 3 \(Thesis C\)}{section.3.5}% 66
-\BOOKMARK [2][-]{subsection.3.5.4}{Evaluation}{section.3.5}% 67
-\BOOKMARK [0][-]{chapter.4}{Conclusion}{}% 68
-\BOOKMARK [1][-]{section.4.1}{Future Work}{chapter.4}% 69
-\BOOKMARK [0][-]{section.4.1}{Bibliography}{}% 70
+\BOOKMARK [1][-]{section.1.3}{Aims}{chapter.1}% 4
+\BOOKMARK [0][-]{chapter.2}{Background}{}% 5
+\BOOKMARK [1][-]{section.2.1}{Comparison table}{chapter.2}% 6
+\BOOKMARK [1][-]{section.2.2}{Google Classroom}{chapter.2}% 7
+\BOOKMARK [2][-]{subsection.2.2.1}{Features}{section.2.2}% 8
+\BOOKMARK [2][-]{subsection.2.2.2}{Review}{section.2.2}% 9
+\BOOKMARK [1][-]{section.2.3}{OpenLearning}{chapter.2}% 10
+\BOOKMARK [2][-]{subsection.2.3.1}{Overview}{section.2.3}% 11
+\BOOKMARK [2][-]{subsection.2.3.2}{Home}{section.2.3}% 12
+\BOOKMARK [2][-]{subsection.2.3.3}{Course Home Page}{section.2.3}% 13
+\BOOKMARK [2][-]{subsection.2.3.4}{Performance}{section.2.3}% 14
+\BOOKMARK [2][-]{subsection.2.3.5}{Forum and Commenting}{section.2.3}% 15
+\BOOKMARK [2][-]{subsection.2.3.6}{Data Migration}{section.2.3}% 16
+\BOOKMARK [2][-]{subsection.2.3.7}{Conclusion}{section.2.3}% 17
+\BOOKMARK [1][-]{section.2.4}{Moodle}{chapter.2}% 18
+\BOOKMARK [2][-]{subsection.2.4.1}{Overview}{section.2.4}% 19
+\BOOKMARK [2][-]{subsection.2.4.2}{Dashboard}{section.2.4}% 20
+\BOOKMARK [2][-]{subsection.2.4.3}{Course Pages}{section.2.4}% 21
+\BOOKMARK [2][-]{subsection.2.4.4}{Forums}{section.2.4}% 22
+\BOOKMARK [2][-]{subsection.2.4.5}{Performance and Accessibility}{section.2.4}% 23
+\BOOKMARK [2][-]{subsection.2.4.6}{Data Migration}{section.2.4}% 24
+\BOOKMARK [2][-]{subsection.2.4.7}{Conclusion}{section.2.4}% 25
+\BOOKMARK [1][-]{section.2.5}{Edmodo}{chapter.2}% 26
+\BOOKMARK [2][-]{subsection.2.5.1}{Overview}{section.2.5}% 27
+\BOOKMARK [2][-]{subsection.2.5.2}{Dashboard}{section.2.5}% 28
+\BOOKMARK [2][-]{subsection.2.5.3}{Assignments and quizzes}{section.2.5}% 29
+\BOOKMARK [2][-]{subsection.2.5.4}{Data migration}{section.2.5}% 30
+\BOOKMARK [2][-]{subsection.2.5.5}{Conclusion}{section.2.5}% 31
+\BOOKMARK [1][-]{section.2.6}{WebCMS}{chapter.2}% 32
+\BOOKMARK [2][-]{subsection.2.6.1}{Enrolments}{section.2.6}% 33
+\BOOKMARK [2][-]{subsection.2.6.2}{Course Page Feed}{section.2.6}% 34
+\BOOKMARK [2][-]{subsection.2.6.3}{Email Notifications}{section.2.6}% 35
+\BOOKMARK [2][-]{subsection.2.6.4}{Quiz and Assignment System}{section.2.6}% 36
+\BOOKMARK [2][-]{subsection.2.6.5}{Display Content}{section.2.6}% 37
+\BOOKMARK [2][-]{subsection.2.6.6}{Gradebook and Profile}{section.2.6}% 38
+\BOOKMARK [2][-]{subsection.2.6.7}{Admin Functionalities}{section.2.6}% 39
+\BOOKMARK [2][-]{subsection.2.6.8}{Conclusion}{section.2.6}% 40
+\BOOKMARK [0][-]{chapter.3}{Project Plan}{}% 41
+\BOOKMARK [1][-]{section.3.1}{Topic Tree}{chapter.3}% 42
+\BOOKMARK [2][-]{subsection.3.1.1}{Overview}{section.3.1}% 43
+\BOOKMARK [2][-]{subsection.3.1.2}{UI/UX}{section.3.1}% 44
+\BOOKMARK [2][-]{subsection.3.1.3}{Requirements}{section.3.1}% 45
+\BOOKMARK [2][-]{subsection.3.1.4}{Functional Requirements}{section.3.1}% 46
+\BOOKMARK [2][-]{subsection.3.1.5}{Timeline}{section.3.1}% 47
+\BOOKMARK [2][-]{subsection.3.1.6}{Milestones}{section.3.1}% 48
+\BOOKMARK [2][-]{subsection.3.1.7}{Evaluation}{section.3.1}% 49
+\BOOKMARK [1][-]{section.3.2}{Course Pages}{chapter.3}% 50
+\BOOKMARK [2][-]{subsection.3.2.1}{Overview}{section.3.2}% 51
+\BOOKMARK [2][-]{subsection.3.2.2}{Pages}{section.3.2}% 52
+\BOOKMARK [2][-]{subsection.3.2.3}{Requirements}{section.3.2}% 53
+\BOOKMARK [2][-]{subsection.3.2.4}{Timeline and Milestones}{section.3.2}% 54
+\BOOKMARK [2][-]{subsection.3.2.5}{Evaluation}{section.3.2}% 55
+\BOOKMARK [1][-]{section.3.3}{Forums}{chapter.3}% 56
+\BOOKMARK [2][-]{subsection.3.3.1}{Overview}{section.3.3}% 57
+\BOOKMARK [2][-]{subsection.3.3.2}{Requirements}{section.3.3}% 58
+\BOOKMARK [2][-]{subsection.3.3.3}{Backend Assumptions}{section.3.3}% 59
+\BOOKMARK [2][-]{subsection.3.3.4}{Evaluation}{section.3.3}% 60
+\BOOKMARK [2][-]{subsection.3.3.5}{Project Timeline}{section.3.3}% 61
+\BOOKMARK [1][-]{section.3.4}{Assessments}{chapter.3}% 62
+\BOOKMARK [2][-]{subsection.3.4.1}{Overview}{section.3.4}% 63
+\BOOKMARK [2][-]{subsection.3.4.2}{Stakeholders}{section.3.4}% 64
+\BOOKMARK [2][-]{subsection.3.4.3}{Functional Requirements}{section.3.4}% 65
+\BOOKMARK [2][-]{subsection.3.4.4}{Non-functional Requirements}{section.3.4}% 66
+\BOOKMARK [1][-]{section.3.5}{Required Training/Upskilling}{chapter.3}% 67
+\BOOKMARK [2][-]{subsection.3.5.1}{Back-end Assumptions}{section.3.5}% 68
+\BOOKMARK [2][-]{subsection.3.5.2}{Front-end Assumptions}{section.3.5}% 69
+\BOOKMARK [1][-]{section.3.6}{Timeline}{chapter.3}% 70
+\BOOKMARK [2][-]{subsection.3.6.1}{Term 1 \(Thesis A\)}{section.3.6}% 71
+\BOOKMARK [2][-]{subsection.3.6.2}{Term 2 \(Thesis B\)}{section.3.6}% 72
+\BOOKMARK [2][-]{subsection.3.6.3}{Term 3 \(Thesis C\)}{section.3.6}% 73
+\BOOKMARK [2][-]{subsection.3.6.4}{Evaluation}{section.3.6}% 74
+\BOOKMARK [0][-]{chapter.4}{Conclusion}{}% 75
+\BOOKMARK [1][-]{section.4.1}{Future Work}{chapter.4}% 76
+\BOOKMARK [0][-]{section.4.1}{Bibliography}{}% 77

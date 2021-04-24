@@ -1,15 +1,46 @@
-\begin{thebibliography}{Opeb}
+\begin{thebibliography}{Mood}
 
 \bibitem[Ell12]{lmsdefinition}
 Ryann Ellis.
 \newblock Field guide to learning management.
 \newblock {\em ASTD Learning Circuits}, 2012.
 
+\bibitem[eTh]{moodleIntro}
+eThink.
+\newblock What is moodle™? the comprehensive moodle™ learning management
+  system (lms) guide.
+\newblock \url{https://ethinkeducation.com/what-is-moodle-guide/}.
+\newblock Accessed: 2021-03-16.
+
 \bibitem[Goo]{googleLighthouse}
 Google.
 \newblock Lighthouse - tools for web developers - google developers.
 \newblock \url{https://developers.google.com/web/tools/lighthouse}.
 \newblock Accessed: 2021-04-23.
+
+\bibitem[Mooa]{moodleBackupAndRestore}
+Moodle.
+\newblock Backup and restore faq.
+\newblock \url{https://docs.moodle.org/310/en/Backup_and_restore_FAQ}.
+\newblock Accessed: 2021-03-16.
+
+\bibitem[Moob]{moodleBackup}
+Moodle.
+\newblock Course backup.
+\newblock \url{https://docs.moodle.org/310/en/Course_backup}.
+\newblock Accessed: 2021-03-16.
+
+\bibitem[Mooc]{moodleRestore}
+Moodle.
+\newblock Course restore.
+\newblock \url{https://docs.moodle.org/310/en/Course_restoreQ}.
+\newblock Accessed: 2021-03-16.
+
+\bibitem[Mood]{moodleLMS}
+Moodle.
+\newblock Moodle lms.
+\newblock \url{https://moodle.com/lms/}.
+\newblock Accessed: 2021-03-16.
 
 \bibitem[Opea]{openlearning}
 OpenLearning.
