@@ -1,4 +1,17 @@
-\begin{thebibliography}{Mood}
+\begin{thebibliography}{Edmb}
+
+\bibitem[Edma]{edmodoLMS}
+Edmodo.
+\newblock Edmodo.
+\newblock \url{https://new.edmodo.com}.
+\newblock Accessed: 2021-03-17.
+
+\bibitem[Edmb]{edmodoGamification}
+Edmodo.
+\newblock Introducing jumpstart activity studio on edmodo.
+\newblock
+  \url{https://go.edmodo.com/introducing-jumpstart-activity-studio-on-edmodo}.
+\newblock Accessed: 2021-03-17.
 
 \bibitem[Ell12]{lmsdefinition}
 Ryann Ellis.
@@ -67,5 +80,17 @@ ProductPlan.
 \newblock Moscow prioritization.
 \newblock \url{https://www.productplan.com/glossary/moscow-prioritization/}.
 \newblock Accessed: 2021-04-30.
+
+\bibitem[SCO]{scormExplained}
+SCORM.com.
+\newblock Scorm explained: In depth review of the scorm elearning standard.
+\newblock \url{https://scorm.com/scorm-explained}.
+\newblock Accessed: 2021-03-20.
+
+\bibitem[Wik]{edmodoAbout}
+Wikipedia.
+\newblock Edmodowikipedia.
+\newblock \url{https://en.wikipedia.org/wiki/Edmodo}.
+\newblock Accessed: 2021-03-17.
 
 \end{thebibliography}
