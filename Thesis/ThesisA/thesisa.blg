@@ -1,64 +1,54 @@
-This is BibTeX, Version 0.99d
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: thesisa.aux
-Reallocating 'name_of_file' (item size: 1) to 13 items.
 A level-1 auxiliary file: abstract.aux
-Reallocating 'name_of_file' (item size: 1) to 21 items.
 A level-1 auxiliary file: acknowledgements.aux
-Reallocating 'name_of_file' (item size: 1) to 18 items.
 A level-1 auxiliary file: contributions.aux
-Reallocating 'name_of_file' (item size: 1) to 18 items.
 A level-1 auxiliary file: abbreviations.aux
-Reallocating 'name_of_file' (item size: 1) to 17 items.
 A level-1 auxiliary file: introduction.aux
-Reallocating 'name_of_file' (item size: 1) to 15 items.
 A level-1 auxiliary file: background.aux
-Reallocating 'name_of_file' (item size: 1) to 11 items.
 A level-1 auxiliary file: mywork.aux
-Reallocating 'name_of_file' (item size: 1) to 15 items.
 A level-1 auxiliary file: conclusion.aux
-Reallocating 'name_of_file' (item size: 1) to 6 items.
 The style file: alpha.bst
-Reallocating 'name_of_file' (item size: 1) to 5 items.
 Database file #1: pubs.bib
-You've used 15 entries,
+You've used 18 entries,
             2543 wiz_defined-function locations,
-            637 strings with 6453 characters,
-and the built_in function-call counts, 4098 in all, are:
-= -- 402
-> -- 120
-< -- 15
-+ -- 36
-- -- 30
-* -- 155
-:= -- 665
-add.period$ -- 58
-call.type$ -- 15
-change.case$ -- 75
-chr.to.int$ -- 9
-cite$ -- 15
-duplicate$ -- 168
-empty$ -- 371
-format.name$ -- 60
-if$ -- 864
-int.to.chr$ -- 7
+            652 strings with 7089 characters,
+and the built_in function-call counts, 4923 in all, are:
+= -- 485
+> -- 144
+< -- 18
++ -- 43
+- -- 36
+* -- 183
+:= -- 788
+add.period$ -- 71
+call.type$ -- 18
+change.case$ -- 90
+chr.to.int$ -- 11
+cite$ -- 18
+duplicate$ -- 198
+empty$ -- 451
+format.name$ -- 72
+if$ -- 1045
+int.to.chr$ -- 8
 int.to.str$ -- 0
-missing$ -- 1
-newline$ -- 91
-num.names$ -- 45
-pop$ -- 185
+missing$ -- 0
+newline$ -- 110
+num.names$ -- 54
+pop$ -- 228
 preamble$ -- 1
-purify$ -- 90
+purify$ -- 108
 quote$ -- 0
-skip$ -- 105
+skip$ -- 126
 stack$ -- 0
-substring$ -- 105
-swap$ -- 15
-text.length$ -- 15
-text.prefix$ -- 15
+substring$ -- 126
+swap$ -- 18
+text.length$ -- 18
+text.prefix$ -- 18
 top$ -- 0
-type$ -- 120
+type$ -- 144
 warning$ -- 0
-while$ -- 30
-width$ -- 21
-write$ -- 194
+while$ -- 36
+width$ -- 22
+write$ -- 235
