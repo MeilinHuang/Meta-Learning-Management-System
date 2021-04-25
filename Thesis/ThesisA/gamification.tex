@@ -41,16 +41,16 @@ Since the backend for the Meta LMS is being built out independently to the indiv
 The above outlines the learning structure for the gamification feature. This includes Core Knowledge modules that can be set as objectives for the week. Academics can customise the content and the number of these core knowledge modules which should be broken down by topics (E.g. Variables, Arrays, Loops). The Challenge module allows academics to create challenging practical exercises for students to apply their knowledge learnt in core knowledge modules. Academics can set the rewards and achievements that students will earn in each of the different modules. These rewards will allow the system to automatically produce leaderboards and in game prompts to drive a competitive environment.
 
 \subsubsection{Core Knowledge Modules}
-Core Knowledge modules will have functionality to add video content, content from webpage as well as pdf content. After these content, several game types can be added (MCQ, True/False, Coding Questions) to test the knowledge students just learnt. 
+Core Knowledge modules will have functionality to add video content, content from webpage as well as pdf content. After these content, several game types can be added (MCQ, True/False, Coding Questions) to test the knowledge students just learnt. Core Knowledge modules can be set as prerequisite for challenges and allow the students to earn reward points as well. Core Knowledge modules will be used to introduce specific topics through short videos followed by questions to test the newly gained knowledge. 
 
 \subsubsection{Challenge Modules}
 Challenges are more challenging timed games where students need to apply the core knowledge in various ways to earn points. This reinforces and simulates a review of the core knowledge. Challenges are timed levels with a higher difficulty level but provide students with the most rewards based on their performance (Time Taken and Accuracy Of Answers).
 
 \subsubsection{Reward System}
-
+In Core Knowledge and Challenge modules, students can earn points based on their accuracy in answering questions under time pressure. The number of points earned per activity can be customised by course admin. These points will be recorded for modules, weeks and all time to generate leaderboards. Based on points earned and certain criteria, the platform can issue an achievement that is unique and only be earned once per course. These achievements can be customised by the course admin. Students will be able to use the points earned to redeem items that will help them earn more points. Some examples: x2 points for 1 hour. 
 
 \subsubsection{Game Types}
-
+Game Types in scope are Timed or Untimed multiple choice questions, True / False questions as well as coding questions (through integrated text editor). The game type structures pull data from the meta-lms database that are related to their specific data structure. Course admins will be able to create, customise and choose reward parameters for each game type. This feature will be implemented to be easily modified to include more game types in the future.
 
 \subsubsection{Student Frontend Requirements}
 \begin{enumerate}
@@ -61,6 +61,7 @@ Challenges are more challenging timed games where students need to apply the cor
     \item As a Student, I need to be able to view all my enrolled courses and access weekly activities. (Course)
     \item As a Student, I need to be able to monitor my progress compared to other students. (Course)
     \item As a Student, I need to be able to see my achievements and reward points. (Rewards)
+    \item As a Student, I need to be able to see my leaderboard rankings compared to my peers. (Rewards)
 \end{enumerate}
 
 \subsubsection{Academic Frontend Requirements}
@@ -76,17 +77,14 @@ Challenges are more challenging timed games where students need to apply the cor
 \newpage
 
 \subsubsection{Backend Requirements}
-The main database table required for this component is one to store all the forum posts.
-This would include all the post details including author, title, description, date created and tags.
-It would also need to have a way to keep track of the replies and comments left on the forum post.
-This could either be done by having separate tables for replies and comments, or by storing a list of replies and comments within each forum post entry.
-For each of the forum posts, the author would need to be linked to a user in the user table of the database.
+Gamification Feature will require some backend connections to the meta-lms to setup for integration of permissions, content and results.
+This feature will also need backend functions that will enable setup and customisation of courses, modules and student profiles.
 
 \begin{enumerate}
-    \item Retrieve a list of courses
-    \item Retrieve a list of all or course levels
+    \item Retrieve a list of students enrolled in course from meta-lms
+    \item Retrieve a list of all or courses in meta-lms
     \item Retrieve a list of all or course games
-    \item Retrieve a list of 
+    \item Retrieve a list of levels in 
     \item Retrieve individual post details for post page (including comments and responses)
     \item Store new post details
     \item Store post responses
@@ -116,6 +114,7 @@ To evaluate the quality of the implementation, the gamification feature must be 
 
 On completion of a working prototype of the meta-lms gamification feature, we will conduct user testing that will help to refine and iron out issues with the platform. The user testing will include hands-on interaction with the prototype running through various use cases on the gamified lms. Upon completion we will utilise the feedback from user testing to refine the platform. Success of the thesis will determine completion of the gamified LMS feature with positive user feedback for the platform.
 
+\newpage
 
 \subsection{Project Timeline}
 Below is a rough guideline of some milestones that should be met throughout the year in order to complete this feature on time.
