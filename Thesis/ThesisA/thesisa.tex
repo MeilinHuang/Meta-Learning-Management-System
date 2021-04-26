@@ -1,5 +1,8 @@
-
-\documentclass[]{unswthesis}
+\documentclass[singlespacing]{unswthesis}
+\usepackage{graphicx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\graphicspath{ {./images/} }
 
 %%% Class options:
 
@@ -17,11 +20,11 @@
 
 
 %% Thesis details
-\thesistitle{Requirements to theses submitted in the Faculty of Engineering}
+\thesistitle{A Meta Learning Management System}
 \thesisschool{School of Computer Science and Engineering}
 \thesisauthor{My Name}
 \thesistopic{Meta Learning Management System}  % for undergrad theses only
-\thesisdegree{Bachelor of Engineering}
+\thesisdegree{Bachelor of Engineering (Honours)}
 %\thesisdegree{Doctor of Philosophy}
 \thesisdate{January 1970}
 \thesissupervisor{A/Prof.\ Person}% for undergrad theses only
@@ -39,11 +42,12 @@
 
 \include{abstract}
 \include{acknowledgements}
+\include{contributions}
 \include{abbreviations}
 
 \tableofcontents
-% \listoffigures  % if required
-% \listoftables  % if required
+%\listoffigures  % if required
+%\listoftables  % if required
 
 %% pages in the ``mainmatter'' section have arabic page numbers and chapters are numbered
 \mainmatter
@@ -51,15 +55,17 @@
 \include{introduction}
 \include{background}
 \include{mywork}
-\include{evaluation}
 \include{conclusion}
 
 %% chapters in the ``backmatter'' section do not have chapter numbering
 %% text in the ``backmatter'' is single spaced
-\backmatter
+%%\backmatter
 \bibliographystyle{alpha}
-\bibliography{pubs}
 
+\bibliography{pubs} %There is any isssue here causing compilation issues
+
+\include{appendix1}
+\include{appendix2}
 % \include{appendix1}
 % \include{appendix2}
 
