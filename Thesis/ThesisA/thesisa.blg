@@ -1,4 +1,4 @@
-This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2020)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: thesisa.aux
 A level-1 auxiliary file: abstract.aux
@@ -10,10 +10,12 @@ A level-1 auxiliary file: background.aux
 A level-1 auxiliary file: mywork.aux
 A level-1 auxiliary file: conclusion.aux
 The style file: alpha.bst
+A level-1 auxiliary file: appendix1.aux
+A level-1 auxiliary file: appendix2.aux
 Database file #1: pubs.bib
 You've used 18 entries,
             2543 wiz_defined-function locations,
-            652 strings with 7089 characters,
+            654 strings with 7115 characters,
 and the built_in function-call counts, 4923 in all, are:
 = -- 485
 > -- 144
