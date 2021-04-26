@@ -40,6 +40,18 @@ Google.
 \newblock \url{https://web.dev/performance-scoring/}.
 \newblock Accessed: 2021-04-25.
 
+\bibitem[Ins]{insomniaTesting}
+Insomnia.
+\newblock Unit {Testing}.
+\newblock \url{https://support.insomnia.rest/article/194-unit-testing}.
+\newblock Accessed: 2021-04-26.
+
+\bibitem[{Lib}]{reactTestingLibrary}
+Testing {Library}.
+\newblock React {Testing} {Library}.
+\newblock \url{https://testing-library.com/docs/react-testing-library/intro/}.
+\newblock Accessed: 2021-04-26.
+
 \bibitem[Mooa]{moodleBackupAndRestore}
 Moodle.
 \newblock Backup and {Restore} {FAQ}.
@@ -108,6 +120,12 @@ Charles~{Sturt} {University}.
 \newblock Innovative curriculum - {Engineering}.
 \newblock \url{https://www.csu.edu.au/engineering/curriculum}.
 \newblock Accessed: 2021-04-25.
+
+\bibitem[web]{googleLighthouseAccessibility}
+web.dev.
+\newblock Lighthouse accessibility scoring.
+\newblock \url{https://web.dev/accessibility-scoring/}.
+\newblock Accessed: 2021-04-26.
 
 \bibitem[Wik]{edmodoAbout}
 Wikipedia.
