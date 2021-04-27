@@ -1,7 +1,9 @@
 \section{Gamification}
 \subsection{Overview}
-Learning Management Systems (LMS) are often only used as tools to distribute course content in various forms and act as a communication tool between course staff and students. Many LMS do not provide features that actively engage, retain and influence students for a better academic outcome.
-Gamification of LMS can achieve this through an interactive and immersive approach by applying game-like mechanics, creating a fun learning experience for students. 
+Learning Management Systems (LMS) are often only used as tools to distribute course content in various forms and act as a communication tool between course staff and students. Many LMS do not provide features that actively engage, retain and influence students for a better academic outcome. Futhermore, many LMS do not have sufficient capability to ensure content is not lost, can be easily readapted or reused and provide academics a simple flow efficiently set up interactive content. This gamification feature will focus on addressing this lack of capability in the market to provide students and academics an immersive and engaging learning experience within a wider meta-lms where content can be easily reused, readapted and monitored.
+\newline
+
+Gamification of LMS can achieve this through an interactive and immersive approach by applying game-like mechanics, creating a fun learning experience for students within an integrated environment of the meta-lms where data is tightly connected to other parts of the lms (i.e. Course Page, Forums, Assessments).
 A Gamification feature must also link seamlessly into a wider meta-lms to ensure course content can be easily retrieved, reused and updated to provide a high-quality learning journey for students.
 
 \subsection{Introduction to LMS Gamification}
@@ -13,7 +15,10 @@ Through these fairly simple concepts, the gamification feature in a learning man
 
 \subsection{Goal Of Gamification Feature}
 The goal of this feature is to form a crucial component in the meta-lms to provide a reusable, customisable and seamless experience for course admins as well as a fun, interactive and immersive learning experience for students using the platform. This feature aims to implement the 3 gamification concepts of Objectives, Rewards and Competition. 
-The gamification feature will be structured into levels with Core Knowledge modules providing clear objectives for students, Challenge modules providing practical hands on practice that when combined with the reward system create a competitive environment for students. These modules will provide a level of customisation based on wider lms permissions to academics. Academics can customise the questions and question types in each module, set the correct answers as well as set the achievement / rewards that students will earn on completion.
+The gamification feature will be structured into levels with Core Knowledge modules providing clear objectives for students, Challenge modules providing practical hands on practice that when combined with the reward system create a competitive environment for students. These modules will provide a level of customisation based on wider lms permissions to academics. 
+\newline
+
+Academics can customise the questions and question types in each module, set the correct answers as well as set the achievement / rewards that students will earn on completion.
 The types of games in scope for development will be multiple-choice style (Timed and Untimed) games, True / False games and coding questions (Assessed on test suite). The feature will also enable academics to customise the levels and select the games they like to be included in their course run. The Gamification feature will be integrated into the larger meta-lms where the data is stored.
 
 \begin{itemize}
@@ -41,16 +46,20 @@ Since the backend for the Meta LMS is being built out independently to the indiv
 The above outlines the learning structure for the gamification feature. This includes Core Knowledge modules that can be set as objectives for the week. Academics can customise the content and the number of these core knowledge modules which should be broken down by topics (E.g. Variables, Arrays, Loops). The Challenge module allows academics to create challenging practical exercises for students to apply their knowledge learnt in core knowledge modules. Academics can set the rewards and achievements that students will earn in each of the different modules. These rewards will allow the system to automatically produce leaderboards and in game prompts to drive a competitive environment.
 
 \subsubsection{Core Knowledge Modules}
-Core Knowledge modules will have functionality to add video content, content from webpage as well as pdf content. After these content, several game types can be added (MCQ, True/False, Coding Questions) to test the knowledge students just learnt. Core Knowledge modules can be set as prerequisite for challenges and allow the students to earn reward points as well. Core Knowledge modules will be used to introduce specific topics through short videos followed by questions to test the newly gained knowledge. 
+Core Knowledge modules aims to present the fundumental knownledge topics in video, slides or pdf form and followed up with some simple practice to reinforce the new learnings for students.
+This sub feature will have functionality to add video content, content from webpage as well as pdf content. After these content, several game types can be added (MCQ, True/False, Coding Questions) to test the knowledge students just learnt. Core Knowledge modules can be set as prerequisite for challenges and allow the students to earn reward points as well. Core Knowledge modules will be used to introduce specific topics through short videos followed by questions to test the newly gained knowledge. 
 
 \subsubsection{Challenge Modules}
+Challenge modules aims to create interactive content that enables students to apply knowledge they learnt by providing an environment to develop their critical thinking skills.
 Challenges are more challenging timed games where students need to apply the core knowledge in various ways to earn points. This reinforces and simulates a review of the core knowledge. Challenges are timed levels with a higher difficulty level but provide students with the most rewards based on their performance (Time Taken and Accuracy Of Answers).
 
 \subsubsection{Reward System}
+The reward system aims to provide a mechanism for positive reinforcement, create a competitive environment and set some goals for students to achieve, ultimately increasing engagement and retention of students.
 In Core Knowledge and Challenge modules, students can earn points based on their accuracy in answering questions under time pressure. The number of points earned per activity can be customised by course admin. These points will be recorded for modules, weeks and all time to generate leaderboards. Based on points earned and certain criteria, the platform can issue an achievement that is unique and only be earned once per course. These achievements can be customised by the course admin. Students will be able to use the points earned to redeem items that will help them earn more points. Some examples: x2 points for 1 hour. 
 
 \subsubsection{Game Types}
-Game Types in scope are Timed or Untimed multiple choice questions, True / False questions as well as coding questions (through integrated text editor). The game type structures pull data from the meta-lms database that are related to their specific data structure. Course admins will be able to create, customise and choose reward parameters for each game type. This feature will be implemented to be easily modified to include more game types in the future.
+Game Types facilitate the assessment of student's knowledege in an interactive manner. These games should be extremely reusable and customisable.
+In scope are Timed or Untimed multiple choice questions, True / False questions as well as coding questions (through integrated text editor). The game type structures pull data from the meta-lms database that are related to their specific data structure. Course admins will be able to create, customise and choose reward parameters for each game type. This feature will be implemented to be easily modified to include more game types in the future.
 
 \subsubsection{Student Frontend Requirements}
 \begin{enumerate}
@@ -84,14 +93,17 @@ This feature will also need backend functions that will enable setup and customi
     \item Retrieve a list of students enrolled in course from meta-lms
     \item Retrieve a list of all or courses in meta-lms
     \item Retrieve a list of all or course games
-    \item Retrieve a list of levels in 
+    \item Retrieve a list of levels in course
     \item Retrieve individual post details for post page (including comments and responses)
-    \item Store new post details
-    \item Store post responses
-    \item Store post comments
-    \item Update post details when author edits post
-    \item Update response when author edits response
-    \item Update pinned post list when admin pins/unpins posts
+    \item Retrieve permissions for user
+    \item Store course
+    \item Store level
+    \item Store game
+    \item Update game
+    \item Update level
+    \item Update course
+    \item Update user rewards
+    \item Update permissions for user
 \end{enumerate}
 
 \subsection{Software Development Approach}

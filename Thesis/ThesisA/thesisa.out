@@ -18,7 +18,7 @@
 \BOOKMARK [2][-]{subsection.2.3.5}{Forum and Commenting}{section.2.3}% 18
 \BOOKMARK [2][-]{subsection.2.3.6}{Data Migration}{section.2.3}% 19
 \BOOKMARK [2][-]{subsection.2.3.7}{Conclusion}{section.2.3}% 20
-\BOOKMARK [1][-]{section.2.4}{Moodle}{chapter.2}% 21
+\BOOKMARK [1][-]{section.2.4}{Moodle \(https://moodle.com/\)}{chapter.2}% 21
 \BOOKMARK [2][-]{subsection.2.4.1}{Overview}{section.2.4}% 22
 \BOOKMARK [2][-]{subsection.2.4.2}{Dashboard}{section.2.4}% 23
 \BOOKMARK [2][-]{subsection.2.4.3}{Course Pages}{section.2.4}% 24
@@ -41,44 +41,69 @@
 \BOOKMARK [2][-]{subsection.2.6.6}{Gradebook and Profile}{section.2.6}% 41
 \BOOKMARK [2][-]{subsection.2.6.7}{Admin Functionalities}{section.2.6}% 42
 \BOOKMARK [2][-]{subsection.2.6.8}{Conclusion}{section.2.6}% 43
-\BOOKMARK [0][-]{chapter.3}{Project Plan}{}% 44
-\BOOKMARK [1][-]{section.3.1}{Topic Tree}{chapter.3}% 45
-\BOOKMARK [2][-]{subsection.3.1.1}{Overview}{section.3.1}% 46
-\BOOKMARK [2][-]{subsection.3.1.2}{UI/UX}{section.3.1}% 47
-\BOOKMARK [2][-]{subsection.3.1.3}{Requirements}{section.3.1}% 48
-\BOOKMARK [2][-]{subsection.3.1.4}{Functional Requirements}{section.3.1}% 49
-\BOOKMARK [2][-]{subsection.3.1.5}{Timeline}{section.3.1}% 50
-\BOOKMARK [2][-]{subsection.3.1.6}{Milestones}{section.3.1}% 51
-\BOOKMARK [2][-]{subsection.3.1.7}{Evaluation}{section.3.1}% 52
-\BOOKMARK [1][-]{section.3.2}{Course Pages}{chapter.3}% 53
-\BOOKMARK [2][-]{subsection.3.2.1}{Overview}{section.3.2}% 54
-\BOOKMARK [2][-]{subsection.3.2.2}{Pages}{section.3.2}% 55
-\BOOKMARK [2][-]{subsection.3.2.3}{Requirements}{section.3.2}% 56
-\BOOKMARK [2][-]{subsection.3.2.4}{Timeline and Milestones}{section.3.2}% 57
-\BOOKMARK [2][-]{subsection.3.2.5}{Evaluation}{section.3.2}% 58
-\BOOKMARK [1][-]{section.3.3}{Forums}{chapter.3}% 59
-\BOOKMARK [2][-]{subsection.3.3.1}{Overview}{section.3.3}% 60
-\BOOKMARK [2][-]{subsection.3.3.2}{Requirements}{section.3.3}% 61
-\BOOKMARK [2][-]{subsection.3.3.3}{Backend Assumptions}{section.3.3}% 62
-\BOOKMARK [2][-]{subsection.3.3.4}{Evaluation}{section.3.3}% 63
-\BOOKMARK [2][-]{subsection.3.3.5}{Project Timeline}{section.3.3}% 64
-\BOOKMARK [1][-]{section.3.4}{Assessments}{chapter.3}% 65
-\BOOKMARK [2][-]{subsection.3.4.1}{Overview}{section.3.4}% 66
-\BOOKMARK [2][-]{subsection.3.4.2}{Stakeholders}{section.3.4}% 67
-\BOOKMARK [2][-]{subsection.3.4.3}{Functional Requirements}{section.3.4}% 68
-\BOOKMARK [2][-]{subsection.3.4.4}{Non-functional Requirements}{section.3.4}% 69
-\BOOKMARK [2][-]{subsection.3.4.5}{Required Training/Upskilling}{section.3.4}% 70
-\BOOKMARK [2][-]{subsection.3.4.6}{Assumptions}{section.3.4}% 71
-\BOOKMARK [2][-]{subsection.3.4.7}{Back-end Assumptions}{section.3.4}% 72
-\BOOKMARK [2][-]{subsection.3.4.8}{Timeline}{section.3.4}% 73
-\BOOKMARK [1][-]{section.3.5}{Gamification}{chapter.3}% 74
-\BOOKMARK [2][-]{subsection.3.5.1}{Overview}{section.3.5}% 75
-\BOOKMARK [2][-]{subsection.3.5.2}{Introduction to LMS Gamification}{section.3.5}% 76
-\BOOKMARK [2][-]{subsection.3.5.3}{Goal Of Gamification Feature}{section.3.5}% 77
-\BOOKMARK [2][-]{subsection.3.5.4}{Functional Requirements}{section.3.5}% 78
-\BOOKMARK [2][-]{subsection.3.5.5}{Software Development Approach}{section.3.5}% 79
-\BOOKMARK [2][-]{subsection.3.5.6}{Evaluation}{section.3.5}% 80
-\BOOKMARK [2][-]{subsection.3.5.7}{Project Timeline}{section.3.5}% 81
-\BOOKMARK [0][-]{chapter.4}{Conclusion}{}% 82
-\BOOKMARK [1][-]{section.4.1}{Future Work}{chapter.4}% 83
-\BOOKMARK [0][-]{section.4.1}{Bibliography}{}% 84
+\BOOKMARK [1][-]{section.2.7}{Canvas}{chapter.2}% 44
+\BOOKMARK [2][-]{subsection.2.7.1}{Overview}{section.2.7}% 45
+\BOOKMARK [2][-]{subsection.2.7.2}{Course Management}{section.2.7}% 46
+\BOOKMARK [2][-]{subsection.2.7.3}{Discussions}{section.2.7}% 47
+\BOOKMARK [2][-]{subsection.2.7.4}{Collaborations}{section.2.7}% 48
+\BOOKMARK [2][-]{subsection.2.7.5}{Commons}{section.2.7}% 49
+\BOOKMARK [2][-]{subsection.2.7.6}{Conferences}{section.2.7}% 50
+\BOOKMARK [0][-]{chapter.3}{Project Plan}{}% 51
+\BOOKMARK [1][-]{section.3.1}{Topic Tree}{chapter.3}% 52
+\BOOKMARK [2][-]{subsection.3.1.1}{Overview}{section.3.1}% 53
+\BOOKMARK [2][-]{subsection.3.1.2}{UI/UX}{section.3.1}% 54
+\BOOKMARK [2][-]{subsection.3.1.3}{Requirements}{section.3.1}% 55
+\BOOKMARK [2][-]{subsection.3.1.4}{Functional Requirements}{section.3.1}% 56
+\BOOKMARK [2][-]{subsection.3.1.5}{Timeline}{section.3.1}% 57
+\BOOKMARK [2][-]{subsection.3.1.6}{Milestones}{section.3.1}% 58
+\BOOKMARK [2][-]{subsection.3.1.7}{Evaluation}{section.3.1}% 59
+\BOOKMARK [1][-]{section.3.2}{Course Pages}{chapter.3}% 60
+\BOOKMARK [2][-]{subsection.3.2.1}{Overview}{section.3.2}% 61
+\BOOKMARK [2][-]{subsection.3.2.2}{Pages}{section.3.2}% 62
+\BOOKMARK [2][-]{subsection.3.2.3}{Requirements}{section.3.2}% 63
+\BOOKMARK [2][-]{subsection.3.2.4}{Timeline and Milestones}{section.3.2}% 64
+\BOOKMARK [2][-]{subsection.3.2.5}{Evaluation}{section.3.2}% 65
+\BOOKMARK [1][-]{section.3.3}{Forums}{chapter.3}% 66
+\BOOKMARK [2][-]{subsection.3.3.1}{Overview}{section.3.3}% 67
+\BOOKMARK [2][-]{subsection.3.3.2}{Requirements}{section.3.3}% 68
+\BOOKMARK [2][-]{subsection.3.3.3}{Backend Assumptions}{section.3.3}% 69
+\BOOKMARK [2][-]{subsection.3.3.4}{Evaluation}{section.3.3}% 70
+\BOOKMARK [2][-]{subsection.3.3.5}{Project Timeline}{section.3.3}% 71
+\BOOKMARK [1][-]{section.3.4}{Assessments}{chapter.3}% 72
+\BOOKMARK [2][-]{subsection.3.4.1}{Overview}{section.3.4}% 73
+\BOOKMARK [2][-]{subsection.3.4.2}{Stakeholders}{section.3.4}% 74
+\BOOKMARK [2][-]{subsection.3.4.3}{Functional Requirements}{section.3.4}% 75
+\BOOKMARK [2][-]{subsection.3.4.4}{Non-functional Requirements}{section.3.4}% 76
+\BOOKMARK [2][-]{subsection.3.4.5}{Required Training/Upskilling}{section.3.4}% 77
+\BOOKMARK [2][-]{subsection.3.4.6}{Assumptions}{section.3.4}% 78
+\BOOKMARK [2][-]{subsection.3.4.7}{Back-end Assumptions}{section.3.4}% 79
+\BOOKMARK [2][-]{subsection.3.4.8}{Timeline}{section.3.4}% 80
+\BOOKMARK [1][-]{section.3.5}{Gamification}{chapter.3}% 81
+\BOOKMARK [2][-]{subsection.3.5.1}{Overview}{section.3.5}% 82
+\BOOKMARK [2][-]{subsection.3.5.2}{Introduction to LMS Gamification}{section.3.5}% 83
+\BOOKMARK [2][-]{subsection.3.5.3}{Goal Of Gamification Feature}{section.3.5}% 84
+\BOOKMARK [2][-]{subsection.3.5.4}{Functional Requirements}{section.3.5}% 85
+\BOOKMARK [2][-]{subsection.3.5.5}{Software Development Approach}{section.3.5}% 86
+\BOOKMARK [2][-]{subsection.3.5.6}{Evaluation}{section.3.5}% 87
+\BOOKMARK [2][-]{subsection.3.5.7}{Project Timeline}{section.3.5}% 88
+\BOOKMARK [1][-]{section.3.6}{Lectures and Tutorials}{chapter.3}% 89
+\BOOKMARK [2][-]{subsection.3.6.1}{Overview}{section.3.6}% 90
+\BOOKMARK [2][-]{subsection.3.6.2}{Design}{section.3.6}% 91
+\BOOKMARK [2][-]{subsection.3.6.3}{Requirements}{section.3.6}% 92
+\BOOKMARK [2][-]{subsection.3.6.4}{Functional Requirements}{section.3.6}% 93
+\BOOKMARK [2][-]{subsection.3.6.5}{Non-Functional Requirements}{section.3.6}% 94
+\BOOKMARK [2][-]{subsection.3.6.6}{Timeline}{section.3.6}% 95
+\BOOKMARK [2][-]{subsection.3.6.7}{Milestones}{section.3.6}% 96
+\BOOKMARK [2][-]{subsection.3.6.8}{Evaluating Results}{section.3.6}% 97
+\BOOKMARK [1][-]{section.3.7}{Backend}{chapter.3}% 98
+\BOOKMARK [2][-]{subsection.3.7.1}{Overview}{section.3.7}% 99
+\BOOKMARK [2][-]{subsection.3.7.2}{Design}{section.3.7}% 100
+\BOOKMARK [2][-]{subsection.3.7.3}{Requirements}{section.3.7}% 101
+\BOOKMARK [2][-]{subsection.3.7.4}{Functional Requirements}{section.3.7}% 102
+\BOOKMARK [2][-]{subsection.3.7.5}{Non-Functional Requirements}{section.3.7}% 103
+\BOOKMARK [2][-]{subsection.3.7.6}{Timeline}{section.3.7}% 104
+\BOOKMARK [2][-]{subsection.3.7.7}{Milestones}{section.3.7}% 105
+\BOOKMARK [2][-]{subsection.3.7.8}{Evaluating Results}{section.3.7}% 106
+\BOOKMARK [0][-]{chapter.4}{Conclusion}{}% 107
+\BOOKMARK [1][-]{section.4.1}{Additional features}{chapter.4}% 108
+\BOOKMARK [0][-]{section.4.1}{Bibliography}{}% 109
