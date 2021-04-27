@@ -5,8 +5,10 @@ Most learning management systems do not have a simple and easy method to import 
 This new LMS will have a new topic tree feature, which will allow teachers and academics to add course material under a specific topic instead.\\
 Each topic will have prequisites of other topics, for example the topic Graphs will be a prequisite for the topic Depth first Search.\\
 
-\textbf{Topics}
-A topic is a collection of course material that is related to a particular subject. For example, in UNSW's Introduction to Programming course (COMP1511), one of the topics in the course is "Pointers", which contains all course material related to pointers. Instructors can choose what constitutes as a topic, but a topic in this case is part of the course material of an entire course - it does not constitute all the course material of a single course. For example, there is no topic called "Introduction to Programming" or "COMP1511" as that is virtually unusable as not all of this content would be imported into another course.
+\textbf{Topics} \\
+A topic is a collection of educational material that is related to a particular subject. For example, in UNSW's Introduction to Programming course (COMP1511), one of the topics in the course is ``Pointers", which contains all course material related to pointers.\\
+
+At Charles Sturt University, each topic is defined as a small subject that is three hours in length \cite{csutopictree}. CSU's curriculum covers around 1000 topics with each topic being three hours in length for a degree. In this thesis, we will also define a topic being three hours of content, but instructors can choose what amount of content constitutes as a topic.\\
 
 
 \begin{figure}[h!]
@@ -23,23 +25,26 @@ Specific courses in this new LMS would be created by choosing the topics this ne
 \subsection{UI/UX}
 The UI for the topic tree involves two different views of the topic tree - a graph view and a traditional view. The graph view will be the focus of the LMS, as it will allow instructors to visualise the prerequisities between topics easily. However if time permits, a traditional interface will be implemented as well in Thesis C, with an option to switch between the two views. This traditional interface will be easier to use for some users, as it is similar to typical interfaces and a graph interface may be too confusing to use.\\
 
+\newpage
 \textbf{Graph Interface}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.6]{topic-tree-graph-view}
+    \includegraphics[scale=0.4]{topic-tree-graph-view}
     \caption{Topic Groups Graph UI}
 \end{figure}
 
-This is a mockup of a possible graph UI. Arrows indicate prerequisites, as in this example Memory is required to be learnt in order to learn about Pointers. This will be the default view of the topic tree, and a modal will open to display content for a specific topic when the "View Content" button is clicked. Topics will be grouped together - in this example, "Introduction to Programming" would be the name of this group of topics, and would be represented as a "region" of the topic tree.
+This is a mockup of a possible graph UI. Arrows indicate prerequisites, as in this example Memory is required to be learnt in order to learn about Pointers. This will be the default view of the topic tree, and a modal will open to display content for a specific topic when the ``View Content" button is clicked. Topics will be grouped together - in this example, ``Introduction to Programming" would be the name of this group of topics, and would be represented as a ``region" of the topic tree.
 
-\textbf{Traditional Interface}
+\textbf{Traditional Interface}\\
 The following mockups show what a traditional interface could look like, and will be changed and improved upon in the future.\\
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.6]{topic-tree-groups-list}
+    \includegraphics[scale=0.4]{topic-tree-groups-list}
     \caption{Topic Groups UI}
 \end{figure}
+
+\newpage
 
 Each group of topics is listed in card format. The topics in each group can be viewed by clicking on the topic.\\
 
@@ -48,7 +53,6 @@ Each group of topics is listed in card format. The topics in each group can be v
     \includegraphics[scale=0.4]{topic-tree-group}
     \caption{Topic Group - C Programming Example}
 \end{figure}
-\newpage
 
 Inside a topic group, the full list of topics inside this group is listed. Prerequisites are NOT shown here. \\
 
@@ -58,7 +62,7 @@ Inside a topic group, the full list of topics inside this group is listed. Prere
     \caption{Topic - Pointers Example}
 \end{figure}
 
-All resources for this topic are listed, and prerequisites are also listed on this page. This view is modelled after the UNSW handbook, where course prerequisites are listed as links. This topic can then be imported into a course with the import button at the bottom.\\
+All resources for this topic are listed, and prerequisites are also listed on this page. This view is modelled after the UNSW Handbook \url{https://www.handbook.unsw.edu.au/}, where course prerequisites are listed as links. This topic can then be imported into a course with the import button at the bottom.\\
 
 \subsection{Requirements}
 The requirements below are draft requirements, and will become more specific throughout the next stages of the thesis.\\
@@ -158,10 +162,17 @@ Major milestones for the topic tree feature include: \\
 \end{enumerate}
 
 \subsection{Evaluation}
-In order to evaluate how well the feature has met its requirements and achieved its purpose, a criteria will be proposed. In addition to meeting its requirements, the feature will also be assessed in several areas:
-\begin{enumerate}
-    \item Performance - Whether the topic tree feature is fast and responsive
-    \item Accessibility - Can a wide array of users use the topic tree easily (including people with disabilities, etc.)
-    \item UI/UX - Is the feature easy to use and attractive
-    \item Errors - Is the feature bug and error free
-\end{enumerate}
+In order to evaluate how well the feature has met its requirements and achieved its purpose, a criteria will be proposed. \\
+
+This feature will be evaluated in several areas:\\
+\textbf{Functional Requirements} \\
+The feature must meet all of its functional requirements to ensure that the feature is complete and meets its purpose. Higher priority requirements must be completed before lower priority requirements. Testing tools and data will be used in order to assess its functionality, using tools such as React Testing Library \cite{reactTestingLibrary} and Insomnia Unit Testing \cite{insomniaTesting}.\\
+
+\textbf{Performance} \\
+Performance must be high and the feature must be responsive to provide a high quality user experience for both academics and students. Performance will be assessed using tools such as Google Lighthouse \cite{googleLighthouse}. Google Lighthouse uses several metrics to assess performance, as explained previously. \\
+
+\textbf{Accessibility} \\
+The topic tree feature will also be assessed on how accessible the interface is. If features such as alt tags, high contrast colours and keyboard navigation are not implemented then not all academics and students will be able to use the topic tree feature. Therefore, tools such as Google Lighthouse will be used to access its accessibility as the tool also includes metrics for measuring accessibility of a website \cite{googleLighthouseAccessibility}. \\
+
+\textbf{Usability} \\
+Finally, the feature will be assessed on its usability. This includes whether the topic tree feature is attractive and easy to use. Various students and academics will be surveyed on how easy they found the system to use. The number of errors and time taken to complete a task will also be assessed.\\

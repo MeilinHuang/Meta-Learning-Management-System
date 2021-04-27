@@ -438,7 +438,7 @@ Graduate Research.
 	    \vskip 0pt plus 8fill%
 	    {\largeboldcoverpagefont \ThesisTitle \par}%
             \vskip 0pt plus 8fill
-	    Thesis submitted as a requirement for the degree of\\[1ex]
+	    Thesis submitted as a partial requirement for the degree of\\[1ex]
             \ThesisDegreeName \par%
             \begin{tabular}{ c c c }
               Allen Wu & z5205003 & Software Engineering \\

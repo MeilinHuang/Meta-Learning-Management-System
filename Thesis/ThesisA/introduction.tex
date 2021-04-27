@@ -1,14 +1,14 @@
 \chapter{Introduction}\label{ch:intro}
 
 \section{Motivation}
-A learning management system is a software system that administers, documents, facilitates and tracks the progress of educational courses, training programs, and more. They are mostly deployed by educational institutions such as universities and schools, but are also used at corporate institutions to facilitate training programs\cite{lmsdefinition}. \\
+A learning management system is a software system that administers, documents, facilitates and tracks the progress of educational courses, training programs, and more. They are mostly deployed by educational institutions such as universities and schools, but are also used at corporate institutions to facilitate training programs\cite{lmsdefinition}. A learning management system helps academics create and organise course materials, track students' progress, improves communication between academics and students and helps facilitate remote learning, which is especially important with the pandemic \cite{lmsreasons}. Students will have easier access to course resources and can also track what assessments are due, as well as communicate with other students of the same course.\\
 
 This thesis will focus on learning management systems (LMS) that are deployed at institutions. There are a wide range of learning management systems available, such as Moodle, WebCMS, Edmodo, OpenLearning, and more that will be looked at in this thesis, however most do not allow for easy reuse and management of content and do not provide good import or export functionality of educational material. Some provide simple functionality of reusing materials from the same course in a new offering of the course, but if a new course is created from scratch it can be difficult to import material from other courses.\\
 
 Most LMS also do not provide key features such as searchable forums or a polished UI, and so some instructors will look at using other software platforms in conjunction with the learning management system, such as Ed or Piazza. This can degrade the learning experience for students, and make it more difficult to facilitate student learning.\\
 
 \section{Learning Management System}
-This learning management system aims to provide easier reuse of content and an improved structure of content for instructors. Instructors will upload content to a "topic", a subject that students will learn about. For example, a COMP1511 (Introduction to Programming) instructor would upload content about pointers to a topic called "Pointers". Topics can have prerequisites, for example to learn the topic called pointers, students must learn about "Memory in C". This allows instructors to easily import content into new courses, improving reuse of content and providing structure to content, making it faster to create and manage courses.\\
+This learning management system aims to provide easier reuse of content and an improved structure of content for instructors. Instructors will upload content to a ``topic", a subject that students will learn about. For example, a COMP1511 (Introduction to Programming) instructor would upload content about pointers to a topic called ``Pointers". Topics can have prerequisites, for example to learn the topic called pointers, students must learn about ``Memory in C". This allows instructors to easily import content into new courses, improving reuse of content and providing structure to content, making it faster to create and manage courses.\\
 The Meta LMS will be built collaboratively, with students developing their own features of the LMS and collaborating to integrate it into the system. This is explained further in the contributions section of this thesis. \\
 Features such as the topic tree, exam management and third party integration will help improve course management for instructors. Similarly, features such as gamification, assessment notifications and forums also help improve students' learning by facilitating student learning.\\
 
@@ -19,3 +19,30 @@ This report has considered a comprehensive set of features that we plan on imple
 These features were developed through analysing other LMS’s which are compiled in our literature review.
 The literature review provides a basis in which to analyse other competitors and understand their design principles and implementation.
 Through the literature review a set of features for the designed meta LMS are planned in which further the aims for developing a meta LMS.
+
+\section{Contributions}
+This Meta LMS will be developed in sections, with the backend team working with everyone to integrate each feature into the overall system. Each feature has a lead but most features have multiple people contributing. These features include:
+
+\textbf{Accounts} - \textbf{Daniel Ferraro} \\
+Accounts involve user management, logging in and registering users. A secure form of authentication must be chosen, and users should be logged in automatically if they have previously logged in. \\
+
+\textbf{Assessments} - \textbf{Emily Ngo} \\
+Assessments involve quizzes, viewing grades, displaying user progress and assignment management. Academics will be able to control when to release grades and quizzes can open and close at certain times. \\
+
+\textbf{Backend} - \textbf{David Nguyen} and Daniel Ferraro \\
+Backend involves working with the rest of the team to integrate each feature with the whole LMS. An API will be set up using tools listed in this thesis which will be used as the main form of communication between the frontend and backend. \\
+
+\textbf{Course Pages} - \textbf{Allen Wu} and Rebekah Chow \\
+Course Pages involve the home page of the LMS and course management overall. This includes course outlines and page creation. It is the place where students and academics mainly interact with the LMS and acts as the centralised page in which other components are linked, for example the lectures, tutorials and quizzes. \\
+
+\textbf{Forums} - \textbf{Rebekah Chow} \\
+Forums include how students and academics communicate through the LMS. Forums will be searchable and users can create posts and comment on other posts.\\
+
+\textbf{Gamification} - \textbf{Rason Chia} \\
+Gamification includes implementing game thinking and game mechanics into core features of the platform to provide a more interactive learning experience for students.\\
+
+\textbf{Lectures and Tutorials} - \textbf{David Nguyen} \\
+Lectures and Tutorials includes how academics will post content to the LMS, access tutorials and lecture recordings/live streams, and how students will view lecture and tutorial content.\\
+
+\textbf{Topic Tree} - \textbf{Edward Webb} and Allen Wu \\
+A topic tree feature will allow teachers and academics to add educational material under a specific topic or subject. Each topic will have prequisites of other topics, for example the topic Graphs will be a prequisite for the topic Depth first Search.
