@@ -1,5 +1,23 @@
 \begin{thebibliography}{{Ell}12}
 
+\bibitem[Bha20]{prevThesisA2}
+Apoorva~Jayesh Bhagchandani.
+\newblock {\em Building a Meta Learning Management System}.
+\newblock 2020.
+
+\bibitem[Cana]{canvasLMS}
+Canvas.
+\newblock Canvas.
+\newblock \url{https://www.instructure.com/en-au}.
+\newblock Accessed: 2021-04-12.
+
+\bibitem[Canb]{canvasCommons}
+Canvas.
+\newblock What is canvas commons?
+\newblock
+  \url{https://community.canvaslms.com/t5/Commons/What-is-Canvas-Commons/ta-p/1788}.
+\newblock Accessed: 2021-04-25.
+
 \bibitem[Edma]{edmodoLMS}
 Edmodo.
 \newblock Edmodo.
@@ -40,6 +58,18 @@ Google.
 \newblock \url{https://web.dev/performance-scoring/}.
 \newblock Accessed: 2021-04-25.
 
+\bibitem[Ins]{insomniaTesting}
+Insomnia.
+\newblock Unit {Testing}.
+\newblock \url{https://support.insomnia.rest/article/194-unit-testing}.
+\newblock Accessed: 2021-04-26.
+
+\bibitem[{Lib}]{reactTestingLibrary}
+Testing {Library}.
+\newblock React {Testing} {Library}.
+\newblock \url{https://testing-library.com/docs/react-testing-library/intro/}.
+\newblock Accessed: 2021-04-26.
+
 \bibitem[Mooa]{moodleBackupAndRestore}
 Moodle.
 \newblock Backup and {Restore} {FAQ}.
@@ -63,6 +93,11 @@ Moodle.
 \newblock Moodle {LMS}.
 \newblock \url{https://moodle.com/lms/}.
 \newblock Accessed: 2021-03-16.
+
+\bibitem[NT20]{prevThesisA1}
+Suphachabhar Nigrodhananda and Ki~Fung~Kelvin Ting.
+\newblock {\em Building a Meta Learning Management System}.
+\newblock 2020.
 
 \bibitem[Opea]{openlearning}
 OpenLearning.
@@ -109,10 +144,21 @@ Charles~{Sturt} {University}.
 \newblock \url{https://www.csu.edu.au/engineering/curriculum}.
 \newblock Accessed: 2021-04-25.
 
+\bibitem[web]{googleLighthouseAccessibility}
+web.dev.
+\newblock Lighthouse accessibility scoring.
+\newblock \url{https://web.dev/accessibility-scoring/}.
+\newblock Accessed: 2021-04-26.
+
 \bibitem[Wik]{edmodoAbout}
 Wikipedia.
 \newblock Edmodo - {Wikipedia}.
 \newblock \url{https://en.wikipedia.org/wiki/Edmodo}.
 \newblock Accessed: 2021-03-17.
+
+\bibitem[Zho20]{prevThesisA3}
+(Tammy) Xue~Qing Zhong.
+\newblock {\em Building a Meta Learning Management System}.
+\newblock 2020.
 
 \end{thebibliography}

@@ -13,44 +13,48 @@ The style file: alpha.bst
 A level-1 auxiliary file: appendix1.aux
 A level-1 auxiliary file: appendix2.aux
 Database file #1: pubs.bib
-You've used 18 entries,
+Warning--empty publisher in prevThesisA2
+Warning--empty publisher in prevThesisA1
+Warning--empty publisher in prevThesisA3
+You've used 26 entries,
             2543 wiz_defined-function locations,
-            654 strings with 7115 characters,
-and the built_in function-call counts, 4923 in all, are:
-= -- 485
-> -- 144
-< -- 18
-+ -- 43
-- -- 36
-* -- 183
-:= -- 788
-add.period$ -- 71
-call.type$ -- 18
-change.case$ -- 90
-chr.to.int$ -- 11
-cite$ -- 18
-duplicate$ -- 198
-empty$ -- 451
-format.name$ -- 72
-if$ -- 1045
-int.to.chr$ -- 8
+            690 strings with 7965 characters,
+and the built_in function-call counts, 7146 in all, are:
+= -- 692
+> -- 219
+< -- 25
++ -- 64
+- -- 56
+* -- 284
+:= -- 1145
+add.period$ -- 100
+call.type$ -- 26
+change.case$ -- 128
+chr.to.int$ -- 18
+cite$ -- 29
+duplicate$ -- 300
+empty$ -- 651
+format.name$ -- 107
+if$ -- 1508
+int.to.chr$ -- 9
 int.to.str$ -- 0
-missing$ -- 0
-newline$ -- 110
-num.names$ -- 54
-pop$ -- 228
+missing$ -- 6
+newline$ -- 155
+num.names$ -- 78
+pop$ -- 323
 preamble$ -- 1
-purify$ -- 108
+purify$ -- 157
 quote$ -- 0
-skip$ -- 126
+skip$ -- 193
 stack$ -- 0
-substring$ -- 126
-swap$ -- 18
-text.length$ -- 18
-text.prefix$ -- 18
+substring$ -- 182
+swap$ -- 26
+text.length$ -- 25
+text.prefix$ -- 25
 top$ -- 0
-type$ -- 144
-warning$ -- 0
-while$ -- 36
-width$ -- 22
-write$ -- 235
+type$ -- 196
+warning$ -- 3
+while$ -- 53
+width$ -- 29
+write$ -- 333
+(There were 3 warnings)
