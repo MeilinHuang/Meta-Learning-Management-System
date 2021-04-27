@@ -1,5 +1,23 @@
 \begin{thebibliography}{{Ell}12}
 
+\bibitem[Bha20]{prevThesisA2}
+Apoorva~Jayesh Bhagchandani.
+\newblock {\em Building a Meta Learning Management System}.
+\newblock 2020.
+
+\bibitem[Cana]{canvasLMS}
+Canvas.
+\newblock Canvas.
+\newblock \url{https://www.instructure.com/en-au}.
+\newblock Accessed: 2021-04-12.
+
+\bibitem[Canb]{canvasCommons}
+Canvas.
+\newblock What is canvas commons?
+\newblock
+  \url{https://community.canvaslms.com/t5/Commons/What-is-Canvas-Commons/ta-p/1788}.
+\newblock Accessed: 2021-04-25.
+
 \bibitem[Edma]{edmodoLMS}
 Edmodo.
 \newblock Edmodo.
@@ -76,6 +94,11 @@ Moodle.
 \newblock \url{https://moodle.com/lms/}.
 \newblock Accessed: 2021-03-16.
 
+\bibitem[NT20]{prevThesisA1}
+Suphachabhar Nigrodhananda and Ki~Fung~Kelvin Ting.
+\newblock {\em Building a Meta Learning Management System}.
+\newblock 2020.
+
 \bibitem[Opea]{openlearning}
 OpenLearning.
 \newblock About openlearning.
@@ -132,5 +155,10 @@ Wikipedia.
 \newblock Edmodo - {Wikipedia}.
 \newblock \url{https://en.wikipedia.org/wiki/Edmodo}.
 \newblock Accessed: 2021-03-17.
+
+\bibitem[Zho20]{prevThesisA3}
+(Tammy) Xue~Qing Zhong.
+\newblock {\em Building a Meta Learning Management System}.
+\newblock 2020.
 
 \end{thebibliography}
