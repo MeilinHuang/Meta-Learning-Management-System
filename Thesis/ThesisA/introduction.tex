@@ -7,8 +7,11 @@ This thesis will focus on learning management systems (LMS) that are deployed at
 
 Most LMS also do not provide key features such as searchable forums or a polished UI, and so some instructors will look at using other software platforms in conjunction with the learning management system, such as Ed or Piazza. This can degrade the learning experience for students, and make it more difficult to facilitate student learning.\\
 
-\section{Learning Management System}
-This learning management system aims to provide easier reuse of content and an improved structure of content for instructors. Instructors will upload content to a ``topic", a subject that students will learn about. For example, a COMP1511 (Introduction to Programming) instructor would upload content about pointers to a topic called ``Pointers". Topics can have prerequisites, for example to learn the topic called pointers, students must learn about ``Memory in C". This allows instructors to easily import content into new courses, improving reuse of content and providing structure to content, making it faster to create and manage courses.\\
+\section{Meta Learning Management System}
+This meta learning management system (Meta LMS) aims to provide easier reuse of content and an improved structure of content for instructors. Instructors will upload content to a ``topic", a subject that students will learn about. For example, a COMP1511 (Introduction to Programming) instructor would upload content about pointers to a topic called ``Pointers". Topics can have prerequisites, for example to learn the topic called pointers, students must learn about ``Memory in C". This allows instructors to easily import content into new courses, improving reuse of content and providing structure to content, making it faster to create and manage courses.\\
+
+This is as opposed to a traditional LMS, because a traditional LMS involves instructors adding content to a specific ``course''. Content is not added to a global repository of content and if another course uses similar content, instructors will curate new content for that course. The ``meta'' part of this LMS involves instructors importing content into their ``course'' if it already exists in this global repository.\\
+
 The Meta LMS will be built collaboratively, with students developing their own features of the LMS and collaborating to integrate it into the system. This is explained further in the contributions section of this thesis. \\
 Features such as the topic tree, exam management and third party integration will help improve course management for instructors. Similarly, features such as gamification, assessment notifications and forums also help improve students' learning by facilitating student learning.\\
 
@@ -20,7 +23,7 @@ These features were developed through analysing other LMS’s which are compiled
 The literature review provides a basis in which to analyse other competitors and understand their design principles and implementation.
 Through the literature review a set of features for the designed meta LMS are planned in which further the aims for developing a meta LMS.
 
-\section{Contributions}
+\section{Contributions for the LMS}
 This Meta LMS will be developed in sections, with the backend team working with everyone to integrate each feature into the overall system. Each feature has a lead but most features have multiple people contributing. These features include:
 
 \textbf{Accounts} - \textbf{Daniel Ferraro} \\
@@ -46,3 +49,42 @@ Lectures and Tutorials includes how academics will post content to the LMS, acce
 
 \textbf{Topic Tree} - \textbf{Edward Webb} and Allen Wu \\
 A topic tree feature will allow teachers and academics to add educational material under a specific topic or subject. Each topic will have prequisites of other topics, for example the topic Graphs will be a prequisite for the topic Depth first Search.
+
+\section{Thesis Structure}
+The overall thesis structure is detailed in the contents page, but is summarised below:
+
+\begin{enumerate}
+\item Introduction
+    \begin{enumerate}
+    \item Motivation
+    \item Meta Learning Management System
+    \item Aims
+    \item Contributions
+    \item Thesis Structure
+    \end{enumerate}
+\item Background (Literature Review)
+    \begin{enumerate}
+    \item Comparison Table
+    \item Google Classroom
+    \item OpenLearning
+    \item Moodle
+    \item Edmodo
+    \item WebCMS
+    \item Canvas
+    \item D2L Brightspace
+    \end{enumerate}
+\item Project Plan (Details on each feature)
+    \begin{enumerate}
+    \item Topic Tree
+    \item Course Pages
+    \item Forums
+    \item Assessments
+    \item Gamification
+    \item Accounts and Enrolments
+    \item System Architecture
+    \item Lectures and Tutorials
+    \item Backend
+    \item System Architecture
+    \end{enumerate}
+\item Conclusion
+\end{enumerate}
