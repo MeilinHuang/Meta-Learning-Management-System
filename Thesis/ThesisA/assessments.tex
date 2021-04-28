@@ -22,16 +22,18 @@ The core features for quizzes include being able to:
     \item timer that runs during quiz attempt
 \end{itemize}
 
-\begin{figure}[h!]
+\begin{figure}[!hbpt]
 	\centering
-	\includegraphics[scale=0.4]{assessments-quiz-creation}
-	\caption{Quiz creation (Instructor's view)}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\includegraphics[scale=0.4]{assessments-quiz-usage}
-\caption{Quiz usage (Student's view)}
+	\begin{minipage}{0.45\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{assessments-quiz-creation}
+		\caption{Quiz creation (Instructor's view)}
+	\end{minipage}\hfill
+	\begin{minipage}{0.45\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{assessments-quiz-usage}
+		\caption{Quiz usage (Student's view)}
+	\end{minipage}\hfill
 \end{figure}
 
 The core features for polls include being able to:
@@ -156,7 +158,6 @@ Training across multiple areas will be required in order to develop the Learning
 	\item Research SCORM and other standards used in learning management systems
 \end{itemize}
 
-\subsection{Assumptions}
 \subsection{Back-end Assumptions}
 The following back-end assumptions contains details of the final backend technologies used, as discussed with other Thesis A students, and general assumption of the database which data will be retrieved from via API calls. 
 
@@ -174,7 +175,7 @@ The use of a relational database will be ideal as it'll be more organised and qu
 Potential tables involved would include a Question, Poll, Quiz and User table. 
 
 
-\subsubsection{Front-end Assumptions}
+\subsection{Front-end Assumptions}
 The following front-end assumptions contains details of the final front-end technologies used, as discussed with other Thesis A students, and a breakdown of the Assessment feature to give a better insight of the implementation process.
 
 \subsubsection{Technologies Used}
@@ -200,34 +201,34 @@ Since the React frameworks structures content into re-usable, isolated component
 
 \subsection{Timeline}
 \subsubsection{Term 1 (Thesis A)}
-Term 1 will mainly focus on literature research, outlining the main and potential features required to achieve the goals of this thesis.\\
+Term 1 will mainly focus on literature research, outlining the main and potential features required to achieve the goals of this thesis.
 
-\begin{figure}[h!]
+\begin{figure}[!hbpt]
 	\centering
-	\includegraphics[scale=0.4]{assessments-thesis-a}
+	\includegraphics[scale=0.35]{assessments-thesis-a}
 	\caption{Thesis A Timeline}
 \end{figure}
 
 \subsubsection{Term 2 (Thesis B)}
-Term 2 will mainly focus on implementation of the core features and ensuring a good design overall before adding any extra features.\\
+Term 2 will mainly focus on implementation of the core features and ensuring a good design overall before adding any extra features.
 
-\begin{figure}[h!]
+\begin{figure}[!hbpt]
 	\centering
-	\includegraphics[scale=0.4]{assessments-thesis-b}
+	\includegraphics[scale=0.35]{assessments-thesis-b}
 	\caption{Thesis B Timeline}
 \end{figure}
 
 \subsubsection{Term 3 (Thesis C)}
-Term 3 will focus on improving the system based on feedback, implementing additional features and doing a final testing on the system to ensure it satisfies requirements.\\
+Term 3 will focus on improving the system based on feedback, implementing additional features and doing a final testing on the system to ensure it satisfies requirements.
 
-\begin{figure}[h!]
+\begin{figure}[!hbpt]
 	\centering
-	\includegraphics[scale=0.38]{assessments-thesis-c}
+	\includegraphics[scale=0.35]{assessments-thesis-c}
 	\caption{Thesis C Timeline}
 \end{figure}
 
 
-\subsubsection{Evaluation}
+\subsection{Evaluation}
 The system will be evaluated based on:
 \begin{itemize}
 	\item \textbf{Functional requirements} - what was completed, with the satisfactory being all ``Must Haves" and some ``Should Haves"
