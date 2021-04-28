@@ -3,14 +3,14 @@
 \section{Motivation}
 A learning management system is a software system that administers, documents, facilitates and tracks the progress of educational courses, training programs, and more. They are mostly deployed by educational institutions such as universities and schools, but are also used at corporate institutions to facilitate training programs\cite{lmsdefinition}. A learning management system helps academics create and organise course materials, track students' progress, improves communication between academics and students and helps facilitate remote learning, which is especially important with the pandemic \cite{lmsreasons}. Students will have easier access to course resources and can also track what assessments are due, as well as communicate with other students of the same course.\\
 
-This thesis will focus on learning management systems (LMS) that are deployed at institutions. There are a wide range of learning management systems available, such as Moodle, WebCMS, Edmodo, OpenLearning, and more that will be looked at in this thesis, however most do not allow for easy reuse and management of content and do not provide good import or export functionality of educational material. Some provide simple functionality of reusing materials from the same course in a new offering of the course, but if a new course is created from scratch it can be difficult to import material from other courses.\\
+This thesis will focus on learning management systems (LMS) that are deployed at institutions. There are a wide range of learning management systems available, such as Moodle, WebCMS, Edmodo, OpenLearning, and more that will be looked at in this thesis, however most do not allow for easy reuse and management of content and do not provide good import or export functionality of educational material. Some provide simple functionality of reusing materials from the same course in a new offering of the course, but if a new course is created from scratch it can be difficult to import and reuse material from other courses.\\
 
 Most LMS also do not provide key features such as searchable forums or a polished UI, and so some instructors will look at using other software platforms in conjunction with the learning management system, such as Ed or Piazza. This can degrade the learning experience for students, and make it more difficult to facilitate student learning.\\
 
 \section{Meta Learning Management System}
 This meta learning management system (Meta LMS) aims to provide easier reuse of content and an improved structure of content for instructors. Instructors will upload content to a ``topic", a subject that students will learn about. For example, a COMP1511 (Introduction to Programming) instructor would upload content about pointers to a topic called ``Pointers". Topics can have prerequisites, for example to learn the topic called pointers, students must learn about ``Memory in C". This allows instructors to easily import content into new courses, improving reuse of content and providing structure to content, making it faster to create and manage courses.\\
 
-This is as opposed to a traditional LMS, because a traditional LMS involves instructors adding content to a specific ``course''. Content is not added to a global repository of content and if another course uses similar content, instructors will curate new content for that course. The ``meta'' part of this LMS involves instructors importing content into their ``course'' if it already exists in this global repository.\\
+This is as opposed to a traditional LMS, because a traditional LMS involves instructors adding content to a specific ``course''. Content is not added to a global repository of content and if another course uses similar content, instructors will curate new content for that course. The ``meta'' part of this LMS involves instructors importing content into their ``course'' if it already exists in this global repository, and otherwise curating and uploading content to this global repository under a ``subject'' or ``topic''.\\
 
 The Meta LMS will be built collaboratively, with students developing their own features of the LMS and collaborating to integrate it into the system. This is explained further in the contributions section of this thesis. \\
 Features such as the topic tree, exam management and third party integration will help improve course management for instructors. Similarly, features such as gamification, assessment notifications and forums also help improve students' learning by facilitating student learning.\\
@@ -51,40 +51,13 @@ Lectures and Tutorials includes how academics will post content to the LMS, acce
 A topic tree feature will allow teachers and academics to add educational material under a specific topic or subject. Each topic will have prequisites of other topics, for example the topic Graphs will be a prequisite for the topic Depth first Search.
 
 \section{Thesis Structure}
-The overall thesis structure is detailed in the contents page, but is summarised below:
+The overall thesis structure includes:
 
-\begin{enumerate}
-\item Introduction
-    \begin{enumerate}
-    \item Motivation
-    \item Meta Learning Management System
-    \item Aims
-    \item Contributions
-    \item Thesis Structure
-    \end{enumerate}
-\item Background (Literature Review)
-    \begin{enumerate}
-    \item Comparison Table
-    \item Google Classroom
-    \item OpenLearning
-    \item Moodle
-    \item Edmodo
-    \item WebCMS
-    \item Canvas
-    \item D2L Brightspace
-    \end{enumerate}
-\item Project Plan (Details on each feature)
-    \begin{enumerate}
-    \item Topic Tree
-    \item Course Pages
-    \item Forums
-    \item Assessments
-    \item Gamification
-    \item Accounts and Enrolments
-    \item System Architecture
-    \item Lectures and Tutorials
-    \item Backend
-    \item System Architecture
-    \end{enumerate}
-\item Conclusion
-\end{enumerate}
+\begin{itemize}
+\item Chapter 2 - Background (Literature Review) \\
+This chapter covers the current state-of-the-art surveying several popular learning management systems available such as Moodle and WebCMS. It compares each on their features, usability and performance with a comparison table.
+\item Chapter 3 - Project Plan (Details on each feature) \\
+This chapter covers how we plan to implement the meta learning management system. Each person will be responsible for one or more features in the new LMS, with those responsible for backend and course pages to help integrate each feature into the overall system. It also details on the system architecture of the new LMS, with milestones and requirements for each feature.
+\item Chapter 4 - Conclusion \\
+This chapter concludes the thesis and includes additional features that will be planned for Thesis C if time permits.
+\end{itemize}
