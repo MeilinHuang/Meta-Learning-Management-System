@@ -1,16 +1,13 @@
-import React, { useState } from "react"
-import { Flex, Box, Input, InputGroup, InputLeftElement, Text, Center, Divider, Container, Avatar, Menu, MenuButton, MenuList, MenuItem, Portal, Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton, DrawerHeader, DrawerBody, Button, Heading} from "@chakra-ui/react"
+import React from "react"
+import { Flex, Box, Input, InputGroup, InputLeftElement, Center, Divider, Container, Avatar, Menu, MenuButton, MenuList, MenuItem, Portal, Heading} from "@chakra-ui/react"
 import { HamburgerIcon, ChevronDownIcon, ChevronRightIcon, SearchIcon } from '@chakra-ui/icons'
-import Sidebar from "./Sidebar"
 
-function Header({sideBarLinks}) {
-
-    const [isOpen, setOpen] = useState(false)
+function Header({sideBarLinks, setOpen}) {
 
     return (
-        <Box>
+        <Box height="100%">
             <Flex bg="blue.500" height={55}>
-                <Box bg="blue.400" display={["block", "block", "none"]} onClick={() => {setOpen(true)}} cursor="pointer">
+                <Box bg="blue.400" display={["block", "block", "none"]} onClick={() => {setOpen(true)}} cursor="pointer" color="white">
                     <Flex align="center" mr={5} paddingInline={5} margin={0} height="100%" width="100%">
                         <Box>
                             <ChevronRightIcon boxSize={6}></ChevronRightIcon> 
@@ -19,11 +16,11 @@ function Header({sideBarLinks}) {
                 </Box>
                 <Menu>
                     <MenuButton display={["none", "none", "block"]} bg="blue.400" width={200}>
-                        <Flex align="center" mr={5} paddingInline={5} margin={0} height="100%" width="100%">
+                        <Flex align="center" mr={5} paddingInline={5} margin={0} height="100%" width="100%" color="white">
                             <Box>
                                 <HamburgerIcon boxSize={6}></HamburgerIcon> 
                             </Box>
-                            <Text fontWeight="bold" marginLeft={2}>COMP1511</Text>
+                            <Heading size="md" fontWeight="bold" marginLeft={2}>COMP1511</Heading>
                         </Flex>
                     </MenuButton>
                     <MenuList>
@@ -49,7 +46,7 @@ function Header({sideBarLinks}) {
                                 <Flex alignItems="center">
                                     <Avatar name="Dan Abrahmov" src="https://bit.ly/dan-abramov" />
                                     <Box display={["none", "block", "block"]}>
-                                        <ChevronDownIcon boxSize={6}></ChevronDownIcon>
+                                        <ChevronDownIcon boxSize={6} color="white"></ChevronDownIcon>
                                     </Box>
                                 </Flex>
                             </MenuButton>
@@ -62,34 +59,8 @@ function Header({sideBarLinks}) {
                             </Portal>
                         </Menu>
                     </Flex>
-                </Flex>   
-                <Drawer isOpen={isOpen} placement="left" onClose={() => {setOpen(false)}}>
-                    <DrawerOverlay></DrawerOverlay>
-                    <DrawerContent>
-                        <DrawerCloseButton></DrawerCloseButton>
-                        <DrawerHeader>
-                            <Menu>
-                                <MenuButton as={Button} rightIcon={<ChevronDownIcon></ChevronDownIcon>}>
-                                    <Heading>COMP1511</Heading>
-                                </MenuButton>
-                                <MenuList>
-                                    <MenuItem>COMP1521</MenuItem>
-                                    <MenuItem>COMP1531</MenuItem>
-                                </MenuList>
-                            </Menu>
-                        </DrawerHeader>
-                        <DrawerBody>
-                            <Sidebar links={sideBarLinks}></Sidebar>
-                        </DrawerBody>
-                    </DrawerContent>
-                </Drawer>      
+                </Flex>       
             </Flex>
-            <Box display={["none", "none", "block"]} width={200}>
-                <Container margin={0} paddingInline={0} paddingTop={4}>
-                    <Sidebar links={sideBarLinks}></Sidebar>
-                    <Divider orientation="horizontal" marginTop={4}></Divider>
-                </Container>
-            </Box>
         </Box>
     )
 }
