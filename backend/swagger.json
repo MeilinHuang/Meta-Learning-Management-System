@@ -1,0 +1,236 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Meta LMS CRUD",
+    "description": "Meta LMS API",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "localhost:8000",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Topic Tree",
+      "description": "API for Topic Tree feature"
+    },
+    {
+      "name": "Forums",
+      "description": "API for Forums feature"
+    },
+    {
+      "name": "Course Pages",
+      "description": "API for Course Pages feature"
+    },
+    {
+      "name": "Gamification",
+      "description": "API for Gamification feature"
+    },
+    {
+      "name": "Assessment",
+      "description": "API for Assessment feature"
+    },
+    {
+      "name": "Lectures and Tutorials",
+      "description": "API for Lectures and Tutorials feature"
+    }
+  ],
+  "schemes": ["http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/topicGroup": {
+      "get": {
+        "tags": ["Topic Tree"],
+        "summary": "Get a list of topic groups, their information (tutorial times, course outline) and the Topic they contain",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Topic"
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{$topicGroupName}/topic": {
+      "get": {
+        "tags": ["Topic Tree"],
+        "summary": "Get list of Topic",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Topic"
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{$topicGroupName}/topic/{$topicName}/prerequisite": {
+      "get": {
+        "tags": ["Topic Tree"],
+        "summary": "Get prerequisites of topic",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Topic"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Topic Tree"],
+        "summary": "Create a new prerequisite with prerequisite in POST body",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Topic Tree"],
+        "summary": "Delete prerequisites",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/topicGroup/{$topicGroupName}": {
+      "post": {
+        "tags": ["Topic Tree"],
+        "summary": "Create a topic group",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Topic Tree"],
+        "summary": "Delete a topic group",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/topicGroup/{$topicGroupName}/topic/{$topicName}": {
+      "post": {
+        "tags": ["Topic Tree"],
+        "summary": "Create a new topic",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "delete": {
+          "tags": ["Topic Tree"],
+          "summary": "Delete a topic",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/Topic"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Topic": {
+      "required": ["name", "_id", "courseMaterials", "preRequisites"],
+      "properties": {
+        "_id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "isPublic": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string",
+          "example": "Sorting"
+        },
+        "courseMaterials": {
+          "type": "array",
+          "items": {
+            "type": "files",
+            "example": "lecture3 - bubbleSort.mp4"
+          }
+        },
+        "preRequisites": {
+          "type": "array",
+          "items": {
+            "type": "topic",
+            "example": "C++ Basics"
+          }
+        }
+      }
+    },
+    "TopicGroups": {
+      "required": ["name", "_id", "topics"],
+      "properties": {
+        "_id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "isPublic": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string",
+          "example": "Algorithms"
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "topic",
+            "example": "sorting"
+          }
+        }
+      }
+    },
+    "Prerequisites": {
+      "type": "array"
+    }
+  }
+}
