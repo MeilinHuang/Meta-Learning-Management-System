@@ -41,6 +41,57 @@
   "consumes": ["application/json"],
   "produces": ["application/json"],
   "paths": {
+    "/forum": {
+      "get": {
+        "tags": ["Forums"],
+        "summary": "Get all forum posts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetAllForumPosts"
+            }
+          }
+        }
+      }
+    },
+    "/forum/pinned": {
+      "get": {
+        "tags": ["Forums"],
+        "summary": "Get all pinned forum posts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetAllForumPosts"
+            }
+          }
+        }
+      }
+    },
+    "/forum/{$forumSearchTerm}": {
+      "get": {
+        "tags": ["Forums"],
+        "summary": "Get all forum posts related to the search query",
+        "parameters": [
+          {
+            "name": "forumSearchTerm",
+            "in": "path",
+            "required": true,
+            "description": "Search term to include all posts with the search term",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetAllForumPosts"
+            }
+          }
+        }
+      }
+    },
     "/topicGroup": {
       "get": {
         "tags": ["Topic Tree"],
@@ -523,6 +574,107 @@
                   "type": "topic",
                   "example": "N/A"
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "GetAllForumPosts": {
+      "properties": {
+        "forumPosts": {
+          "type": "array",
+          "description": "List of all forum posts",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "title": {
+                "type": "string",
+                "example": "How to start Assignment 1"
+              },
+              "author": {
+                "type": "string",
+                "example": "John Smith"
+              },
+              "publishedDate": {
+                "type": "dateTime",
+                "example": "Wed Mar 25 2015 11:00:00"
+              },
+              "description": {
+                "type": "string",
+                "example": "Lorem ipsum ipsum ipsum ipsum ipsum"
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "integer",
+                      "uniqueItems": true
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Ass1"
+                    }
+                  }
+                }
+              },
+              "replies": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "integer",
+                      "uniqueItems": true
+                    },
+                    "author": {
+                      "type": "string",
+                      "example": "Jessica Smith"
+                    },
+                    "publishedDate": {
+                      "type": "dateTime",
+                      "example": "Wed Mar 25 2015 11:23:05"
+                    },
+                    "reply": {
+                      "type": "string",
+                      "example": "Lorem lorem lorem lorem lorem lorem lorem"
+                    }
+                  }
+                }
+              },
+              "comments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "integer",
+                      "uniqueItems": true
+                    },
+                    "author": {
+                      "type": "string",
+                      "example": "Harold Jenkins"
+                    },
+                    "publishedDate": {
+                      "type": "dateTime",
+                      "example": "Wed Mar 25 2015 11:56:34"
+                    },
+                    "comment": {
+                      "type": "string",
+                      "example": "Check the assigment spec for more info"
+                    }
+                  }
+                }
+              },
+              "isPinned": {
+                "type": "boolean",
+                "example": true
               }
             }
           }
