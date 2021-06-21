@@ -49,7 +49,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Topic"
+              "$ref": "#/definitions/GetAllTopicGroups"
             }
           }
         }
@@ -58,12 +58,21 @@
     "/topicGroup/{$topicGroupName}/topic": {
       "get": {
         "tags": ["Topic Tree"],
-        "summary": "Get list of Topic",
+        "summary": "Get list of Topics",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "required": true,
+            "description": "Gets topics from topic group name",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Topic"
+              "$ref": "#/definitions/GetAllTopics"
             }
           }
         }
@@ -73,11 +82,27 @@
       "get": {
         "tags": ["Topic Tree"],
         "summary": "Get prerequisites of topic",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "required": true,
+            "description": "Name of topic group we want topics for",
+            "type": "string"
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "required": true,
+            "description": "Name of topic we want pre-requisites for",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Topic"
+              "$ref": "#/definitions/GetPreRequisites"
             }
           }
         }
@@ -85,6 +110,16 @@
       "post": {
         "tags": ["Topic Tree"],
         "summary": "Create a new prerequisite with prerequisite in POST body",
+        "parameters": [
+          {
+            "name": "Pre-Requisite",
+            "in": "body",
+            "description": "Topic with new pre-requisite(s)",
+            "schema": {
+              "$ref": "#/definitions/Topic"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -100,6 +135,22 @@
       "delete": {
         "tags": ["Topic Tree"],
         "summary": "Delete prerequisites",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "required": true,
+            "description": "Name of topic group we want topics for",
+            "type": "string"
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "required": true,
+            "description": "Name of topic we want pre-requisites to delete for",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -117,6 +168,16 @@
       "post": {
         "tags": ["Topic Tree"],
         "summary": "Create a topic group",
+        "parameters": [
+          {
+            "name": "TopicGroup",
+            "in": "body",
+            "description": "New Topic Group",
+            "schema": {
+              "$ref": "#/definitions/TopicGroup"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -132,6 +193,15 @@
       "delete": {
         "tags": ["Topic Tree"],
         "summary": "Delete a topic group",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "required": true,
+            "description": "Name of topic group we want to delete",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -149,6 +219,16 @@
       "post": {
         "tags": ["Topic Tree"],
         "summary": "Create a new topic",
+        "parameters": [
+          {
+            "name": "Topic",
+            "in": "body",
+            "description": "New Topic",
+            "schema": {
+              "$ref": "#/definitions/Topic"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -177,7 +257,6 @@
   },
   "definitions": {
     "Topic": {
-      "required": ["name", "_id", "courseMaterials", "preRequisites"],
       "properties": {
         "_id": {
           "type": "integer",
@@ -197,6 +276,13 @@
             "example": "lecture3 - bubbleSort.mp4"
           }
         },
+        "topicGroups":{
+          "type": "array",
+          "items": {
+            "type": "object",
+            "example": "Algorithm"
+          }
+        },
         "preRequisites": {
           "type": "array",
           "items": {
@@ -206,8 +292,7 @@
         }
       }
     },
-    "TopicGroups": {
-      "required": ["name", "_id", "topics"],
+    "TopicGroup": {
       "properties": {
         "_id": {
           "type": "integer",
@@ -223,14 +308,226 @@
         "topics": {
           "type": "array",
           "items": {
-            "type": "topic",
+            "type": "object",
             "example": "sorting"
+          }
+        },
+        "tutorialTimes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tutorialCode": {
+                "type": "string",
+                "example": "M18A2"
+              },
+              "timeSlot": {
+                "type": "dateTime",
+                "example": "10:00-11:00"
+              },
+              "tutor": {
+                "type": "string",
+                "example": "John Smith"
+              },
+              "enrolledStudents": {
+                "type": "array",
+                "description": "List of enrolled students in tutorial",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "Jessica Smith"
+                    },
+                    "studentId": {
+                      "type": "integer",
+                      "example": "z2183122"
+                    }
+                  }
+                }
+              },
+              "maxCapacity": {
+                "type": "integer",
+                "example": 20
+              }
+            }
+          }
+        },
+        "courseOutline": {
+          "type": "file",
+          "example": "course_outline.pdf"
+        }
+      }
+    },
+    "GetAllTopics": {
+      "properties": {
+        "topics": {
+          "type": "array",
+          "description": "List of all topics",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "isPublic": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": "string",
+                "example": "Sorting"
+              },
+              "courseMaterials": {
+                "type": "array",
+                "items": {
+                  "type": "files",
+                  "example": "lecture3 - bubbleSort.mp4"
+                }
+              },
+              "topicGroups":{
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "example": "Algorithm"
+                }
+              },
+              "preRequisites": {
+                "type": "array",
+                "items": {
+                  "type": "topic",
+                  "example": "C++ Basics"
+                }
+              }
+            }
           }
         }
       }
     },
-    "Prerequisites": {
-      "type": "array"
+    "GetAllTopicGroups": {
+      "properties": {
+        "TopicGroups": {
+          "type": "array",
+          "description": "List of all topic groups",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "isPublic": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": "string",
+                "example": "Algorithms"
+              },
+              "topics": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "example": "sorting"
+                }
+              },
+              "tutorialTimes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "tutorialCode": {
+                      "type": "string",
+                      "example": "M18A2"
+                    },
+                    "timeSlot": {
+                      "type": "dateTime",
+                      "example": "10:00-11:00"
+                    },
+                    "tutor": {
+                      "type": "string",
+                      "example": "John Smith"
+                    },
+                    "enrolledStudents": {
+                      "type": "array",
+                      "description": "List of enrolled students in tutorial",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "example": "Jessica Smith"
+                          },
+                          "studentId": {
+                            "type": "integer",
+                            "example": "z2183122"
+                          }
+                        }
+                      }
+                    },
+                    "maxCapacity": {
+                      "type": "integer",
+                      "example": 20
+                    }
+                  }
+                }
+              },
+              "courseOutline": {
+                "type": "file",
+                "example": "course_outline.pdf"
+              }
+            }
+          }
+        }
+      }
+    },
+    "GetPreRequisites": {
+      "properties": {
+        "topic": {
+          "type": "string",
+          "example": "Sorting"
+        },
+        "preRequisites": {
+          "type": "array",
+          "description": "List of pre-requisites for topic",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "isPublic": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": "string",
+                "example": "C++ Basics"
+              },
+              "courseMaterials": {
+                "type": "array",
+                "items": {
+                  "type": "files",
+                  "example": "lecture1 - data-structures.mp4"
+                }
+              },
+              "topicGroups":{
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "example": "Introductory C++"
+                }
+              },
+              "preRequisites": {
+                "type": "array",
+                "items": {
+                  "type": "topic",
+                  "example": "N/A"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
