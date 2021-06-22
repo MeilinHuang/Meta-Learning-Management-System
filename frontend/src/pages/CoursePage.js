@@ -52,9 +52,6 @@ function CoursePage() {
             <Flex>
                 <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
                 <Container marginTop={50} maxWidth="100%">
-                    {/* <Stack spacing={50}>
-                        {[...Array(3).keys()].map(e => { counter += 1; return <Skeleton key={"feed_" + counter} height="300px" ></Skeleton>})}
-                    </Stack> */}
                     <Switch>
                         <Route exact path="/forums"><ForumOverviewPage /></Route>
                     </Switch>
