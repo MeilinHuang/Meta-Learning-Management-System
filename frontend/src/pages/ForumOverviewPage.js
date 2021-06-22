@@ -11,13 +11,20 @@ import { SearchIcon } from '@chakra-ui/icons'
 import Filter from '../components/forums/Filter'
 import PostTableContainer from '../components/forums/PostTableContainer'
 
-const dummyPosts = ['post1', 'post2']
+const dummyPosts = [
+    {
+        id: 1,
+    },
+    {
+        id: 2,
+    }
+]
 
 function ForumOverviewPage() {
     return (
         <>
             <Flex justify="center">
-                <Center width={{ base: '100%', md: '70%' }}>
+                <Center width={{ base: '100%', md: '80%' }}>
                     <Button>Add Post</Button>
                     <InputGroup variant="filled" ml="24px">
                         <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>

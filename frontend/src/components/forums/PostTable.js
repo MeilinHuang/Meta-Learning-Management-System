@@ -1,5 +1,7 @@
 import React from "react"
+import { Link as RouterLink } from 'react-router-dom'
 import {
+    Link,
     Table,
     Thead,
     Tbody,
@@ -11,7 +13,7 @@ import {
 const getRow = post => {
     return (
         <Tr>
-            <Td>inches</Td>
+            <Td width="40%"><Link as={RouterLink} color="blue.500" to={`/forums/${post.id}`}>inches</Link></Td>
             <Td>millimetres (mm)</Td>
             <Td isNumeric>25.4</Td>
             <Td isNumeric>25.4</Td>

@@ -12,7 +12,7 @@ import PostTable from './PostTable'
 function PostTableContainer(props) {
     // if isAdmin then show pin/unpin logo next to each post
     return (
-        <Accordion allowMultiple mx="auto" width={{ base: '100%', md: '70%' }} borderColor="white">
+        <Accordion allowMultiple defaultIndex={[0, 1]} mx="auto" width={{ base: '100%', md: '80%' }} borderColor="white">
             {/* 2.2.2 - Pinned posts are shown at the top of the forum overview page
                 <AccordionItem>
                     <h2>
