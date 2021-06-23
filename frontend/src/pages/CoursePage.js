@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import Header from "../components/Header.js"
 import Sidebar from "../components/Sidebar.js"
 import WidgetsBar from "../components/WidgetsBar.js"
+import TopicTree from "../components/TopicTree.js"
 import { Stack, Skeleton, useBreakpointValue, Flex, Container } from "@chakra-ui/react"
 
 function CoursePage() {
@@ -23,9 +24,10 @@ function CoursePage() {
             <Flex>
                 <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
                 <Container marginTop={50} maxWidth="100%">
-                    <Stack spacing={50}>
+                    {/* <Stack spacing={50}>
                         {[...Array(3).keys()].map(e => { counter += 1; return <Skeleton key={"feed_" + counter} height="300px" ></Skeleton>})}
-                    </Stack>
+                    </Stack> */}
+                    <TopicTree />
                 </Container>
                 <WidgetsBar></WidgetsBar>
             </Flex>
