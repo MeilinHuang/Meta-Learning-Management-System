@@ -35,6 +35,10 @@ function CoursePage() {
         {
             name: 'Support',
             url: '/support',
+        },
+        {
+            name: 'Topic Tree',
+            url: '/topictree'
         }
     ]
     const smVariant = 'drawer'
@@ -54,6 +58,7 @@ function CoursePage() {
                     <Switch>
                         {/* Add your page as a Route here */}
                         <Route exact path="/forums"><ForumOverviewPage /></Route>
+                        <Route exact path="/topictree"><TopicTree /></Route>
                     </Switch>
                 </Container>
                 <WidgetsBar></WidgetsBar>
