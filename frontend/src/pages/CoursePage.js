@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import Header from "../components/Header.js"
 import Sidebar from "../components/Sidebar.js"
 import WidgetsBar from "../components/WidgetsBar.js"
+import CourseContentPage from "../pages/CourseContentPage.js"
 import ForumOverviewPage from "../pages/ForumOverviewPage.js"
 import {
     BrowserRouter as Router,
@@ -53,6 +54,7 @@ function CoursePage() {
                     <Switch>
                         {/* Add your page as a Route here */}
                         <Route exact path="/forums"><ForumOverviewPage /></Route>
+                        <Route exact path="/content"><CourseContentPage /></Route>
                     </Switch>
                 </Container>
                 <WidgetsBar></WidgetsBar>
