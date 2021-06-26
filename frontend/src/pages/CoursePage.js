@@ -54,7 +54,7 @@ function CoursePage() {
             <Header sideBarLinks={links} setOpen={setOpen}></Header>
             <Flex>
                 <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
-                <Container marginTop={50} mx="24px" maxWidth="100%">
+                <Container padding="0" maxWidth="100%">
                     <Switch>
                         {/* Add your page as a Route here */}
                         <Route exact path="/forums"><ForumOverviewPage /></Route>

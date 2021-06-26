@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import './TopicTree.css';
 
 var g;
+var svg
 function zoomed() {
     console.log('zoomed!');
     g.attr("transform", d3.event.transform);
@@ -19,15 +21,16 @@ export default function TopicTree() {
     useEffect(() => {
         console.log('running');
         let size = 500;
-        let width = 500;
-        let height = 500;
+
+        let width = ref.current.clientWidth;
+        let height = ref.current.clientHeight;
         let zoom = d3.zoom()
             .scaleExtent([0.3, 2])
             .on("zoom", zoomed);
-        const svg = d3.select(ref.current)
+        svg = d3.select(ref.current)
                         .append("svg")
-                        .attr("width", size)
-                        .attr("height", size)
+                        .attr("width", '100%')
+                        .attr("height", '100%')
                         .call(zoom)
         g = svg.append("g");
         let rect_width = 95;
@@ -45,7 +48,7 @@ export default function TopicTree() {
         .then( function(data) {
             console.log("data", data);
             // Initialize the links
-            var link = svg
+            var link = g
                 .selectAll("line")
                 .data(data.links)
                 .enter()
@@ -53,7 +56,7 @@ export default function TopicTree() {
                 .style("stroke", "#aaa")
     
             // Initialize the nodes
-            var node = svg
+            var node = g
                 .selectAll("circle")
                 .data(data.nodes)
                 .enter()
@@ -90,6 +93,6 @@ export default function TopicTree() {
     }, [data]);
 
     return (
-        <div ref={ref} />
+        <div id="graph" ref={ref} />
     )
 }
