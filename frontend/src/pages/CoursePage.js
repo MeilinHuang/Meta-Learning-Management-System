@@ -3,7 +3,6 @@ import Header from "../components/Header.js"
 import Sidebar from "../components/Sidebar.js"
 import WidgetsBar from "../components/WidgetsBar.js"
 import ForumOverviewPage from "../pages/ForumOverviewPage.js"
-import ForumPostPage from "../pages/ForumPostPage.js"
 import {
     BrowserRouter as Router,
     Switch,
@@ -55,7 +54,6 @@ function CoursePage() {
                 <Container marginTop={50} maxWidth="100%">
                     <Switch>
                         <Route exact path="/forums"><ForumOverviewPage /></Route>
-                        <Route exact path="/forums/:forumPostId"><ForumPostPage /></Route>
                     </Switch>
                 </Container>
                 <WidgetsBar></WidgetsBar>

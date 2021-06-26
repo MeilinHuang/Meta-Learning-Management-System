@@ -10,7 +10,7 @@ import {
 
 function Filter() {
     return (
-        <Accordion allowToggle my="24px" mx="auto" width={{ base: '100%', md: '80%' }}>
+        <Accordion allowToggle my="24px" mx="auto" width={{ base: '100%', lg: '80%' }}>
             <AccordionItem>
                 <h2>
                 <AccordionButton>
