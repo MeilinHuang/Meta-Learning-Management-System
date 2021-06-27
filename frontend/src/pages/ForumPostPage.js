@@ -61,7 +61,7 @@ function ForumPostPage() {
                 </BreadcrumbItem>
             </Breadcrumb>
             <Flex justifyContent="space-between" alignItems="baseline">
-                <Heading mt="16px" textTransform="uppercase">Post Title</Heading>
+                <Heading mt="16px">{dummyPost.title}</Heading>
                 <Button pr="8px" leftIcon={<BsTrash />} variant="ghost" color="red" />
             </Flex>
             {/* add button to delete post for author */}
