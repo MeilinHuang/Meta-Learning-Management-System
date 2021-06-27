@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import './TopicTree.css';
+import Header from "../components/Header.js"
 
 var g;
 var svg
@@ -14,6 +15,33 @@ export default function TopicTree() {
     const ref = useRef();
     const dataset = [100, 200, 300, 400, 500];
     const [data, setData] = useState([]);
+    const links = [
+        {
+            name: 'Home',
+            url: '/',
+        },
+        {
+            name: 'Course Outline',
+            url: '/course-outline',
+        },
+        {
+            name: 'Content',
+            url: '/content',
+        },
+        {
+            name: 'Forums',
+            url: '/forums',
+        },
+        {
+            name: 'Support',
+            url: '/support',
+        },
+        {
+            name: 'Topic Tree',
+            url: '/topictree'
+        }
+    ];
+    const [isOpen, setOpen] = useState(false);
 
  
 
@@ -24,15 +52,15 @@ export default function TopicTree() {
         console.log('running');
         let size = 500;
 
-        let width = ref.current.clientWidth;
-        let height = ref.current.clientHeight;
+        let width = window.innerWidth;
+        let height = window.innerHeight;
         let zoom = d3.zoom()
             .scaleExtent([0.3, 4])
             .on("zoom", zoomed);
         svg = d3.select(ref.current)
                         .append("svg")
-                        .attr("width", '100%')
-                        .attr("height", '100%')
+                        .attr("width", width)
+                        .attr("height", height)
                         .call(zoom);
         g = svg.append("g")
         var simulation = d3.forceSimulation()
@@ -144,6 +172,10 @@ export default function TopicTree() {
     }, [data]);
 
     return (
-        <div id="graph" ref={ref} />
+        <div>
+            <Header sideBarLinks={links} setOpen={setOpen}></Header>
+            <div id="graph" ref={ref} />
+        </div>
+
     )
 }

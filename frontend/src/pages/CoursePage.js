@@ -9,7 +9,7 @@ import {
     Route,
     Redirect,
 } from "react-router-dom"
-import TopicTree from "../components/TopicTree.js"
+
 import { Stack, Skeleton, useBreakpointValue, Flex, Container } from "@chakra-ui/react"
 
 function CoursePage() {
@@ -50,7 +50,7 @@ function CoursePage() {
 
     //EXAMPLE PAGE LAYOUT
     return (
-        <Router>
+        <div>
             
             <Header sideBarLinks={links} setOpen={setOpen}></Header>
             <Flex>
@@ -60,12 +60,11 @@ function CoursePage() {
                         <Switch>
                             {/* Add your page as a Route here */}
                             <Route exact path="/forums"><ForumOverviewPage /></Route>
-                            <Route exact path="/topictree"><TopicTree /></Route>
                         </Switch>
                     </Container>
                     <WidgetsBar></WidgetsBar>
             </Flex>
-        </Router>
+        </div>
     )
 }
 
