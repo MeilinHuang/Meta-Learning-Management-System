@@ -16,10 +16,34 @@ import { GrAdd } from 'react-icons/gr'
 const dummyPosts = [
     {
         id: 1,
+        title: 'This is a forum post',
+        published_date: 1624724805,
+        replies: [
+            {
+                id: 1,
+            }
+        ],
+        comments: [
+            {
+                id: 1,
+            }
+        ]
     },
     {
         id: 2,
-    }
+        title: 'Another forum post',
+        published_date: 1622046405,
+        replies: [
+            {
+                id: 1,
+            }
+        ],
+        comments: [
+            {
+                id: 1,
+            }
+        ]
+    },
 ]
 
 function ForumOverviewPage() {

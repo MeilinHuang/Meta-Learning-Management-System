@@ -8,14 +8,11 @@ import {
 import { GrEdit, GrShare } from 'react-icons/gr'
 import AuthorDetails from './AuthorDetails'
 
-function PostDetails() {
+function PostDetails({ post: { author, published_date, description }}) {
     return (
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
-            <AuthorDetails />
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-            commodo consequat.
+            <AuthorDetails author={author} date={published_date} />
+            {description}
             <Divider my="16px" />
             <Flex justifyContent="space-between">
                 <Flex>

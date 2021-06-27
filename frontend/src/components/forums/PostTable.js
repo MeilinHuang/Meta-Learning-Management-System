@@ -10,13 +10,16 @@ import {
     Td,
   } from "@chakra-ui/react"
 
-const getRow = post => {
+const getRow = ({ id, title, published_date, replies, comments }) => {
+    const date = new Date(published_date * 1000)
+    const dateString = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
+
     return (
         <Tr>
-            <Td width="40%"><Link as={RouterLink} color="blue.500" to={`/forums/${post.id}`}>inches</Link></Td>
-            <Td>millimetres (mm)</Td>
-            <Td isNumeric>25.4</Td>
-            <Td isNumeric>25.4</Td>
+            <Td width="40%"><Link as={RouterLink} color="blue.500" to={`/forums/${id}`}>{title}</Link></Td>
+            <Td>{dateString}</Td>
+            <Td isNumeric>{replies.length}</Td>
+            <Td isNumeric>{comments.length}</Td>
         </Tr>
     )
 }

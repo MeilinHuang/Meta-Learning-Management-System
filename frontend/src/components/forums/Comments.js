@@ -10,14 +10,13 @@ import {
 import { AiOutlineSend } from 'react-icons/ai'
 import CommentResponse from './CommentResponse'
 
-function Comments() {
+function Comments({ comments }) {
     return (
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md" mb="12px" textTransform="uppercase">Comments</Heading>
-            {/* if no response - "no comments yet" */}
-            {/* maps comments */}
-            <CommentResponse />
-            <CommentResponse />
+            {comments.map(comment => (
+                <CommentResponse {...comment} />
+            ))}
             <form>
                 <Flex>
                     <InputGroup variant="filled" mr="8px">

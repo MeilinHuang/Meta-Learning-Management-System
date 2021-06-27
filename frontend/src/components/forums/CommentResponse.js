@@ -5,14 +5,11 @@ import {
 import AuthorControls from './AuthorControls'
 import AuthorDetails from './AuthorDetails'
 
-function CommentResponse() {
+function CommentResponse({ author, published_date, description }) {
     return (
         <>
-            <AuthorDetails />
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-            commodo consequat.
+            <AuthorDetails author={author} date={published_date} />
+            {description}
             {/* show author controls if user is author */}
             <AuthorControls />
             <Divider my="16px" />
