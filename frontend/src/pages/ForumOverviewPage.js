@@ -5,11 +5,13 @@ import {
     Flex,
     Input,
     InputGroup,
-    InputLeftElement
+    InputLeftElement,
+    useBreakpointValue
 } from "@chakra-ui/react"
 import { SearchIcon } from '@chakra-ui/icons'
 import Filter from '../components/forums/Filter'
 import PostTableContainer from '../components/forums/PostTableContainer'
+import { GrAdd } from 'react-icons/gr'
 
 const dummyPosts = [
     {
@@ -21,12 +23,15 @@ const dummyPosts = [
 ]
 
 function ForumOverviewPage() {
+    const buttonContents = useBreakpointValue({ base: '', md: 'Add Post' })
+    const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null })
+
     return (
         <>
             <Flex justify="center">
-                <Center width={{ base: '100%', md: '80%' }}>
-                    <Button>Add Post</Button>
-                    <InputGroup variant="filled" ml="24px">
+                <Center width={{ base: '100%', lg: '80%' }}>
+                    <Button leftIcon={buttonIcon} pr={{ base: '8px', md: '16px' }}>{buttonContents}</Button>
+                    <InputGroup variant="filled" ml={{ base: '16px', md: '24px'}}>
                         <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
                         <Input placeholder="Search"></Input>
                     </InputGroup>
