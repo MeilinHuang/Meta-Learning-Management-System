@@ -13,6 +13,14 @@
   "basePath": "/",
   "tags": [
     {
+      "name": "Authentication",
+      "description": "API for authentication"
+    },
+    {
+      "name": "User",
+      "description": "API for users"
+    },
+    {
       "name": "Topic Tree",
       "description": "API for Topic Tree feature"
     },
@@ -41,6 +49,1232 @@
   "consumes": ["application/json"],
   "produces": ["application/json"],
   "paths": {
+    "/quiz": {
+      "post": {
+        "tags": ["Assessment"],
+        "summary": "Create new quiz",
+        "parameters": [
+          {
+            "name": "quizBody",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Quiz"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/quiz/{$quizId}": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get quiz containing questions from specified quiz id",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "type": "string",
+            "description": "Id of quiz we want to get",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Quiz"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Assessment"],
+        "summary": "Update quiz details from quiz id",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "type": "string",
+            "description": "Id of quiz we want to get",
+            "in": "path"
+          },
+          {
+            "name": "quizBody",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Quiz"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Assessment"],
+        "summary": "Delete quiz",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "type": "string",
+            "description": "Id of quiz we want to delete",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/quiz/{$quizId}/question/{$questionId}": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get specific question from specified quiz",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "type": "string",
+            "description": "Id of quiz we want to get",
+            "in": "path"
+          },
+          {
+            "name": "questionId",
+            "required": true,
+            "type": "string",
+            "description": "Id of question we want",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/QuizQuestion"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Assessment"],
+        "summary": "Update quiz details from quiz id",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "type": "string",
+            "description": "Id of quiz we want to get",
+            "in": "path"
+          },
+          {
+            "name": "questionId",
+            "required": true,
+            "type": "string",
+            "description": "Id of question we want",
+            "in": "path"
+          },
+          {
+            "name": "questionBody",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/QuizQuestion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },  
+    "/questionBank/{$questionBankId}": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get list of questions with matching question bank id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetQuestionBankQuestions"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Assessment"],
+        "summary": "Update name of question bank",
+        "parameters": [
+          {
+            "name": "questionBankId",
+            "required": true,
+            "type": "string",
+            "description": "Id of question bank we want",
+            "in": "path"
+          },
+          {
+            "name": "questionBankName",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/QuestionBank"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Assessment"],
+        "summary": "Delete question bank",
+        "parameters": [
+          {
+            "name": "questionBankId",
+            "required": true,
+            "type": "string",
+            "description": "Id of question bank we want",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/questionBank": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get list questions from question banks",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetQuestionBankQuestions"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/questionBank/question/{$questionId}": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get question from question bank with specified question id",
+        "parameters": [
+          {
+            "name": "questionId",
+            "required": true,
+            "type": "string",
+            "description": "Id of question we want",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/QuizQuestion"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/poll": {
+      "post": {
+        "tags": ["Assessment"],
+        "summary": "Create new poll",
+        "parameters": [
+          {
+            "name": "pollBody",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Poll"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/poll/{$pollId}": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get poll from specified poll id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Poll"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Assessment"],
+        "summary": "Change data of poll",
+        "parameters": [
+          {
+            "name": "pollId",
+            "required": true,
+            "type": "string",
+            "description": "Id of poll we want",
+            "in": "path"
+          },
+          {
+            "name": "pollBody",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Poll"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/quiz/studentAnswers/student/{$studentId}": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get list of student_answer matching the student ID",
+        "parameters": [
+          {
+            "name": "studentId",
+            "required": true,
+            "type": "string",
+            "description": "Id of student we want",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetStudentAnswer"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/quiz/results/question/{$questionId}/answerCount": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get number of students that selected each answer for a question",
+        "parameters": [
+          {
+            "name": "questionId",
+            "required": true,
+            "type": "string",
+            "description": "Id of question we want",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetAnswerCount"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/questionBank/{$questionBankId}/question": {
+      "post": {
+        "tags": ["Assessment"],
+        "summary": "Create new question for question bank",
+        "parameters": [
+          {
+            "name": "questionBankId",
+            "required": true,
+            "type": "string",
+            "description": "Id of questionBank we want",
+            "in": "path"
+          },
+          {
+            "name": "questionBody",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/QuizQuestion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/quiz_question_answer": {
+      "post": {
+        "tags": ["Assessment"],
+        "summary": "Create new quiz question answer",
+        "parameters": [
+          {
+            "name": "quizQuestionAnswerBody",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/QuizQuestionAnswer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/student_answer": {
+      "post": {
+        "tags": ["Assessment"],
+        "summary": "Create new student answer",
+        "parameters": [
+          {
+            "name": "studentAnswerBody",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/QuizStudentAnswer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/quiz/{$quizId}/question/{$questionId}/answer/{$quizQuestionAnswerId}": {
+      "put": {
+        "tags": ["Assessment"],
+        "summary": "Update quiz question answer",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "type": "string",
+            "description": "Id of quiz we want",
+            "in": "path"
+          },
+          {
+            "name": "questionId",
+            "required": true,
+            "type": "string",
+            "description": "Id of question we want",
+            "in": "path"
+          },
+          {
+            "name": "quizQuestionAnswerId",
+            "required": true,
+            "type": "string",
+            "description": "Id of quiz question answer we want",
+            "in": "path"
+          },
+          {
+            "name": "quizQuestionAnswerBody",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/QuizQuestionAnswer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/questionBank/{$questionBankId}/question/{$quizId}": {
+      "delete": {
+        "tags": ["Assessment"],
+        "summary": "Delete question from question bank",
+        "parameters": [
+          {
+            "name": "questionBankId",
+            "required": true,
+            "type": "string",
+            "description": "Id of questionBank we want",
+            "in": "path"
+          },
+          {
+            "name": "quizId",
+            "required": true,
+            "type": "string",
+            "description": "Id of quiz we want",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/questions": {
+      "get": {
+        "tags": ["Gamification"],
+        "summary": "Get all gamification questions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetAllQuestions"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/questions/new": {
+      "post": {
+        "tags": ["Gamification"],
+        "summary": "Create new question",
+        "parameters": [
+          {
+            "name": "questionBody",
+            "in": "body",
+            "description": "New question body",
+            "schema": {
+              "$ref": "#/definitions/Question"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/questions/{$questionId}": {
+      "get": {
+        "tags": ["Gamification"],
+        "summary": "Get all level data from question id",
+        "parameters": [
+          {
+            "name": "questionId",
+            "type": "string",
+            "in": "path",
+            "required": true,
+            "description": "Id of question to get level data from"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Level"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Gamification"],
+        "summary": "Edit existing question data",
+        "parameters": [
+          {
+            "name": "questionId",
+            "type": "string",
+            "in": "path",
+            "required": true,
+            "description": "Id of question to edit"
+          },
+          {
+            "name": "editQuestion",
+            "in": "body",
+            "description": "Details of updated question",
+            "schema": {
+              "$ref": "#/definitions/Question"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Gamification"],
+        "summary": "Delete question from question id",
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "description": "Id of level we want to delete",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/levels": {
+      "get": {
+        "tags": ["Gamification"],
+        "summary": "Get all gamification levels",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetAllLevels"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/level/{$levelId}": {
+      "get": {
+        "tags": ["Gamification"],
+        "summary": "Get level data for specified level id",
+        "parameters": [
+          {
+            "name": "levelId",
+            "type": "string",
+            "required": true,
+            "in": "path",
+            "description": "Id of level we want data for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Level"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Gamification"],
+        "summary": "Edit existing level data",
+        "parameters": [
+          {
+            "name": "editLevel",
+            "in": "body",
+            "description": "Details of updated level",
+            "schema": {
+              "$ref": "#/definitions/Level"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Level"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Gamification"],
+        "summary": "Delete level from level id",
+        "parameters": [
+          {
+            "name": "levelId",
+            "in": "path",
+            "required": true,
+            "description": "Id of level we want to delete",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/levels/new": {
+      "post": {
+        "tags": ["Gamification"],
+        "summary": "Create new level",
+        "parameters": [
+          {
+            "name": "levelBody",
+            "in": "body",
+            "description": "New level body",
+            "schema": {
+              "$ref": "#/definitions/Level"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/{$level}/questions": {
+      "get": {
+        "tags": ["Gamification"],
+        "summary": "Get all questions linked to level",
+        "parameters": [
+          {
+            "name": "levelName",
+            "in": "path",
+            "description": "Name of level to get questions for",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetLevelQuestions"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logs in the user",
+        "parameters": [
+          {
+            "name": "loginBody",
+            "in": "body",
+            "description": "Login body",
+            "schema": {
+              "$ref": "#/definitions/LoginBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/user/{$userId}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get user from id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "Id of user we want",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Make user an admin for a topic group",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "Id of user we want to make an admin",
+            "type": "string"
+          },
+          {
+            "name": "newAdmin",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["User"],
+        "summary": "Delete user from id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "Id of user we want",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/{$course}/announcement": {
+      "get": {
+        "tags": ["Course Pages"],
+        "summary": "Get all announcements",
+        "parameters": [
+          {
+            "name": "course",
+            "description": "Name of course to get announcements",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetAllAnnouncements"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/{$course}/announcement/new": {
+      "post": {
+        "tags": ["Course Pages"],
+        "summary": "Create new announcement",
+        "parameters": [
+          {
+            "name": "course",
+            "description": "Name of course to create announcement for",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "announcementBody",
+            "in": "body",
+            "description": "Announcement body",
+            "schema": {
+              "$ref": "#/definitions/Announcement"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
     "/forum": {
       "get": {
         "tags": ["Forums"],
@@ -50,6 +1284,16 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/GetAllForumPosts"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
             }
           }
         }
@@ -65,11 +1309,21 @@
             "schema": {
               "$ref": "#/definitions/GetAllForumPosts"
             }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
           }
         }
       }
     },
-    "/forum/{$forumSearchTerm}": {
+    "/forum/search/{$forumSearchTerm}": {
       "get": {
         "tags": ["Forums"],
         "summary": "Get all forum posts related to the search query",
@@ -88,6 +1342,450 @@
             "schema": {
               "$ref": "#/definitions/GetAllForumPosts"
             }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/{$forumFilterTerm}": {
+      "get": {
+        "tags": ["Forums"],
+        "summary": "Get all forum posts related to the filter term",
+        "parameters": [
+          {
+            "name": "forumFilterTerm",
+            "in": "path",
+            "required": true,
+            "description": "Filter term to include all posts with the filter term",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetAllForumPosts"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/post": {
+      "post": {
+        "tags": ["Forums"],
+        "summary": "Make new post",
+        "parameters": [
+          {
+            "name": "New forum post",
+            "in": "body",
+            "description": "New post",
+            "schema": {
+              "$ref": "#/definitions/PostForum"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PostForum"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/{$postId}": {
+      "get": {
+        "tags": ["Forums"],
+        "summary": "Get post details of post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Id of post we want details for",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ForumPost"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Forums"],
+        "summary": "Edit post details with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Id of post we want to edit",
+            "type": "string"
+          },
+          {
+            "name": "editPost",
+            "in": "body",
+            "description": "Details of updated post",
+            "schema": {
+              "$ref": "#/definitions/ForumPost"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ForumPost"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/${postId}/reply": {
+      "put": {
+        "tags": ["Forums"],
+        "summary": "Update reply on a post with id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Id of post we want to update our reply",
+            "type": "string"
+          },
+          {
+            "name": "replyDetails",
+            "in": "body",
+            "description": "Details of updated post reply",
+            "schema": {
+              "$ref": "#/definitions/PostReply"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Forums"],
+        "summary": "Get post details of post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Id of post we want to reply to",
+            "type": "string"
+          },
+          {
+            "name": "replyDetails",
+            "in": "body",
+            "description": "Details of post reply",
+            "schema": {
+              "$ref": "#/definitions/PostReply"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/${postId}/comment": {
+      "post": {
+        "tags": ["Forums"],
+        "summary": "Get post details of post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Id of post we want to reply to",
+            "type": "string"
+          },
+          {
+            "name": "commentDetails",
+            "in": "body",
+            "description": "Details of comment body",
+            "schema": {
+              "$ref": "#/definitions/PostComment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/pin/{$postId}/{$isPinned}": {
+      "put": {
+        "tags": ["Forums"],
+        "summary": "Pins or unpins post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Id of post we want to reply to",
+            "type": "string"
+          },
+          {
+            "name": "commentDetails",
+            "in": "body",
+            "description": "Details of comment body",
+            "schema": {
+              "$ref": "#/definitions/ForumPost"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forums/tags": {
+      "get": {
+        "tags": ["Forums"],
+        "summary": "Get a list tags",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetAllForumTags"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Forums"],
+        "summary": "Create new tag",
+        "parameters": [
+          {
+            "name": "Pre-Requisite",
+            "in": "body",
+            "description": "Topic with new pre-requisite(s)",
+            "schema": {
+              "$ref": "#/definitions/ForumTag"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/remove-level/{$levelId}": {
+      "delete": {
+        "tags": ["Gamification"],
+        "summary": "Delete level from topic group",
+        "parameters": [
+          {
+            "name": "levelId",
+            "type": "string",
+            "required": true,
+            "description": "Id of level we want to remove from topic group",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{$topicGroupId}/newLevel": {
+      "post": {
+        "tags": ["Gamification"],
+        "summary": "Create a new level for topic group",
+        "parameters": [
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Id of topic group we want to add new level to"
+          },
+          {
+            "name": "levelBody",
+            "in": "body",
+            "description": "New level body",
+            "schema": {
+              "$ref": "#/definitions/Level"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{$topicGroupId}/levels": {
+      "get": {
+        "tags": ["Gamification"],
+        "summary": "Get a list of levels for provided topic group",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetAllLevels"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
           }
         }
       }
@@ -101,6 +1799,16 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/GetAllTopicGroups"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
             }
           }
         }
@@ -124,6 +1832,16 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/GetAllTopics"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
             }
           }
         }
@@ -155,6 +1873,16 @@
             "schema": {
               "$ref": "#/definitions/GetPreRequisites"
             }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
           }
         }
       },
@@ -176,10 +1904,14 @@
             "description": "OK"
           },
           "400": {
-            "description": "Bad Request"
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
           },
-          "404": {
-            "description": "Not Found"
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
           }
         }
       },
@@ -207,10 +1939,14 @@
             "description": "OK"
           },
           "400": {
-            "description": "Bad Request"
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
           },
-          "404": {
-            "description": "Not Found"
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
           }
         }
       }
@@ -234,10 +1970,14 @@
             "description": "OK"
           },
           "400": {
-            "description": "Bad Request"
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
           },
-          "404": {
-            "description": "Not Found"
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
           }
         }
       },
@@ -258,10 +1998,14 @@
             "description": "OK"
           },
           "400": {
-            "description": "Bad Request"
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
           },
-          "404": {
-            "description": "Not Found"
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
           }
         }
       }
@@ -285,10 +2029,14 @@
             "description": "OK"
           },
           "400": {
-            "description": "Bad Request"
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
           },
-          "404": {
-            "description": "Not Found"
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
           }
         },
         "delete": {
@@ -300,6 +2048,16 @@
               "schema": {
                 "$ref": "#/definitions/Topic"
               }
+            },
+            "400": {
+              "schema": { 
+                "$ref": "#/definitions/400"
+              }
+            },
+            "403": {
+              "schema": {
+                "$ref": "#/definitions/403"
+              }
             }
           }
         }
@@ -307,6 +2065,154 @@
     }
   },
   "definitions": {
+    "Announcement": {
+      "properties": {
+        "announcementId": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "author": {
+          "type": "string",
+          "example": "Mark Saylor"
+        },
+        "postDate": {
+          "type": "dateTime",
+          "example":"Wed Jun 30 2016 08:20:15"
+        },
+        "description": {
+          "type": "string",
+          "example": "All tutorials will be online"
+        },
+        "externalFiles": {
+          "type": "file",
+          "example": "dog.img"
+        },
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "commentId": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "author": {
+                "type": "string",
+                "example": "Harold Jenkins"
+              },
+              "publishedDate": {
+                "type": "dateTime",
+                "example": "Wed Mar 25 2015 11:56:34"
+              },
+              "comment": {
+                "type": "string",
+                "example": "Awesome"
+              }
+            }
+          }
+        }
+      }
+    },
+    "ForumTag": {
+      "properties": {
+        "tagName": {
+          "type": "string",
+          "example": "FinalExam"
+        }
+      }
+    },
+    "ForumPost": {
+      "properties": {
+        "_id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "title": {
+          "type": "string",
+          "example": "How to start Assignment 1"
+        },
+        "author": {
+          "type": "string",
+          "example": "John Smith"
+        },
+        "publishedDate": {
+          "type": "dateTime",
+          "example": "Wed Mar 25 2015 11:00:00"
+        },
+        "description": {
+          "type": "string",
+          "example": "Lorem ipsum ipsum ipsum ipsum ipsum"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "name": {
+                "type": "string",
+                "example": "Ass1"
+              }
+            }
+          }
+        },
+        "replies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "author": {
+                "type": "string",
+                "example": "Jessica Smith"
+              },
+              "publishedDate": {
+                "type": "dateTime",
+                "example": "Wed Mar 25 2015 11:23:05"
+              },
+              "reply": {
+                "type": "string",
+                "example": "Lorem lorem lorem lorem lorem lorem lorem"
+              }
+            }
+          }
+        },
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "author": {
+                "type": "string",
+                "example": "Harold Jenkins"
+              },
+              "publishedDate": {
+                "type": "dateTime",
+                "example": "Wed Mar 25 2015 11:56:34"
+              },
+              "comment": {
+                "type": "string",
+                "example": "Check the assigment spec for more info"
+              }
+            }
+          }
+        },
+        "isPinned": {
+          "type": "boolean",
+          "example": true
+        }
+      }
+    },
     "Topic": {
       "properties": {
         "_id": {
@@ -580,6 +2486,23 @@
         }
       }
     },
+    "GetAllForumTags": {
+      "properties": {
+        "tags": {
+          "type": "array",
+          "description": "List of forum tags",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tagName": {
+                "type": "string",
+                "example": "Ass1"
+              }
+            }
+          }
+        }
+      }
+    },
     "GetAllForumPosts": {
       "properties": {
         "forumPosts": {
@@ -679,6 +2602,646 @@
             }
           }
         }
+      }
+    },
+    "PostForum": {
+      "properties": {
+        "postId": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "title": {
+          "type": "string",
+          "example": "Final exam marks release date?"
+        },
+        "author": {
+          "type": "string",
+          "example": "Billy Hendryk"
+        },
+        "publishedDate": {
+          "type": "dateTime",
+          "example":"Wed Mar 30 2016 08:20:15"
+        },
+        "description": {
+          "type": "string",
+          "example": "When do the final marks get released?"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tag": {
+                "type": "string",
+                "example": "FinalExam"
+              }
+            }
+          }
+        }
+      }
+    },
+    "PostReply": {
+      "properties": {
+        "author": {
+          "type": "string",
+          "example": "Alan Smith"
+        },
+        "publishedDate": {
+          "type": "dateTime",
+          "example": "Wed Mar 29 2015 11:00:00"
+        },
+        "reply": {
+          "type": "string",
+          "example": "The final exam marks have already been released"
+        }
+      }
+    },
+    "PostComment": {
+      "properties": {
+        "author": {
+          "type": "string",
+          "example": "Alan Smith"
+        },
+        "publishedDate": {
+          "type": "dateTime",
+          "example": "Wed Mar 29 2015 11:00:00"
+        },
+        "comment": {
+          "type": "string",
+          "example": "The final exam hasn't happened yet"
+        }
+      }
+    },
+    "User": {
+      "properties": {
+        "_id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "name": {
+          "type": "string",
+          "example": "John Smitty"
+        },
+        "isAdmin": {
+          "type": "boolean",
+          "example": false
+        },
+        "enrolledCourses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "isPublic": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": "string",
+                "example": "Algorithms"
+              },
+              "topics": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "example": "sorting"
+                }
+              },
+              "tutorialTimes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "tutorialCode": {
+                      "type": "string",
+                      "example": "M18A2"
+                    },
+                    "timeSlot": {
+                      "type": "dateTime",
+                      "example": "10:00-11:00"
+                    },
+                    "tutor": {
+                      "type": "string",
+                      "example": "John Smith"
+                    },
+                    "enrolledStudents": {
+                      "type": "array",
+                      "description": "List of enrolled students in tutorial",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "example": "Jessica Smith"
+                          },
+                          "studentId": {
+                            "type": "integer",
+                            "example": "z2183122"
+                          }
+                        }
+                      }
+                    },
+                    "maxCapacity": {
+                      "type": "integer",
+                      "example": 20
+                    }
+                  }
+                }
+              },
+              "courseOutline": {
+                "type": "file",
+                "example": "course_outline.pdf"
+              }
+            }
+          }
+        }
+      }
+    },
+    "GetAllAnnouncements": {
+      "properties": {
+        "announcements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "announcementId": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "author": {
+                "type": "string",
+                "example": "Mark Saylor"
+              },
+              "postDate": {
+                "type": "dateTime",
+                "example":"Wed Jun 30 2016 08:20:15"
+              },
+              "description": {
+                "type": "string",
+                "example": "All tutorials will be online"
+              },
+              "externalFiles": {
+                "type": "file",
+                "example": "dog.img"
+              },
+              "comments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "commentId": {
+                      "type": "integer",
+                      "uniqueItems": true
+                    },
+                    "author": {
+                      "type": "string",
+                      "example": "Harold Jenkins"
+                    },
+                    "publishedDate": {
+                      "type": "dateTime",
+                      "example": "Wed Mar 25 2015 11:56:34"
+                    },
+                    "comment": {
+                      "type": "string",
+                      "example": "Awesome"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "GetAllLevels": {
+      "properties": {
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "List of levels",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "title": {
+                "type": "string",
+                "example": "Level"
+              },
+              "topicGroupId": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "levelType": {
+                "type": "string"
+              },
+              "availableFrom": {
+                "type": "dateTime",
+                "example":"Wed Jun 30 2016 08:20:15"
+              },
+              "questionNumbers": {
+                "type": "integer",
+                "example": 3
+              },
+              "estimatedTimeRequired": {
+                "type": "integer",
+                "example": 15
+              }
+            }
+          }
+        }
+      }
+    },
+    "GetAllLevelQuestions": {
+      "properties": {
+        "levelQuestions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "List of questions for level",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "title": {
+                "type": "string",
+                "example": "What is the day today?"
+              },
+              "questionType": {
+                "type": "string",
+                "example": "Multiple Choice"
+              },
+              "potentialAnswers": {
+                "type": "text",
+                "example": "Monday"
+              },
+              "correctAnswer": {
+                "type": "string",
+                "example": "Friday"
+              },
+              "availableFrom": {
+                "type": "dateTime",
+                "example": "Wed Jun 30 2016 08:20:15"
+              },
+              "mediaLink": {
+                "type": "string",
+                "example": "123.png"
+              },
+              "estimatedTimeRequired": {
+                "type": "integer",
+                "example": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "GetAllQuestions": {
+      "properties": {
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "List of questions",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "title": {
+                "type": "string",
+                "example": "What is the day today?"
+              },
+              "questionType": {
+                "type": "string",
+                "example": "Multiple Choice"
+              },
+              "potentialAnswers": {
+                "type": "text",
+                "example": "Monday"
+              },
+              "correctAnswer": {
+                "type": "string",
+                "example": "Friday"
+              },
+              "availableFrom": {
+                "type": "dateTime",
+                "example": "Wed Jun 30 2016 08:20:15"
+              },
+              "mediaLink": {
+                "type": "string",
+                "example": "123.png"
+              },
+              "estimatedTimeRequired": {
+                "type": "integer",
+                "example": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "Level": {
+      "properties": {
+        "_id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "title": {
+          "type": "string",
+          "example": "Level"
+        },
+        "topicGroupId": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "levelType": {
+          "type": "string"
+        },
+        "availableFrom": {
+          "type": "dateTime",
+          "example":"Wed Jun 30 2016 08:20:15"
+        },
+        "questionNumbers": {
+          "type": "integer",
+          "example": 3
+        },
+        "estimatedTimeRequired": {
+          "type": "integer",
+          "example": 15
+        }
+      }
+    },
+    "Question": {
+      "properties": {
+        "_id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "title": {
+          "type": "string",
+          "example": "What is the day today?"
+        },
+        "questionType": {
+          "type": "string",
+          "example": "Multiple Choice"
+        },
+        "potentialAnswers": {
+          "type": "text",
+          "example": "Monday"
+        },
+        "correctAnswer": {
+          "type": "string",
+          "example": "Friday"
+        },
+        "availableFrom": {
+          "type": "dateTime",
+          "example": "Wed Jun 30 2016 08:20:15"
+        },
+        "mediaLink": {
+          "type": "string",
+          "example": "123.png"
+        },
+        "estimatedTimeRequired": {
+          "type": "integer",
+          "example": 1
+        }
+      }
+    },
+    "Quiz": {
+      "properties": {
+        "_id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "name": {
+          "type": "string",
+          "example": "Mid Sem Quiz"
+        },
+        "dueDate": {
+          "type": "dateTime",
+          "example": "Wed Jun 30 2016 08:20:15"
+        },
+        "timeGiven": {
+          "type": "dateTime",
+          "example": "Wed Jun 30 2016 08:20:15"
+        }
+      }
+    },
+    "Poll": {
+      "_id": {
+        "type": "integer",
+        "example": 1
+      },
+      "name": {
+        "type": "string",
+        "example": "Poll A"
+      },
+      "startTime": {
+        "type": "dateTime",
+        "example": "Wed Jun 30 2016 08:20:15"
+      },
+      "closeTime": {
+        "type": "dateTime",
+        "example": "Wed Jun 30 2016 08:20:15"
+      },
+      "isClosed": {
+        "type": "boolean",
+        "example": true
+      },
+      "pollType": {
+        "type": "string",
+        "example": "Single"
+      },
+      "pollOptions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": {
+              "type": "string",
+              "example": "Poll options"
+            }
+          }
+        }
+      }
+    },
+    "QuizQuestion": {
+      "properties": {
+        "_id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "quizId": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "quizType": {
+          "type": "string",
+          "example": "shortAnswer"
+        },
+        "marksAwarded": {
+          "type": "integer",
+          "example": 2
+        },
+        "topicId": {
+          "type": "integer",
+          "example": 3
+        }
+      }
+    },
+    "QuizQuestionAnswer": {
+      "properties": {
+        "_id": {
+          "type": "integer",
+          "example": 3
+        },
+        "quizId": {
+          "type": "integer",
+          "example": 2
+        },
+        "questionId": {
+          "type": "integer",
+          "example": 4
+        },
+        "isCorrectAnswer": {
+          "type": "boolean",
+          "example": false
+        },
+        "description": {
+          "type": "string",
+          "example": "2 + 2 = 4"
+        }
+      }
+    },
+    "QuizStudentAnswer": {
+      "properties": {
+        "studentId": {
+          "type": "string",
+          "example": "z2103091"
+        },
+        "quizId": {
+          "type": "integer",
+          "example": 2
+        },
+        "questionId": {
+          "type": "integer",
+          "example": 5
+        },
+        "answerSelectedId": {
+          "type": "integer",
+          "example": 3
+        }
+      }
+    },
+    "QuestionBank": {
+      "properties": {
+        "_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "Question Bank 1"
+        }
+      }
+    },
+    "GetAnswerCount": {
+      "properties": {
+        "type": "integer",
+        "example": 50
+      }
+    },
+    "GetStudentAnswer": {
+      "properties": {
+        "studentAnswers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "studentId": {
+                "type": "string",
+                "example": "z2103091"
+              },
+              "quizId": {
+                "type": "integer",
+                "example": 2
+              },
+              "questionId": {
+                "type": "integer",
+                "example": 5
+              },
+              "answerSelectedId": {
+                "type": "integer",
+                "example": 3
+              }
+            }
+          }
+        }
+      }
+    },
+    "GetQuestionBankQuestions": {
+      "properties": {
+        "questionBankQuestions": {
+          "type": "array",
+          "questionBankName": {
+            "type": "string",
+            "example": "Question Bank 1"
+          },
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "quizId": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "quizType": {
+                "type": "string",
+                "example": "shortAnswer"
+              },
+              "marksAwarded": {
+                "type": "integer",
+                "example": 2
+              },
+              "topicId": {
+                "type": "integer",
+                "example": 3
+              }
+            }
+          }
+        }
+      }
+    },
+    "400": {
+      "description": "Bad Input",
+      "properties": {
+          "error": {
+              "type": "string",
+              "description": "Error message returned from server",
+              "example": "Invalid input"
+          }
+      }
+   },
+    "403": {
+      "description": "Forbidden",
+      "properties": {
+          "error": {
+              "type": "string",
+              "description": "Error message returned from server",
+              "example": "Invalid Token"
+          }
       }
     }
   }
