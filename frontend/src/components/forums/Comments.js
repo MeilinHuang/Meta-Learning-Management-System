@@ -12,7 +12,7 @@ import Comment from './Comment'
 
 function Comments() {
     return (
-        <Box width={{ base: '100%', md: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
+        <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md" mb="12px" textTransform="uppercase">Comments</Heading>
             {/* if no response - "no comments yet" */}
             {/* maps comments */}
