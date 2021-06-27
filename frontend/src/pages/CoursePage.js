@@ -51,17 +51,19 @@ function CoursePage() {
     //EXAMPLE PAGE LAYOUT
     return (
         <Router>
+            
             <Header sideBarLinks={links} setOpen={setOpen}></Header>
             <Flex>
-                <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
-                <Container padding="0" maxWidth="100%">
-                    <Switch>
-                        {/* Add your page as a Route here */}
-                        <Route exact path="/forums"><ForumOverviewPage /></Route>
-                        <Route exact path="/topictree"><TopicTree /></Route>
-                    </Switch>
-                </Container>
-                <WidgetsBar></WidgetsBar>
+                
+                    <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
+                    <Container padding="0" maxWidth="100%">
+                        <Switch>
+                            {/* Add your page as a Route here */}
+                            <Route exact path="/forums"><ForumOverviewPage /></Route>
+                            <Route exact path="/topictree"><TopicTree /></Route>
+                        </Switch>
+                    </Container>
+                    <WidgetsBar></WidgetsBar>
             </Flex>
         </Router>
     )
