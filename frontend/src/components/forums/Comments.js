@@ -8,7 +8,7 @@ import {
     InputGroup,
 } from "@chakra-ui/react"
 import { AiOutlineSend } from 'react-icons/ai'
-import Comment from './Comment'
+import CommentResponse from './CommentResponse'
 
 function Comments() {
     return (
@@ -16,8 +16,8 @@ function Comments() {
             <Heading size="md" mb="12px" textTransform="uppercase">Comments</Heading>
             {/* if no response - "no comments yet" */}
             {/* maps comments */}
-            <Comment />
-            <Comment />
+            <CommentResponse />
+            <CommentResponse />
             <form>
                 <Flex>
                     <InputGroup variant="filled" mr="8px">

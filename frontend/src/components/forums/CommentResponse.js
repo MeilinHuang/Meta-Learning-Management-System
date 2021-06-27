@@ -5,7 +5,7 @@ import {
 import AuthorControls from './AuthorControls'
 import AuthorDetails from './AuthorDetails'
 
-function Responses() {
+function CommentResponse() {
     return (
         <>
             <AuthorDetails />
@@ -13,10 +13,11 @@ function Responses() {
             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
             veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
             commodo consequat.
+            {/* show author controls if user is author */}
             <AuthorControls />
             <Divider my="16px" />
         </>
     )
 }
 
-export default Responses
+export default CommentResponse
