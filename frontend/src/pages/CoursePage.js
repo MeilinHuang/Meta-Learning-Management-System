@@ -3,6 +3,7 @@ import Header from "../components/Header.js"
 import Sidebar from "../components/Sidebar.js"
 import WidgetsBar from "../components/WidgetsBar.js"
 import ForumOverviewPage from "../pages/ForumOverviewPage.js"
+import Assessments from "./Assessments.js"
 import {
     BrowserRouter as Router,
     Switch,
@@ -32,6 +33,10 @@ function CoursePage() {
             url: '/forums',
         },
         {
+            name: 'Assessments',
+            url: '/assessments',
+        },
+        {
             name: 'Support',
             url: '/support',
         }
@@ -53,6 +58,7 @@ function CoursePage() {
                     <Switch>
                         {/* Add your page as a Route here */}
                         <Route exact path="/forums"><ForumOverviewPage /></Route>
+                        <Route exact path="/assessments"><Assessments /></Route>
                     </Switch>
                 </Container>
                 <WidgetsBar></WidgetsBar>
