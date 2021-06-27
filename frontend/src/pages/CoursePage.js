@@ -3,6 +3,7 @@ import Header from "../components/Header.js"
 import Sidebar from "../components/Sidebar.js"
 import WidgetsBar from "../components/WidgetsBar.js"
 import ForumOverviewPage from "../pages/ForumOverviewPage.js"
+import ForumPostPage from '../pages/ForumPostPage'
 import {
     BrowserRouter as Router,
     Switch,
@@ -53,6 +54,7 @@ function CoursePage() {
                     <Switch>
                         {/* Add your page as a Route here */}
                         <Route exact path="/forums"><ForumOverviewPage /></Route>
+                        <Route exact path="/forums/:id"><ForumPostPage /></Route>
                     </Switch>
                 </Container>
                 <WidgetsBar></WidgetsBar>
