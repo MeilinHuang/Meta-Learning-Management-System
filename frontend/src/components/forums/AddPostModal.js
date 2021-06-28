@@ -1,9 +1,9 @@
-import React from "react"
+import React, { useState } from "react"
 import {
     Button,
+    Flex,
+    Heading,
     Input,
-    InputGroup,
-    InputLeftAddon,
     Modal,
     ModalOverlay,
     ModalContent,
@@ -11,14 +11,18 @@ import {
     ModalHeader,
     ModalBody,
     ModalCloseButton,
-  } from "@chakra-ui/react"
+} from "@chakra-ui/react"
+import DraftEditor from './DraftEditor/DraftEditor'
 
 function AddPostModal({ isOpen, onClose }) {
+    const [title, setTitle] = useState('')
+    const [details, setDetails] = useState('')
+
     const handleSubmit = e => {
         e.preventDefault()
         const postDetails = {
-            title: e.target[0].value,
-            description: e.target[1].value,
+            title,
+            details
         }
         console.log(postDetails)
     }
@@ -31,15 +35,15 @@ function AddPostModal({ isOpen, onClose }) {
                 <ModalCloseButton />
                 <ModalBody>
                 <form id="createPost" onSubmit={handleSubmit}>
-                    <InputGroup>
-                        <InputLeftAddon children="Title" />
-                        <Input name="postTitle" />
-                    </InputGroup>
+                    <Flex flexDirection="column" mb="16px">
+                        <Heading size="sm" mb="4px">Title</Heading>
+                        <Input name="postTitle" onChange={e => setTitle(e.target.value)} />
+                    </Flex>
                     {/* Placeholder details area */}
-                    <InputGroup mt="16px">
-                        <InputLeftAddon children="Details" />
-                        <Input name="details" />
-                    </InputGroup>
+                    <Flex flexDirection="column">
+                        <Heading size="sm" mb="4px">Details</Heading>
+                        <DraftEditor setDetails={setDetails}  />
+                    </Flex>
                 </form>
                 </ModalBody>
                 <ModalFooter>
