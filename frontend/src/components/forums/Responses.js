@@ -2,7 +2,6 @@ import React from "react"
 import {
     Button,
     Box,
-    Divider,
     Flex,
     Heading,
     Input,
