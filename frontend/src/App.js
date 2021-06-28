@@ -8,7 +8,7 @@ import {
     Route,
     Redirect,
 } from "react-router-dom"
-import TopicTree from "./components/TopicTree.js"
+import TopicTree from "./components/topictree/TopicTree.js"
 
 function App() {
     return (

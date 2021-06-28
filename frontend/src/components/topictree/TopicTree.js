@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import './TopicTree.css';
-import Header from "../components/Header.js"
+import TopicTreeHeader from "./TopicTreeHeader.js"
 
 var g;
 var svg
@@ -165,15 +165,12 @@ export default function TopicTree() {
                 d.fx = null;
                 d.fy = null;
             }
-
-            
-    
         });
     }, [data]);
 
     return (
         <div>
-            <Header sideBarLinks={links} setOpen={setOpen}></Header>
+            <TopicTreeHeader></TopicTreeHeader>
             <div id="graph" ref={ref} />
         </div>
 
