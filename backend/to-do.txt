@@ -2,13 +2,3 @@
 2. Update topic groups to include announcements, list of admin users, list of enrolled students
 3. Add DELETE request to remove content from topics
 4. Make loginBody definition and link to api call
-
-Assessments
-  Definintions
-    - GetAnswerCount
-    - GetStudentAnswer
-    - GetQuestionBankQuestions
-    - QuizQuestion
-    - QuizQuestionAnswer
-    - QuizStudentAnswer
-    - QuestionBank (just name)
