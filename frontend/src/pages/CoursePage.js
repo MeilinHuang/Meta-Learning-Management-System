@@ -3,6 +3,7 @@ import Header from "../components/Header.js"
 import Sidebar from "../components/Sidebar.js"
 import WidgetsBar from "../components/WidgetsBar.js"
 import ForumOverviewPage from "../pages/ForumOverviewPage.js"
+import ForumPostPage from '../pages/ForumPostPage'
 import {
     BrowserRouter as Router,
     Switch,
@@ -54,15 +55,15 @@ function CoursePage() {
             
             <Header sideBarLinks={links} setOpen={setOpen}></Header>
             <Flex>
-                
-                    <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
-                    <Container marginTop={50} mx="24px" maxWidth="100%">
-                        <Switch>
-                            {/* Add your page as a Route here */}
-                            <Route exact path="/forums"><ForumOverviewPage /></Route>
-                        </Switch>
-                    </Container>
-                    <WidgetsBar></WidgetsBar>
+                <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
+                <Container marginTop={50} mx="24px" maxWidth="100%">
+                    <Switch>
+                        {/* Add your page as a Route here */}
+                        <Route exact path="/forums"><ForumOverviewPage /></Route>
+                        <Route exact path="/forums/:id"><ForumPostPage /></Route>
+                    </Switch>
+                </Container>
+                <WidgetsBar></WidgetsBar>
             </Flex>
         </div>
     )
