@@ -10,6 +10,7 @@ import {
     Route,
     Redirect,
 } from "react-router-dom"
+
 import { Stack, Skeleton, useBreakpointValue, Flex, Container } from "@chakra-ui/react"
 
 function CoursePage() {
@@ -35,6 +36,10 @@ function CoursePage() {
         {
             name: 'Support',
             url: '/support',
+        },
+        {
+            name: 'Topic Tree',
+            url: '/topictree'
         }
     ]
     const smVariant = 'drawer'
@@ -46,7 +51,8 @@ function CoursePage() {
 
     //EXAMPLE PAGE LAYOUT
     return (
-        <Router>
+        <div>
+            
             <Header sideBarLinks={links} setOpen={setOpen}></Header>
             <Flex>
                 <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
@@ -59,7 +65,7 @@ function CoursePage() {
                 </Container>
                 <WidgetsBar></WidgetsBar>
             </Flex>
-        </Router>
+        </div>
     )
 }
 
