@@ -10,7 +10,7 @@ import {
     Heading,
 } from "@chakra-ui/react"
 import Tags from '../components/forums/Tags'
-import PostDetails from '../components/forums/PostDetails'
+import PostDetails from '../components/forums/PostDetails/PostDetails'
 import Responses from '../components/forums/Responses'
 import Comments from '../components/forums/Comments'
 import { BsTrash } from 'react-icons/bs'
@@ -20,7 +20,7 @@ const dummyPost = {
     author: 'John Smith',
     title: 'This is a forum post',
     published_date: 1624724805,
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non tristique libero. Mauris sit amet est nisl. Cras a leo ipsum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nunc quam, elementum vitae ligula a, consequat mattis nisl. Sed ut nisl nisi. Nam turpis risus, vehicula egestas tortor ut, sagittis vehicula urna. Nulla facilisi. Vivamus efficitur scelerisque mi ac ultrices. Pellentesque sed porttitor lacus. Aliquam euismod tempus magna pharetra laoreet. In eget ipsum eleifend, tempus quam id, cursus nisi. Vestibulum nec mi eleifend, pharetra arcu in, rhoncus libero. Duis tempus posuere nisi et mollis. Vestibulum eget laoreet arcu. Aliquam facilisis arcu dolor, sed sodales lacus egestas et.',
+    description: '<p>unstyled <strong>bold</strong> <em>italics</em> <u>underline</u> <code>code</code> </p><ul><li>unorderded list</li><li>unorderded list</li></ul><ol type="1"><li>ordered list</li><li>ordered list</li></ol><blockquote>block quote</blockquote>',
     tags: [
         {
             id: 1,

@@ -4,15 +4,17 @@ import {
     Box,
     Divider,
     Flex,
+    Text,
 } from "@chakra-ui/react"
 import { GrEdit, GrShare } from 'react-icons/gr'
-import AuthorDetails from './AuthorDetails'
+import AuthorDetails from '../AuthorDetails'
+import styles from './PostDetails.module.css'
 
 function PostDetails({ post: { author, published_date, description }}) {
     return (
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <AuthorDetails author={author} date={published_date} />
-            {description}
+            <Text className={styles.description} dangerouslySetInnerHTML={{ __html: description }} />
             <Divider my="16px" />
             <Flex justifyContent="space-between">
                 <Flex>

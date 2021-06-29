@@ -33,7 +33,7 @@ export default class SimpleStaticToolbarEditor extends Component {
     this.setState({
       editorState,
     });
-    // this.props.setDetails(convertToHTML(editorState.getCurrentContent()))
+    this.props.setDetails(convertToHTML(editorState.getCurrentContent()))
   };
 
   componentDidMount() {
@@ -66,8 +66,9 @@ export default class SimpleStaticToolbarEditor extends Component {
     const styleMap = {
         'CODE': {
             backgroundColor: '#eee',
+            borderRadius: '8px',
             fontFamily: 'Monospace',
-            padding: '4px'
+            padding: '4px',
         }
     }
 
