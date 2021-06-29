@@ -2,12 +2,11 @@ import React from "react"
 import {
     Flex,
     Link,
-    Text,
 } from "@chakra-ui/react"
 
 function AuthorControls() {
     return (
-        <Flex mt="8px">
+        <Flex mt="8px" justifyContent="flex-end">
             <Link>Edit</Link>
             <Link color="red" ml="8px">Delete</Link>
         </Flex>

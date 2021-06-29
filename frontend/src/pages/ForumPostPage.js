@@ -11,8 +11,7 @@ import {
 } from "@chakra-ui/react"
 import Tags from '../components/forums/Tags'
 import PostDetails from '../components/forums/PostDetails/PostDetails'
-import Responses from '../components/forums/Responses'
-import Comments from '../components/forums/Comments'
+import CommentsResponses from '../components/forums/CommentsResponses/CommentsResponses'
 import { BsTrash } from 'react-icons/bs'
 
 const dummyPost = {
@@ -37,6 +36,12 @@ const dummyPost = {
             author: 'Course Admin',
             published_date: 1624725805,
             description: 'Nullam ut gravida ipsum, ut blandit diam. Nunc pulvinar dui a diam ultrices pretium. Nulla eleifend diam quis accumsan porta. Proin ut nibh quam. Sed et elementum arcu, a mattis augue. Suspendisse vestibulum mi quis mollis mollis. Integer ac egestas augue. Fusce ultrices imperdiet diam. Vestibulum interdum consequat lacus, non malesuada orci consectetur bibendum. Maecenas finibus dui eget sodales condimentum. Duis mollis leo in ex luctus tincidunt.',
+        },
+        {
+            id: 2,
+            author: 'Commenter2',
+            published_date: 1624725806,
+            description: '<p>unstyled <strong>bold</strong> <em>italics</em> <u>underline</u> <code>code</code> </p><ul><li>unorderded list</li><li>unorderded list</li></ul><ol type="1"><li>ordered list</li><li>ordered list</li></ol><blockquote>block quote</blockquote>',
         }
     ],
     comments: [
@@ -45,6 +50,12 @@ const dummyPost = {
             author: 'Commenter',
             published_date: 1624725806,
             description: 'Nunc imperdiet nec felis quis porttitor. Aliquam placerat magna justo, vitae porta odio mollis et. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce lobortis, leo ac placerat rhoncus, diam nibh tempor nisi, eget eleifend felis justo sed massa. Praesent auctor magna consectetur, mollis ante vel, ornare velit. Vivamus tristique venenatis gravida. Proin in mauris sem.',
+        },
+        {
+            id: 2,
+            author: 'Commenter2',
+            published_date: 1624725806,
+            description: '<p>unstyled <strong>bold</strong> <em>italics</em> <u>underline</u> <code>code</code> </p><ul><li>unorderded list</li><li>unorderded list</li></ul><ol type="1"><li>ordered list</li><li>ordered list</li></ol><blockquote>block quote</blockquote>',
         }
     ]
 }
@@ -67,8 +78,8 @@ function ForumPostPage() {
             <Divider />
             <Tags tags={dummyPost.tags} />
             <PostDetails post={dummyPost} />
-            <Responses replies={dummyPost.replies} />
-            <Comments comments={dummyPost.comments} />
+            <CommentsResponses posts={dummyPost.replies} />
+            <CommentsResponses isComments posts={dummyPost.comments} />
         </>
     )
 }

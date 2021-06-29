@@ -1,5 +1,6 @@
 // Code based on sample code from https://www.draft-js-plugins.com/plugin/static-toolbar
 import React, { Component } from 'react';
+import classnames from 'classnames'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
 import createToolbarPlugin from '@draft-js-plugins/static-toolbar';
 import '@draft-js-plugins/static-toolbar/lib/plugin.css'
@@ -13,7 +14,7 @@ import {
     UnorderedListButton,
     OrderedListButton,
     BlockquoteButton,
-    CodeBlockButton,
+    // CodeBlockButton,
 } from '@draft-js-plugins/buttons';
 import { convertToHTML } from 'draft-convert'
 
@@ -73,8 +74,8 @@ export default class SimpleStaticToolbarEditor extends Component {
     }
 
     return (
-        <div>
-            <div className={styles.editor} onClick={this.focus}>
+        <>
+            <div className={classnames(styles.editor, this.props.classname)} onClick={this.focus}>
             <Editor
                 blockStyleFn={this.styleBlocks}
                 customStyleMap={styleMap}
@@ -102,7 +103,7 @@ export default class SimpleStaticToolbarEditor extends Component {
                 }
             </Toolbar>
             </div>
-        </div>
+        </>
     );
   }
 }

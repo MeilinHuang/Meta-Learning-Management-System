@@ -1,9 +1,6 @@
 import React, { useState } from "react"
 import {
-    Alert,
-    AlertDescription,
     Button,
-    CloseButton,
     Flex,
     Heading,
     Input,
@@ -20,8 +17,6 @@ import DraftEditor from './DraftEditor/DraftEditor'
 function AddPostModal({ isOpen, onClose }) {
     const [title, setTitle] = useState('')
     const [details, setDetails] = useState('')
-    // const [post, setPost] = useState('')
-    // const [showAlert, setShowAlert] = useState(false)
 
     const handleSubmit = e => {
         e.preventDefault()
@@ -29,8 +24,6 @@ function AddPostModal({ isOpen, onClose }) {
             title,
             details
         }
-        // setPost(details)
-        // setShowAlert(true)
         console.log(postDetails)
     }
 
@@ -59,10 +52,6 @@ function AddPostModal({ isOpen, onClose }) {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
-            {/* {showAlert && <Alert status="error">
-                <AlertDescription dangerouslySetInnerHTML={{ __html: post }} />
-                <CloseButton position="absolute" right="8px" top="8px" />
-            </Alert>} */}
         </>
     )
 }
