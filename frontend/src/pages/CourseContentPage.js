@@ -8,7 +8,7 @@ function CourseContentPage() {
             <Box marginBottom={10}>
                 <Flex alignItems="center">
                     <Heading flexGrow={1}size="lg">Course Content</Heading>
-                    {/* TODO ONLY FOR ADMIN */}
+                    {/* TODO ONLY FOR ADMIN TO EDIT TOPIC TREE*/}
                     <Button color="white" bg="blue.400" size={buttonSize}>EDIT</Button>
                 </Flex>
                 <Divider></Divider>
