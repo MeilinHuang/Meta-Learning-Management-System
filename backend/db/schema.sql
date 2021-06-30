@@ -1,22 +1,24 @@
+-- \i 'C:/Users/Dave/Desktop/COMP4962 - Thesis B/metalms/backend/db/schema.sql';
 
 -- USERS
-DROP TABLE IF EXISTS "user_student" CASCADE;
-CREATE TABLE IF NOT EXISTS "user_student" (
-  id INTEGER NOT NULL PRIMARY KEY,
+DROP TABLE IF EXISTS "users" CASCADE;
+CREATE TABLE IF NOT EXISTS "users" (
+  id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  zId TEXT NOT NULL
+  zId TEXT NOT NULL,
+  isAdmin BOOLEAN NOT NULL
 );
 
 DROP TABLE IF EXISTS "topic_group" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_group" (
-  id INTEGER NOT NULL PRIMARY KEY,
+  id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   topic_code TEXT NOT NULL
 );
 
 DROP TABLE IF EXISTS "user_admin" CASCADE;
 CREATE TABLE IF NOT EXISTS "user_admin" (
-  admin_id INTEGER NOT NULL,
+  admin_id SERIAL NOT NULL REFERENCES users(id),
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
   PRIMARY KEY (admin_id, topic_group_id)
 );
@@ -24,7 +26,7 @@ CREATE TABLE IF NOT EXISTS "user_admin" (
 DROP TABLE IF EXISTS "user_enrolled" CASCADE;
 CREATE TABLE IF NOT EXISTS "user_enrolled" (
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
-  user_id INTEGER NOT NULL REFERENCES user_student(id),
+  user_id INTEGER NOT NULL REFERENCES users(id),
   PRIMARY KEY(user_id, topic_group_id)
 );
 
@@ -60,7 +62,7 @@ DROP TABLE IF EXISTS "forum_posts" CASCADE;
 CREATE TABLE IF NOT EXISTS "forum_posts" (
   post_id INTEGER NOT NULL PRIMARY KEY,
   title TEXT NOT NULL,
-  user_id INTEGER NOT NULL REFERENCES user_student(id),
+  user_id INTEGER NOT NULL REFERENCES users(id),
   author TEXT NOT NULL,
   published_date TIMESTAMP,
   description TEXT,
@@ -76,7 +78,7 @@ CREATE TABLE IF NOT EXISTS "tags" (
 DROP TABLE IF EXISTS "replies" CASCADE;
 CREATE TABLE IF NOT EXISTS "replies" (
   reply_id INTEGER NOT NULL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES user_student(id),
+  user_id INTEGER NOT NULL REFERENCES users(id),
   author TEXT NOT NULL,
   published_date TIMESTAMP,
   reply TEXT
@@ -85,7 +87,7 @@ CREATE TABLE IF NOT EXISTS "replies" (
 DROP TABLE IF EXISTS "post_comments" CASCADE;
 CREATE TABLE IF NOT EXISTS "post_comments" (
   comment_id INTEGER NOT NULL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES user_student(id),
+  user_id INTEGER NOT NULL REFERENCES users(id),
   author TEXT NOT NULL,
   published_date TIMESTAMP,
   comment TEXT
@@ -139,7 +141,7 @@ CREATE TABLE IF NOT EXISTS "post_tags"(
 -- Course Pages
 DROP TABLE IF EXISTS "user_content_progress" CASCADE;
 CREATE TABLE "user_content_progress" (
-  user_id INTEGER NOT NULL REFERENCES user_student(id),
+  user_id INTEGER NOT NULL REFERENCES users(id),
   topic_file_id INTEGER NOT NULL REFERENCES topic_files(id),
   topic_id INTEGER NOT NULL REFERENCES topics(id),
   course_progression INTEGER NOT NULL 
@@ -148,7 +150,7 @@ CREATE TABLE "user_content_progress" (
 DROP TABLE IF EXISTS "announcements" CASCADE;
 CREATE TABLE IF NOT EXISTS "announcements" (
   id INTEGER PRIMARY KEY,
-  author INTEGER NOT NULL REFERENCES user_student(id),
+  author INTEGER NOT NULL REFERENCES users(id),
   topic_group INTEGER NOT NULL REFERENCES topic_group(id),
   title TEXT NOT NULL,
   content TEXT NOT NULL,
@@ -160,7 +162,7 @@ DROP TABLE IF EXISTS "announcement_comment" CASCADE;
 CREATE TABLE "announcement_comment" (
   id INTEGER PRIMARY KEY,
   announcement_id INTEGER NOT NULL REFERENCES announcements(id),
-  author INTEGER NOT NULL REFERENCES user_student(id),
+  author INTEGER NOT NULL REFERENCES users(id),
   content TEXT NOT NULL,
   attachments TEXT
 );
@@ -233,7 +235,7 @@ CREATE TABLE "quiz_question_answer" (
 
 DROP TABLE IF EXISTS "quiz_student_answer" CASCADE;
 CREATE TABLE "quiz_student_answer" (
-  student_id INTEGER NOT NULL REFERENCES user_student(id),
+  student_id INTEGER NOT NULL REFERENCES users(id),
   quiz_id INTEGER NOT NULL REFERENCES quiz(id),
   question_id INTEGER NOT NULL REFERENCES quiz_question(id),
   answer_selected_id INTEGER NOT NULL REFERENCES quiz_question_answer(id)
