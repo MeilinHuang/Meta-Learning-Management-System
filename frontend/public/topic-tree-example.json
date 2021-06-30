@@ -1,0 +1,225 @@
+{
+    "nodes": [
+        {
+            "id": 1,
+            "title": "Variables",
+            "prerequisite_strings": [],
+            "description": "All about Variables in C!",
+            "materials_strings": {
+                "preparation": [],
+                "content": [],
+                "practice": [],
+                "assessment": []
+            },
+            "group": "C Programming",
+            "discipline": "Computer Science and Engineering",
+            "creator": "greg"
+        },
+        {
+            "id": 2,
+            "title": "Pointers",
+            "prerequisite_strings": [
+                "Variables"
+            ],
+            "description": "All about Pointers in C",
+            "materials_strings": {
+                "preparation": [
+                    "Motivation for Learning.mp4",
+                    "Listening.mp3"
+                ],
+                "content": [
+                    "Lecture Slides.pdf",
+                    "Walkthrough.mp4",
+                    "Swap.mp4",
+                    "diagram.png"
+                ],
+                "practice": [
+                    "Exercise Set 1.pdf",
+                    "Exercise Set 2.pdf"
+                ],
+                "assessment": [
+                    "Test Questions.pdf"
+                ]
+            },
+            "group": "C Programming",
+            "discipline": "Computer Science and Engineering",
+            "creator": "greg"
+        },
+        {
+            "id": 3,
+            "title": "Struct",
+            "prerequisite_strings": [
+                "Variables"
+            ],
+            "description": "All about Structs",
+            "materials_strings": {
+                "preparation": [],
+                "content": [],
+                "practice": [],
+                "assessment": []
+            },
+            "group": "C Programming",
+            "discipline": "Computer Science and Engineering",
+            "creator": "greg"
+        },
+        {
+            "id": 5,
+            "title": "Linked list",
+            "prerequisite_strings": [
+                "Struct"
+            ],
+            "description": "All about Linked List",
+            "materials_strings": {
+                "preparation": [],
+                "content": [],
+                "practice": [],
+                "assessment": []
+            },
+            "group": "C Programming",
+            "discipline": "Computer Science and Engineering",
+            "creator": "greg"
+        },
+        {
+            "id": 6,
+            "title": "Doubly linked list",
+            "prerequisite_strings": [
+                "Linked list"
+            ],
+            "description": "All about Doubly Linked Lists",
+            "materials_strings": {
+                "preparation": [],
+                "content": [
+                    "HCI-2021T2-Assignment1.pdf"
+                ],
+                "practice": [],
+                "assessment": []
+            },
+            "group": "Data Structure and Algorithms",
+            "discipline": "Computer Science and Engineering",
+            "creator": "greg"
+        },
+        {
+            "id": 7,
+            "title": "Graph",
+            "prerequisite_strings": [
+                "Doubly linked list"
+            ],
+            "description": "All about graphs",
+            "materials_strings": {
+                "preparation": [],
+                "content": [],
+                "practice": [],
+                "assessment": []
+            },
+            "group": "Data Structure and Algorithms",
+            "discipline": "Computer Science and Engineering",
+            "creator": "greg"
+        },
+        {
+            "id": 8,
+            "title": "Binary tree",
+            "prerequisite_strings": [
+                "Linked list"
+            ],
+            "description": "All about trees!",
+            "materials_strings": {
+                "preparation": [],
+                "content": [],
+                "practice": [],
+                "assessment": []
+            },
+            "group": "Data Structure and Algorithms",
+            "discipline": "Computer Science and Engineering",
+            "creator": "greg"
+        },
+        {
+            "id": 9,
+            "title": "Arrays",
+            "prerequisite_strings": [
+                "Variables"
+            ],
+            "description": "All about arrays",
+            "materials_strings": {
+                "preparation": [],
+                "content": [],
+                "practice": [],
+                "assessment": []
+            },
+            "group": "C Programming",
+            "discipline": "Computer Science and Engineering",
+            "creator": "greg"
+        },
+        {
+            "id": 11,
+            "title": "Strings",
+            "prerequisite_strings": [],
+            "description": "All about Strings",
+            "materials_strings": {
+                "preparation": [
+                    "str.md"
+                ],
+                "content": [
+                    "DetailedArticle.html"
+                ],
+                "practice": [
+                    "StrExplained.pdf"
+                ],
+                "assessment": []
+            },
+            "group": "C Programming",
+            "discipline": "Computer Science and Engineering",
+            "creator": "greg"
+        },
+        {
+            "id": 12,
+            "title": "Binary search",
+            "prerequisite_strings": [
+                "Binary tree"
+            ],
+            "description": "All about binary search in C!",
+            "materials_strings": {
+                "preparation": [],
+                "content": [],
+                "practice": [],
+                "assessment": []
+            },
+            "group": "Data Structure and Algorithms",
+            "discipline": "Computer Science and Engineering",
+            "creator": "greg"
+        }
+    ],
+    "links": [
+        {
+            "source": 1,
+            "target": 2
+        },
+        {
+            "source": 1,
+            "target": 3
+        },
+        {
+            "source": 3,
+            "target": 5
+        },
+        {
+            "source": 5,
+            "target": 6
+        },
+        {
+            "source": 6,
+            "target": 7
+        },
+        {
+            "source": 5,
+            "target": 8
+        },
+        {
+            "source": 1,
+            "target": 9
+        },
+        {
+            "source": 8,
+            "target": 12
+        }
+    ]
+}
