@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import React from "react"
 import {
     Box,
     Flex,
@@ -15,18 +15,25 @@ import {
     useDisclosure,
     useColorModeValue,
     Stack,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton,
   } from '@chakra-ui/react';
   import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 
+import TopicTreeAddTopic from './TopicTreeAddTopic.js';
 
-const Links = ['Add a Topic'];
-
-const NavLink = ({ children }) => (
+const NavLink = ({ onClick, children }) => (
     <Link
         px={2}
         py={1}
         color={'white'}
         rounded={'md'}
+        onClick={onClick}
         _hover={
             {
                 textDecoration: 'none',
@@ -38,11 +45,17 @@ const NavLink = ({ children }) => (
     </Link>
 );
   
-export default function TopicTreeHeader() {
+export default function TopicTreeHeader({id}) {
     const { isOpen, onOpen, onClose } = useDisclosure();
+
+    const { 
+        isOpen:isOpenModal, 
+        onOpen: onOpenModal, 
+        onClose: onCloseModal 
+    } = useDisclosure();
   
     return (
-        <>
+        <div id={id}>
             <Box bg={useColorModeValue('blue.400', 'blue.400')} px={4}>
             <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
                 <IconButton
@@ -58,9 +71,8 @@ export default function TopicTreeHeader() {
                         as={'nav'}
                         spacing={4}
                         display={{ base: 'none', md: 'flex' }}>
-                        {Links.map((link) => (
-                        <NavLink key={link}>{link}</NavLink>
-                        ))}
+                        
+                        <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
                     </HStack>
                 </HStack>
                 <Flex alignItems={'center'}>
@@ -90,13 +102,12 @@ export default function TopicTreeHeader() {
             {isOpen ? (
                 <Box pb={4} display={{ md: 'none' }}>
                 <Stack as={'nav'} spacing={4}>
-                    {Links.map((link) => (
-                    <NavLink key={link}>{link}</NavLink>
-                    ))}
+                    <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
                 </Stack>
                 </Box>
             ) : null}
             </Box>
-        </>
+            <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} />
+        </div>
     );
   }

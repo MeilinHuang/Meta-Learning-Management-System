@@ -7,7 +7,6 @@ var g;
 var svg
 
 function zoomed() {
-    console.log('zoomed!');
     g.attr("transform", d3.event.transform);
 }
 
@@ -53,7 +52,7 @@ export default function TopicTree() {
         let size = 500;
 
         let width = window.innerWidth;
-        let height = window.innerHeight;
+        let height = window.innerHeight - document.getElementById('topic-tree-header').getBoundingClientRect().height;
         let zoom = d3.zoom()
             .scaleExtent([0.3, 4])
             .on("zoom", zoomed);
@@ -64,13 +63,14 @@ export default function TopicTree() {
                         .call(zoom);
         g = svg.append("g")
         var simulation = d3.forceSimulation()
-            .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(50))
-            .force("charge", d3.forceManyBody())
+            .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(400))
+            .force("charge", d3.forceManyBody().strength(-70))
             .force("center", d3.forceCenter(width / 2, height / 2));
 
         
-
-        d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json")
+        // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
+        fetch('/topic-tree-example.json')
+        .then((res) => res.json())
         .then( function(data) {
             
             // arrow heads
@@ -79,7 +79,7 @@ export default function TopicTree() {
                 .enter().append("svg:marker")
                 .attr("id", String)
                 .attr("viewBox", "0 -5 10 10")
-                .attr("refX", 20) // whereabouts it is on the line - TODO adjust this dependon if we are talking about distance of hull or topic nodes
+                .attr("refX", 43) // whereabouts it is on the line - TODO adjust this dependon if we are talking about distance of hull or topic nodes
                 .attr("refY", 0)
                 .attr("markerWidth", 10)
                 .attr("markerHeight", 6)
@@ -100,29 +100,35 @@ export default function TopicTree() {
                 .style("stroke", "#666")
                 .style("stroke-width", "1.5px")
                 .style("opacity", 0.8);
+                
             
             // Initialize the nodes
             var node = g
                 .attr("class", "nodes")
                 .selectAll("g")
                 .data(data.nodes)
-                .enter().append("g");
+                .enter().append("g")
+                .on("click", function() {
+                    console.log("node clicked", d3.select(this).text());
+                });
+            let radius = 30;
             var circles = node.append("circle")
-            .attr("r", 10)
+            .attr("r", radius)
             .attr("fill",'#ADD8E6')
             .call(d3.drag()
                 .on("start", dragstarted)
                 .on("drag", dragged)
-                .on("end", dragended));
-
+                .on("end", dragended))
+                
             var lables = node.append("text")
+                .attr('text-anchor', 'middle')
+                .attr('alignment-baseline', 'middle')
+                .style("font-size", "8px")
+                .append('tspan')
                 .text(function(d) {
-                  return d.name;
+                  return d.title;
                 })
-                .attr('x', -5)
-                .attr('y', 5)
-            node.append("title")
-                .text(function(d) { return d.name; });
+                
         
             simulation
                 .nodes(data.nodes)
@@ -133,8 +139,7 @@ export default function TopicTree() {
     
             // This function is run at each iteration of the force algorithm, updating the nodes position.
             function ticked() {
-                link
-                .attr('d', function (d) {
+                link.attr('d', function (d) {
                     var dx = d.target.x - d.source.x,
                         dy = d.target.y - d.source.y,
                         dr = Math.sqrt(dx * dx + dy * dy);
@@ -143,10 +148,10 @@ export default function TopicTree() {
                     return val2;
                 });
             
-                node
-                    .attr("transform", function(d) {
+                node.attr("transform", function(d) {
                       return "translate(" + d.x + "," + d.y + ")";
                     })
+                    
             }
 
             function dragstarted(d) {
@@ -170,7 +175,7 @@ export default function TopicTree() {
 
     return (
         <div>
-            <TopicTreeHeader></TopicTreeHeader>
+            <TopicTreeHeader id="topic-tree-header"></TopicTreeHeader>
             <div id="graph" ref={ref} />
         </div>
 
