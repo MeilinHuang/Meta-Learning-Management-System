@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import './TopicTree.css';
 import TopicTreeHeader from "./TopicTreeHeader.js"
+import { Spinner } from '@chakra-ui/spinner';
+import { Button, Text, Heading, Box, Input, Flex, InputGroup, InputLeftElement, Stack, Divider } from '@chakra-ui/react';
+import { SearchIcon, ArrowRightIcon } from '@chakra-ui/icons'
 
 var g;
 var svg
@@ -12,6 +15,9 @@ function zoomed() {
 }
 
 export default function TopicTree() {
+
+    const [view, setView] = useState("Graph View")
+
     const ref = useRef();
     const dataset = [100, 200, 300, 400, 500];
     const [data, setData] = useState([]);
@@ -43,8 +49,6 @@ export default function TopicTree() {
     ];
     const [isOpen, setOpen] = useState(false);
 
- 
-
     // Runs on start, used for testing mainly
     useEffect(() => {
 
@@ -68,11 +72,12 @@ export default function TopicTree() {
             .force("charge", d3.forceManyBody())
             .force("center", d3.forceCenter(width / 2, height / 2));
 
-        
-
         d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json")
         .then( function(data) {
             
+            //TODO MIGHT NEED TO CHANGE SO THAT DATA ISNT PULLED EVERYTIME USER CHANGES VIEW
+            setData(data)
+
             // arrow heads
             svg.append("svg:defs").selectAll("marker")
                 .data(["end"])
@@ -166,13 +171,68 @@ export default function TopicTree() {
                 d.fy = null;
             }
         });
-    }, [data]);
+    }, [view]);
 
-    return (
-        <div>
-            <TopicTreeHeader></TopicTreeHeader>
-            <div id="graph" ref={ref} />
-        </div>
+    let pageView = null
+    if (view === "Graph View") {
+        pageView = (
+            <div>
+                <TopicTreeHeader view={view} setView={setView}></TopicTreeHeader>
+                <div id="graph" ref={ref} />
+            </div>
+        )
+    }
+    else {
+        if (data != null) {
+            pageView = (
+            <div>
+                <TopicTreeHeader view={view} setView={setView}></TopicTreeHeader>
+                <Box paddingInline={[5, 15, 30, 80]} paddingBlock={10}>
+                    <Flex flexDirection={["column", "column", "row"]}>
+                        <Heading>Topic Groups</Heading>
+                        <InputGroup variant="filled" marginLeft={["0", "0", "20%"]} width={["80%", "70%", "30%"]} alignSelf="center">
+                            <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
+                            <Input placeholder="Search"></Input>
+                        </InputGroup>
+                    </Flex>
+                    <Stack spacing={5} divider={<Divider></Divider>} marginTop={10}>
+                        {data.nodes.map(e => {
+                            return (
+                                <Flex key={"topic-group-" + e.id} padding={5} justifyContent="auto">
+                                    <Button as={Flex} bg="white" cursor="pointer" flexGrow={1}>
+                                        <ArrowRightIcon color="blue.500" alignSelf="center"></ArrowRightIcon>
+                                        <Box marginLeft={10} width={[200]}>
+                                            <Heading fontSize="lg">
+                                                {e.name}
+                                            </Heading>
+                                        </Box>
+                                        <Box marginLeft={10}>
+                                            <Text>
+                                                {"COMP" + (parseInt(e.id)*1000).toString().substring(0,4)}
+                                            </Text>
+                                        </Box>
+                                        <Box marginLeft={10} fontSize="sm">
+                                            <Text>
+                                                5 Topics
+                                            </Text>
+                                        </Box>
+                                        <Box flexGrow={1}></Box>
+                                    </Button>
+                                    <Box flexGrow={0.1}></Box>
+                                    <Button bg="blue.500" color="white">Visit Course Page</Button>
+                                </Flex>
+                            )
+                        })}
+                    </Stack>
+                </Box>
+                
+            </div>
+            )
+        }
+        else {
+            pageView = <Spinner></Spinner>
+        }
+    }
 
-    )
+    return pageView
 }

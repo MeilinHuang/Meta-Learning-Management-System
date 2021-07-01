@@ -9,10 +9,9 @@ import {
     BrowserRouter as Router,
     Switch,
     Route,
-    Redirect,
 } from "react-router-dom"
 
-import { Stack, Skeleton, useBreakpointValue, Flex, Container } from "@chakra-ui/react"
+import { useBreakpointValue, Flex, Container } from "@chakra-ui/react"
 
 function CoursePage() {
     //currently hardcoded sidebar content
