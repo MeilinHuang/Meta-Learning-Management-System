@@ -1,24 +1,28 @@
 -- \i 'C:/Users/Dave/Desktop/COMP4962 - Thesis B/metalms/backend/db/schema.sql';
 
+-- Reset Schema
+DROP SCHEMA public cascade;
+CREATE SCHEMA public;
+
 -- USERS
 DROP TABLE IF EXISTS "users" CASCADE;
 CREATE TABLE IF NOT EXISTS "users" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  zId TEXT NOT NULL,
-  isAdmin BOOLEAN NOT NULL
+  zId TEXT NOT NULL
 );
 
 DROP TABLE IF EXISTS "topic_group" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_group" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  topic_code TEXT NOT NULL
+  topic_code TEXT NOT NULL,
+  course_outline TEXT
 );
 
 DROP TABLE IF EXISTS "user_admin" CASCADE;
 CREATE TABLE IF NOT EXISTS "user_admin" (
-  admin_id SERIAL NOT NULL REFERENCES users(id),
+  admin_id INTEGER NOT NULL REFERENCES users(id),
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
   PRIMARY KEY (admin_id, topic_group_id)
 );
@@ -27,13 +31,14 @@ DROP TABLE IF EXISTS "user_enrolled" CASCADE;
 CREATE TABLE IF NOT EXISTS "user_enrolled" (
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
   user_id INTEGER NOT NULL REFERENCES users(id),
+  user_progress REAL NOT NULL, 
   PRIMARY KEY(user_id, topic_group_id)
 );
 
 -- TOPIC GROUPSS
 DROP TABLE IF EXISTS "topics" CASCADE;
 CREATE TABLE IF NOT EXISTS "topics" (
-  id INTEGER NOT NULL PRIMARY KEY,
+  id SERIAL NOT NULL PRIMARY KEY,
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
   name TEXT NOT NULL
 );
@@ -47,7 +52,7 @@ CREATE TABLE IF NOT EXISTS "prerequisites" (
 
 DROP TABLE IF EXISTS "topic_files" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_files" (
-  id INTEGER NOT NULL PRIMARY KEY,
+  id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   file_id TEXT NOT NULL,
   topic_id INTEGER NOT NULL REFERENCES topics(id),
@@ -255,4 +260,23 @@ CREATE TABLE "quiz_poll" (
   close_time TIMESTAMP,
   is_closed BOOLEAN NOT NULL,
   poll_type TEXT NOT NULL
+);
+
+-- Lectures and Tutorials
+DROP TABLE IF EXISTS "tutorials" CASCADE;
+CREATE TABLE "tutorials" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  tutor_id INTEGER NOT NULL REFERENCES users(id),
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
+  tutorial_code TEXT NOT NULL,
+  timeslot TEXT,
+  curr_capacity INTEGER NOT NULL,
+  max_capacity INTEGER NOT NULL
+);
+
+DROP TABLE IF EXISTS "enrolled_tutorials" CASCADE;
+CREATE TABLE "enrolled_tutorials" (
+  tutorial_id INTEGER NOT NULL REFERENCES tutorials(id),
+  student_id INTEGER NOT NULL REFERENCES users(id),
+  PRIMARY KEY (tutorial_id, student_id)
 );

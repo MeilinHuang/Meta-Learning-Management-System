@@ -1137,37 +1137,6 @@
           }
         }
       },
-      "put": {
-        "tags": ["User"],
-        "summary": "Make user an admin for a topic group",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "description": "Id of user we want to make an admin",
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
-          },
-          "400": {
-            "schema": { 
-              "$ref": "#/definitions/400"
-            }
-          },
-          "403": {
-            "schema": {
-              "$ref": "#/definitions/403"
-            }
-          }
-        }
-      },
       "delete": {
         "tags": ["User"],
         "summary": "Delete user from id",
@@ -1197,7 +1166,79 @@
         }
       }
     },
-    "/{$course}/announcement": {
+    "/user/{userId}/{topicGroupId}": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Make user an admin for a topic group",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "Id of user we want to make an admin",
+            "type": "integer"
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "required": true,
+            "description": "Id of topic group to make admin for",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["User"],
+        "summary": "Delete admin user from id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "Id of user we want",
+            "type": "integer"
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "required": true,
+            "description": "Id of topic group to make admin for",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/{course}/announcement": {
       "get": {
         "tags": ["Course Pages"],
         "summary": "Get all announcements",
@@ -1807,7 +1848,7 @@
         }
       }
     },
-    "/topicGroup/{$topicGroupName}/topic": {
+    "/topicGroup/{topicGroupName}/topic": {
       "get": {
         "tags": ["Topic Tree"],
         "summary": "Get list of Topics",
@@ -2212,9 +2253,6 @@
           "type": "integer",
           "uniqueItems": true
         },
-        "isPublic": {
-          "type": "boolean"
-        },
         "name": {
           "type": "string",
           "example": "Sorting"
@@ -2247,9 +2285,6 @@
         "_id": {
           "type": "integer",
           "uniqueItems": true
-        },
-        "isPublic": {
-          "type": "boolean"
         },
         "name": {
           "type": "string",
@@ -2321,9 +2356,6 @@
                 "type": "integer",
                 "uniqueItems": true
               },
-              "isPublic": {
-                "type": "boolean"
-              },
               "name": {
                 "type": "string",
                 "example": "Sorting"
@@ -2366,9 +2398,6 @@
                 "type": "integer",
                 "uniqueItems": true
               },
-              "isPublic": {
-                "type": "boolean"
-              },
               "name": {
                 "type": "string",
                 "example": "Algorithms"
@@ -2377,46 +2406,54 @@
                 "type": "array",
                 "items": {
                   "type": "object",
-                  "example": "sorting"
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "topic_group_id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Arrays"
+                    }
+                  }
                 }
               },
-              "tutorialTimes": {
+              "tutorialList": {
                 "type": "array",
                 "items": {
                   "type": "object",
                   "properties": {
-                    "tutorialCode": {
-                      "type": "string",
-                      "example": "M18A2"
+                    "id": {
+                      "type": "integer",
+                      "example": 0
                     },
-                    "timeSlot": {
-                      "type": "dateTime",
+                    "tutor_id": {
+                      "type": "integer",
+                      "example": 3
+                    }
+                    ,"topic_group_id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "tutorial_code": {
+                      "type": "string",
+                      "example": "W82A1"
+                    },
+                    "timeslot": {
+                      "type": "string",
                       "example": "10:00-11:00"
                     },
-                    "tutor": {
-                      "type": "string",
-                      "example": "John Smith"
-                    },
-                    "enrolledStudents": {
-                      "type": "array",
-                      "description": "List of enrolled students in tutorial",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string",
-                            "example": "Jessica Smith"
-                          },
-                          "studentId": {
-                            "type": "integer",
-                            "example": "z2183122"
-                          }
-                        }
-                      }
-                    },
-                    "maxCapacity": {
+                    "curr_capacity": {
                       "type": "integer",
-                      "example": 20
+                      "example": 0
+                    },
+                    "max_capacity": {
+                      "type": "integer",
+                      "example": 30
                     }
                   }
                 }
@@ -2445,9 +2482,6 @@
               "_id": {
                 "type": "integer",
                 "uniqueItems": true
-              },
-              "isPublic": {
-                "type": "boolean"
               },
               "name": {
                 "type": "string",
@@ -2671,81 +2705,34 @@
           "type": "integer",
           "uniqueItems": true
         },
-        "name": {
+        "user_name": {
           "type": "string",
           "example": "John Smitty"
         },
-        "isAdmin": {
-          "type": "boolean",
-          "example": false
+        "zid": {
+          "type": "string",
+          "example": "z5123842"
         },
         "enrolledCourses": {
           "type": "array",
           "items": {
             "type": "object",
             "properties": {
-              "_id": {
+              "id": {
                 "type": "integer",
-                "uniqueItems": true
-              },
-              "isPublic": {
-                "type": "boolean"
+                "example": 1
               },
               "name": {
                 "type": "string",
-                "example": "Algorithms"
+                "example": "C++ Programming"
               },
-              "topics": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "example": "sorting"
-                }
+              "topic_code": {
+                "type": "string",
+                "example": "COMP5661"
               },
-              "tutorialTimes": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "tutorialCode": {
-                      "type": "string",
-                      "example": "M18A2"
-                    },
-                    "timeSlot": {
-                      "type": "dateTime",
-                      "example": "10:00-11:00"
-                    },
-                    "tutor": {
-                      "type": "string",
-                      "example": "John Smith"
-                    },
-                    "enrolledStudents": {
-                      "type": "array",
-                      "description": "List of enrolled students in tutorial",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string",
-                            "example": "Jessica Smith"
-                          },
-                          "studentId": {
-                            "type": "integer",
-                            "example": "z2183122"
-                          }
-                        }
-                      }
-                    },
-                    "maxCapacity": {
-                      "type": "integer",
-                      "example": 20
-                    }
-                  }
-                }
-              },
-              "courseOutline": {
-                "type": "file",
-                "example": "course_outline.pdf"
+              "course_outline": {
+                "type": "string",
+                "example": "Course_outline.pdf"
               }
             }
           }

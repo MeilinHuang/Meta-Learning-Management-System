@@ -6,6 +6,3 @@
 Database 
   - File system 
   - Express file upload 
-
-Etc 
-  - auto set ID for users
