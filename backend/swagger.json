@@ -796,14 +796,14 @@
         }
       }
     },
-    "/questions/{$questionId}": {
+    "/questions/{questionId}": {
       "get": {
         "tags": ["Gamification"],
         "summary": "Get all level data from question id",
         "parameters": [
           {
             "name": "questionId",
-            "type": "string",
+            "type": "integer",
             "in": "path",
             "required": true,
             "description": "Id of question to get level data from"
@@ -872,7 +872,7 @@
             "name": "questionId",
             "in": "path",
             "required": true,
-            "description": "Id of level we want to delete",
+            "description": "Id of question to delete",
             "type": "string"
           }
         ],
@@ -917,14 +917,14 @@
         }
       }
     },
-    "/level/{$levelId}": {
+    "/levels/{levelId}": {
       "get": {
         "tags": ["Gamification"],
         "summary": "Get level data for specified level id",
         "parameters": [
           {
             "name": "levelId",
-            "type": "string",
+            "type": "integer",
             "required": true,
             "in": "path",
             "description": "Id of level we want data for"
@@ -954,11 +954,18 @@
         "summary": "Edit existing level data",
         "parameters": [
           {
+            "name": "levelId",
+            "type": "integer",
+            "required": true,
+            "in": "path",
+            "description": "Id of level"
+          },
+          {
             "name": "editLevel",
             "in": "body",
             "description": "Details of updated level",
             "schema": {
-              "$ref": "#/definitions/Level"
+              "$ref": "#/definitions/PutLevel"
             }
           }
         ],
@@ -990,7 +997,7 @@
             "in": "path",
             "required": true,
             "description": "Id of level we want to delete",
-            "type": "string"
+            "type": "integer"
           }
         ],
         "responses": {
@@ -1020,7 +1027,7 @@
             "in": "body",
             "description": "New level body",
             "schema": {
-              "$ref": "#/definitions/Level"
+              "$ref": "#/definitions/PostLevel"
             }
           }
         ],
@@ -1041,13 +1048,13 @@
         }
       }
     },
-    "/{$level}/questions": {
+    "/{level}/questions": {
       "get": {
         "tags": ["Gamification"],
         "summary": "Get all questions linked to level",
         "parameters": [
           {
-            "name": "levelName",
+            "name": "level",
             "in": "path",
             "description": "Name of level to get questions for",
             "required": true,
@@ -1058,7 +1065,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/GetLevelQuestions"
+              "$ref": "#/definitions/GetAllQuestions"
             }
           },
           "400": {
@@ -1238,14 +1245,14 @@
         }
       }
     },
-    "/{course}/announcement": {
+    "/{topicGroup}/announcement": {
       "get": {
         "tags": ["Course Pages"],
         "summary": "Get all announcements",
         "parameters": [
           {
-            "name": "course",
-            "description": "Name of course to get announcements",
+            "name": "topicGroup",
+            "description": "Name of topic group to get announcements",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1271,14 +1278,14 @@
         }
       }
     },
-    "/{$course}/announcement/new": {
+    "/{topicGroup}/announcement/new": {
       "post": {
         "tags": ["Course Pages"],
         "summary": "Create new announcement",
         "parameters": [
           {
-            "name": "course",
-            "description": "Name of course to create announcement for",
+            "name": "topicGroup",
+            "description": "Name of topic Group",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1288,7 +1295,45 @@
             "in": "body",
             "description": "Announcement body",
             "schema": {
-              "$ref": "#/definitions/Announcement"
+              "$ref": "#/definitions/PostAnnouncement"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroup}/announcement/comment": {
+      "post": {
+        "tags": ["Course Pages"],
+        "summary": "Create new announcement comment",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "description": "Name of topic Group to create announcement for",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "commentBody",
+            "in": "body",
+            "description": "Comment body",
+            "schema": {
+              "$ref": "#/definitions/PostAnnouncementComment"
             }
           }
         ],
@@ -1357,7 +1402,7 @@
         }
       }
     },
-    "/forum/search/{$forumSearchTerm}": {
+    "/forum/search/{forumSearchTerm}": {
       "get": {
         "tags": ["Forums"],
         "summary": "Get all forum posts related to the search query",
@@ -1390,7 +1435,7 @@
         }
       }
     },
-    "/forum/{$forumFilterTerm}": {
+    "/forum/{forumFilterTerm}": {
       "get": {
         "tags": ["Forums"],
         "summary": "Get all forum posts related to the filter term",
@@ -1457,7 +1502,7 @@
         }
       }
     },
-    "/forum/post/{$postId}": {
+    "/forum/post/{postId}": {
       "get": {
         "tags": ["Forums"],
         "summary": "Get post details of post associated with post id",
@@ -1505,7 +1550,7 @@
             "in": "body",
             "description": "Details of updated post",
             "schema": {
-              "$ref": "#/definitions/ForumPost"
+              "$ref": "#/definitions/PutForumPost"
             }
           }
         ],
@@ -1529,24 +1574,31 @@
         }
       }
     },
-    "/forum/post/${postId}/reply": {
+    "/forum/post/{postId}/reply/{replyId}": {
       "put": {
         "tags": ["Forums"],
         "summary": "Update reply on a post with id",
         "parameters": [
           {
-            "name": "postId",
+            "name": "replyId",
             "in": "path",
             "required": true,
-            "description": "Id of post we want to update our reply",
-            "type": "string"
+            "description": "Id of reply we want to update",
+            "type": "integer"
+          },
+          {
+            "name": "postId",
+            "in": "path",
+            "required": false,
+            "description": "Id of post",
+            "type": "integer"
           },
           {
             "name": "replyDetails",
             "in": "body",
             "description": "Details of updated post reply",
             "schema": {
-              "$ref": "#/definitions/PostReply"
+              "$ref": "#/definitions/PutReply"
             }
           }
         ],
@@ -1565,10 +1617,12 @@
             }
           }
         }
-      },
+      }
+    },
+    "/forum/post/{postId}/reply": {
       "post": {
         "tags": ["Forums"],
-        "summary": "Get post details of post associated with post id",
+        "summary": "Create a reply on post by postId",
         "parameters": [
           {
             "name": "postId",
@@ -1603,17 +1657,17 @@
         }
       }
     },
-    "/forum/post/${postId}/comment": {
+    "/forum/post/{postId}/comment": {
       "post": {
         "tags": ["Forums"],
-        "summary": "Get post details of post associated with post id",
+        "summary": "Create comment on post",
         "parameters": [
           {
             "name": "postId",
             "in": "path",
             "required": true,
-            "description": "Id of post we want to reply to",
-            "type": "string"
+            "description": "Id of post we want to comment to",
+            "type": "integer"
           },
           {
             "name": "commentDetails",
@@ -1641,7 +1695,7 @@
         }
       }
     },
-    "/forum/post/pin/{$postId}/{$isPinned}": {
+    "/forum/post/pin/{postId}/{isPinned}": {
       "put": {
         "tags": ["Forums"],
         "summary": "Pins or unpins post associated with post id",
@@ -1650,16 +1704,15 @@
             "name": "postId",
             "in": "path",
             "required": true,
-            "description": "Id of post we want to reply to",
-            "type": "string"
+            "description": "Id of post we want to pin/unpin",
+            "type": "integer"
           },
           {
-            "name": "commentDetails",
-            "in": "body",
-            "description": "Details of comment body",
-            "schema": {
-              "$ref": "#/definitions/ForumPost"
-            }
+            "name": "isPinned",
+            "in": "path",
+            "required": true,
+            "description": "Set pinned to true or false",
+            "type": "boolean"
           }
         ],
         "responses": {
@@ -1679,10 +1732,10 @@
         }
       }
     },
-    "/forums/tags": {
-      "get": {
+    "/forum/tags": {
+      "put": {
         "tags": ["Forums"],
-        "summary": "Get a list tags",
+        "summary": "Get list of all tags",
         "responses": {
           "200": {
             "description": "OK",
@@ -1707,9 +1760,9 @@
         "summary": "Create new tag",
         "parameters": [
           {
-            "name": "Pre-Requisite",
+            "name": "tagName",
             "in": "body",
-            "description": "Topic with new pre-requisite(s)",
+            "description": "Body with tag name",
             "schema": {
               "$ref": "#/definitions/ForumTag"
             }
@@ -1732,16 +1785,23 @@
         }
       }
     },
-    "/topicGroup/remove-level/{$levelId}": {
+    "/{topicGroup}/remove-level/{level}": {
       "delete": {
         "tags": ["Gamification"],
         "summary": "Delete level from topic group",
         "parameters": [
           {
-            "name": "levelId",
+            "name": "topicGroup",
             "type": "string",
             "required": true,
-            "description": "Id of level we want to remove from topic group",
+            "description": "name of topic group",
+            "in": "path"
+          },
+          {
+            "name": "level",
+            "type": "string",
+            "required": true,
+            "description": "Name of level we want to remove from topic group",
             "in": "path"
           }
         ],
@@ -1762,7 +1822,7 @@
         }
       }
     },
-    "/topicGroup/{$topicGroupId}/newLevel": {
+    "/topicGroup/{topicGroupId}/newLevel": {
       "post": {
         "tags": ["Gamification"],
         "summary": "Create a new level for topic group",
@@ -1771,7 +1831,7 @@
             "name": "topicGroupId",
             "in": "path",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of topic group we want to add new level to"
           },
           {
@@ -1800,10 +1860,19 @@
         }
       }
     },
-    "/topicGroup/{$topicGroupId}/levels": {
+    "/topicGroup/{topicGroupId}/levels": {
       "get": {
         "tags": ["Gamification"],
         "summary": "Get a list of levels for provided topic group",
+        "parameters": [
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "Id of topic group"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1881,7 +1950,7 @@
         }
       }
     },
-    "/topicGroup/{$topicGroupName}/topic/{$topicName}/prerequisite": {
+    "/topicGroup/{topicGroupName}/topic/{topicName}/prerequisite": {
       "get": {
         "tags": ["Topic Tree"],
         "summary": "Get prerequisites of topic",
@@ -1925,11 +1994,25 @@
         "summary": "Create a new prerequisite with prerequisite in POST body",
         "parameters": [
           {
+            "name": "topicGroupName",
+            "in": "path",
+            "required": true,
+            "description": "Name of topic group we want topics for",
+            "type": "string"
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "required": true,
+            "description": "Name of topic we want pre-requisites for",
+            "type": "string"
+          },
+          {
             "name": "Pre-Requisite",
             "in": "body",
             "description": "Topic with new pre-requisite(s)",
             "schema": {
-              "$ref": "#/definitions/Topic"
+              "$ref": "#/definitions/PreRequisite"
             }
           }
         ],
@@ -1966,6 +2049,14 @@
             "required": true,
             "description": "Name of topic we want pre-requisites to delete for",
             "type": "string"
+          },
+          {
+            "name": "Pre-Requisite",
+            "in": "body",
+            "description": "PreRequisite delete body",
+            "schema": {
+              "$ref": "#/definitions/PreRequisite"
+            }
           }
         ],
         "responses": {
@@ -1985,11 +2076,18 @@
         }
       }
     },
-    "/topicGroup/{$topicGroupName}": {
+    "/topicGroup/{topicGroupName}": {
       "post": {
         "tags": ["Topic Tree"],
         "summary": "Create a topic group",
         "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "required": true,
+            "description": "Name of topic group",
+            "type": "string"
+          },
           {
             "name": "TopicGroup",
             "in": "body",
@@ -2044,18 +2142,24 @@
         }
       }
     },
-    "/topicGroup/{$topicGroupName}/topic/{$topicName}": {
+    "/topicGroup/{topicGroupName}/topic/{topicName}": {
       "post": {
         "tags": ["Topic Tree"],
         "summary": "Create a new topic",
         "parameters": [
           {
-            "name": "Topic",
-            "in": "body",
-            "description": "New Topic",
-            "schema": {
-              "$ref": "#/definitions/Topic"
-            }
+            "name": "topicGroupName",
+            "in": "path",
+            "required": true,
+            "description": "Name of topic group",
+            "type": "string"
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "required": true,
+            "description": "Name of new topic",
+            "type": "string"
           }
         ],
         "responses": {
@@ -2099,6 +2203,87 @@
     }
   },
   "definitions": {
+    "PostLevel": {
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Level"
+        },
+        "topicGroupId": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "levelType": {
+          "type": "string"
+        },
+        "availableFrom": {
+          "type": "dateTime",
+          "example":"2016-06-22 19:10:25-07"
+        },
+        "questionNumbers": {
+          "type": "integer",
+          "example": 3
+        },
+        "estimatedTimeRequired": {
+          "type": "integer",
+          "example": 15
+        }
+      }
+    },
+    "PostAnnouncement": {
+      "properties": {
+        "author": {
+          "type": "integer",
+          "example": 3
+        },
+        "title": {
+          "type": "string",
+          "example": "First announcement"
+        },
+        "content": {
+          "type": "string",
+          "example": "Description of the first announcement"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "file",
+            "example": "announcement.img"
+          }
+        },
+        "postDate": {
+          "type": "dateTime",
+          "example":"2016-06-22 19:10:25-07"
+        }
+      }
+    },
+    "PostAnnouncementComment": {
+      "properties": {
+        "announcementId": {
+          "type": "integer",
+          "example": 1
+        },
+        "author": {
+          "type": "integer",
+          "example": 1
+        },
+        "content": {
+          "type": "string",
+          "example": "New announcement comment incoming"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "file",
+            "example": "image.png"
+          }
+        },
+        "postDate": {
+          "type": "dateTime",
+          "example":"2016-06-22 19:10:25-07"
+        }
+      }
+    },
     "Announcement": {
       "properties": {
         "announcementId": {
@@ -2155,6 +2340,14 @@
         }
       }
     },
+    "PutForumPost": {
+      "properties": {
+        "description": {
+          "type": "string",
+          "example": "Some new description"
+        }
+      }
+    },
     "ForumPost": {
       "properties": {
         "_id": {
@@ -2176,6 +2369,10 @@
         "description": {
           "type": "string",
           "example": "Lorem ipsum ipsum ipsum ipsum ipsum"
+        },
+        "isPinned": {
+          "type": "boolean",
+          "example": true
         },
         "tags": {
           "type": "array",
@@ -2240,10 +2437,18 @@
               }
             }
           }
+        }
+      }
+    },
+    "PreRequisite": {
+      "properties": {
+        "preReqId": {
+          "type": "integer",
+          "example": 1
         },
-        "isPinned": {
-          "type": "boolean",
-          "example": true
+        "topicId": {
+          "type": "integer",
+          "example": 1
         }
       }
     },
@@ -2282,63 +2487,15 @@
     },
     "TopicGroup": {
       "properties": {
-        "_id": {
-          "type": "integer",
-          "uniqueItems": true
-        },
         "name": {
           "type": "string",
           "example": "Algorithms"
         },
-        "topics": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "example": "sorting"
-          }
+        "topic_code": {
+          "type": "string",
+          "example": "COMP3821"
         },
-        "tutorialTimes": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "tutorialCode": {
-                "type": "string",
-                "example": "M18A2"
-              },
-              "timeSlot": {
-                "type": "dateTime",
-                "example": "10:00-11:00"
-              },
-              "tutor": {
-                "type": "string",
-                "example": "John Smith"
-              },
-              "enrolledStudents": {
-                "type": "array",
-                "description": "List of enrolled students in tutorial",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "example": "Jessica Smith"
-                    },
-                    "studentId": {
-                      "type": "integer",
-                      "example": "z2183122"
-                    }
-                  }
-                }
-              },
-              "maxCapacity": {
-                "type": "integer",
-                "example": 20
-              }
-            }
-          }
-        },
-        "courseOutline": {
+        "course_outline": {
           "type": "file",
           "example": "course_outline.pdf"
         }
@@ -2365,20 +2522,6 @@
                 "items": {
                   "type": "files",
                   "example": "lecture3 - bubbleSort.mp4"
-                }
-              },
-              "topicGroups":{
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "example": "Algorithm"
-                }
-              },
-              "preRequisites": {
-                "type": "array",
-                "items": {
-                  "type": "topic",
-                  "example": "C++ Basics"
                 }
               }
             }
@@ -2486,27 +2629,6 @@
               "name": {
                 "type": "string",
                 "example": "C++ Basics"
-              },
-              "courseMaterials": {
-                "type": "array",
-                "items": {
-                  "type": "files",
-                  "example": "lecture1 - data-structures.mp4"
-                }
-              },
-              "topicGroups":{
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "example": "Introductory C++"
-                }
-              },
-              "preRequisites": {
-                "type": "array",
-                "items": {
-                  "type": "topic",
-                  "example": "N/A"
-                }
               }
             }
           }
@@ -2521,6 +2643,10 @@
           "items": {
             "type": "object",
             "properties": {
+              "tag_id": {
+                "type": "integer",
+                "example": 1
+              },
               "tagName": {
                 "type": "string",
                 "example": "Ass1"
@@ -2633,10 +2759,6 @@
     },
     "PostForum": {
       "properties": {
-        "postId": {
-          "type": "integer",
-          "uniqueItems": true
-        },
         "title": {
           "type": "string",
           "example": "Final exam marks release date?"
@@ -2658,6 +2780,10 @@
           "items": {
             "type": "object",
             "properties": {
+              "tag_id": {
+                "type": "integer",
+                "example": 1
+              },
               "tag": {
                 "type": "string",
                 "example": "FinalExam"
@@ -2671,12 +2797,20 @@
       "properties": {
         "author": {
           "type": "string",
-          "example": "Alan Smith"
+          "example": "Lecturey Lecturer"
         },
-        "publishedDate": {
+        "published_date": {
           "type": "dateTime",
-          "example": "Wed Mar 29 2015 11:00:00"
+          "example": "2016-06-22 19:10:25-07"
         },
+        "reply": {
+          "type": "string",
+          "example": "The final exam marks have already been released"
+        }
+      }
+    },
+    "PutReply": {
+      "properties": {
         "reply": {
           "type": "string",
           "example": "The final exam marks have already been released"
@@ -2687,11 +2821,11 @@
       "properties": {
         "author": {
           "type": "string",
-          "example": "Alan Smith"
+          "example": "Lecturey Lecturer"
         },
-        "publishedDate": {
+        "published_date": {
           "type": "dateTime",
-          "example": "Wed Mar 29 2015 11:00:00"
+          "example": "2016-06-27 09:25:25-07"
         },
         "comment": {
           "type": "string",
@@ -2912,6 +3046,10 @@
                 "type": "dateTime",
                 "example": "Wed Jun 30 2016 08:20:15"
               },
+              "numberOfAnswers": {
+                "type": "integer",
+                "example": 4
+              },
               "mediaLink": {
                 "type": "string",
                 "example": "123.png"
@@ -2922,6 +3060,33 @@
               }
             }
           }
+        }
+      }
+    },
+    "PutLevel": {
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Level"
+        },
+        "topicGroupId": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "levelType": {
+          "type": "string"
+        },
+        "availableFrom": {
+          "type": "dateTime",
+          "example":"2016-06-22 19:10:25-07"
+        },
+        "questionNumbers": {
+          "type": "integer",
+          "example": 3
+        },
+        "estimatedTimeRequired": {
+          "type": "integer",
+          "example": 15
         }
       }
     },
@@ -2944,7 +3109,7 @@
         },
         "availableFrom": {
           "type": "dateTime",
-          "example":"Wed Jun 30 2016 08:20:15"
+          "example":"2016-06-22 19:10:25-07"
         },
         "questionNumbers": {
           "type": "integer",
@@ -2958,17 +3123,13 @@
     },
     "Question": {
       "properties": {
-        "_id": {
-          "type": "integer",
-          "uniqueItems": true
-        },
         "title": {
           "type": "string",
           "example": "What is the day today?"
         },
         "questionType": {
           "type": "string",
-          "example": "Multiple Choice"
+          "example": "mpc"
         },
         "potentialAnswers": {
           "type": "text",
@@ -2980,7 +3141,11 @@
         },
         "availableFrom": {
           "type": "dateTime",
-          "example": "Wed Jun 30 2016 08:20:15"
+          "example": "2016-06-22 19:10:25-07"
+        },
+        "numberOfAnswers": {
+          "type": "integer",
+          "example": 4
         },
         "mediaLink": {
           "type": "string",
