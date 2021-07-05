@@ -12,7 +12,7 @@ import {
 import { SearchIcon } from '@chakra-ui/icons'
 import Filter from '../components/forums/Filter'
 import PostTableContainer from '../components/forums/PostTableContainer'
-import AddPostModal from '../components/forums/AddPostModal'
+import AddPostModal from '../components/forums/AddPostModal/AddPostModal'
 import { GrAdd } from 'react-icons/gr'
 
 const dummyPosts = [

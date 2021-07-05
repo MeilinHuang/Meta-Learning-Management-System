@@ -1,0 +1,7 @@
+.select div {
+    border-color: rgb(226, 232, 240);
+}
+
+.select div:hover {
+    border-color: #CBD5E0;
+}
