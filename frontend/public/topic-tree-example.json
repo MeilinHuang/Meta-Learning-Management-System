@@ -1,7 +1,8 @@
 {
     "nodes": [
+        {},
         {
-            "id": 1,
+            "id": 99,
             "title": "Variables",
             "prerequisite_strings": [],
             "description": "All about Variables in C!",
@@ -190,11 +191,11 @@
     ],
     "links": [
         {
-            "source": 1,
+            "source": 99,
             "target": 2
         },
         {
-            "source": 1,
+            "source": 99,
             "target": 3
         },
         {
@@ -214,7 +215,7 @@
             "target": 8
         },
         {
-            "source": 1,
+            "source": 99,
             "target": 9
         },
         {
