@@ -28,7 +28,7 @@ function CommentsResponses({ isComments, posts }) {
             <form id="createCommentResponse" onSubmit={handleSubmit}>
                 <Flex>
                     <InputGroup variant="filled" mr="8px">
-                        <DraftEditor setDetails={setDetails} classname={styles.editor} />
+                        <DraftEditor setDetails={setDetails} className={styles.editor} />
                     </InputGroup>
                     <Button pr="8px" leftIcon={<AiOutlineSend />} form="createCommentResponse" type="submit" />
                 </Flex>

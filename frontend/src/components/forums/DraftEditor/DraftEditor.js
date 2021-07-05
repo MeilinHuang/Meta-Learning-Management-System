@@ -75,7 +75,7 @@ export default class SimpleStaticToolbarEditor extends Component {
 
     return (
         <>
-            <div className={classnames(styles.editor, this.props.classname)} onClick={this.focus}>
+            <div className={classnames(styles.editor, this.props.className)} onClick={this.focus}>
             <Editor
                 blockStyleFn={this.styleBlocks}
                 customStyleMap={styleMap}
