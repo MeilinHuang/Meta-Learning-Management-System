@@ -38,7 +38,13 @@ export default function TopicTreeHeader({data, isOpen, onClose, prereqs}) {
         <ModalBody>
           <Box>
             <Heading as="h5" size="sm">Prerequisites</Heading>
-            
+            <UnorderedList mb={10}>
+              {prereqs.map((prereq) => {
+                return (
+                  <ListItem>{prereq}</ListItem>
+                );
+              })}
+            </UnorderedList>
             <Heading as="h5" size="sm">Files</Heading>
             <Table variant="simple">
               <Thead>
@@ -58,6 +64,7 @@ export default function TopicTreeHeader({data, isOpen, onClose, prereqs}) {
                 })}
               </Tbody>
             </Table>
+            <Button colorScheme="green" mt={3}>Upload file</Button>
           </Box>
         </ModalBody>
 

@@ -80,7 +80,7 @@ export default function TopicTree() {
         for (let i = 0; i < data.nodes.length; i++) {
             for (let j = 0; j < linksArray.length; j++) {
                 if (data.nodes[i].id == linksArray[j]) {
-                    prereqs.push(data.nodes[i].name);
+                    prereqs.push(data.nodes[i].title);
                     break;
                 }
             }

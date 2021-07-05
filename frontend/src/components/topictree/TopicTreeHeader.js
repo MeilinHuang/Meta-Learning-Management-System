@@ -15,15 +15,10 @@ import {
     useDisclosure,
     useColorModeValue,
     Stack,
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    ModalCloseButton,
+    FormControl
   } from '@chakra-ui/react';
-  import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import Select from "./ChakraReactSelect.js";
 
 import TopicTreeAddTopic from './TopicTreeAddTopic.js';
 
@@ -44,6 +39,8 @@ const NavLink = ({ onClick, children }) => (
         {children}
     </Link>
 );
+
+
   
 export default function TopicTreeHeader({id}) {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -53,6 +50,15 @@ export default function TopicTreeHeader({id}) {
         onOpen: onOpenModal, 
         onClose: onCloseModal 
     } = useDisclosure();
+
+    var colourOptions = [
+        { value: "blue", label: "Blue", color: "#0052CC" },
+        { value: "purple", label: "Purple", color: "#5243AA" },
+        { value: "red", label: "Red", color: "#FF5630" },
+        { value: "orange", label: "Orange", color: "#FF8B00" },
+        { value: "yellow", label: "Yellow", color: "#FFC400" },
+        { value: "green", label: "Green", color: "#36B37E" }
+    ];
   
     return (
         <div id={id}>
@@ -73,6 +79,23 @@ export default function TopicTreeHeader({id}) {
                         display={{ base: 'none', md: 'flex' }}>
                         
                         <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
+                        <Box bg='white' w={200}>
+                            <FormControl id="new-topic-dependencies">
+                                <Select
+                                    name="searchTopic"
+                                    options={colourOptions}
+                                    placeholder="Search a topic"
+                                    closeMenuOnSelect={true}
+                                    size="sm"
+                                    w={5000}
+                                    onKeyDown={(key) => {
+                                        if (key.code == "Enter") {
+                                            
+                                        }
+                                    }}
+                                />
+                            </FormControl>
+                        </Box>
                     </HStack>
                 </HStack>
                 <Flex alignItems={'center'}>
