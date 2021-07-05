@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import './TopicTree.css';
 import TopicTreeHeader from "./TopicTreeHeader.js"
+import TopicTreeViewResource from "./TopicTreeViewResource.js"
+import { useDisclosure } from '@chakra-ui/hooks';
 
 var g;
 var svg
@@ -14,6 +16,22 @@ export default function TopicTree() {
     const ref = useRef();
     const dataset = [100, 200, 300, 400, 500];
     const [data, setData] = useState([]);
+    const [listPrereqs, setListPrereqs] = useState([]);
+    const [selectedNode, setSelectedNode] = useState({
+        "id": 0,
+        "title": "",
+        "prerequisite_strings": [],
+        "description": "",
+        "materials_strings": {
+            "preparation": [],
+            "content": [],
+            "practice": [],
+            "assessment": []
+        },
+        "group": "",
+        "discipline": "",
+        "creator": ""
+    });
     const links = [
         {
             name: 'Home',
@@ -41,8 +59,35 @@ export default function TopicTree() {
         }
     ];
     const [isOpen, setOpen] = useState(false);
+    const { 
+        isOpen: isOpenModal, 
+        onOpen: onOpenModal, 
+        onClose: onCloseModal 
+    } = useDisclosure();
 
- 
+
+    const getListOfPrerequisites = (id, data) => {
+        console.log('id', id);
+        console.log('data', data);
+        let linksArray = [];
+        for (let i = 0; i < data.links.length; i++) {
+            if (data.links[i].target.id === id) {
+                linksArray.push(data.links[i].source.id);
+            }
+        }
+        console.log(linksArray);
+        let prereqs = [];
+        for (let i = 0; i < data.nodes.length; i++) {
+            for (let j = 0; j < linksArray.length; j++) {
+                if (data.nodes[i].id == linksArray[j]) {
+                    prereqs.push(data.nodes[i].name);
+                    break;
+                }
+            }
+        }
+        console.log('prereqs', prereqs);
+        setListPrereqs(prereqs);
+    }
 
     // Runs on start, used for testing mainly
     useEffect(() => {
@@ -109,7 +154,19 @@ export default function TopicTree() {
                 .data(data.nodes)
                 .enter().append("g")
                 .on("click", function() {
+                    let topicName = d3.select(this).text();
                     console.log("node clicked", d3.select(this).text());
+                    let nodeData = data.nodes.filter(function (dataValue) {
+                        console.log(dataValue);
+                        return dataValue.title === topicName;
+                    });
+                    console.log('nodeData', nodeData);
+
+                    setSelectedNode(nodeData[0]);
+                    getListOfPrerequisites(nodeData[0].id, data);
+                    onOpenModal();
+
+
                 });
             let radius = 30;
             var circles = node.append("circle")
@@ -177,6 +234,7 @@ export default function TopicTree() {
         <div>
             <TopicTreeHeader id="topic-tree-header"></TopicTreeHeader>
             <div id="graph" ref={ref} />
+            <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} />
         </div>
 
     )

@@ -11,8 +11,7 @@ import {
     FormControl,
     FormLabel,
     Input,
-    Box,
-    FormHelperText
+    Box
   } from "@chakra-ui/react"
 import Select from "./ChakraReactSelect.js";
 
