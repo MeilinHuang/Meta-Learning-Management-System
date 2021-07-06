@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import Header from "../components/Header.js"
 import Sidebar from "../components/Sidebar.js"
 import WidgetsBar from "../components/WidgetsBar.js"
+import CourseContentPage from "../pages/CourseContentPage.js"
 import ForumOverviewPage from "../pages/ForumOverviewPage.js"
 import ForumPostPage from '../pages/ForumPostPage'
 import {
@@ -10,6 +11,7 @@ import {
     Route,
     Redirect,
 } from "react-router-dom"
+
 import { Stack, Skeleton, useBreakpointValue, Flex, Container } from "@chakra-ui/react"
 
 function CoursePage() {
@@ -35,6 +37,10 @@ function CoursePage() {
         {
             name: 'Support',
             url: '/support',
+        },
+        {
+            name: 'Topic Tree',
+            url: '/topictree'
         }
     ]
     const smVariant = 'drawer'
@@ -46,7 +52,8 @@ function CoursePage() {
 
     //EXAMPLE PAGE LAYOUT
     return (
-        <Router>
+        <div>
+            
             <Header sideBarLinks={links} setOpen={setOpen}></Header>
             <Flex>
                 <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
@@ -54,12 +61,13 @@ function CoursePage() {
                     <Switch>
                         {/* Add your page as a Route here */}
                         <Route exact path="/forums"><ForumOverviewPage /></Route>
+                        <Route exact path="/content"><CourseContentPage /></Route>
                         <Route exact path="/forums/:id"><ForumPostPage /></Route>
                     </Switch>
                 </Container>
                 <WidgetsBar></WidgetsBar>
             </Flex>
-        </Router>
+        </div>
     )
 }
 
