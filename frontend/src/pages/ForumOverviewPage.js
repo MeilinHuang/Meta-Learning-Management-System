@@ -50,9 +50,11 @@ const dummyPosts = [
 
 function ForumOverviewPage() {
     const [posts, setPosts] = useState([])
+    const [pinnedPosts, setPinnedPosts] = useState([])
 
     useEffect(() => {
         fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
+        fetch('http://localhost:8000/forum/pinned').then(r => r.json()).then(data => setPinnedPosts(data))
     }, [])
 
     const buttonContents = useBreakpointValue({ base: '', md: 'Add Post' })
@@ -72,7 +74,7 @@ function ForumOverviewPage() {
                 </Center>
             </Flex>
             <Filter />
-            <PostTableContainer posts={posts} />
+            <PostTableContainer posts={posts} pinnedPosts={pinnedPosts} />
         </>
     )
 }
