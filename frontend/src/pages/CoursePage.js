@@ -60,9 +60,9 @@ function CoursePage() {
                 <Container marginTop={50} mx={{ base: "0", md: "24px"}} maxWidth="100%">
                     <Switch>
                         {/* Add your page as a Route here */}
-                        <Route exact path="/forums"><ForumOverviewPage /></Route>
+                        <Route exact path="/forums" component={ForumOverviewPage} />
                         <Route exact path="/content"><CourseContentPage /></Route>
-                        <Route exact path="/forums/:id"><ForumPostPage /></Route>
+                        <Route exact path="/forums/:id" component={ForumPostPage} />
                     </Switch>
                 </Container>
                 <WidgetsBar></WidgetsBar>

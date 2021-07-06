@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { 
     Button,
     Center,
@@ -49,6 +49,12 @@ const dummyPosts = [
 ]
 
 function ForumOverviewPage() {
+    const [posts, setPosts] = useState([])
+
+    useEffect(() => {
+        fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
+    }, [])
+
     const buttonContents = useBreakpointValue({ base: '', md: 'Add Post' })
     const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null })
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -66,7 +72,7 @@ function ForumOverviewPage() {
                 </Center>
             </Flex>
             <Filter />
-            <PostTableContainer posts={dummyPosts} />
+            <PostTableContainer posts={posts} />
         </>
     )
 }

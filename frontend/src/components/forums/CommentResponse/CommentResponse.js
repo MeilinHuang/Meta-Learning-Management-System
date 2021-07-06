@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
     Button,
     ButtonGroup,
@@ -22,9 +22,15 @@ import { ContentState, convertFromHTML } from 'draft-js'
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './CommentResponse.module.css'
 
-function CommentResponse({ author, published_date, description }) {
+function CommentResponse({ author, comment, published_date, reply }) {
     const [ editorState, setEditorState ] = useState('')
-    const [ details, setDetails ] = useState(description)
+    const [ details, setDetails ] = useState('')
+
+    useEffect(() => {
+        setDetails(comment || reply)
+    }, [comment, reply])
+
+    console.log(details)
 
     const editPost = () => {
         const markup = convertFromHTML(details)

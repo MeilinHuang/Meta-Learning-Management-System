@@ -6,7 +6,7 @@ import {
 } from "@chakra-ui/react"
 
 function AuthorDetails({ author, date }) {
-    const dateString = new Date(date * 1000).toLocaleString('en-AU')
+    const dateString = new Date(date).toLocaleString('en-AU')
 
     return (
         <Flex alignItems={{ base: 'unset', md: 'center' }} justifyContent="space-between" flexDirection={{ base: 'column', md: 'row' }} mb="8px">

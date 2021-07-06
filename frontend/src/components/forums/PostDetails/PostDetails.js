@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
     Button,
     Box,
@@ -17,8 +17,12 @@ import styles from './PostDetails.module.css'
 
 function PostDetails({ post: { author, published_date, description }}) {
     const [ editorState, setEditorState ] = useState('')
-    const [ details, setDetails ] = useState(description)
+    const [ details, setDetails ] = useState('')
     const toast = useToast()
+
+    useEffect(() => {
+        setDetails(description)
+    }, [description])
 
     const shareLink = () => {
         const link = window.location.href

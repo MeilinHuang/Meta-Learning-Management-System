@@ -7,7 +7,7 @@ import {
 function Tags({ tags }) {
     return (
         <Flex>
-            {tags.map(({ id, name })=> (
+            {tags && tags.map(({ id, name })=> (
                 <Tag key={id} my="8px" mx="4px" px="12px" borderRadius="full" variant="outline">{name}</Tag>
             ))}
         </Flex>

@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Link as RouterLink } from 'react-router-dom'
 import {
     Breadcrumb,
@@ -69,7 +69,13 @@ const dummyPost = {
     ]
 }
 
-function ForumPostPage() {
+function ForumPostPage({ match: { params: { id }}}) {
+    const [post, setPost] = useState({})
+
+    useEffect(() => {
+        fetch(`http://localhost:8000/forum/post/${id}`).then(r => r.json()).then(data => setPost(data[0]))
+    }, [id])
+
     return (
         <>
             <Breadcrumb separator=">">
@@ -77,11 +83,11 @@ function ForumPostPage() {
                     <BreadcrumbLink as={RouterLink} to="/forums" fontWeight="bold">Forums</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbItem isCurrentPage>
-                    <BreadcrumbLink href="#">{dummyPost.title}</BreadcrumbLink>
+                    <BreadcrumbLink href="#">{post.title}</BreadcrumbLink>
                 </BreadcrumbItem>
             </Breadcrumb>
             <Flex justifyContent="space-between" alignItems="baseline">
-                <Heading mt="16px">{dummyPost.title}</Heading>
+                <Heading mt="16px">{post.title}</Heading>
                 <Popover>
                     <PopoverTrigger>
                         <Button pr="8px" leftIcon={<BsTrash />} variant="ghost" color="red" />
@@ -103,10 +109,10 @@ function ForumPostPage() {
                 </Popover>
             </Flex>
             <Divider />
-            <Tags tags={dummyPost.tags} />
-            <PostDetails post={dummyPost} />
-            <CommentsResponses posts={dummyPost.replies} />
-            <CommentsResponses isComments posts={dummyPost.comments} />
+            <Tags tags={post.tags} />
+            <PostDetails post={post} />
+            <CommentsResponses posts={post.replies} />
+            <CommentsResponses isComments posts={post.comments} />
         </>
     )
 }

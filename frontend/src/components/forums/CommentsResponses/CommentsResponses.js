@@ -22,7 +22,7 @@ function CommentsResponses({ isComments, posts }) {
     return (
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md" mb="12px" textTransform="uppercase">{isComments ? 'Comments' : 'Responses'}</Heading>
-            {posts.map(post => (
+            {posts && posts.map(post => (
                 <CommentResponse {...post} />
             ))}
             <form id="createCommentResponse" onSubmit={handleSubmit}>
