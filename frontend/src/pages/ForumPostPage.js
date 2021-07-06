@@ -5,9 +5,18 @@ import {
     BreadcrumbItem,
     BreadcrumbLink,
     Button,
+    ButtonGroup,
     Divider,
     Flex,
     Heading,
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+    PopoverHeader,
+    PopoverBody,
+    PopoverFooter,
+    PopoverArrow,
+    PopoverCloseButton,
 } from "@chakra-ui/react"
 import Tags from '../components/forums/Tags'
 import PostDetails from '../components/forums/PostDetails/PostDetails'
@@ -73,7 +82,25 @@ function ForumPostPage() {
             </Breadcrumb>
             <Flex justifyContent="space-between" alignItems="baseline">
                 <Heading mt="16px">{dummyPost.title}</Heading>
-                <Button pr="8px" leftIcon={<BsTrash />} variant="ghost" color="red" />
+                <Popover>
+                    <PopoverTrigger>
+                        <Button pr="8px" leftIcon={<BsTrash />} variant="ghost" color="red" />
+                    </PopoverTrigger>
+                    <PopoverContent>
+                        <PopoverHeader fontWeight="semibold">Confirmation</PopoverHeader>
+                        <PopoverArrow />
+                        <PopoverCloseButton />
+                        <PopoverBody>
+                            Are you sure you want to delete this post?
+                        </PopoverBody>
+                        <PopoverFooter d="flex" justifyContent="flex-end">
+                            <ButtonGroup size="sm">
+                            <Button variant="outline">Cancel</Button>
+                            <Button colorScheme="red">Delete</Button>
+                            </ButtonGroup>
+                        </PopoverFooter>
+                    </PopoverContent>
+                    </Popover>
             </Flex>
             <Divider />
             <Tags tags={dummyPost.tags} />
