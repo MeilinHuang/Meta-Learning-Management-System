@@ -58,7 +58,7 @@
             "name": "quizBody",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/Quiz"
+              "$ref": "#/definitions/PostQuiz"
             }
           }
         ],
@@ -79,7 +79,7 @@
         }
       }
     },
-    "/quiz/{$quizId}": {
+    "/quiz/{quizId}": {
       "get": {
         "tags": ["Assessment"],
         "summary": "Get quiz containing questions from specified quiz id",
@@ -87,7 +87,7 @@
           {
             "name": "quizId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of quiz we want to get",
             "in": "path"
           }
@@ -96,7 +96,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Quiz"
+              "$ref": "#/definitions/GetQuizQuestions"
             }
           },
           "400": {
@@ -118,8 +118,8 @@
           {
             "name": "quizId",
             "required": true,
-            "type": "string",
-            "description": "Id of quiz we want to get",
+            "type": "integer",
+            "description": "Id of quiz",
             "in": "path"
           },
           {
@@ -153,7 +153,7 @@
           {
             "name": "quizId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of quiz we want to delete",
             "in": "path"
           }
@@ -175,7 +175,7 @@
         }
       }
     },
-    "/quiz/{$quizId}/question/{$questionId}": {
+    "/quiz/{quizId}/question/{questionId}": {
       "get": {
         "tags": ["Assessment"],
         "summary": "Get specific question from specified quiz",
@@ -183,14 +183,14 @@
           {
             "name": "quizId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of quiz we want to get",
             "in": "path"
           },
           {
             "name": "questionId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of question we want",
             "in": "path"
           }
@@ -216,7 +216,7 @@
       },
       "put": {
         "tags": ["Assessment"],
-        "summary": "Update quiz details from quiz id",
+        "summary": "Update question details from quiz id",
         "parameters": [
           {
             "name": "quizId",
@@ -228,7 +228,7 @@
           {
             "name": "questionId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of question we want",
             "in": "path"
           },
@@ -236,7 +236,7 @@
             "name": "questionBody",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/QuizQuestion"
+              "$ref": "#/definitions/PutQuizQuestion"
             }
           }
         ],
@@ -257,10 +257,19 @@
         }
       }
     },  
-    "/questionBank/{$questionBankId}": {
+    "/questionBank/{questionBankId}": {
       "get": {
         "tags": ["Assessment"],
         "summary": "Get list of questions with matching question bank id",
+        "parameters": [
+          {
+            "name": "questionBankId",
+            "required": true,
+            "type": "integer",
+            "description": "Question bank Id",
+            "in": "path"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -287,15 +296,15 @@
           {
             "name": "questionBankId",
             "required": true,
-            "type": "string",
-            "description": "Id of question bank we want",
+            "type": "integer",
+            "description": "Question bank Id",
             "in": "path"
           },
           {
             "name": "questionBankName",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/QuestionBank"
+              "$ref": "#/definitions/PutQuestionBank"
             }
           }
         ],
@@ -322,8 +331,8 @@
           {
             "name": "questionBankId",
             "required": true,
-            "type": "string",
-            "description": "Id of question bank we want",
+            "type": "integer",
+            "description": "Question bank Id",
             "in": "path"
           }
         ],
@@ -368,7 +377,7 @@
         }
       }
     },
-    "/questionBank/question/{$questionId}": {
+    "/questionBank/question/{questionId}": {
       "get": {
         "tags": ["Assessment"],
         "summary": "Get question from question bank with specified question id",
@@ -376,7 +385,7 @@
           {
             "name": "questionId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of question we want",
             "in": "path"
           }
@@ -410,7 +419,7 @@
             "name": "pollBody",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/Poll"
+              "$ref": "#/definitions/PostPoll"
             }
           }
         ],
@@ -431,10 +440,19 @@
         }
       }
     },
-    "/poll/{$pollId}": {
+    "/poll/{pollId}": {
       "get": {
         "tags": ["Assessment"],
         "summary": "Get poll from specified poll id",
+        "parameters": [
+          {
+            "name": "pollId",
+            "type": "integer",
+            "required": true,
+            "in": "path",
+            "description": "Id of poll"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -461,7 +479,7 @@
           {
             "name": "pollId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of poll we want",
             "in": "path"
           },
@@ -469,8 +487,36 @@
             "name": "pollBody",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/Poll"
+              "$ref": "#/definitions/PostPoll"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Assessment"],
+        "summary": "Delete Poll",
+        "parameters": [
+          {
+            "name": "pollId",
+            "required": true,
+            "type": "integer",
+            "description": "Id of poll we want",
+            "in": "path"
           }
         ],
         "responses": {
@@ -490,7 +536,7 @@
         }
       }
     },
-    "/quiz/studentAnswers/student/{$studentId}": {
+    "/quiz/studentAnswers/student/{studentId}": {
       "get": {
         "tags": ["Assessment"],
         "summary": "Get list of student_answer matching the student ID",
@@ -498,7 +544,7 @@
           {
             "name": "studentId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of student we want",
             "in": "path"
           }
@@ -523,7 +569,7 @@
         }
       }
     },
-    "/quiz/results/question/{$questionId}/answerCount": {
+    "/quiz/results/question/{questionId}/answerCount": {
       "get": {
         "tags": ["Assessment"],
         "summary": "Get number of students that selected each answer for a question",
@@ -531,7 +577,7 @@
           {
             "name": "questionId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of question we want",
             "in": "path"
           }
@@ -556,7 +602,7 @@
         }
       }
     },
-    "/questionBank/{$questionBankId}/question": {
+    "/questionBank/{questionBankId}/question": {
       "post": {
         "tags": ["Assessment"],
         "summary": "Create new question for question bank",
@@ -564,7 +610,7 @@
           {
             "name": "questionBankId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of questionBank we want",
             "in": "path"
           },
@@ -572,7 +618,7 @@
             "name": "questionBody",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/QuizQuestion"
+              "$ref": "#/definitions/PostQuizQuestion"
             }
           }
         ],
@@ -602,7 +648,7 @@
             "name": "quizQuestionAnswerBody",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/QuizQuestionAnswer"
+              "$ref": "#/definitions/PostQuizQuestionAnswer"
             }
           }
         ],
@@ -653,7 +699,7 @@
         }
       }
     },
-    "/quiz/{$quizId}/question/{$questionId}/answer/{$quizQuestionAnswerId}": {
+    "/quiz/{quizId}/question/{questionId}/answer/{quizQuestionAnswerId}": {
       "put": {
         "tags": ["Assessment"],
         "summary": "Update quiz question answer",
@@ -661,21 +707,21 @@
           {
             "name": "quizId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of quiz we want",
             "in": "path"
           },
           {
             "name": "questionId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of question we want",
             "in": "path"
           },
           {
             "name": "quizQuestionAnswerId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of quiz question answer we want",
             "in": "path"
           },
@@ -683,7 +729,7 @@
             "name": "quizQuestionAnswerBody",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/QuizQuestionAnswer"
+              "$ref": "#/definitions/PutQuizQuestionAnswer"
             }
           }
         ],
@@ -704,7 +750,37 @@
         }
       }
     },
-    "/questionBank/{$questionBankId}/question/{$quizId}": {
+    "/question/{questionId}/delete": {
+      "delete": {
+        "tags": ["Assessment"],
+        "summary": "Delete question from id",
+        "parameters": [
+          {
+            "name": "questionId",
+            "required": true,
+            "type": "integer",
+            "description": "Id of question",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/questionBank/{questionBankId}/question/{questionId}": {
       "delete": {
         "tags": ["Assessment"],
         "summary": "Delete question from question bank",
@@ -712,15 +788,15 @@
           {
             "name": "questionBankId",
             "required": true,
-            "type": "string",
+            "type": "integer",
             "description": "Id of questionBank we want",
             "in": "path"
           },
           {
-            "name": "quizId",
+            "name": "questionId",
             "required": true,
-            "type": "string",
-            "description": "Id of quiz we want",
+            "type": "integer",
+            "description": "Id of question",
             "in": "path"
           }
         ],
@@ -2203,6 +2279,138 @@
     }
   },
   "definitions": {
+    "Poll": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "Poll 1"
+        },
+        "start_time": {
+          "type": "dateTime",
+          "example": "2016-06-22 19:10:25-07"
+        },
+        "close_time": {
+          "type": "dateTime",
+          "example": "2016-06-22 19:10:25-07"
+        },
+        "is_closed": {
+          "type": "boolean",
+          "example": false
+        },
+        "poll_type": {
+          "type": "string",
+          "example": "Type A"
+        }
+      }
+    },
+    "PostPoll": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Poll 1"
+        },
+        "start_time": {
+          "type": "dateTime",
+          "example": "2016-06-22 19:10:25-07"
+        },
+        "close_time": {
+          "type": "dateTime",
+          "example": "2016-06-22 19:10:25-07"
+        },
+        "is_closed": {
+          "type": "boolean",
+          "example": false
+        },
+        "poll_type": {
+          "type": "string",
+          "example": "Type A"
+        }
+      }
+    },
+    "PutQuestionBank": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Algorithms Question Bank"
+        }
+      }
+    },
+    "PutQuizQuestion": {
+      "properties": {
+        "quiz_type": {
+          "type": "string",
+          "example": "mpc | sa | la"
+        },
+        "marks_awarded": {
+          "type": "float",
+          "example": 1
+        },
+        "description": {
+          "type": "string",
+          "example": "What is 2 + 2?"
+        },
+        "related_topic_id": {
+          "type": "integer",
+          "example": 1
+        }
+      }
+    },
+    "PostQuizQuestion": {
+      "properties": {
+        "quiz_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "quiz_type": {
+          "type": "string",
+          "example": "mpc | sa | la"
+        },
+        "marks_awarded": {
+          "type": "float",
+          "example": 1
+        },
+        "description": {
+          "type": "string",
+          "example": "What is 2 + 2?"
+        },
+        "related_topic_id": {
+          "type": "integer",
+          "example": 1
+        }
+      }
+    },
+    "GetQuizQuestions": {
+      "properties": {
+        "quiz": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 0
+              },
+              "name": {
+                "type": "string",
+                "example": "Question 1"
+              },
+              "dueDate": {
+                "type": "dateTime",
+                "example": "2016-06-22 19:10:25-07"
+              },
+              "timeGiven": {
+                "type": "integer",
+                "example": 40
+              }
+            }
+          }
+        }
+      }
+    },
     "PostLevel": {
       "properties": {
         "title": {
@@ -3157,65 +3365,35 @@
         }
       }
     },
-    "Quiz": {
+    "PostQuiz": {
       "properties": {
-        "_id": {
-          "type": "integer",
-          "uniqueItems": true
-        },
         "name": {
           "type": "string",
           "example": "Mid Sem Quiz"
         },
         "dueDate": {
           "type": "dateTime",
-          "example": "Wed Jun 30 2016 08:20:15"
+          "example": "2016-06-22 19:10:25-07"
         },
         "timeGiven": {
-          "type": "dateTime",
-          "example": "Wed Jun 30 2016 08:20:15"
+          "type": "integer",
+          "example": 30
         }
       }
     },
-    "Poll": {
-      "_id": {
-        "type": "integer",
-        "example": 1
-      },
-      "name": {
-        "type": "string",
-        "example": "Poll A"
-      },
-      "startTime": {
-        "type": "dateTime",
-        "example": "Wed Jun 30 2016 08:20:15"
-      },
-      "closeTime": {
-        "type": "dateTime",
-        "example": "Wed Jun 30 2016 08:20:15"
-      },
-      "isClosed": {
-        "type": "boolean",
-        "example": true
-      },
-      "pollType": {
-        "type": "string",
-        "example": "Single"
-      },
-      "pollOptions": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "_id": {
-              "type": "integer",
-              "example": 1
-            },
-            "description": {
-              "type": "string",
-              "example": "Poll options"
-            }
-          }
+    "Quiz": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Mid Sem Quiz"
+        },
+        "dueDate": {
+          "type": "dateTime",
+          "example": "2016-06-22 19:10:25-07"
+        },
+        "timeGiven": {
+          "type": "integer",
+          "example": 30
         }
       }
     },
@@ -3229,6 +3407,10 @@
           "type": "integer",
           "uniqueItems": true
         },
+        "question_bank_id": {
+          "type": "integer",
+          "example": 1
+        },
         "quizType": {
           "type": "string",
           "example": "shortAnswer"
@@ -3240,6 +3422,38 @@
         "topicId": {
           "type": "integer",
           "example": 3
+        }
+      }
+    },
+    "PutQuizQuestionAnswer": {
+      "properties": {
+        "isCorrectAnswer": {
+          "type": "boolean",
+          "example": false
+        },
+        "description": {
+          "type": "string",
+          "example": "2 + 2 = 4"
+        }
+      }
+    },
+    "PostQuizQuestionAnswer": {
+      "properties": {
+        "quizId": {
+          "type": "integer",
+          "example": 2
+        },
+        "questionId": {
+          "type": "integer",
+          "example": 4
+        },
+        "isCorrectAnswer": {
+          "type": "boolean",
+          "example": false
+        },
+        "description": {
+          "type": "string",
+          "example": "2 + 2 = 4"
         }
       }
     },
@@ -3270,8 +3484,8 @@
     "QuizStudentAnswer": {
       "properties": {
         "studentId": {
-          "type": "string",
-          "example": "z2103091"
+          "type": "integer",
+          "example": 1
         },
         "quizId": {
           "type": "integer",
@@ -3301,8 +3515,10 @@
     },
     "GetAnswerCount": {
       "properties": {
-        "type": "integer",
-        "example": 50
+        "answerCount": {
+          "type": "integer",
+          "example": 50
+        }
       }
     },
     "GetStudentAnswer": {

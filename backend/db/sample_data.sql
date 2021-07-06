@@ -113,8 +113,36 @@ VALUES(3, 2);
 INSERT INTO topic_group_levels(topic_group_id, levelsid) 
 VALUES(1, 2);
 
--- Queries
+-- Create quiz
+INSERT INTO quiz(id, name, due_date, time_given) VALUES(default, 'Quiz 1', '2016-06-22 19:10:25-07', 30);
+INSERT INTO quiz(id, name, due_date, time_given) VALUES(default, 'Quiz 2', '2016-06-22 19:10:25-07', 45);
+INSERT INTO quiz(id, name, due_date, time_given) VALUES(default, 'Quiz 3', '2016-06-22 19:10:25-07', 45);
 
-SELECT l.id, l.title, l.topic_group_id, l.typeOfLevel, l.availableFrom, l.numberOfquestions, l.estimatedTimeRequired
-FROM levels l 
-JOIN topic_group_levels tgl ON tgl.levelsid = l.id AND tgl.topic_group_id = 1;
+-- Create questionbank
+INSERT INTO quiz_question_bank(id, name) VALUES(default, 'Question Bank 1');
+INSERT INTO quiz_question_bank(id, name) VALUES(default, 'Question Bank 2');
+
+-- Create quiz questions
+INSERT INTO quiz_question(id, quiz_id, question_bank_id, quiz_type, marks_awarded, description, related_topic_id) 
+VALUES(default, 1, 1, 'mpc', 2,'Questions Description', 1);
+INSERT INTO quiz_question(id, quiz_id, question_bank_id, quiz_type, marks_awarded, description, related_topic_id) 
+VALUES(default, 1, 1, 'mpc', 5,'Questions Description', 1);
+INSERT INTO quiz_question(id, quiz_id, question_bank_id, quiz_type, marks_awarded, description, related_topic_id) 
+VALUES(default, 2, 2, 'mpc', 1.5,'Questions Description', 2);
+
+-- Link Question Bank to Questions
+INSERT INTO question_bank_question(question_bank_id, question_id) VALUES(3, 4);
+INSERT INTO question_bank_question(question_bank_id, question_id) VALUES(3, 5);
+INSERT INTO question_bank_question(question_bank_id, question_id) VALUES(2, 6);
+
+-- Create quiz question answer
+INSERT INTO quiz_question_anwer(id, quiz_id, question_id, is_correct_anwer, description)
+VALUES(default, 1, 1, false, 'Some description for answer 1');
+INSERT INTO quiz_question_anwer(id, quiz_id, question_id, is_correct_anwer, description)
+VALUES(default, 2, 2, false, 'Some description for answer 2');
+
+-- Create student answer
+INSERT INTO quiz_student_answer() VALUES();
+
+-- Create poll
+INSERT INTO quiz_poll() VALUES();

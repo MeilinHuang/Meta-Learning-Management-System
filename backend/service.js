@@ -1005,7 +1005,446 @@ async function getTGLevels (request, response) {
   }
 };
 
+/***************************************************************
+                       Assessment Functions
+***************************************************************/
+
+// Post new assessment quiz
+async function postQuiz (request, response) {
+  const name = request.body.name;
+  const dueDate = request.body.dueDate;
+  const timeGiven = request.body.timeGiven;
+
+  try {
+    let resp = await pool.query(
+      `INSERT INTO quiz(id, name, due_date, time_given)
+      VALUES(default, $1, $2, $3)`,
+      [name, dueDate, timeGiven]);
+
+    response.status(200).send("Post new quiz success");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Post new assessment quiz
+async function postQuizQuestion (request, response) {
+  const questionBankId = request.params.questionBankId;
+  const quiz_id = request.body.quiz_id;
+  const quiz_type = request.body.quiz_type;
+  const marks_awarded = request.body.marks_awarded;
+  const related_topic_id = request.body.related_topic_id;
+  const description = request.body.description;
+
+  try {
+    let resp = await pool.query(
+      `INSERT INTO quiz_question(id, quiz_id, quiz_type, marks_awarded,
+       description, related_topic_id) 
+      VALUES(default, $1, $2, $3, $4, $5) RETURNING id`,
+      [quiz_id, quiz_type, marks_awarded, description, related_topic_id]);
+  
+    let link = await pool.query(`INSERT INTO question_bank_question(question_bank_id, question_id)
+    VALUES($1, $2)`, [questionBankId, resp.rows[0].id])
+  
+    response.status(200).send("Post new quiz question success");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Get quiz from id and questions related to quiz
+async function getQuizQuestions (request, response) {
+  const quizId = request.params.quizId;
+  try {
+    let resp = await pool.query(
+      `SELECT q.id, q.name, q.due_date, q.time_given, array_agg(qq.id) 
+      as questions_list FROM quiz q
+      LEFT JOIN quiz_question qq ON qq.quiz_id = q.id 
+      WHERE q.id = $1 GROUP BY q.id;`, [quizId]);
+
+    // Check if questions_list exists
+    if (resp.rows[0].questions_list) {
+      var finalQuery = resp.rows[0];
+      var questionArr = [];
+
+      for (const questionId of resp.rows[0].questions_list) {
+        let qResp = await pool.query(
+          `SELECT * FROM quiz_question WHERE id = $1`, [questionId]);
+          questionArr.push(qResp.rows[0]);
+      }
+      finalQuery.questions_list = questionArr;
+    }
+
+    response.status(200).json(finalQuery);
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Change quiz details by id
+async function putQuizById (request, response) {
+  const quizId = request.params.quizId;
+  const name = request.body.name;
+  const dueDate = request.body.dueDate;
+  const timeGiven = request.body.timeGiven;
+
+  try {
+    let resp = await pool.query(
+      `UPDATE quiz SET name = $1, due_date = $2, time_given = $3 WHERE id = $4`,
+      [name, dueDate, timeGiven, quizId]);
+
+    response.status(200).send("Update quiz success");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Delete quiz by id
+async function deleteQuizById (request, response) {
+  const quizId = request.params.quizId;
+
+  try {
+    let resp = await pool.query(`DELETE FROM quiz WHERE id = $1`, [quizId]);
+    response.status(200).send("Delete quiz success");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Get specific question from quiz
+async function getQuestionFromQuiz (request, response) {
+  const quizId = request.params.quizId;
+  const questionId = request.params.questionId;
+
+  try {
+    let resp = await pool.query(`SELECT * FROM quiz_question WHERE quiz_id = $1 AND id = $2`
+    , [quizId, questionId]);
+    response.status(200).json(resp.rows[0]);
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Put question from quiz
+async function putQuestionFromQuiz (request, response) {
+  const quizId = request.params.quizId;
+  const questionId = request.params.questionId;
+  const quiz_type = request.body.quiz_type;
+  const marks_awarded = request.body.marks_awarded;
+  const related_topic_id = request.body.related_topic_id;
+  const description = request.body.description;
+
+  try {
+    let resp = await pool.query(
+      `UPDATE quiz_question SET quiz_Type = $1, marks_awarded = $2, 
+      description = $3, related_topic_id = $4 WHERE quiz_id = $5 AND id = $6`
+    , [quiz_type, marks_awarded, description, related_topic_id, quizId, questionId]);
+    response.status(200).send("Update quiz question success");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Get questions from question bank
+async function getQuestionBankQuestions (request, response) {
+  const questionBankId = request.params.questionBankId;
+
+  try {
+    let resp = await pool.query(
+      `SELECT * FROM quiz_question
+       WHERE question_bank_id = $1`
+    , [questionBankId]);
+
+    response.status(200).json(resp.rows[0]);
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Update name of question bank
+async function putQuestionBank (request, response) {
+  const questionBankId = request.params.questionBankId;
+  const name = request.body.name;
+
+  try {
+    let resp = await pool.query(
+      `UPDATE quiz_question_bank SET name = $1 WHERE id = $2`
+    , [name, questionBankId]);
+
+    response.status(200).send("Question Bank name updated");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Delete question bank
+async function deleteQuestionBank (request, response) {
+  const questionBankId = request.params.questionBankId;
+
+  try {
+    let resp = await pool.query(
+      `DELETE FROM quiz_question_bank WHERE id = $1`
+    , [questionBankId]);
+
+    response.status(200).send("Question Bank deleted");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Get questions from all question banks
+async function getAllQuestionBankQuestions (request, response) {
+  void (request);
+ 
+  try {
+    let resp = await pool.query(
+      `SELECT qb.id, qb.name, array_agg(q.id) as questions_list 
+      FROM quiz_question_bank qb
+      LEFT JOIN question_bank_question qbq ON qbq.question_bank_id = qb.id
+      LEFT JOIN quiz_question q ON q.id = qbq.question_id
+      GROUP BY qb.id`);
+
+    if (resp.rows) { 
+      var finalQuery = resp.rows;
+
+      for (const row of resp.rows) {
+        var questionArr = [];
+        for (const questionId of row.questions_list) {
+          let qResp = await pool.query(
+            `SELECT * FROM quiz_question WHERE id = $1`, [questionId]);
+          questionArr.push(qResp.rows[0]);
+        }
+        row.questions_list = questionArr;
+      }
+      response.status(200).json(finalQuery);
+    } else { response.status(200).json(resp.rows); }
+
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Get specific question from question bank
+async function getQuestionFromQuestionBank (request, response) {
+  const questionId = request.params.questionId;
+
+  try {
+    let resp = await pool.query(
+      `SELECT * FROM quiz_question WHERE id = $1`
+    , [questionId]);
+
+    response.status(200).json(resp.rows[0]);
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Get specific question from question bank
+async function postPoll (request, response) {
+  const name = request.body.name;
+  const startTime = request.body.start_time;
+  const closeTime = request.body.close_time;
+  const isClosed = request.body.is_closed; 
+  const pollType = request.body.poll_type;
+
+  try {
+    let resp = await pool.query(
+      `INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type)
+      VALUES(default, $1, $2, $3, $4, $5)`
+    , [name, startTime, closeTime, isClosed, pollType]);
+  
+    response.status(200).send("Post poll success");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Get specific poll from id
+async function getPoll (request, response) {
+  const pollId = request.params.pollId;
+
+  try {
+    let resp = await pool.query(
+      `SELECT * FROM quiz_poll WHERE id = $1`
+    , [pollId]);
+  
+    response.status(200).json(resp.rows[0]);
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Update poll details
+async function putPoll (request, response) {
+  const pollId = request.params.pollId;
+  const name = request.body.name;
+  const startTime = request.body.start_time;
+  const closeTime = request.body.close_time;
+  const isClosed = request.body.is_closed; 
+  const pollType = request.body.poll_type;
+
+  try {
+    let resp = await pool.query(
+      `UPDATE quiz_poll SET name = $1, start_time = $2, close_time = $3, 
+      is_closed = $4, poll_type = $5
+      WHERE id = $6`
+    , [name, startTime, closeTime, isClosed, pollType, pollId]);
+  
+    response.status(200).send("Poll update success");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Update poll details
+async function deletePoll (request, response) {
+  const pollId = request.params.pollId;
+
+  try {
+    let resp = await pool.query(
+      `DELETE FROM quiz_poll WHERE id = $1`
+    , [pollId]);
+  
+    response.status(200).send("Poll delete success");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Get list of student answers by student id
+async function getStudentAnswer (request, response) {
+  const studentId = request.params.studentId;
+
+  try {
+    let resp = await pool.query(
+      `SELECT * fROM quiz_student_answer WHERE student_id = $1`
+    , [studentId]);
+  
+    response.status(200).json(resp.rows);
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Get list of student answers by student id
+async function postStudentAnswer (request, response) {
+  const studentId = request.body.studentId;
+  const quizId = request.body.quizId;
+  const questionId = request.body.questionId;
+  const answerId = request.body.answerSelectedId;
+
+  let resp = await pool.query(
+    `INSERT INTO quiz_student_answer(student_id, quiz_id, question_id, answer_selected_id)
+    VALUES($1, $2, $3, $4)`
+  , [studentId, quizId, questionId, answerId]);
+
+  response.status(200).send("Post student answer success");
+
+  try {
+    
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Get list of student answers by student id
+async function postQuestionAnswer (request, response) {
+  const quizId = request.body.quizId;
+  const questionId = request.body.questionId;
+  const isCorrectAnswer = request.body.isCorrectAnswer;
+  const description = request.body.description;
+
+  try {
+    let resp = await pool.query(
+      `INSERT INTO quiz_question_answer(id, quiz_id, question_id, is_correct_answer, description)
+      VALUES(default, $1, $2, $3, $4)`
+    , [quizId, questionId, isCorrectAnswer, description]);
+  
+    response.status(200).send("Post quiz question answer success");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Delete question from question bank
+async function deleteQuestionBankQuestion (request, response) {
+  const questionBankId = request.params.questionBankId;
+  const questionId = request.params.questionId;
+
+  try {
+    let resp = await pool.query(
+      `DELETE FROM question_bank_question WHERE question_bank_id = $1 AND question_id = $2`
+    , [questionBankId, questionId]);
+  
+    response.status(200).send("Question deleted from question bank");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Delete question from question bank
+async function deleteAssessmentQuestion (request, response) {
+  const questionId = request.params.questionId;
+
+  try {
+    let resp = await pool.query(
+      `DELETE FROM quiz_question WHERE id = $1`
+    , [questionId]);
+  
+    response.status(200).send("Question delete success");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Update quiz question answer
+async function putQuestionAnswer (request, response) {
+  const quizId = request.params.quizId;
+  const questionId = request.params.questionId;
+  const quizQuestionAnswerId = request.params.quizQuestionAnswerId;
+  const isCorrectAnswer = request.body.isCorrectAnswer;
+  const description = request.body.description;
+  
+  try {
+    let resp = await pool.query(
+      `UPDATE quiz_question_answer SET is_correct_answer = $1, description = $2
+      WHERE quiz_id = $3 AND question_id = $4 AND id = $5`, 
+      [isCorrectAnswer, description, quizId, questionId, quizQuestionAnswerId]);
+  
+    response.status(200).send("Quiz question answer update success");
+  } catch(e) {
+    response.status(400).send(e);
+  }
+};
+
+// Get number of students that selected each answer for a question (MPC only)
+async function getStudentAnswerCount (request, reponse) {
+  
+};
+
 module.exports = {
+  getStudentAnswerCount,
+  putQuestionAnswer,
+  deleteAssessmentQuestion,
+  deleteQuestionBankQuestion,
+  postQuestionAnswer,
+  postStudentAnswer,
+  getStudentAnswer,
+  deletePoll,
+  putPoll,
+  getPoll,
+  postPoll,
+  getQuestionFromQuestionBank,
+  getAllQuestionBankQuestions,
+  deleteQuestionBank,
+  putQuestionBank,
+  getQuestionBankQuestions,
+  putQuestionFromQuiz,
+  getQuestionFromQuiz,
+  deleteQuizById,
+  putQuizById,
+  getQuizQuestions,
+  postQuiz,
   getTGLevels,
   postTGLevel,
   removeTGLevel,
@@ -1047,5 +1486,6 @@ module.exports = {
   getLevelById,
   putLevel,
   deleteLevel,
-  postLevel
+  postLevel,
+  postQuizQuestion
 };
