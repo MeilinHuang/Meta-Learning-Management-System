@@ -1,30 +1,31 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import Select from 'react-select'
 import classnames from 'classnames'
 import makeAnimated from 'react-select/animated'
 import styles from './TagSelect.module.css'
 
-function TagSelect({ isFilter, setTags }) {
-    const options = [
-        // set value as id and label as name
-        { value: 'tag1', label: 'Tag 1' },
-        { value: 'tag2', label: 'Tag 2' },
-        { value: 'tag3', label: 'Tag 3' },
-    ]
+function TagSelect({ isFilter, setTags: setSelectedTags }) {
+    const [ tags, setTags ] = useState([])
+
+    useEffect(() => {
+        fetch(`http://localhost:8000/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => {
+            setTags(data.map(({ tag_id, name }) => ({ value: tag_id, label: name })))
+        })
+    }, [])
 
     const handleSelect = selectedTags => {
         let currentTags = []
         selectedTags.forEach(({ value, label }) => {
-            currentTags.push({id: value, name: label})
+            currentTags.push({tag_id: value, name: label})
         })
-        setTags(currentTags)
+        setSelectedTags(currentTags)
     }
 
     return (
         <Select 
             className={classnames(styles.select, { [styles.filter]: isFilter })}
             isMulti
-            options={options}
+            options={tags}
             components={makeAnimated()}
             placeholder="Filter"
             onChange={handleSelect}
