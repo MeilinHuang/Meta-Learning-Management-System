@@ -1,6 +1,3 @@
-1. Have each post/reply/comment with a unique id
-2. Update topic groups to include announcements, list of admin users, list of enrolled students
-3. Add DELETE request to remove content from topics
 
 Database 
   - File system 
@@ -9,11 +6,14 @@ Database
 
 Topic group
   - API for adding/deleting/updating topic files
-
-API
-  - Fix responses 400 and 404 
-  - Make query calls case insensitive from parameters
-  - Change all DATETIME/TIMESTAMP vars to pool.query(`SELECT CURRENT_TIMESTAMP`).rows[0].current_timestamp;
+  - Update topic groups to include announcements, list of admin users, list of enrolled students
+  - Add DELETE request to remove content from topics
 
 Gamification
   - Change some datatypes array(potential answers)
+
+API
+- Fix responses 400 and 404 
+- Make query calls case insensitive from parameters
+- Change all DATETIME/TIMESTAMP vars to pool.query(`SELECT CURRENT_TIMESTAMP`).rows[0].current_timestamp;
+- Make sure for INSERT / POST there is no duplicate inserts
