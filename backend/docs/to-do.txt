@@ -7,7 +7,7 @@ Database
 Topic group
   - API for adding/deleting/updating topic files
   - Update topic groups to include announcements, list of admin users, list of enrolled students
- - Add DELETE request to remove content from topics
+  - Add DELETE request to remove content from topics
 
 Gamification
   - Change some datatypes array(potential answers)

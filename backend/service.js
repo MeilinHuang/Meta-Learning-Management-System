@@ -1418,8 +1418,23 @@ async function putQuestionAnswer (request, response) {
 };
 
 // Get number of students that selected each answer for a question (MPC only)
-async function getStudentAnswerCount (request, reponse) {
+async function getStudentAnswerCount (request, response) {
+  const questionId = request.params.questionId;
+
+  try {
+    let resp = await pool.query(
+      `SELECT qqa.id, qqa.quiz_id, qqa.question_id, qqa.is_correct_answer, 
+      qqa.description, count(qsa.answer_selected_id) as answer_count FROM quiz_question_answer qqa
+      LEFT JOIN quiz_student_answer qsa ON qsa.question_id = qqa.question_id 
+      AND qsa.quiz_id = qqa.quiz_id AND qsa.answer_selected_id = qqa.id
+      WHERE qqa.question_id = $1
+      GROUP BY qqa.id`, 
+      [questionId]);
   
+    response.status(200).json(resp.rows);
+  } catch(e) {
+    response.status(400).send(e);
+  }
 };
 
 module.exports = {

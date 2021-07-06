@@ -137,12 +137,23 @@ INSERT INTO question_bank_question(question_bank_id, question_id) VALUES(2, 6);
 
 -- Create quiz question answer
 INSERT INTO quiz_question_anwer(id, quiz_id, question_id, is_correct_anwer, description)
-VALUES(default, 1, 1, false, 'Some description for answer 1');
+VALUES(default, 1, 1, false, '1 + 1 = 3');
 INSERT INTO quiz_question_anwer(id, quiz_id, question_id, is_correct_anwer, description)
-VALUES(default, 2, 2, false, 'Some description for answer 2');
+VALUES(default, 1, 1, true, '1 + 1 = 2');
+INSERT INTO quiz_question_anwer(id, quiz_id, question_id, is_correct_anwer, description)
+VALUES(default, 1, 1, false, '1 + 1 = 0');
+INSERT INTO quiz_question_anwer(id, quiz_id, question_id, is_correct_anwer, description)
+VALUES(default, 2, 2, false, 'None of the above');
 
 -- Create student answer
-INSERT INTO quiz_student_answer() VALUES();
+INSERT INTO quiz_student_answer(student_id, quiz_id, question_id, answer_selected_id) 
+VALUES(1, 2, 5, 1);
+INSERT INTO quiz_student_answer(student_id, quiz_id, question_id, answer_selected_id) 
+VALUES(2, 2, 5, 1);
+INSERT INTO quiz_student_answer(student_id, quiz_id, question_id, answer_selected_id) 
+VALUES(3, 2, 5, 1);
 
 -- Create poll
-INSERT INTO quiz_poll() VALUES();
+INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll A', current_timestamp, current_timestamp, false, 'Poll type A');
+INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll B', current_timestamp, current_timestamp, false, 'Poll type B');
+INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll C', current_timestamp, current_timestamp, false, 'Poll type C');

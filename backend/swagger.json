@@ -3515,9 +3515,37 @@
     },
     "GetAnswerCount": {
       "properties": {
-        "answerCount": {
-          "type": "integer",
-          "example": 50
+        "QuizQuestionAnswer": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 1
+              },
+              "quiz_id": {
+                "type": "integer",
+                "example": 1
+              },
+              "question_id": {
+                "type": "integer",
+                "example": 1
+              },
+              "is_correct_answer": {
+                "type": "boolean",
+                "example": true
+              },
+              "description": {
+                "type": "string",
+                "example": "5 x 5 = 12"
+              },
+              "answer_count": {
+                "type": "integer",
+                "example": 30
+              }
+            }
+          }
         }
       }
     },
