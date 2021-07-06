@@ -100,7 +100,7 @@ function ForumPostPage() {
                             </ButtonGroup>
                         </PopoverFooter>
                     </PopoverContent>
-                    </Popover>
+                </Popover>
             </Flex>
             <Divider />
             <Tags tags={dummyPost.tags} />

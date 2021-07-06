@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import classnames from 'classnames'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
+import { EditorState } from 'draft-js'
 import createToolbarPlugin from '@draft-js-plugins/static-toolbar';
 import '@draft-js-plugins/static-toolbar/lib/plugin.css'
 import createMarkdownShortcutsPlugin from 'draft-js-md-keyboard-plugin';
@@ -27,7 +28,7 @@ const plugins = [
 
 export default class SimpleStaticToolbarEditor extends Component {
   state = {
-    editorState: createEditorStateWithText(''),
+    editorState: this.props.content ? EditorState.createWithContent(this.props.content) : createEditorStateWithText(''),
   };
 
   onChange = (editorState) => {
@@ -41,7 +42,7 @@ export default class SimpleStaticToolbarEditor extends Component {
     // fixing issue with SSR https://github.com/facebook/draft-js/issues/2332#issuecomment-761573306
     // eslint-disable-next-line react/no-did-mount-set-state
     this.setState({
-      editorState: createEditorStateWithText(''),
+      editorState: this.props.content ? EditorState.createWithContent(this.props.content) : createEditorStateWithText(''),
     });
   }
 

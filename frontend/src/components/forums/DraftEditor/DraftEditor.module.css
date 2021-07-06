@@ -6,6 +6,7 @@
   border-radius: 6px;
   margin-bottom: 16px;
   background: #fefefe;
+  width: 100%;
 }
   
 .editor :global(.public-DraftEditor-content) {
