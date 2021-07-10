@@ -4,6 +4,7 @@ import './TopicTree.css';
 import TopicTreeHeader from "./TopicTreeHeader.js"
 import TopicTreeViewResource from "./TopicTreeViewResource.js"
 import { useDisclosure } from '@chakra-ui/hooks';
+import { backend_url, get_topics_url } from '../../Constants.js';
 
 var g;
 var svg
@@ -89,7 +90,7 @@ export default function TopicTree() {
         setListPrereqs(prereqs);
     }
 
-    // Runs on start, used for testing mainly
+
     useEffect(() => {
 
         
