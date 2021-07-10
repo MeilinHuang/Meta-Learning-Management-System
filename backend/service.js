@@ -122,28 +122,36 @@ async function getTopics (request, response) {
       GROUP BY tp_group.id;`, [topicGroupName]);
 
     var finalQuery = resp.rows;
+    console.log('finalQuery', finalQuery);
 
     for (var object of finalQuery) { 
       var topicArr = [];
       for (const topic_id of object.topics_list) {
-
+        //  \ 
         let tmp = await pool.query(
-          `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(topic_files.id) as course_materials 
+          `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(topic_files.id) as course_materials, array_agg(DISTINCT prerequisites.prereq) as prereqs
           FROM topics 
           JOIN topic_files ON topic_files.topic_id = topics.id
+          JOIN prerequisites ON prerequisites.topic = topics.id
           WHERE topics.id = $1
           GROUP BY topics.id`
           , [topic_id]);
 
-        var courseMaterialsArr = [];
 
-        for (var material_id of tmp.rows[0].course_materials) {
-          let tmp2 = await pool.query(`SELECT * from topic_files WHERE id = $1`, [material_id]);
-          courseMaterialsArr.push(tmp2.rows[0]);
+
+        if (tmp.rows.length > 0) {
+          console.log('tmp', tmp.rows);
+          var courseMaterialsArr = [];
+          for (var material_id of tmp.rows[0].course_materials) {
+            let tmp2 = await pool.query(`SELECT * from topic_files WHERE id = $1`, [material_id]);
+            courseMaterialsArr.push(tmp2.rows[0]);
+          }
+
+          tmp.rows[0].course_materials = courseMaterialsArr;
+          topicArr.push(tmp.rows[0]);
         }
 
-        tmp.rows[0].course_materials = courseMaterialsArr;
-        topicArr.push(tmp.rows[0]);
+
       };
 
       object.topics_list = topicArr;
