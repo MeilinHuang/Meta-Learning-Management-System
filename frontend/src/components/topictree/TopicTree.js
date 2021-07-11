@@ -66,6 +66,28 @@ export default function TopicTree() {
         onClose: onCloseModal 
     } = useDisclosure();
 
+    const treeStructure = (jsonData) => {
+        let newJson = {
+            "nodes": [{}],
+            "links": []
+        };
+        for (let topic of jsonData.topics_list) {
+            let node = {};
+            node["id"] = topic.id;
+            node["title"] = topic.name;
+            console.log('topic', topic);
+            newJson.nodes.push(node);
+            for (let prereq of topic.prereqs) {
+                newJson.links.push({
+                    'source': prereq,
+                    'target': topic.id
+                });
+            }
+        }
+        console.log('newJson', newJson);
+        return newJson;
+    }
+
 
     const getListOfPrerequisites = (id, data) => {
         console.log('id', id);
@@ -115,10 +137,16 @@ export default function TopicTree() {
 
         
         // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
-        fetch('/topic-tree-example.json')
-        .then((res) => res.json())
+        fetch(get_topics_url('Introduction to Programming'))
+        .then((res) => {
+            return res.json();
+        })
+        .then((res) => {
+            console.log('old json', res);
+            return treeStructure(res);
+        })
         .then( function(data) {
-            
+            console.log('data');
             // arrow heads
             svg.append("svg:defs").selectAll("marker")
                 .data(["end"])
