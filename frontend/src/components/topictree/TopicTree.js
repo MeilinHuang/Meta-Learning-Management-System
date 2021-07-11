@@ -75,6 +75,11 @@ export default function TopicTree() {
             let node = {};
             node["id"] = topic.id;
             node["title"] = topic.name;
+            node["materials_strings"] = {};
+            node.materials_strings["content"] = [];
+            for (let course_material of topic.course_materials) {
+                node.materials_strings.content.push(course_material.name);
+            }
             console.log('topic', topic);
             newJson.nodes.push(node);
             for (let prereq of topic.prereqs) {
