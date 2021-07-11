@@ -146,6 +146,13 @@ export default function TopicTree() {
             return treeStructure(res);
         })
         .then( function(data) {
+            let preprocessedData = {};
+            // make it easier to access instead of having to traverse data.nodes each time
+            for (let node of data.nodes) {
+                if (node.hasOwnProperty('id')) {
+                    preprocessedData[node.id.toString()] = node;
+                }
+            }
             console.log('data');
             // arrow heads
             svg.append("svg:defs").selectAll("marker")
@@ -214,13 +221,21 @@ export default function TopicTree() {
                 .text(function(d) {
                   return d.title;
                 })
-                
-        
+            
+            var linkNodes = [];
+            data.links.forEach(function(link) {
+                linkNodes.push({
+                    source: preprocessedData[link.source],
+                    target: preprocessedData[link.target]
+                });
+            });
+            
+            console.log('linkNodes', linkNodes);
             simulation
-                .nodes(data.nodes)
+                .nodes(data.nodes.concat(linkNodes))
                 .on("tick", ticked);
             simulation.force("link")
-                .links(data.links);
+                .links(data.links.concat(linkNodes));
 
     
             // This function is run at each iteration of the force algorithm, updating the nodes position.
