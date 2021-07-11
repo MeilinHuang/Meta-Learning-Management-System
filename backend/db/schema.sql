@@ -239,17 +239,18 @@ CREATE TABLE "quiz" (
 DROP TABLE IF EXISTS "quiz_question" CASCADE;
 CREATE TABLE "quiz_question" (
   id SERIAL PRIMARY KEY,
-  quiz_id INTEGER REFERENCES quiz(id),
+  quiz_id INTEGER REFERENCES quiz(id) ON UPDATE CASCADE ON DELETE CASCADE,
   quiz_type TEXT NOT NULL,
   marks_awarded REAL,
-  related_topic_id INTEGER NOT NULL REFERENCES topics(id)
+  description TEXT NOT NULL,
+  related_topic_id INTEGER NOT NULL REFERENCES topics(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "quiz_question_answer" CASCADE;
 CREATE TABLE "quiz_question_answer" (
   id SERIAL NOT NULL PRIMARY KEY,
-  quiz_id INTEGER NOT NULL REFERENCES quiz(id),
-  question_id INTEGER NOT NULL REFERENCES quiz_question(id),
+  quiz_id INTEGER NOT NULL REFERENCES quiz(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  question_id INTEGER NOT NULL REFERENCES quiz_question(id) ON UPDATE CASCADE ON DELETE CASCADE,
   is_correct_answer BOOLEAN NOT NULL,
   description TEXT
 );
@@ -257,8 +258,8 @@ CREATE TABLE "quiz_question_answer" (
 DROP TABLE IF EXISTS "quiz_student_answer" CASCADE;
 CREATE TABLE "quiz_student_answer" (
   student_id INTEGER NOT NULL REFERENCES users(id),
-  quiz_id INTEGER NOT NULL REFERENCES quiz(id),
-  question_id INTEGER NOT NULL REFERENCES quiz_question(id),
+  quiz_id INTEGER NOT NULL REFERENCES quiz(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  question_id INTEGER NOT NULL REFERENCES quiz_question(id) ON UPDATE CASCADE ON DELETE CASCADE,
   answer_selected_id INTEGER NOT NULL REFERENCES quiz_question_answer(id)
 );
 
@@ -266,6 +267,13 @@ DROP TABLE IF EXISTS "quiz_question_bank" CASCADE;
 CREATE TABLE "quiz_question_bank" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS "question_bank_question" CASCADE;
+CREATE TABLE "question_bank_question" (
+  question_bank_id INTEGER NOT NULL REFERENCES quiz_question_bank(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  question_id INTEGER NOT NULL REFERENCES quiz_question(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (question_bank_id, question_id)
 );
 
 DROP TABLE IF EXISTS "quiz_poll" CASCADE;
@@ -283,7 +291,7 @@ DROP TABLE IF EXISTS "tutorials" CASCADE;
 CREATE TABLE "tutorials" (
   id SERIAL NOT NULL PRIMARY KEY,
   tutor_id INTEGER NOT NULL REFERENCES users(id),
-  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
   tutorial_code TEXT NOT NULL,
   timeslot TEXT,
   curr_capacity INTEGER NOT NULL,
@@ -292,7 +300,7 @@ CREATE TABLE "tutorials" (
 
 DROP TABLE IF EXISTS "enrolled_tutorials" CASCADE;
 CREATE TABLE "enrolled_tutorials" (
-  tutorial_id INTEGER NOT NULL REFERENCES tutorials(id),
+  tutorial_id INTEGER NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE ON UPDATE CASCADE,
   student_id INTEGER NOT NULL REFERENCES users(id),
   PRIMARY KEY (tutorial_id, student_id)
 );

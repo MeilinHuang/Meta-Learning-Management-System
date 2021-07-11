@@ -209,6 +209,106 @@ app.get('/topicGroup/:topicGroupId/levels', async(request, response) => {
   await database.getTGLevels(request, response);
 })
 
+/***************************************************************
+                       Assessnebt Functions
+***************************************************************/
+
+app.post('/quiz', async(request, response) => {
+  await database.postQuiz(request, response);
+})
+
+/* app.post('/quiz_question', async(request, response) => {
+  await database.postQuizQuestion(request, response);
+}) */
+
+app.get('/quiz/:quizId', async(request, response) => {
+  await database.getQuizQuestions(request, response);
+})
+
+app.put('/quiz/:quizId', async(request, response) => {
+  await database.putQuizById(request, response);
+})
+
+app.delete('/quiz/:quizId', async(request, response) => {
+  await database.deleteQuizById(request, response);
+})
+
+app.get('/quiz/:quizId/question/:questionId', async(request, response) => {
+  await database.getQuestionFromQuiz(request, response);
+})
+
+app.put('/quiz/:quizId/question/:questionId', async(request, response) => {
+  await database.putQuestionFromQuiz(request, response);
+})
+
+app.get('/questionBank/:questionBankId', async(request, response) => {
+  await database.getQuestionBankQuestions(request, response);
+})
+
+app.put('/questionBank/:questionBankId', async(request, response) => {
+  await database.putQuestionBank(request, response);
+})
+
+app.delete('/questionBank/:questionBankId', async(request, response) => {
+  await database.deleteQuestionBank(request, response);
+})
+
+app.get('/questionBank', async(request, response) => {
+  await database.getAllQuestionBankQuestions(request, response);
+})
+
+app.get('/questionBank/question/:questionId', async(request, response) => {
+  await database.getQuestionFromQuestionBank(request, response);
+})
+
+app.post('/poll', async(request, response) => {
+  await database.postPoll(request, response);
+})
+
+app.get('/poll/:pollId', async(request, response) => {
+  await database.getPoll(request, response);
+})
+
+app.put('/poll/:pollId', async(request, response) => {
+  await database.putPoll(request, response);
+})
+
+app.delete('/poll/:pollId', async(request, response) => {
+  await database.deletePoll(request, response);
+})
+
+app.get('/quiz/studentAnswers/student/:studentId', async(request, response) => {
+  await database.getStudentAnswer(request, response);
+})
+
+app.post('/student_answer', async(request, response) => {
+  await database.postStudentAnswer(request, response);
+})
+
+app.post('/quiz_question_answer', async(request, response) => {
+  await database.postQuestionAnswer(request, response);
+})
+
+app.post('/questionBank/:questionBankId/question', async(request, response) => {
+  await database.postQuizQuestion(request, response);
+})
+
+app.delete('/questionBank/:questionBankId/question/:questionId', async(request, response) => {
+  await database.deleteQuestionBankQuestion(request, response);
+})
+
+app.delete('/question/:questionId/delete', async(request, response) => {
+  await database.deleteAssessmentQuestion(request, response);
+})
+
+app.put('/quiz/:quizId/question/:questionId/answer/:quizQuestionAnswerId', async(request, response) => {
+  await database.putQuestionAnswer(request, response);
+})
+
+app.get('/quiz/results/question/:questionId/answerCount', async(request, response) => {
+  await database.getStudentAnswerCount(request, response);
+})
+
 app.listen(8000, () => {
   console.log("Server listening on http://localhost:8000/\n");
 });
