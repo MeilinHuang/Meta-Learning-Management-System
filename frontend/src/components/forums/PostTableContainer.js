@@ -9,11 +9,11 @@ import {
 } from "@chakra-ui/react"
 import PostTable from './PostTable'
 
-function PostTableContainer({ pinnedPosts, posts }) {
+function PostTableContainer({ pinnedPosts, posts, showPinned }) {
     // if isAdmin then show pin/unpin logo next to each post
     return (
         <Accordion allowMultiple defaultIndex={[0, 1]} mx="auto" width={{ base: '100%', lg: '80%' }} borderColor="white">
-            <AccordionItem>
+            {showPinned && <AccordionItem>
                 <h2>
                 <AccordionButton>
                     <Box flex="1" textAlign="left" fontWeight="bold">
@@ -25,7 +25,7 @@ function PostTableContainer({ pinnedPosts, posts }) {
                 <AccordionPanel pb={4} px={0} overflowX={{ base: 'scroll', md: 'initial' }}>
                     <PostTable posts={pinnedPosts} />
                 </AccordionPanel>
-            </AccordionItem> 
+            </AccordionItem>} 
             <AccordionItem>
                 <h2>
                 <AccordionButton>

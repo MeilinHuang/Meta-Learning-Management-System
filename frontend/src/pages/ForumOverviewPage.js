@@ -19,13 +19,16 @@ import { StoreContext } from '../utils/store'
 
 function ForumOverviewPage() {
     const context = useContext(StoreContext)
-    const { posts: [posts, setPosts] } = context;
+    const { posts: [posts, setPosts], showPinned: [showPinned, setShowPinned] } = context;
     const [pinnedPosts, setPinnedPosts] = useState([])
 
     useEffect(() => {
         fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
-        fetch('http://localhost:8000/forum/pinned').then(r => r.json()).then(data => setPinnedPosts(data))
-    }, [setPosts])
+        fetch('http://localhost:8000/forum/pinned').then(r => r.json()).then(data => {
+            setPinnedPosts(data)
+            setShowPinned(true)
+        })
+    }, [setPosts, setShowPinned])
 
     const buttonContents = useBreakpointValue({ base: '', md: 'Add Post' })
     const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null })
@@ -44,7 +47,7 @@ function ForumOverviewPage() {
                 </Center>
             </Flex>
             <Filter />
-            <PostTableContainer posts={posts} pinnedPosts={pinnedPosts} />
+            <PostTableContainer posts={posts} pinnedPosts={pinnedPosts} showPinned={showPinned} />
         </>
     )
 }

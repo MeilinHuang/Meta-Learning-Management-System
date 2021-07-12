@@ -12,17 +12,21 @@ import { StoreContext } from '../../utils/store'
 function Filter() {
     const [tags, setTags] = useState([])
     const context = useContext(StoreContext)
-    const { posts: [posts, setPosts] } = context;
+    const { posts: [, setPosts], showPinned: [, setShowPinned] } = context;
 
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     useEffect(() => {
         if (!tags.length) {
-            fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
+            fetch('http://localhost:8000/forum').then(r => r.json()).then(data => {
+                setPosts(data)
+                setShowPinned(true)
+            })
             return
         }
 
         const tagNames = tags.map(t => t.name.toLowerCase())
+        setShowPinned(false)
         const filteredPosts = []
         tagNames.forEach(t => {
             fetch(`http://localhost:8000/forum/${t}`).then(r => r.json()).then(data => {
@@ -30,7 +34,7 @@ function Filter() {
                 setPosts(filteredPosts)
             })
         })
-    }, [setPosts, tags])
+    }, [setPosts, setShowPinned, tags])
     
     // TODO: need to update the list of options in tagSelect when new tag added
 
