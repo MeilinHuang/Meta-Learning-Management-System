@@ -30,8 +30,6 @@ function CommentResponse({ author, comment, published_date, reply }) {
         setDetails(comment || reply)
     }, [comment, reply])
 
-    console.log(details)
-
     const editPost = () => {
         const markup = convertFromHTML(details)
         const state = ContentState.createFromBlockArray(markup)

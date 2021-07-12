@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { 
     Button,
     Center,
@@ -14,48 +14,18 @@ import Filter from '../components/forums/Filter'
 import PostTableContainer from '../components/forums/PostTableContainer'
 import AddPostModal from '../components/forums/AddPostModal'
 import { GrAdd } from 'react-icons/gr'
+import { StoreContext } from '../utils/store'
 
-const dummyPosts = [
-    {
-        id: 1,
-        title: 'This is a forum post',
-        published_date: 1624724805,
-        replies: [
-            {
-                id: 1,
-            }
-        ],
-        comments: [
-            {
-                id: 1,
-            }
-        ]
-    },
-    {
-        id: 2,
-        title: 'Another forum post',
-        published_date: 1622046405,
-        replies: [
-            {
-                id: 1,
-            }
-        ],
-        comments: [
-            {
-                id: 1,
-            }
-        ]
-    },
-]
 
 function ForumOverviewPage() {
-    const [posts, setPosts] = useState([])
+    const context = useContext(StoreContext)
+    const { posts: [posts, setPosts] } = context;
     const [pinnedPosts, setPinnedPosts] = useState([])
 
     useEffect(() => {
         fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
         fetch('http://localhost:8000/forum/pinned').then(r => r.json()).then(data => setPinnedPosts(data))
-    }, [])
+    }, [setPosts])
 
     const buttonContents = useBreakpointValue({ base: '', md: 'Add Post' })
     const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null })

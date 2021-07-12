@@ -27,7 +27,7 @@ function TagSelect({ isFilter, setTags: setSelectedTags }) {
             isMulti
             options={tags}
             components={makeAnimated()}
-            placeholder="Filter"
+            placeholder={isFilter ? "Filter" : 'Select'}
             onChange={handleSelect}
         />
     )

@@ -54,10 +54,10 @@ function AddPostModal({ isOpen, onClose }) {
                             <Heading size="sm" mb="4px">Details</Heading>
                             <DraftEditor setDetails={setDetails}  />
                         </Flex>
-                        <Flex flexDirection="column" mb="16px">
+                        {/* <Flex flexDirection="column" mb="16px">
                             <Heading size="sm" mb="4px">Attach Images</Heading>
                             <input type="file" name="images" onChange={handleUpload} />
-                        </Flex>
+                        </Flex> */}
                         <Flex flexDirection="column">
                             <Heading size="sm" mb="4px">Tags</Heading>
                             <TagSelect setTags={setTags} />

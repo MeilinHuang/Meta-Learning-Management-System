@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { 
     Box,
     Button,
@@ -7,10 +7,30 @@ import {
 } from "@chakra-ui/react"
 import TagSelect from './TagSelect/TagSelect'
 import ManageTagsModal from "./ManageTagsModal"
+import { StoreContext } from '../../utils/store'
 
 function Filter() {
     const [tags, setTags] = useState([])
+    const context = useContext(StoreContext)
+    const { posts: [posts, setPosts] } = context;
+
     const { isOpen, onOpen, onClose } = useDisclosure()
+
+    useEffect(() => {
+        if (!tags.length) {
+            fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
+            return
+        }
+
+        const tagNames = tags.map(t => t.name.toLowerCase())
+        const filteredPosts = []
+        tagNames.forEach(t => {
+            fetch(`http://localhost:8000/forum/${t}`).then(r => r.json()).then(data => {
+                filteredPosts.push(...data)
+                setPosts(filteredPosts)
+            })
+        })
+    }, [setPosts, tags])
     
     // TODO: need to update the list of options in tagSelect when new tag added
 

@@ -15,9 +15,9 @@ import AuthorDetails from '../AuthorDetails'
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './PostDetails.module.css'
 
-function PostDetails({ post: { author, published_date, description }}) {
+function PostDetails({ post: { author, post_id, published_date, description }}) {
     const [ editorState, setEditorState ] = useState('')
-    const [ details, setDetails ] = useState('')
+    const [ details, setDetails ] = useState()
     const toast = useToast()
 
     useEffect(() => {
@@ -43,6 +43,16 @@ function PostDetails({ post: { author, published_date, description }}) {
 
     const handleSubmit = e => {
         e.preventDefault()
+        console.log(post_id)
+        // fetch(
+        //     `http://localhost:8000/forum/post/${post_id}`,
+        //     {
+        //         method: 'PUT',
+        //         body: JSON.stringify({
+        //             description: details,
+        //         }),
+        //     }
+        // ).then(r => console.log(r))
         setEditorState('')
     }
 
