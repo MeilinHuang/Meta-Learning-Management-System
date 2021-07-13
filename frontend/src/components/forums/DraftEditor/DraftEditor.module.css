@@ -1,0 +1,26 @@
+.editor {
+  box-sizing: border-box;
+  border: 1px solid rgb(226, 232, 240);
+  cursor: text;
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  background: #fefefe;
+  width: 100%;
+}
+  
+.editor :global(.public-DraftEditor-content) {
+  min-height: 140px;
+}
+
+.blockquote,
+.orderedListItem,
+.unorderedListItem {
+  margin-left: 32px;
+}
+
+.blockquote {
+  padding-left: 12px;
+  border-left: 5px solid #ccc;
+}
+
