@@ -3003,9 +3003,9 @@
     },
     "PostReply": {
       "properties": {
-        "author": {
-          "type": "string",
-          "example": "Lecturey Lecturer"
+        "user_id": {
+          "type": "integer",
+          "example": 1
         },
         "published_date": {
           "type": "dateTime",
@@ -3027,9 +3027,9 @@
     },
     "PostComment": {
       "properties": {
-        "author": {
-          "type": "string",
-          "example": "Lecturey Lecturer"
+        "user_id": {
+          "type": "integer",
+          "example": 1
         },
         "published_date": {
           "type": "dateTime",
