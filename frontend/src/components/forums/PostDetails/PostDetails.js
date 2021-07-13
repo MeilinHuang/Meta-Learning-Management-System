@@ -56,7 +56,7 @@ function PostDetails({ post: { author, post_id, published_date, description }}) 
                     'Content-Type': 'application/json',
                 }
             }
-        ).then(r => console.log(r)) // TODO: handle errors
+        ).then(r => console.log(r)) // TODO: handle errors (maybe don't change the value in the frontend until this is okay)
         setEditorState('')
     }
 
