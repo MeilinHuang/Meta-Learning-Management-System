@@ -15,6 +15,8 @@ const dummyAuthor = 'David Nguyen'
 
 function CommentsResponses({ isComments, posts, post_id }) {
     const [details, setDetails] = useState('')
+    
+    console.log(posts)
 
     const handleSubmit = e => {
         e.preventDefault()
@@ -51,7 +53,7 @@ function CommentsResponses({ isComments, posts, post_id }) {
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md" mb="12px" textTransform="uppercase">{isComments ? 'Comments' : 'Responses'}</Heading>
             {posts && posts[0] !== null && posts.map(post => (
-                <CommentResponse {...post} />
+                <CommentResponse {...post} post_id={post_id} />
             ))}
             <form id={`create${isComments ? 'Comment' : 'Response'}`} onSubmit={handleSubmit}>
                 <Flex>

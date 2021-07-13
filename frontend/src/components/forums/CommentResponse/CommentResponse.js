@@ -22,7 +22,7 @@ import { ContentState, convertFromHTML } from 'draft-js'
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './CommentResponse.module.css'
 
-function CommentResponse({ author, comment, published_date, reply }) {
+function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id }) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState('')
 
@@ -38,6 +38,26 @@ function CommentResponse({ author, comment, published_date, reply }) {
 
     const handleSubmit = e => {
         e.preventDefault()
+        const isComments = !!comment && !reply
+
+        // TODO: add support for updating comment
+        if (isComments) {
+            return
+        }
+
+        fetch(
+            `http://localhost:8000/forum/post/${post_id}/reply/${reply_id}`,
+            {
+                method: 'PUT',
+                body: JSON.stringify({
+                    reply: details,
+                }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then(r => console.log(r)) // TODO: handle errors (maybe don't change the value in the frontend until this is okay)
         setEditorState('')
     }
 
