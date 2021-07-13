@@ -2971,9 +2971,9 @@
           "type": "string",
           "example": "Final exam marks release date?"
         },
-        "author": {
-          "type": "string",
-          "example": "Billy Hendryk"
+        "user_id": {
+          "type": "integer",
+          "example": 0
         },
         "publishedDate": {
           "type": "dateTime",

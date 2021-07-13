@@ -461,9 +461,9 @@ async function getFilterPosts (request, response) {
 // Create new post on forum (TAGS MUST ALREADY EXIST and USER MUST EXIST)
 async function postForum (request, response) {
   const title = request.body.title;
-  const author = request.body.author;
-  const idReq = await pool.query(`SELECT id FROM users WHERE name = $1`, [author]);
-  const user_id = idReq.rows[0].id;
+  const user_id = request.body.user_id;
+  const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [user_id]);
+  const author = authReq.rows[0].name;
   const publishedDate = request.body.publishedDate;
   const description = request.body.description;
   const tags = request.body.tags;
@@ -480,7 +480,7 @@ async function postForum (request, response) {
       `INSERT INTO post_tags(post_id, tag_id) VALUES($1, $2)`, [resp.rows[0].post_id, tag.tag_id]);
   }
 
-  response.status(200).send(resp.rows[0].post_id);
+  response.sendStatus(200);
 };
 
 // Get post details of selected post
