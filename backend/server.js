@@ -43,6 +43,7 @@ app.delete('/user/:userId/:topicGroupId', database.deleteAdmin);
                        Topic Group Functions
 ***************************************************************/
 
+
 app.get('/topicGroup', async(request, response) => {
   await database.getAllTopicGroups(request, response);
 });

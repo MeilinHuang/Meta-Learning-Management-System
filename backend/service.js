@@ -79,8 +79,8 @@ async function getAllTopicGroups(request, response) {
       `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
       array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list
       FROM topic_group tp_group 
-      JOIN topics ON topics.topic_group_id = tp_group.id
-      JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
+      LEFT JOIN topics ON topics.topic_group_id = tp_group.id
+      LEFT JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
       GROUP BY tp_group.id;`);
 
     var finalQuery = resp.rows;
@@ -122,28 +122,41 @@ async function getTopics (request, response) {
       GROUP BY tp_group.id;`, [topicGroupName]);
 
     var finalQuery = resp.rows;
+    console.log('finalQuery', finalQuery);
 
     for (var object of finalQuery) { 
       var topicArr = [];
       for (const topic_id of object.topics_list) {
-
+        console.log('topic_id', topic_id);
         let tmp = await pool.query(
-          `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(topic_files.id) as course_materials 
+          `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(topic_files.id) as course_materials, array_agg(DISTINCT prerequisites.prereq) as prereqs
           FROM topics 
-          JOIN topic_files ON topic_files.topic_id = topics.id
+          FULL OUTER JOIN topic_files ON topic_files.topic_id = topics.id
+          FULL OUTER JOIN prerequisites ON prerequisites.topic = topics.id
           WHERE topics.id = $1
           GROUP BY topics.id`
           , [topic_id]);
 
-        var courseMaterialsArr = [];
 
-        for (var material_id of tmp.rows[0].course_materials) {
-          let tmp2 = await pool.query(`SELECT * from topic_files WHERE id = $1`, [material_id]);
-          courseMaterialsArr.push(tmp2.rows[0]);
+        console.log(tmp.rows);
+        if (tmp.rows.length > 0) {
+          console.log('tmp', tmp.rows);
+          var courseMaterialsArr = [];
+          if (tmp.rows[0].course_materials[0] !== null) {
+            for (var material_id of tmp.rows[0].course_materials) {
+              let tmp2 = await pool.query(`SELECT * from topic_files WHERE id = $1`, [material_id]);
+              courseMaterialsArr.push(tmp2.rows[0]);
+            }
+          }
+          if (tmp.rows[0].prereqs[0] === null) {
+            tmp.rows[0].prereqs = [];
+          }
+          tmp.rows[0].course_materials = courseMaterialsArr;
+          topicArr.push(tmp.rows[0]);
+
         }
 
-        tmp.rows[0].course_materials = courseMaterialsArr;
-        topicArr.push(tmp.rows[0]);
+
       };
 
       object.topics_list = topicArr;
@@ -461,9 +474,9 @@ async function getFilterPosts (request, response) {
 // Create new post on forum (TAGS MUST ALREADY EXIST and USER MUST EXIST)
 async function postForum (request, response) {
   const title = request.body.title;
-  const author = request.body.author;
-  const idReq = await pool.query(`SELECT id FROM users WHERE name = $1`, [author]);
-  const user_id = idReq.rows[0].id;
+  const user_id = request.body.user_id;
+  const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [user_id]);
+  const author = authReq.rows[0].name;
   const publishedDate = request.body.publishedDate;
   const description = request.body.description;
   const tags = request.body.tags;
@@ -480,7 +493,7 @@ async function postForum (request, response) {
       `INSERT INTO post_tags(post_id, tag_id) VALUES($1, $2)`, [resp.rows[0].post_id, tag.tag_id]);
   }
 
-  response.status(200).send(resp.rows[0].post_id);
+  response.sendStatus(200);
 };
 
 // Get post details of selected post
