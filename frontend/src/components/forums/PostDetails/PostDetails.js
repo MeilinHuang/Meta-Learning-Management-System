@@ -44,15 +44,19 @@ function PostDetails({ post: { author, post_id, published_date, description }}) 
     const handleSubmit = e => {
         e.preventDefault()
         console.log(post_id)
-        // fetch(
-        //     `http://localhost:8000/forum/post/${post_id}`,
-        //     {
-        //         method: 'PUT',
-        //         body: JSON.stringify({
-        //             description: details,
-        //         }),
-        //     }
-        // ).then(r => console.log(r))
+        fetch(
+            `http://localhost:8000/forum/post/${post_id}`,
+            {
+                method: 'PUT',
+                body: JSON.stringify({
+                    description: details,
+                }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then(r => console.log(r)) // TODO: handle errors
         setEditorState('')
     }
 
