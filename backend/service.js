@@ -368,10 +368,9 @@ async function getAllPinnedPosts (request, response) {
 
 // Get all posts related search term
 async function getSearchPosts (request, response) {
-  const forumSearchTerm = request.params.forumSearchTerm;
-  let resp;
   try {
-    resp = await pool.query(
+    const forumSearchTerm = request.params.forumSearchTerm;
+    let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp 
@@ -381,8 +380,8 @@ async function getSearchPosts (request, response) {
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
-      WHERE LOWER (fp.title) LIKE $1
-      OR LOWER (fp.description) LIKE $1
+      WHERE LOWER (fp.title) LIKE LOWER($1)
+      OR LOWER (fp.description) LIKE LOWER($1)
       GROUP BY fp.post_id`, [`%${forumSearchTerm}%`]);
 
     var finalQuery = resp.rows;
@@ -411,12 +410,12 @@ async function getSearchPosts (request, response) {
       object.replies = repliesArr;
       object.comments = commentsArr;
     }
-
+    response.status(200).json(finalQuery);
   } catch (e) {
-    console.log(e);
+    response.sendStatus(400);
+    response.send(e);
   }
 
-  response.status(200).json(finalQuery);
 }
 
 // Get all posts related tag term
@@ -582,6 +581,21 @@ async function putPostReply (request, response) {
   }
 };
 
+// Update post reply with id
+async function deletePostReply (request, response) {
+  try {
+    const replyId = request.params.replyId;
+
+    let resp = await pool.query(`DELETE FROM replies WHERE reply_id = $1`,
+    [replyId]);
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.sendStatus(400);
+    response.send(e);
+  }
+};
+
 // Create new reply
 async function postReply (request, response) {
   try {
@@ -636,6 +650,46 @@ async function postComment (request, response) {
   }
 };
 
+// Put comment
+async function putComment (request, response) {
+  try {
+    const commentId = request.params.commentId;
+    const commentDescription = request.body.comment;
+
+    let resp = await pool.query(
+      `UPDATE comments SET comment = $1 WHERE comment_id = $2`,
+      [commentDescription, commentId]);
+  
+    /* let linkComment = await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
+    VALUES($1, $2)`, [postId, resp.rows[0].comment_id]); */
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+};
+
+// Delete new comment
+async function deleteComment (request, response) {
+  try {
+    //const postId = request.params.postId;
+    const commentId = request.params.commentId;
+
+    let resp = await pool.query(
+    `DELETE FROM comments WHERE comment_id = $1`,
+    [commentId]);
+  
+    /* let linkComment = await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
+    VALUES($1, $2)`, [postId, resp.rows[0].comment_id]); */
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+};
+
 // Pins or unpins forum post
 async function putPostPin (request, response) {
   try {
@@ -669,6 +723,18 @@ async function postTag (request, response) {
   try {
     const tagName = request.body.tagName;
     let resp = await pool.query(`INSERT INTO tags(tag_id, name) VALUES(default, $1)`, [tagName]);
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  } 
+};
+
+// Posts tag
+async function deleteTag (request, response) {
+  try {
+    const tagId = request.params.tagId;
+    let resp = await pool.query(`DELETE FROM tags WHERE tag_id = $1`, [tagId]);
     response.sendStatus(200);
   } catch(e) {
     response.status(400);
@@ -1463,6 +1529,10 @@ async function getStudentAnswerCount (request, response) {
 };
 
 module.exports = {
+  deleteComment,
+  putComment,
+  deletePostReply,
+  deleteTag,
   getStudentAnswerCount,
   putQuestionAnswer,
   deleteAssessmentQuestion,
