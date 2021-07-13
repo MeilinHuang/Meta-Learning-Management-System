@@ -79,8 +79,8 @@ async function getAllTopicGroups(request, response) {
       `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
       array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list
       FROM topic_group tp_group 
-      JOIN topics ON topics.topic_group_id = tp_group.id
-      JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
+      FULL OUTER JOIN topics ON topics.topic_group_id = tp_group.id
+      FULL OUTER JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
       GROUP BY tp_group.id;`);
 
     var finalQuery = resp.rows;

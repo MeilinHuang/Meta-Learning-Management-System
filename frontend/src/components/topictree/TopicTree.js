@@ -13,9 +13,8 @@ function zoomed() {
     g.attr("transform", d3.event.transform);
 }
 
-export default function TopicTree() {
+export default function TopicTree({ match: { params: { topicGroup }}}) {
     const ref = useRef();
-    const dataset = [100, 200, 300, 400, 500];
     const [data, setData] = useState([]);
     const [listPrereqs, setListPrereqs] = useState([]);
     const [selectedNode, setSelectedNode] = useState({
@@ -33,33 +32,6 @@ export default function TopicTree() {
         "discipline": "",
         "creator": ""
     });
-    const links = [
-        {
-            name: 'Home',
-            url: '/',
-        },
-        {
-            name: 'Course Outline',
-            url: '/course-outline',
-        },
-        {
-            name: 'Content',
-            url: '/content',
-        },
-        {
-            name: 'Forums',
-            url: '/forums',
-        },
-        {
-            name: 'Support',
-            url: '/support',
-        },
-        {
-            name: 'Topic Tree',
-            url: '/topictree'
-        }
-    ];
-    const [isOpen, setOpen] = useState(false);
     const { 
         isOpen: isOpenModal, 
         onOpen: onOpenModal, 
@@ -142,7 +114,7 @@ export default function TopicTree() {
 
         
         // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
-        fetch(get_topics_url('Introduction to Programming'))
+        fetch(get_topics_url(topicGroup))
         .then((res) => {
             return res.json();
         })
