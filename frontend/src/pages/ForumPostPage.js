@@ -30,8 +30,6 @@ function ForumPostPage({ match: { params: { id }}}) {
         fetch(`http://localhost:8000/forum/post/${id}`).then(r => r.json()).then(data => setPost(data[0]))
     }, [id])
 
-    console.log(post)
-
     return (
         <>
             <Breadcrumb separator=">">
@@ -67,8 +65,8 @@ function ForumPostPage({ match: { params: { id }}}) {
             <Divider />
             <Tags tags={post.tags} />
             <PostDetails post={post} />
-            <CommentsResponses posts={post.replies} />
-            <CommentsResponses isComments posts={post.comments} />
+            <CommentsResponses posts={post.replies} post_id={id} />
+            <CommentsResponses isComments posts={post.comments} post_id={id} />
         </>
     )
 }
