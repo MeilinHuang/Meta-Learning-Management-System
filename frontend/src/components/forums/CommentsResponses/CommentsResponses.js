@@ -15,8 +15,6 @@ const dummyAuthor = 'David Nguyen'
 
 function CommentsResponses({ isComments, posts, post_id }) {
     const [details, setDetails] = useState('')
-    
-    console.log(posts)
 
     const handleSubmit = e => {
         e.preventDefault()
@@ -41,7 +39,6 @@ function CommentsResponses({ isComments, posts, post_id }) {
                 'Content-Type': 'application/json'
             }
         }).then(r => {
-            console.log(r)
             if (r.status === 200) {
                 window.location.reload()
             } 
