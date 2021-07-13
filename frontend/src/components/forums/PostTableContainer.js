@@ -9,25 +9,23 @@ import {
 } from "@chakra-ui/react"
 import PostTable from './PostTable'
 
-function PostTableContainer(props) {
+function PostTableContainer({ pinnedPosts, posts, showPinned }) {
     // if isAdmin then show pin/unpin logo next to each post
     return (
         <Accordion allowMultiple defaultIndex={[0, 1]} mx="auto" width={{ base: '100%', lg: '80%' }} borderColor="white">
-            {/* 2.2.2 - Pinned posts are shown at the top of the forum overview page
-                <AccordionItem>
-                    <h2>
-                    <AccordionButton>
-                        <Box flex="1" textAlign="left">
+            {showPinned && <AccordionItem>
+                <h2>
+                <AccordionButton>
+                    <Box flex="1" textAlign="left" fontWeight="bold">
                         Pinned
-                        </Box>
-                        <AccordionIcon />
-                    </AccordionButton> 
-                    </h2>
-                    <AccordionPanel pb={4}>
-                        <PostTable {...props} />
-                    </AccordionPanel>
-                </AccordionItem> 
-            */}
+                    </Box>
+                    <AccordionIcon />
+                </AccordionButton> 
+                </h2>
+                <AccordionPanel pb={4} px={0} overflowX={{ base: 'scroll', md: 'initial' }}>
+                    <PostTable posts={pinnedPosts} />
+                </AccordionPanel>
+            </AccordionItem>} 
             <AccordionItem>
                 <h2>
                 <AccordionButton>
@@ -38,7 +36,7 @@ function PostTableContainer(props) {
                 </AccordionButton> 
                 </h2>
                 <AccordionPanel pb={4} px={0} overflowX={{ base: 'scroll', md: 'initial' }}>
-                    <PostTable {...props} />
+                    <PostTable posts={posts} />
                 </AccordionPanel>
             </AccordionItem>
         </Accordion>

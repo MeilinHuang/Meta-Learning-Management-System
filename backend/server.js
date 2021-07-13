@@ -1,10 +1,8 @@
 const express = require("express");
-const cors = require('cors');
+var cors = require('cors');
 const app = express();
 const database =  require('./service.js');
-
 app.use(cors());
-
 // Body parsing
 app.use(express.json());
 
