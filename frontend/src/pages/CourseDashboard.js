@@ -9,7 +9,6 @@ import {
     InputLeftElement,
     useBreakpointValue,
     useDisclosure,
-    useToast,
 } from "@chakra-ui/react"
 import { GrAdd } from 'react-icons/gr'
 import { SearchIcon } from '@chakra-ui/icons'
@@ -26,7 +25,6 @@ function CourseDashboard() {
     const buttonContents = useBreakpointValue({ base: '', md: 'Add Post' })
     const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null })
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const toast = useToast()
 
     useEffect(() => {
         fetch(`http://localhost:8000/${dummyCourse}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))
@@ -41,13 +39,6 @@ function CourseDashboard() {
     }
 
     const handleAddPostSubmit = ({ title, details, date }) => {
-        console.log(JSON.stringify({
-            author: dummyAuthor,
-            attachments: [],
-            title,
-            content: details,
-            postDate: date,
-        }))
         fetch(`http://localhost:8000/${dummyCourse}/announcement/new`, {
             method: 'POST',
             body: JSON.stringify({
@@ -63,13 +54,7 @@ function CourseDashboard() {
             }
         }).then(r => {
             if (r.status === 200) {
-                toast({
-                    title: 'Post created',
-                    description: 'Refresh the page to view announcement',
-                    status: 'success',
-                    duration: 3000,
-                    isClosable: true,
-                })
+                window.location.reload()
             } 
             // TODO: Handle error case
         })

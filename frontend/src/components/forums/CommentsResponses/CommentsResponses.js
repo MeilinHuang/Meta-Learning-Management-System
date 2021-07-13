@@ -11,6 +11,8 @@ import CommentResponse from "../CommentResponse/CommentResponse"
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './CommentsResponses.module.css'
 
+const dummyAuthor = 1
+
 function CommentsResponses({ isComments, posts }) {
     const [details, setDetails] = useState('')
 
@@ -22,7 +24,7 @@ function CommentsResponses({ isComments, posts }) {
     return (
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md" mb="12px" textTransform="uppercase">{isComments ? 'Comments' : 'Responses'}</Heading>
-            {posts && posts.map(post => (
+            {posts && posts[0] !== null && posts.map(post => (
                 <CommentResponse {...post} />
             ))}
             <form id="createCommentResponse" onSubmit={handleSubmit}>

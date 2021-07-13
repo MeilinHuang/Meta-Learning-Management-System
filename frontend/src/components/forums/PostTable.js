@@ -25,6 +25,7 @@ const getRow = ({ post_id, title, published_date, replies, comments }) => {
 }
 
 function PostTable({ isAdmin, posts }) {
+    const orderedPosts = [...posts].reverse()
     // if isAdmin then show pin/unpin logo next to each post
     return (
         <Table variant="simple">
@@ -37,7 +38,7 @@ function PostTable({ isAdmin, posts }) {
                 </Tr>
             </Thead>
             <Tbody>
-                {posts.map(post => getRow(post))}
+                {orderedPosts.map(post => getRow(post))}
             </Tbody>
         </Table>
     )

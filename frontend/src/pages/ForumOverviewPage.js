@@ -17,6 +17,9 @@ import AddPostModal from '../components/forums/AddPostModal'
 import { GrAdd } from 'react-icons/gr'
 import { StoreContext } from '../utils/store'
 
+// DUMMY VALUES
+const dummyAuthor = 3
+
 
 function ForumOverviewPage() {
     const context = useContext(StoreContext)
@@ -54,8 +57,26 @@ function ForumOverviewPage() {
         console.log(searchTerm)
     }
 
-    const handleAddPostSubmit = postDetails => {
-        console.log(postDetails)
+    const handleAddPostSubmit = ({ title, details, tags, date }) => {
+        fetch(`http://localhost:8000/forum/post`, {
+            method: 'POST',
+            body: JSON.stringify({
+                title,
+                user_id: dummyAuthor,
+                publishedDate: date,
+                description: details,
+                tags,
+            }),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).then(r => {
+            if (r.status === 200) {
+                window.location.reload()
+            } 
+            // TODO: Handle error case
+        })
     }
 
     return (
