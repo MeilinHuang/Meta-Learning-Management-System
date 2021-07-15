@@ -34,10 +34,10 @@ export default function Assessments() {
   };
 
   return (
-    <Box>
+    <div>
       <p>Assessments</p>
       <QuizCreation />
-    </Box>
+    </div>
   );
 
 }
