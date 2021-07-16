@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import React from "react"
 import {
     Box,
     Flex,
@@ -20,16 +20,18 @@ import {
     Switch,
     Divider
   } from '@chakra-ui/react';
-  import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import Select from "./ChakraReactSelect.js";
+import TopicTreeAddTopic from './TopicTreeAddTopic.js';
 
 const Links = ['Add a Topic'];
-
-const NavLink = ({ children }) => (
+const NavLink = ({ onClick, children }) => (
     <Link
         px={2}
         py={1}
         color={'white'}
         rounded={'md'}
+        onClick={onClick}
         _hover={
             {
                 textDecoration: 'none',
@@ -40,11 +42,29 @@ const NavLink = ({ children }) => (
         {children}
     </Link>
 );
+
+
   
-export default function TopicTreeHeader({view, setView}) {
+export default function TopicTreeHeader({id}) {
     const { isOpen, onOpen, onClose } = useDisclosure();
+
+    const { 
+        isOpen:isOpenModal, 
+        onOpen: onOpenModal, 
+        onClose: onCloseModal 
+    } = useDisclosure();
+
+    var colourOptions = [
+        { value: "blue", label: "Blue", color: "#0052CC" },
+        { value: "purple", label: "Purple", color: "#5243AA" },
+        { value: "red", label: "Red", color: "#FF5630" },
+        { value: "orange", label: "Orange", color: "#FF8B00" },
+        { value: "yellow", label: "Yellow", color: "#FFC400" },
+        { value: "green", label: "Green", color: "#36B37E" }
+    ];
+  
     return (
-        <>
+        <div id={id}>
             <Box bg={useColorModeValue('blue.400', 'blue.400')} px={4}>
             <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
                 <IconButton
@@ -60,9 +80,25 @@ export default function TopicTreeHeader({view, setView}) {
                         as={'nav'}
                         spacing={4}
                         display={{ base: 'none', md: 'flex' }}>
-                        {Links.map((link) => (
-                        <NavLink key={link}>{link}</NavLink>
-                        ))}
+                        
+                        <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
+                        <Box bg='white' w={200}>
+                            <FormControl id="new-topic-dependencies">
+                                <Select
+                                    name="searchTopic"
+                                    options={colourOptions}
+                                    placeholder="Search a topic"
+                                    closeMenuOnSelect={true}
+                                    size="sm"
+                                    w={5000}
+                                    onKeyDown={(key) => {
+                                        if (key.code == "Enter") {
+                                            
+                                        }
+                                    }}
+                                />
+                            </FormControl>
+                        </Box>
                     </HStack>
                 </HStack>
                 <Flex alignItems={'center'} height="100%">
@@ -100,13 +136,12 @@ export default function TopicTreeHeader({view, setView}) {
             {isOpen ? (
                 <Box pb={4} display={{ md: 'none' }}>
                 <Stack as={'nav'} spacing={4}>
-                    {Links.map((link) => (
-                    <NavLink key={link}>{link}</NavLink>
-                    ))}
+                    <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
                 </Stack>
                 </Box>
             ) : null}
             </Box>
-        </>
+            <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} />
+        </div>
     );
   }

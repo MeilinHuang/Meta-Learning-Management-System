@@ -1,0 +1,8 @@
+.editor {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.editor :global(.public-DraftEditor-content) {
+    min-height: 40px;
+}

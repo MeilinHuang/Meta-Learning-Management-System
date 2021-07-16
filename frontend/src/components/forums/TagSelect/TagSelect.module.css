@@ -1,0 +1,31 @@
+.select div {
+    border-color: rgb(226, 232, 240);
+    border-radius: 6px;
+    /* width: 100%; */
+}
+
+.select div:hover {
+    border-color: #CBD5E0;
+}
+
+.select :global(.css-1wa3eu0-placeholder) {
+    color: #A0AEC0;
+}
+
+.filter :global(.css-1okebmr-indicatorSeparator) {
+    display: none;
+}
+
+.filter :global(.css-tlfecz-indicatorContainer) {
+    background-color: #edf2f7;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+}
+
+.filter :global(.css-tlfecz-indicatorContainer):hover {
+    background-color: #E2E8F0;
+}
+
+.filter :global(.css-tlfecz-indicatorContainer) svg {
+    color: #000;
+}

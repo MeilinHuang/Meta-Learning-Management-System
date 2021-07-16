@@ -5,12 +5,14 @@ import TopicTreeHeader from "./TopicTreeHeader.js"
 import { Spinner } from '@chakra-ui/spinner';
 import { Button, Text, Heading, Box, Input, Flex, InputGroup, InputLeftElement, Stack, Divider } from '@chakra-ui/react';
 import { SearchIcon, ArrowRightIcon } from '@chakra-ui/icons'
+import TopicTreeViewResource from "./TopicTreeViewResource.js"
+import { useDisclosure } from '@chakra-ui/hooks';
+import { backend_url, get_topics_url } from '../../Constants.js';
 
 var g;
 var svg
 
 function zoomed() {
-    console.log('zoomed!');
     g.attr("transform", d3.event.transform);
 }
 
@@ -21,6 +23,22 @@ export default function TopicTree() {
     const ref = useRef();
     const dataset = [100, 200, 300, 400, 500];
     const [data, setData] = useState([]);
+    const [listPrereqs, setListPrereqs] = useState([]);
+    const [selectedNode, setSelectedNode] = useState({
+        "id": 0,
+        "title": "",
+        "prerequisite_strings": [],
+        "description": "",
+        "materials_strings": {
+            "preparation": [],
+            "content": [],
+            "practice": [],
+            "assessment": []
+        },
+        "group": "",
+        "discipline": "",
+        "creator": ""
+    });
     const links = [
         {
             name: 'Home',
@@ -48,8 +66,63 @@ export default function TopicTree() {
         }
     ];
     const [isOpen, setOpen] = useState(false);
+    const { 
+        isOpen: isOpenModal, 
+        onOpen: onOpenModal, 
+        onClose: onCloseModal 
+    } = useDisclosure();
 
-    // Runs on start, used for testing mainly
+    const treeStructure = (jsonData) => {
+        let newJson = {
+            "nodes": [{}],
+            "links": []
+        };
+        for (let topic of jsonData.topics_list) {
+            let node = {};
+            node["id"] = topic.id;
+            node["title"] = topic.name;
+            node["materials_strings"] = {};
+            node.materials_strings["content"] = [];
+            for (let course_material of topic.course_materials) {
+                node.materials_strings.content.push(course_material.name);
+            }
+            console.log('topic', topic);
+            newJson.nodes.push(node);
+            for (let prereq of topic.prereqs) {
+                newJson.links.push({
+                    'source': prereq,
+                    'target': topic.id
+                });
+            }
+        }
+        console.log('newJson', newJson);
+        return newJson;
+    }
+
+
+    const getListOfPrerequisites = (id, data) => {
+        console.log('id', id);
+        console.log('data', data);
+        let linksArray = [];
+        for (let i = 0; i < data.links.length; i++) {
+            if (data.links[i].target.id === id) {
+                linksArray.push(data.links[i].source.id);
+            }
+        }
+        console.log(linksArray);
+        let prereqs = [];
+        for (let i = 0; i < data.nodes.length; i++) {
+            for (let j = 0; j < linksArray.length; j++) {
+                if (data.nodes[i].id == linksArray[j]) {
+                    prereqs.push(data.nodes[i].title);
+                    break;
+                }
+            }
+        }
+        console.log('prereqs', prereqs);
+        setListPrereqs(prereqs);
+    }
+
     useEffect(() => {
 
         
@@ -57,7 +130,7 @@ export default function TopicTree() {
         let size = 500;
 
         let width = window.innerWidth;
-        let height = window.innerHeight;
+        let height = window.innerHeight - document.getElementById('topic-tree-header').getBoundingClientRect().height;
         let zoom = d3.zoom()
             .scaleExtent([0.3, 4])
             .on("zoom", zoomed);
@@ -68,23 +141,36 @@ export default function TopicTree() {
                         .call(zoom);
         g = svg.append("g")
         var simulation = d3.forceSimulation()
-            .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(50))
-            .force("charge", d3.forceManyBody())
+            .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(400))
+            .force("charge", d3.forceManyBody().strength(-70))
             .force("center", d3.forceCenter(width / 2, height / 2));
 
-        d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json")
+        
+        // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
+        fetch(get_topics_url('Introduction to Programming'))
+        .then((res) => {
+            return res.json();
+        })
+        .then((res) => {
+            console.log('old json', res);
+            return treeStructure(res);
+        })
         .then( function(data) {
-            
-            //TODO MIGHT NEED TO CHANGE SO THAT DATA ISNT PULLED EVERYTIME USER CHANGES VIEW
-            setData(data)
-
+            let preprocessedData = {};
+            // make it easier to access instead of having to traverse data.nodes each time
+            for (let node of data.nodes) {
+                if (node.hasOwnProperty('id')) {
+                    preprocessedData[node.id.toString()] = node;
+                }
+            }
+            console.log('data');
             // arrow heads
             svg.append("svg:defs").selectAll("marker")
                 .data(["end"])
                 .enter().append("svg:marker")
                 .attr("id", String)
                 .attr("viewBox", "0 -5 10 10")
-                .attr("refX", 20) // whereabouts it is on the line - TODO adjust this dependon if we are talking about distance of hull or topic nodes
+                .attr("refX", 43) // whereabouts it is on the line - TODO adjust this dependon if we are talking about distance of hull or topic nodes
                 .attr("refY", 0)
                 .attr("markerWidth", 10)
                 .attr("markerHeight", 6)
@@ -105,41 +191,66 @@ export default function TopicTree() {
                 .style("stroke", "#666")
                 .style("stroke-width", "1.5px")
                 .style("opacity", 0.8);
+                
             
             // Initialize the nodes
             var node = g
                 .attr("class", "nodes")
                 .selectAll("g")
                 .data(data.nodes)
-                .enter().append("g");
+                .enter().append("g")
+                .on("click", function() {
+                    let topicName = d3.select(this).text();
+                    console.log("node clicked", d3.select(this).text());
+                    let nodeData = data.nodes.filter(function (dataValue) {
+                        console.log(dataValue);
+                        return dataValue.title === topicName;
+                    });
+                    console.log('nodeData', nodeData);
+
+                    setSelectedNode(nodeData[0]);
+                    getListOfPrerequisites(nodeData[0].id, data);
+                    onOpenModal();
+
+
+                });
+            let radius = 30;
             var circles = node.append("circle")
-            .attr("r", 10)
+            .attr("r", radius)
             .attr("fill",'#ADD8E6')
             .call(d3.drag()
                 .on("start", dragstarted)
                 .on("drag", dragged)
-                .on("end", dragended));
-
+                .on("end", dragended))
+                
             var lables = node.append("text")
+                .attr('text-anchor', 'middle')
+                .attr('alignment-baseline', 'middle')
+                .style("font-size", "8px")
+                .append('tspan')
                 .text(function(d) {
-                  return d.name;
+                  return d.title;
                 })
-                .attr('x', -5)
-                .attr('y', 5)
-            node.append("title")
-                .text(function(d) { return d.name; });
-        
+            
+            var linkNodes = [];
+            data.links.forEach(function(link) {
+                linkNodes.push({
+                    source: preprocessedData[link.source],
+                    target: preprocessedData[link.target]
+                });
+            });
+            
+            console.log('linkNodes', linkNodes);
             simulation
-                .nodes(data.nodes)
+                .nodes(data.nodes.concat(linkNodes))
                 .on("tick", ticked);
             simulation.force("link")
-                .links(data.links);
+                .links(data.links.concat(linkNodes));
 
     
             // This function is run at each iteration of the force algorithm, updating the nodes position.
             function ticked() {
-                link
-                .attr('d', function (d) {
+                link.attr('d', function (d) {
                     var dx = d.target.x - d.source.x,
                         dy = d.target.y - d.source.y,
                         dr = Math.sqrt(dx * dx + dy * dy);
@@ -148,10 +259,10 @@ export default function TopicTree() {
                     return val2;
                 });
             
-                node
-                    .attr("transform", function(d) {
+                node.attr("transform", function(d) {
                       return "translate(" + d.x + "," + d.y + ")";
                     })
+                    
             }
 
             function dragstarted(d) {
@@ -177,8 +288,9 @@ export default function TopicTree() {
     if (view === "Graph View") {
         pageView = (
             <div>
-                <TopicTreeHeader view={view} setView={setView}></TopicTreeHeader>
+                <TopicTreeHeader id="topic-tree-header"></TopicTreeHeader>
                 <div id="graph" ref={ref} />
+                <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} />
             </div>
         )
     }

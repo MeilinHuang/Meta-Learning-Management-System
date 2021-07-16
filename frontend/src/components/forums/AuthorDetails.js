@@ -5,11 +5,13 @@ import {
     Text,
 } from "@chakra-ui/react"
 
-function AuthorDetails() {
+function AuthorDetails({ author, date }) {
+    const dateString = new Date(date).toLocaleString('en-AU')
+
     return (
         <Flex alignItems={{ base: 'unset', md: 'center' }} justifyContent="space-between" flexDirection={{ base: 'column', md: 'row' }} mb="8px">
-            <Heading size="sm">Author</Heading>
-            <Text>Date</Text>
+            <Heading size="sm">{author}</Heading>
+            <Text>{dateString}</Text>
         </Flex>
     )
 }
