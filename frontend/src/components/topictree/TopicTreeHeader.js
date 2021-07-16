@@ -42,7 +42,7 @@ const NavLink = ({ onClick, children }) => (
 
 
   
-export default function TopicTreeHeader({id}) {
+export default function TopicTreeHeader({id, topicGroupName=''}) {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const { 
@@ -125,12 +125,14 @@ export default function TopicTreeHeader({id}) {
             {isOpen ? (
                 <Box pb={4} display={{ md: 'none' }}>
                 <Stack as={'nav'} spacing={4}>
-                    <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
+                    { topicGroupName != '' ? (
+                        <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
+                    ) : <></> }
                 </Stack>
                 </Box>
             ) : null}
             </Box>
-            <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} />
+            <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} topicGroupName={topicGroupName} />
         </div>
     );
   }

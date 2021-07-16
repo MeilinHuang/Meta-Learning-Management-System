@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import {
     Modal,
     ModalOverlay,
@@ -14,16 +14,43 @@ import {
     Box
   } from "@chakra-ui/react"
 import Select from "./ChakraReactSelect.js";
+import { get_topics_url } from "../../Constants.js";
 
-export default function TopicTreeAddTopic({isOpen, onClose}) {
-    var colourOptions = [
-        { value: "blue", label: "Blue", color: "#0052CC" },
-        { value: "purple", label: "Purple", color: "#5243AA" },
-        { value: "red", label: "Red", color: "#FF5630" },
-        { value: "orange", label: "Orange", color: "#FF8B00" },
-        { value: "yellow", label: "Yellow", color: "#FFC400" },
-        { value: "green", label: "Green", color: "#36B37E" }
-    ];
+export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
+
+
+    const [topics, setTopics] = useState([]);
+    const [selectedTopics, setSelectedTopics] = useState([]);
+    const [newTopicName, setNewTopicName] = useState("");
+
+    const convertToList = (jsonData) => {
+        let tempTopics = [];
+        for (let topic of jsonData.topics_list) {
+            topic['value'] = topic.name;
+            topic['label'] = topic.name;
+            tempTopics.push(topic);
+        }
+
+        return tempTopics;
+    };
+
+    const onChangePrerequisites = (value, action) => {
+        console.log('value', value);
+        setSelectedTopics(value);
+    }
+
+    const onChangeNewName = (value) => {
+        console.log('value', value.target.value);
+        setNewTopicName(value.target.value);
+    }
+
+    useEffect(() => {
+        fetch(get_topics_url(topicGroupName))
+        .then(response => response.json())
+        .then(function (data) {
+            setTopics(convertToList(data));
+        });
+    }, []);
     return (
         <>
         
@@ -36,17 +63,18 @@ export default function TopicTreeAddTopic({isOpen, onClose}) {
                     <Box>
                         <FormControl mb={3} id="new-topic-name">
                             <FormLabel>Topic Name</FormLabel>
-                            <Input type="text" />
+                            <Input onChange={onChangeNewName} placeholder="Enter topic name..." type="text" />
                         </FormControl>
                         <FormControl id="new-topic-dependencies">
                             <FormLabel>Select Topic Prerequisites</FormLabel>
                             <Select
                                 isMulti
                                 name="topics"
-                                options={colourOptions}
+                                options={topics}
                                 placeholder="Select some topics..."
                                 closeMenuOnSelect={false}
                                 size="sm"
+                                onChange={onChangePrerequisites}
                             />
                         </FormControl>
                     </Box>
