@@ -73,48 +73,61 @@ const deleteAdmin = (request, response) => {
 
 async function getAllTopicGroups(request, response) {
   void (request);
-  let resp;
   try {
-    resp = await pool.query(
-      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
-      array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list
-      FROM topic_group tp_group 
-      LEFT JOIN topics ON topics.topic_group_id = tp_group.id
-      LEFT JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
-      GROUP BY tp_group.id;`);
+    let resp = await pool.query(
+    `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
+    array_agg(DISTINCT user_admin.admin_id) as admin_list,
+    array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
+    array_agg(DISTINCT announcements.id) as announcements_list
+    FROM topic_group tp_group 
+    LEFT JOIN user_admin ON user_admin.topic_group_id = tp_group.id
+    LEFT JOIN topics ON topics.topic_group_id = tp_group.id
+    LEFT JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
+    LEFT JOIN announcements ON topics.topic_group_id = announcements.topic_group
+    GROUP BY tp_group.id`);
 
-    var finalQuery = resp.rows;
-
-    for (var object of finalQuery) { // Loop through list of topic groups
+    for (var object of resp.rows) { // Loop through list of topic groups
+      var adminArr = [];
       var topicArr = [];
       var tutArr = [];
-      for (const topic_id of object.topics_list) {
-        let tmp = await pool.query(`SELECT * FROM topics WHERE id = $1`, [topic_id]);
+      var announcementArr = [];
+
+      for (const topicId of object.topics_list) {
+        let tmp = await pool.query(`SELECT * FROM topics WHERE id = $1`, [topicId]);
         topicArr.push(tmp.rows[0]);
       };
   
-      for (const tutorial_id of object.tutorial_list) {
-        let tmp = await pool.query(`SELECT * FROM tutorials WHERE id = $1`, [tutorial_id]);
+      for (const tutorialId of object.tutorial_list) {
+        let tmp = await pool.query(`SELECT * FROM tutorials WHERE id = $1`, [tutorialId]);
         tutArr.push(tmp.rows[0]);
+      };
+
+      for (const adminId of object.admin_list) {
+        let tmp = await pool.query(`SELECT * FROM users WHERE id = $1`, [adminId]);
+        adminArr.push(tmp.rows[0]);
+      };
+
+      for (const announcementId of object.announcements_list) {
+        let tmp = await pool.query(`SELECT * FROM announcements WHERE id = $1`, [announcementId]);
+        announcementArr.push(tmp.rows[0]);
       };
 
       object.topics_list = topicArr;
       object.tutorial_list = tutArr;
+      object.announcements_list = announcementArr;
+      object.admin_list = adminArr;
     }
-
+    response.status(200).json(resp.rows);
   } catch (e) {
-    console.log(e);
+    response.sendStatus(400);
+    response.send(e);
   }
-
-  response.status(200).json(finalQuery);
 }
 
 async function getTopics (request, response) { 
-  const topicGroupName = request.params.topicGroupName;
-  let resp;
-
   try {
-    resp = await pool.query(
+    const topicGroupName = request.params.topicGroupName;
+    let resp = await pool.query(
       `SELECT array_agg(DISTINCT topics.id) AS topics_list
       FROM topic_group tp_group 
       JOIN topics ON topics.topic_group_id = tp_group.id
@@ -122,7 +135,6 @@ async function getTopics (request, response) {
       GROUP BY tp_group.id;`, [topicGroupName]);
 
     var finalQuery = resp.rows;
-    console.log('finalQuery', finalQuery);
 
     for (var object of finalQuery) { 
       var topicArr = [];
@@ -161,21 +173,18 @@ async function getTopics (request, response) {
 
       object.topics_list = topicArr;
     }
-
+    response.status(200).json(finalQuery[0]);
   } catch(e) {
-    console.log(e);
+    response.sendStatus(400);
+    response.send(e);
   }
-
-  response.status(200).json(finalQuery[0]);
 }
 
 async function getTopicPreReqs (request, response) {
-  const topicGroupName = request.params.topicGroupName;
-  const topicName = request.params.topicName;
-  let resp;
-    
   try {
-    resp = await pool.query(
+    const topicGroupName = request.params.topicGroupName;
+    const topicName = request.params.topicName;
+    let resp = await pool.query(
       `SELECT array_agg(DISTINCT p.prereq) as prerequisites_list 
       FROM prerequisites p
       JOIN topic_group ON name = $1
@@ -192,11 +201,11 @@ async function getTopicPreReqs (request, response) {
     }
 
     finalQuery[0].prerequisites_list = preReqsArr;
+    response.status(200).json(finalQuery[0]);
   } catch(e) {
-    console.log(e);
+    response.sendStatus(400);
+    response.send(e);
   }
-
-  response.status(200).json(finalQuery[0]);
 }
 
 // Create new pre requisite (Modify for topic name instead of IDs ??)
