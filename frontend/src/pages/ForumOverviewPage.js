@@ -28,6 +28,7 @@ function ForumOverviewPage() {
     const [searchTerm, setSearchTerm] = useState('')
 
     useEffect(() => {
+        console.log('here')
         fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
         fetch('http://localhost:8000/forum/pinned').then(r => r.json()).then(data => {
             setPinnedPosts(data)
