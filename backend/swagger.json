@@ -1648,6 +1648,34 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": ["Forums"],
+        "summary": "Delete forum post by id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Id of post we want to delete",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
       }
     },
     "/forum/post/{postId}/reply": {

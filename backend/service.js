@@ -565,6 +565,19 @@ async function putPost (request, response) {
   }
 };
 
+// delete forum post
+async function deletePost (request, response) {
+  try {
+    const postId = request.params.postId;
+    let resp = await pool.query(`DELETE FROM forum_posts WHERE post_id = $1`,
+    [postId]);
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+};
+
 // Update post reply with id
 async function putPostReply (request, response) {
   const replyId = request.params.replyId;
@@ -1529,6 +1542,7 @@ async function getStudentAnswerCount (request, response) {
 };
 
 module.exports = {
+  deletePost,
   deleteComment,
   putComment,
   deletePostReply,

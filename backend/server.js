@@ -110,6 +110,10 @@ app.put('/forum/post/:postId', async(request, response) => {
   await database.putPost(request, response);
 });
 
+app.delete('/forum/post/:postId', async(request, response) => {
+  await database.deletePost(request, response);
+});
+
 app.put('/forum/post/:postId/reply/:replyId', async(request, response) => {
   await database.putPostReply(request, response);
 });
