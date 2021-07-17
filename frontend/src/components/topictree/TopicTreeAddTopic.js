@@ -11,10 +11,14 @@ import {
     FormControl,
     FormLabel,
     Input,
-    Box
+    Box,
+    Alert,
+    AlertIcon,
+    AlertDescription,
+    CloseButton
   } from "@chakra-ui/react"
 import Select from "./ChakraReactSelect.js";
-import { get_topics_url } from "../../Constants.js";
+import { get_topics_url, post_new_topic_url, post_new_prereq } from "../../Constants.js";
 
 export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
 
@@ -22,6 +26,8 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
     const [topics, setTopics] = useState([]);
     const [selectedTopics, setSelectedTopics] = useState([]);
     const [newTopicName, setNewTopicName] = useState("");
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertTitle, setAlertTitle] = useState("");
 
     const convertToList = (jsonData) => {
         let tempTopics = [];
@@ -44,6 +50,57 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
         setNewTopicName(value.target.value);
     }
 
+    const onSubmitTopic = async () => {
+        if (newTopicName == "") {
+            setShowAlert(true);
+            setAlertTitle("Please enter a topic title");
+            return;
+        }
+        
+        let response = await fetch(post_new_topic_url(topicGroupName, newTopicName), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        let responseJson = await response.json();
+
+        if (response.status != 200) {
+            setAlertTitle(responseJson.error);
+            return;
+        }
+        console.log(responseJson);
+
+        let groupId = responseJson.id;
+        for (let prereq of selectedTopics) {
+            console.log('Sending prereqs with body', {
+                "preReqId": prereq.id,
+                "topicId": groupId
+            });
+            response = await fetch(post_new_prereq(topicGroupName, newTopicName), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "preReqId": prereq.id,
+                    "topicId": groupId
+                })
+            });
+
+            if (response.status != 200) {
+                setAlertTitle(response.json().error);
+                return;
+            }
+        }
+        window.location.reload();
+    }
+
+    const closeAlert = () => {
+        setShowAlert(false);
+    }
+
     useEffect(() => {
         fetch(get_topics_url(topicGroupName))
         .then(response => response.json())
@@ -61,6 +118,14 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
                 <ModalCloseButton />
                 <ModalBody>
                     <Box>
+                        {showAlert ? 
+                        <Alert status="error" mb={2}>
+                            <AlertIcon />
+                            <AlertDescription mr={2}>Please enter a topic title</AlertDescription>
+                            <CloseButton onClick={closeAlert} position="absolute" right="8px" top="8px" />
+                        </Alert>
+                        : <></>
+                        }
                         <FormControl mb={3} id="new-topic-name">
                             <FormLabel>Topic Name</FormLabel>
                             <Input onChange={onChangeNewName} placeholder="Enter topic name..." type="text" />
@@ -81,7 +146,7 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
                 </ModalBody>
         
                 <ModalFooter>
-                    <Button colorScheme="blue" mr={3}>Submit</Button>
+                    <Button colorScheme="blue" onClick={onSubmitTopic} mr={3}>Submit</Button>
                     <Button variant="ghost" onClick={onClose}>
                     Close
                     </Button>

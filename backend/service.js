@@ -256,8 +256,14 @@ async function postTopic (request, response) {
   let resp = await pool.query(
     'INSERT INTO topics(id, topic_group_id, name) values(default, $1, $2)',
     [topicGroupId, topicName]);
+  
+  let tmp = await pool.query(
+    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+  , [topicName, topicGroupId]);
+  let topicId = tmp.rows[0];
 
-  response.status(200).send(`Topic created with name: ${topicGroupName}`)
+
+  response.status(200).json(topicId);
 }
 
 /***************************************************************

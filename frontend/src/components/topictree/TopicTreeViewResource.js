@@ -26,7 +26,7 @@ import {
 } from "@chakra-ui/react"  
 
 
-export default function TopicTreeHeader({data, isOpen, onClose, prereqs}) {
+export default function TopicTreeViewResource({data, isOpen, onClose, prereqs}) {
   return (
     <>
     

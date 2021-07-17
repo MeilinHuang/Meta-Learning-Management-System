@@ -6,4 +6,10 @@ export function get_topics_url(topicGroupName) {
     return backend_url + "topicGroup/" + topicGroupName + "/topic";
 }
 
+export function post_new_topic_url(topicGroupName, newTopicName) {
+    return backend_url + "topicGroup/" + topicGroupName + "/topic/" + newTopicName;
+}
 
+export function post_new_prereq(topicGroupName, newTopicName) {
+    return backend_url + "topicGroup/" + topicGroupName + "/topic/" + newTopicName + "/prerequisite";
+}
