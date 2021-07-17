@@ -1650,6 +1650,44 @@
         }
       }
     },
+    "/forum/post/{postId}/reply": {
+      "post": {
+        "tags": ["Forums"],
+        "summary": "Create a reply on post by postId",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Id of post we want to reply to",
+            "type": "string"
+          },
+          {
+            "name": "replyDetails",
+            "in": "body",
+            "description": "Details of post reply",
+            "schema": {
+              "$ref": "#/definitions/PostReply"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
     "/forum/post/{postId}/reply/{replyId}": {
       "put": {
         "tags": ["Forums"],
@@ -1693,43 +1731,32 @@
             }
           }
         }
-      }
-    },
-    "/forum/post/{postId}/reply": {
-      "post": {
+      },
+      "delete": {
         "tags": ["Forums"],
-        "summary": "Create a reply on post by postId",
+        "summary": "Delete forum post reply",
         "parameters": [
+          {
+            "name": "replyId",
+            "in": "path",
+            "required": true,
+            "description": "Id of reply we want to delete",
+            "type": "integer"
+          },
           {
             "name": "postId",
             "in": "path",
-            "required": true,
-            "description": "Id of post we want to reply to",
-            "type": "string"
-          },
-          {
-            "name": "replyDetails",
-            "in": "body",
-            "description": "Details of post reply",
-            "schema": {
-              "$ref": "#/definitions/PostReply"
-            }
+            "required": false,
+            "description": "Id of post",
+            "type": "integer"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
+          "200": { "description": "OK" },
           "400": {
-            "schema": { 
-              "$ref": "#/definitions/400"
-            }
+            "schema": { "$ref": "#/definitions/400" }
           },
-          "403": {
-            "schema": {
-              "$ref": "#/definitions/403"
-            }
-          }
+          "403": { "schema": { "$ref": "#/definitions/403" } }
         }
       }
     },
@@ -1752,6 +1779,87 @@
             "schema": {
               "$ref": "#/definitions/PostComment"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/{postId}/comment/{commentId}": {
+      "put": {
+        "tags": ["Forums"],
+        "summary": "Updates post comment",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": false,
+            "description": "Id of post",
+            "type": "integer"
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "description": "Id of comment",
+            "type": "integer"
+          },
+          {
+            "name": "commentBody",
+            "in": "body",
+            "required": true,
+            "description": "Id of comment",
+            "schema": {
+              "$ref": "#/definitions/PutComment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Forums"],
+        "summary": "Deletes forum comment",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": false,
+            "description": "Id of post",
+            "type": "integer"
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "description": "Id of comment",
+            "type": "integer"
           }
         ],
         "responses": {
@@ -1842,6 +1950,73 @@
             "schema": {
               "$ref": "#/definitions/ForumTag"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/tags/{tagId}": {
+      "put": {
+        "tags": ["Forums"],
+        "summary": "Update forum tag",
+        "parameters": [
+          {
+            "name": "tagId",
+            "type": "integer",
+            "required": true,
+            "description": "Id of tag",
+            "in": "path"
+          },
+          {
+            "name": "tagBody",
+            "required": true,
+            "description": "Id of tag",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Forumtag"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Forums"],
+        "summary": "Delete forum tag",
+        "parameters": [
+          {
+            "name": "tagId",
+            "type": "integer",
+            "required": true,
+            "description": "Id of tag",
+            "in": "path"
           }
         ],
         "responses": {
@@ -3003,9 +3178,9 @@
     },
     "PostReply": {
       "properties": {
-        "author": {
-          "type": "string",
-          "example": "Lecturey Lecturer"
+        "user_id": {
+          "type": "integer",
+          "example": 1
         },
         "published_date": {
           "type": "dateTime",
@@ -3027,9 +3202,9 @@
     },
     "PostComment": {
       "properties": {
-        "author": {
-          "type": "string",
-          "example": "Lecturey Lecturer"
+        "user_id": {
+          "type": "integer",
+          "example": 1
         },
         "published_date": {
           "type": "dateTime",
@@ -3268,6 +3443,14 @@
               }
             }
           }
+        }
+      }
+    },
+    "PutComment": {
+      "properties": {
+        "comment": {
+          "type": "string",
+          "example": "New comment description"
         }
       }
     },

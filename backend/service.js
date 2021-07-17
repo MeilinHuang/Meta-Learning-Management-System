@@ -368,10 +368,9 @@ async function getAllPinnedPosts (request, response) {
 
 // Get all posts related search term
 async function getSearchPosts (request, response) {
-  const forumSearchTerm = request.params.forumSearchTerm;
-  let resp;
   try {
-    resp = await pool.query(
+    const forumSearchTerm = request.params.forumSearchTerm;
+    let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp 
@@ -381,8 +380,8 @@ async function getSearchPosts (request, response) {
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
-      WHERE LOWER (fp.title) LIKE $1
-      OR LOWER (fp.description) LIKE $1
+      WHERE LOWER (fp.title) LIKE LOWER($1)
+      OR LOWER (fp.description) LIKE LOWER($1)
       GROUP BY fp.post_id`, [`%${forumSearchTerm}%`]);
 
     var finalQuery = resp.rows;
@@ -411,20 +410,19 @@ async function getSearchPosts (request, response) {
       object.replies = repliesArr;
       object.comments = commentsArr;
     }
-
+    response.status(200).json(finalQuery);
   } catch (e) {
-    console.log(e);
+    response.sendStatus(400);
+    response.send(e);
   }
 
-  response.status(200).json(finalQuery);
 }
 
 // Get all posts related tag term
 async function getFilterPosts (request, response) {
-  const forumFilterTerm = request.params.forumFilterTerm;
-  let resp;
   try {
-    resp = await pool.query(
+    const forumFilterTerm = request.params.forumFilterTerm;
+    let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
@@ -434,12 +432,12 @@ async function getFilterPosts (request, response) {
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
-      WHERE LOWER(t.name) LIKE $1
+      WHERE LOWER(t.name) LIKE LOWER($1)
       GROUP BY fp.post_id`, [`%${forumFilterTerm}%`]);
 
     var finalQuery = resp.rows;
 
-    for (var object of finalQuery) { // Loop through list of topic groups
+    for (var object of finalQuery) {
       var tagsArr = [];
       var repliesArr = [];
       var commentsArr = [];
@@ -463,37 +461,42 @@ async function getFilterPosts (request, response) {
       object.replies = repliesArr;
       object.comments = commentsArr;
     }
-
+    response.status(200).json(finalQuery);
   } catch (e) {
-    console.log(e);
+    response.send(e);
   }
-
-  response.status(200).json(finalQuery);
 }
 
 // Create new post on forum (TAGS MUST ALREADY EXIST and USER MUST EXIST)
 async function postForum (request, response) {
-  const title = request.body.title;
-  const user_id = request.body.user_id;
-  const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [user_id]);
-  const author = authReq.rows[0].name;
-  const publishedDate = request.body.publishedDate;
-  const description = request.body.description;
-  const tags = request.body.tags;
+  try {
+    const title = request.body.title;
+    const user_id = request.body.user_id;
+    const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [user_id]);
 
-  let resp = await pool.query(
-    `INSERT INTO forum_posts(post_id, title, user_id, 
-      author, published_date, description, isPinned) 
-      values(default, $1, $2, $3, $4, $5, false) 
-      RETURNING post_id`,
-    [title, user_id, author, publishedDate, description]);
+    if (!authReq.rows[0]) { throw (`User does not exist with id: ${user_id}`); }
 
-  for (const tag of tags) { // Insert linked tags
-    let linkPostTag = await pool.query(
-      `INSERT INTO post_tags(post_id, tag_id) VALUES($1, $2)`, [resp.rows[0].post_id, tag.tag_id]);
+    const author = authReq.rows[0].name;
+    const publishedDate = request.body.publishedDate;
+    const description = request.body.description;
+    const tags = request.body.tags;
+  
+    let resp = await pool.query(
+      `INSERT INTO forum_posts(post_id, title, user_id, 
+        author, published_date, description, isPinned) 
+        values(default, $1, $2, $3, $4, $5, false) 
+        RETURNING post_id`,
+      [title, user_id, author, publishedDate, description]);
+  
+    for (const tag of tags) { // Insert linked tags
+      let linkPostTag = await pool.query(
+        `INSERT INTO post_tags(post_id, tag_id) VALUES($1, $2)`, [resp.rows[0].post_id, tag.tag_id]);
+    }
+
+    response.sendStatus(200);
+  } catch (e) {
+    response.status(400).send(e);
   }
-
-  response.sendStatus(200);
 };
 
 // Get post details of selected post
@@ -578,16 +581,34 @@ async function putPostReply (request, response) {
   }
 };
 
+// Update post reply with id
+async function deletePostReply (request, response) {
+  try {
+    const replyId = request.params.replyId;
+
+    let resp = await pool.query(`DELETE FROM replies WHERE reply_id = $1`,
+    [replyId]);
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.sendStatus(400);
+    response.send(e);
+  }
+};
+
 // Create new reply
 async function postReply (request, response) {
-  const author = request.body.author;
-  const postId = request.params.postId;
-  const idReq = await pool.query(`SELECT id FROM users WHERE name = $1`, [author]);
-  const user_id = idReq.rows[0].id;
-  const publishedDate = request.body.published_date;
-  const reply = request.body.reply;
-
   try {
+    const user_id = request.body.user_id;
+    const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [user_id]);
+
+    if (typeof authReq.rows[0].name == 'undefined') { throw (`User doesn't exist with id: ${user_id}`) }
+
+    const author = authReq.rows[0].name;
+    const postId = request.params.postId;
+    const publishedDate = request.body.published_date;
+    const reply = request.body.reply;
+
     let resp = await pool.query(
       `INSERT INTO replies(reply_id, user_id, author, published_date, reply) 
       VALUES(default, $1, $2, $3, $4) RETURNING reply_id`,
@@ -596,22 +617,24 @@ async function postReply (request, response) {
     let linkReply = await pool.query(`INSERT INTO post_replies(post_id, reply_id) 
     VALUES($1, $2)`, [postId, resp.rows[0].reply_id]);
   
-    response.status(200).send("Update success");
+    response.sendStatus(200);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400);
+    response.send(e);
   }
 };
 
 // Post new comment
 async function postComment (request, response) {
-  const author = request.body.author;
-  const postId = request.params.postId;
-  const idReq = await pool.query(`SELECT id FROM users WHERE name = $1`, [author]);
-  const user_id = idReq.rows[0].id;
-  const publishedDate = request.body.published_date;
-  const comment = request.body.comment;
-
   try {
+    const user_id = request.body.user_id;
+    const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [user_id]);
+    if (typeof authReq.rows[0].name == 'undefined') { throw (`User doesn't exist with id: ${user_id}`) }
+    const author = authReq.rows[0].name;
+    const postId = request.params.postId;
+    const publishedDate = request.body.published_date;
+    const comment = request.body.comment;
+
     let resp = await pool.query(
       `INSERT INTO comments(comment_id, user_id, author, published_date, comment) 
       VALUES(default, $1, $2, $3, $4) RETURNING comment_id`,
@@ -620,23 +643,66 @@ async function postComment (request, response) {
     let linkComment = await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
     VALUES($1, $2)`, [postId, resp.rows[0].comment_id]);
 
-    response.status(200).send("Update success");
+    response.sendStatus(200);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400);
+    response.send(e);
+  }
+};
+
+// Put comment
+async function putComment (request, response) {
+  try {
+    const commentId = request.params.commentId;
+    const commentDescription = request.body.comment;
+
+    let resp = await pool.query(
+      `UPDATE comments SET comment = $1 WHERE comment_id = $2`,
+      [commentDescription, commentId]);
+  
+    /* let linkComment = await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
+    VALUES($1, $2)`, [postId, resp.rows[0].comment_id]); */
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+};
+
+// Delete new comment
+async function deleteComment (request, response) {
+  try {
+    //const postId = request.params.postId;
+    const commentId = request.params.commentId;
+
+    let resp = await pool.query(
+    `DELETE FROM comments WHERE comment_id = $1`,
+    [commentId]);
+  
+    /* let linkComment = await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
+    VALUES($1, $2)`, [postId, resp.rows[0].comment_id]); */
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
   }
 };
 
 // Pins or unpins forum post
 async function putPostPin (request, response) {
-  const postId = request.params.postId;
-  const isPinned = request.params.isPinned;
-
   try {
+    const postId = request.params.postId;
+    const isPinned = request.params.isPinned;
+
     let resp = await pool.query(`UPDATE forum_posts SET ispinned = $1 WHERE post_id = $2`,
     [isPinned, postId]);
-    response.status(200).send('Update success');
+
+    response.sendStatus(200);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400);
+    response.send(e);
   }
 }
 
@@ -647,20 +713,32 @@ async function getAllTags (request, response) {
     let resp = await pool.query(`SELECT * FROM tags`);
     response.status(200).json(resp.rows);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400)
+    response.send(e);
   }
 };
 
 // Posts tag
 async function postTag (request, response) {
-  const tagName = request.body.tagName;
-
   try {
-    let resp = await pool.query(`INSERT INTO tags(tag_id, name) VALUES(default, $1)`,
-     [tagName]);
-    response.status(200).send(`Tag created with name: ${tagName}`);
+    const tagName = request.body.tagName;
+    let resp = await pool.query(`INSERT INTO tags(tag_id, name) VALUES(default, $1)`, [tagName]);
+    response.sendStatus(200);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400);
+    response.send(e);
+  } 
+};
+
+// Posts tag
+async function deleteTag (request, response) {
+  try {
+    const tagId = request.params.tagId;
+    let resp = await pool.query(`DELETE FROM tags WHERE tag_id = $1`, [tagId]);
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
   } 
 };
 
@@ -1451,6 +1529,10 @@ async function getStudentAnswerCount (request, response) {
 };
 
 module.exports = {
+  deleteComment,
+  putComment,
+  deletePostReply,
+  deleteTag,
   getStudentAnswerCount,
   putQuestionAnswer,
   deleteAssessmentQuestion,
