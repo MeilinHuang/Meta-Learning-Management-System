@@ -30,6 +30,10 @@ function ForumPostPage({ match: { params: { id }}}) {
         fetch(`http://localhost:8000/forum/post/${id}`).then(r => r.json()).then(data => setPost(data[0]))
     }, [id])
 
+    const handleDelete = () => {
+        
+    }
+
     return (
         <>
             <Breadcrumb separator=">">
@@ -56,7 +60,7 @@ function ForumPostPage({ match: { params: { id }}}) {
                         <PopoverFooter d="flex" justifyContent="flex-end">
                             <ButtonGroup size="sm">
                             <Button variant="outline">Cancel</Button>
-                            <Button colorScheme="red">Delete</Button>
+                            <Button colorScheme="red" onClick={handleDelete}>Delete</Button>
                             </ButtonGroup>
                         </PopoverFooter>
                     </PopoverContent>

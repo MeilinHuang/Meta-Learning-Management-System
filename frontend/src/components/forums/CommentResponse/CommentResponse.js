@@ -15,6 +15,7 @@ import {
     PopoverArrow,
     PopoverCloseButton,
     Text,
+    useToast,
 } from "@chakra-ui/react"
 import AuthorDetails from '../AuthorDetails'
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai"
@@ -25,6 +26,8 @@ import styles from './CommentResponse.module.css'
 function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id }) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState('')
+    const toast = useToast()
+    console.log(reply_id)
 
     useEffect(() => {
         setDetails(comment || reply)
@@ -39,26 +42,100 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
     const handleSubmit = e => {
         e.preventDefault()
         const isComments = !!comment && !reply
+        console.log(isComments)
 
-        // TODO: add support for updating comment
         if (isComments) {
-            return
-        }
-
-        fetch(
-            `http://localhost:8000/forum/post/${post_id}/reply/${reply_id}`,
-            {
-                method: 'PUT',
-                body: JSON.stringify({
-                    reply: details,
-                }),
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
+            fetch(
+                `http://localhost:8000/forum/post/${post_id}/comment/${comment_id}`,
+                {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        comment: details,
+                    }),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    }
                 }
-            }
-        ).then(r => console.log(r)) // TODO: handle errors (maybe don't change the value in the frontend until this is okay)
-        setEditorState('')
+            ).then(r => {
+                if (r.status === 200) {
+                    setEditorState('')
+                } else {
+                    toast({
+                        title: 'Sorry, an error has occurred',
+                        description: 'Please try again',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+            })
+        } else {
+            fetch(
+                `http://localhost:8000/forum/post/${post_id}/reply/${reply_id}`,
+                {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        reply: details,
+                    }),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then(r => {
+                if (r.status === 200) {
+                    setEditorState('')
+                } else {
+                    toast({
+                        title: 'Sorry, an error has occurred',
+                        description: 'Please try again',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+            })
+        }
+    }
+
+    const handleDelete = () => {
+        const isComments = !!comment && !reply
+
+        console.log(isComments)
+        if (isComments) {
+            fetch(
+                `http://localhost:8000/forum/post/${post_id}/comment/${comment_id}`, { method: 'DELETE' }
+            ).then(r => {
+                if (r.status === 200) {
+                    window.location.reload()
+                } else {
+                    toast({
+                        title: 'Sorry, an error has occurred',
+                        description: 'Please try again',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+            })
+        } else {
+            fetch(
+                `http://localhost:8000/forum/post/${post_id}/reply/${reply_id}`, { method: 'DELETE' }
+            ).then(r => {
+                if (r.status === 200) {
+                    window.location.reload()
+                } else {
+                    toast({
+                        title: 'Sorry, an error has occurred',
+                        description: 'Please try again',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+            })
+        }
     }
 
     return (
@@ -97,7 +174,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
                                     <PopoverFooter d="flex" justifyContent="flex-end">
                                         <ButtonGroup size="sm">
                                         <Button variant="outline">Cancel</Button>
-                                        <Button colorScheme="red">Delete</Button>
+                                        <Button colorScheme="red" onClick={handleDelete}>Delete</Button>
                                         </ButtonGroup>
                                     </PopoverFooter>
                                 </PopoverContent>

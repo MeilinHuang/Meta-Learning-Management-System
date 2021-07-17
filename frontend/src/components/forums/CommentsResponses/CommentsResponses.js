@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import {
     Button,
     Box,
@@ -11,7 +11,7 @@ import CommentResponse from "../CommentResponse/CommentResponse"
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './CommentsResponses.module.css'
 
-const dummyAuthor = 'David Nguyen'
+const dummyAuthor = 1
 
 function CommentsResponses({ isComments, posts, post_id }) {
     const [details, setDetails] = useState('')
@@ -22,11 +22,11 @@ function CommentsResponses({ isComments, posts, post_id }) {
 
         const body = isComments ? 
             {
-                author: dummyAuthor, // TODO: update to user_id if changed in backend
+                user_id: dummyAuthor,
                 published_date: date,
                 comment: details,
             } : {
-                author: dummyAuthor, // TODO: update to user_id if changed in backend
+                user_id: dummyAuthor,
                 published_date: date,
                 reply: details,
             }
@@ -50,7 +50,7 @@ function CommentsResponses({ isComments, posts, post_id }) {
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md" mb="12px" textTransform="uppercase">{isComments ? 'Comments' : 'Responses'}</Heading>
             {posts && posts[0] !== null && posts.map(post => (
-                <CommentResponse {...post} post_id={post_id} />
+                post !== null && <CommentResponse {...post} post_id={post_id} />
             ))}
             <form id={`create${isComments ? 'Comment' : 'Response'}`} onSubmit={handleSubmit}>
                 <Flex>
