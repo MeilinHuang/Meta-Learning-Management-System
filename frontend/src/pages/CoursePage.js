@@ -6,7 +6,6 @@ import CourseContentPage from "../pages/CourseContentPage.js"
 import ForumOverviewPage from "../pages/ForumOverviewPage.js"
 import ForumPostPage from '../pages/ForumPostPage'
 import {
-    BrowserRouter as Router,
     Switch,
     Route,
 } from "react-router-dom"
@@ -47,11 +46,10 @@ function CoursePage() {
     const variants = useBreakpointValue({ base: smVariant, md: mdVariant })
     const [isOpen, setOpen] = useState(false)
 
-    //EXAMPLE PAGE LAYOUT
     return (
         <div>
             
-            <Header sideBarLinks={links} setOpen={setOpen}></Header>
+            <Header setOpen={setOpen}></Header>
             <Flex>
                 <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
                 <Container marginTop={50} mx={{ base: "0", md: "24px"}} maxWidth="100%">
