@@ -110,6 +110,10 @@ app.put('/forum/post/:postId', async(request, response) => {
   await database.putPost(request, response);
 });
 
+app.delete('/forum/post/:postId', async(request, response) => {
+  await database.deletePost(request, response);
+});
+
 app.put('/forum/post/:postId/reply/:replyId', async(request, response) => {
   await database.putPostReply(request, response);
 });
@@ -118,8 +122,20 @@ app.post('/forum/post/:postId/reply', async(request, response) => {
   await database.postReply(request, response);
 });
 
+app.delete('/forum/post/:postId/reply/:replyId', async(request, response) => {
+  await database.deletePostReply(request, response);
+});
+
 app.post('/forum/post/:postId/comment', async(request, response) => {
   await database.postComment(request, response);
+});
+
+app.put('/forum/post/:postId/comment/:commentId', async(request, response) => {
+  await database.putComment(request, response);
+});
+
+app.delete('/forum/post/:postId/comment/:commentId', async(request, response) => {
+  await database.deleteComment(request, response);
 });
 
 app.put('/forum/post/pin/:postId/:isPinned', async(request, response) => {
@@ -132,6 +148,10 @@ app.put('/forum/tags', async(request, response) => {
 
 app.post('/forum/tags', async(request, response) => {
   await database.postTag(request, response);
+});
+
+app.delete('/forum/tags/:tagId', async(request, response) => {
+  await database.deleteTag(request, response);
 });
 
 /***************************************************************
