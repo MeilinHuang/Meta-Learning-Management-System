@@ -45,7 +45,7 @@ const NavLink = ({ onClick, children }) => (
 
 
   
-export default function TopicTreeHeader({id}) {
+export default function TopicTreeHeader({id, view, setView}) {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const { 

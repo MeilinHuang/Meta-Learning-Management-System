@@ -47,8 +47,6 @@ function CoursePage() {
     const variants = useBreakpointValue({ base: smVariant, md: mdVariant })
     const [isOpen, setOpen] = useState(false)
 
-    let counter = 0
-
     //EXAMPLE PAGE LAYOUT
     return (
         <div>
