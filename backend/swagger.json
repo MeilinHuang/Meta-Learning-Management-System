@@ -1392,17 +1392,121 @@
         }
       }
     },
-    "/{topicGroup}/announcement/comment": {
+    "/{topicGroup}/announcement/{announcementId}": {
+      "get": {
+        "tags": ["Course Pages"],
+        "summary": "Get announcement by id",
+        "parameters": [
+          {
+            "name": "announcementId",
+            "description": "Announcement Id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Announcement"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Course Pages"],
+        "summary": "Update announcement details",
+        "parameters": [
+          {
+            "name": "announcementId",
+            "description": "Announcement Id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "announcementBody",
+            "in": "body",
+            "description": "Announcement body",
+            "schema": {
+              "$ref": "#/definitions/PutAnnouncement"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Course Pages"],
+        "summary": "Delete announcement",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "description": "Name of topic Group",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "announcementId",
+            "description": "Announcement id to delete",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroup}/announcement/{announcementId}/comment": {
       "post": {
         "tags": ["Course Pages"],
         "summary": "Create new announcement comment",
         "parameters": [
           {
-            "name": "topicGroup",
-            "description": "Name of topic Group to create announcement for",
+            "name": "announcementId",
+            "description": "Id of announcement to comment",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer"
           },
           {
             "name": "commentBody",
@@ -1411,6 +1515,72 @@
             "schema": {
               "$ref": "#/definitions/PostAnnouncementComment"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroup}/announcement/{announcementId}/comment/{commentId}": {
+      "put": {
+        "tags": ["Course Pages"],
+        "summary": "Update announcement comment",
+        "parameters": [
+          {
+            "name": "commentId",
+            "description": "Id of comment to update",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "commentBody",
+            "in": "body",
+            "description": "Comment body",
+            "schema": {
+              "$ref": "#/definitions/PutAnnouncementComment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Course Pages"],
+        "summary": "Delete announcement comment",
+        "parameters": [
+          {
+            "name": "commentId",
+            "description": "Id of comment to delete",
+            "in": "path",
+            "required": true,
+            "type": "integer"
           }
         ],
         "responses": {
@@ -2012,10 +2182,10 @@
           {
             "name": "tagBody",
             "required": true,
-            "description": "Id of tag",
+            "description": "New tag name",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/Forumtag"
+              "$ref": "#/definitions/ForumTag"
             }
           }
         ],
@@ -2670,10 +2840,6 @@
     },
     "PostAnnouncementComment": {
       "properties": {
-        "announcementId": {
-          "type": "integer",
-          "example": 1
-        },
         "author": {
           "type": "integer",
           "example": 1
@@ -3244,6 +3410,14 @@
         }
       }
     },
+    "PutAnnouncementComment": {
+      "properties": {
+        "content": {
+          "type": "string",
+          "example": "Some new comment description"
+        }
+      }
+    },
     "User": {
       "properties": {
         "_id": {
@@ -3422,6 +3596,18 @@
               }
             }
           }
+        }
+      }
+    },
+    "PutAnnouncement": {
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Some title"
+        },
+        "content": {
+          "type": "string",
+          "example": "Some new description"
         }
       }
     },

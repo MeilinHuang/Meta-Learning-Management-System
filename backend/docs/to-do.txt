@@ -11,5 +11,4 @@ Topic group
 
 API
   - Make query calls case insensitive from parameters
-  - Change posts/replies/comment published date to current_timestamp()
   - Make sure for INSERT / POST there is no duplicate inserts
