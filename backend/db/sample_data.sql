@@ -3,15 +3,16 @@
 -- \i '/Users/davidnguyen/Desktop/COMP - Thesis B/metalms/backend/db/sample_data.sql';
 
 -- Create Users
-INSERT INTO users(id, name, zid) values(default, 'David Nguyen', 'z5166106');
-INSERT INTO users(id, name, zid) values(default, 'John Smith', 'z5123821');
-INSERT INTO users(id, name, zid) values(default, 'Tutory Tutorer', 'z5921738');
-INSERT INTO users(id, name, zid) values(default, 'Lecturey Lecturer', 'z5928712');
+INSERT INTO users(id, name, email, password, zid) values(default, 'David Nguyen', 'test@test.com', 'passsword', 'z5166106');
+INSERT INTO users(id, name, email, password, zid) values(default, 'John Smith', 'test@test.com', 'passsword', 'z5123821');
+INSERT INTO users(id, name, email, password, zid) values(default, 'Tutory Tutorer', 'test@test.com', 'passsword', 'z5921738');
+INSERT INTO users(id, name, email, password, zid) values(default, 'Lecturey Lecturer', 'test@test.com', 'passsword', 'z5928712');
 
 
 -- Create Topic Groups
 INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, 'C++ Programming', 'COMP6771', 'Course_Outline.pdf');
 INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, 'Database Systems', 'COMP3331', 'Course_Outline.pdf');
+INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, 'Fake Course', 'COMP1234', 'Course_Outline.pdf');
 
 -- Create Topics
 INSERT INTO topics(id, topic_group_id, name) values(default, 1, 'Loops');
