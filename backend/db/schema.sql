@@ -177,7 +177,7 @@ CREATE TABLE "announcement_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   file_id TEXT NOT NULL,
-  announcement_id INTEGER NOT NULL REFERENCES announcements(id)
+  announcement_id INTEGER NOT NULL REFERENCES announcements(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "announcement_comment_files" CASCADE;
@@ -185,7 +185,7 @@ CREATE TABLE "announcement_comment_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   file_id TEXT NOT NULL,
-  comment_id INTEGER NOT NULL REFERENCES announcement_comment(id)
+  comment_id INTEGER NOT NULL REFERENCES announcement_comment(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- Gamification

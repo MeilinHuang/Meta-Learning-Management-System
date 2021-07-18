@@ -110,6 +110,10 @@ app.put('/forum/post/:postId', async(request, response) => {
   await database.putPost(request, response);
 });
 
+app.delete('/forum/post/:postId', async(request, response) => {
+  await database.deletePost(request, response);
+});
+
 app.put('/forum/post/:postId/reply/:replyId', async(request, response) => {
   await database.putPostReply(request, response);
 });
@@ -162,8 +166,28 @@ app.post('/:topicGroup/announcement/new', async(request, response) => {
   await database.postAnnouncement(request, response);
 })
 
-app.post('/:topicGroup/announcement/comment', async(request, response) => {
+app.get('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.getAnnouncementById(request, response);
+})
+
+app.put('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.putAnnouncement(request, response);
+})
+
+app.delete('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.deleteAnnouncement(request, response);
+})
+
+app.post('/:topicGroup/announcement/:announcementId/comment', async(request, response) => {
   await database.postAnnouncementComment(request, response);
+})
+
+app.put('/:topicGroup/announcement/:announcementId/comment/:commentId', async(request, response) => {
+  await database.putAnnouncementComment(request, response);
+})
+
+app.delete('/:topicGroup/announcement/:announcementId/comment/:commentId', async(request, response) => {
+  await database.deleteAnnouncementComment(request, response);
 })
 
 /***************************************************************

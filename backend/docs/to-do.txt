@@ -11,8 +11,4 @@ Topic group
 
 API
   - Make query calls case insensitive from parameters
-  - Change all DATETIME/TIMESTAMP vars to pool.query(`SELECT CURRENT_TIMESTAMP`).rows[0].current_timestamp;
   - Make sure for INSERT / POST there is no duplicate inserts
-
-Forum
-  - DELETE for post, comment, reply, tag
