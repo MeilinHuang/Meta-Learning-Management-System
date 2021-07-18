@@ -54,7 +54,7 @@ function CourseDashboard() {
             }
         }).then(r => {
             if (r.status === 200) {
-                window.location.reload()
+                fetch(`http://localhost:8000/${dummyCourse}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))
             } 
             // TODO: Handle error case
         })

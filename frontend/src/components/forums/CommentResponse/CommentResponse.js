@@ -23,11 +23,10 @@ import { ContentState, convertFromHTML } from 'draft-js'
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './CommentResponse.module.css'
 
-function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id }) {
+function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id, setPost }) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState('')
     const toast = useToast()
-    console.log(reply_id)
 
     useEffect(() => {
         setDetails(comment || reply)
@@ -42,7 +41,6 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
     const handleSubmit = e => {
         e.preventDefault()
         const isComments = !!comment && !reply
-        console.log(isComments)
 
         if (isComments) {
             fetch(
@@ -99,16 +97,17 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
         }
     }
 
-    const handleDelete = () => {
+    const handleDelete = onClose => {
         const isComments = !!comment && !reply
-
-        console.log(isComments)
         if (isComments) {
             fetch(
                 `http://localhost:8000/forum/post/${post_id}/comment/${comment_id}`, { method: 'DELETE' }
             ).then(r => {
                 if (r.status === 200) {
-                    window.location.reload()
+                    fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
+                        setPost(data[0])
+                        onClose()
+                    })
                 } else {
                     toast({
                         title: 'Sorry, an error has occurred',
@@ -124,7 +123,10 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
                 `http://localhost:8000/forum/post/${post_id}/reply/${reply_id}`, { method: 'DELETE' }
             ).then(r => {
                 if (r.status === 200) {
-                    window.location.reload()
+                    fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
+                        setPost(data[0])
+                        onClose()
+                    })
                 } else {
                     toast({
                         title: 'Sorry, an error has occurred',
@@ -161,23 +163,27 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
                         <Flex mt="8px" justifyContent="flex-end">
                             <Link onClick={editPost}>Edit</Link>
                             <Popover>
-                                <PopoverTrigger>
-                                    <Link color="red" ml="8px">Delete</Link>
-                                </PopoverTrigger>
-                                <PopoverContent>
-                                    <PopoverHeader fontWeight="semibold">Confirmation</PopoverHeader>
-                                    <PopoverArrow />
-                                    <PopoverCloseButton />
-                                    <PopoverBody>
-                                        Are you sure you want to delete this post?
-                                    </PopoverBody>
-                                    <PopoverFooter d="flex" justifyContent="flex-end">
-                                        <ButtonGroup size="sm">
-                                        <Button variant="outline">Cancel</Button>
-                                        <Button colorScheme="red" onClick={handleDelete}>Delete</Button>
-                                        </ButtonGroup>
-                                    </PopoverFooter>
-                                </PopoverContent>
+                                {({ onClose }) => (
+                                    <>
+                                        <PopoverTrigger>
+                                            <Link color="red" ml="8px">Delete</Link>
+                                        </PopoverTrigger>
+                                        <PopoverContent>
+                                            <PopoverHeader fontWeight="semibold">Confirmation</PopoverHeader>
+                                            <PopoverArrow />
+                                            <PopoverCloseButton />
+                                            <PopoverBody>
+                                                Are you sure you want to delete this post?
+                                            </PopoverBody>
+                                            <PopoverFooter d="flex" justifyContent="flex-end">
+                                                <ButtonGroup size="sm">
+                                                <Button variant="outline">Cancel</Button>
+                                                <Button colorScheme="red" onClick={() => handleDelete(onClose)}>Delete</Button>
+                                                </ButtonGroup>
+                                            </PopoverFooter>
+                                        </PopoverContent>
+                                    </>
+                                )}
                             </Popover>
                         </Flex>
                     </>

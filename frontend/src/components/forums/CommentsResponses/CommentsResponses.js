@@ -13,7 +13,8 @@ import styles from './CommentsResponses.module.css'
 
 const dummyAuthor = 1
 
-function CommentsResponses({ isComments, posts, post_id }) {
+function CommentsResponses({ isComments, posts, post_id, setPost }) {
+    const [ editorState, setEditorState ] = useState('')
     const [details, setDetails] = useState('')
 
     const handleSubmit = e => {
@@ -40,7 +41,10 @@ function CommentsResponses({ isComments, posts, post_id }) {
             }
         }).then(r => {
             if (r.status === 200) {
-                window.location.reload()
+                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
+                    setPost(data[0])
+                    setEditorState('') // TODO: work out how to clear editor on save
+                })
             } 
             // TODO: Handle error case
         })
@@ -50,12 +54,12 @@ function CommentsResponses({ isComments, posts, post_id }) {
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md" mb="12px" textTransform="uppercase">{isComments ? 'Comments' : 'Responses'}</Heading>
             {posts && posts[0] !== null && posts.map(post => (
-                post !== null && <CommentResponse {...post} post_id={post_id} />
+                post !== null && <CommentResponse {...post} post_id={post_id} setPost={setPost} />
             ))}
             <form id={`create${isComments ? 'Comment' : 'Response'}`} onSubmit={handleSubmit}>
                 <Flex>
                     <InputGroup variant="filled" mr="8px">
-                        <DraftEditor setDetails={setDetails} className={styles.editor} />
+                        <DraftEditor content={editorState} setDetails={setDetails} className={styles.editor} />
                     </InputGroup>
                     <Button pr="8px" leftIcon={<AiOutlineSend />} form={`create${isComments ? 'Comment' : 'Response'}`} type="submit" />
                 </Flex>

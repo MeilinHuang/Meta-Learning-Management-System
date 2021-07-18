@@ -11,9 +11,9 @@ import {
     Td,
 } from "@chakra-ui/react"
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri'
-// import { StoreContext } from '../../utils/store'
+import { StoreContext } from '../../utils/store'
 
-const getRow = ({ post_id, title, published_date, replies, comments, ispinned } /*, setPosts */) => {
+const getRow = ({ post_id, title, published_date, replies, comments, ispinned }, setPosts, setPinnedPosts) => {
     const date = new Date(published_date)
     const dateString = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
 
@@ -21,8 +21,10 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned } 
         fetch(`http://localhost:8000/forum/post/pin/${post_id}/${!ispinned}`, { method: 'PUT' })
             .then(r => { 
                 if (r.status === 200) {
-                    // fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
-                    window.location.reload()
+                    fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
+                    fetch('http://localhost:8000/forum/pinned').then(r => r.json()).then(data => {
+                        setPinnedPosts(data)
+                    })
                 }
             })
     }
@@ -46,10 +48,10 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned } 
     )
 }
 
-function PostTable({ isAdmin, posts }) {
-    const orderedPosts = [...posts].reverse()
-    // const context = useContext(StoreContext)
-    // const { posts: [, setPosts] } = context;
+function PostTable({ isAdmin, posts: postData }) {
+    const orderedPosts = [...postData].reverse()
+    const context = useContext(StoreContext)
+    const { posts: [, setPosts], pinnedPosts: [, setPinnedPosts] } = context;
 
     return (
         <Table variant="simple">
@@ -63,7 +65,7 @@ function PostTable({ isAdmin, posts }) {
                 </Tr>
             </Thead>
             <Tbody>
-                {orderedPosts.map(post => getRow(post/*, setPosts*/))}
+                {orderedPosts.map(post => getRow(post, setPosts, setPinnedPosts))}
             </Tbody>
         </Table>
     )

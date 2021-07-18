@@ -86,8 +86,8 @@ function ForumPostPage({ match: { params: { id }}}) {
             <Divider />
             <Tags tags={post.tags} />
             <PostDetails post={post} />
-            <CommentsResponses posts={post.replies} post_id={id} />
-            <CommentsResponses isComments posts={post.comments} post_id={id} />
+            <CommentsResponses posts={post.replies} post_id={id} setPost={setPost} />
+            <CommentsResponses isComments posts={post.comments} post_id={id} setPost={setPost} />
         </>
     )
 }

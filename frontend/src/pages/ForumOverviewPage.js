@@ -23,18 +23,20 @@ const dummyAuthor = 3
 
 function ForumOverviewPage() {
     const context = useContext(StoreContext)
-    const { posts: [posts, setPosts], showPinned: [showPinned, setShowPinned] } = context;
-    const [pinnedPosts, setPinnedPosts] = useState([])
+    const {
+        posts: [posts, setPosts],
+        pinnedPosts: [pinnedPosts, setPinnedPosts],
+        showPinned: [showPinned, setShowPinned]
+    } = context;
     const [searchTerm, setSearchTerm] = useState('')
 
     useEffect(() => {
-        console.log('here')
         fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
         fetch('http://localhost:8000/forum/pinned').then(r => r.json()).then(data => {
             setPinnedPosts(data)
             setShowPinned(true)
         })
-    }, [setPosts, setShowPinned])
+    }, [setPosts, setPinnedPosts, setShowPinned])
 
     const buttonContents = useBreakpointValue({ base: '', md: 'Add Post' })
     const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null })
@@ -74,7 +76,7 @@ function ForumOverviewPage() {
             }
         }).then(r => {
             if (r.status === 200) {
-                window.location.reload()
+                fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
             } 
             // TODO: Handle error case
         })
