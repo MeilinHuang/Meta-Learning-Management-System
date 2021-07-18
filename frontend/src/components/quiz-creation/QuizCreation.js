@@ -5,7 +5,15 @@ import {
           Button,
           Checkbox, 
           CheckboxGroup, 
-          Heading, 
+          FormControl,
+          FormErrorIcon,
+          FormErrorMessage,
+          FormLabel,
+          Heading,
+          Input,
+          InputGroup,
+          InputLeftElement, 
+          InputRightElement,
           Radio, 
           RadioGroup, 
           Select, 
@@ -365,7 +373,7 @@ export default function QuizCreation() {
   const renderNewQuestionEntry = () => {
     return (
       <Box>
-        <Heading>Question</Heading>
+        <Heading>New Question</Heading>
         <Box display="inline-flex">
           <p>Question type:</p>
           <Select defaultValue="mc" onChange={onChangeQuestionType} value={newQuestion.question_type}>
@@ -489,31 +497,41 @@ export default function QuizCreation() {
     // Checkboxes
   };
 
+  const handleChangeCorrectAnswer = (ans) => {
+
+  };
+
   const getCorrectAnswers = () => {
 
     if (newQuestion.question_type === "mc" || newQuestion.question_type === "sa")
     {
       // TODO
-      const foundCorrectAnswer = newQuestion.answers.find(a => a.is_correct);
-      console.log(typeof foundCorrectAnswer);
-      return foundCorrectAnswer.id.toString(); // TODO: Check why this works when it's not a list
+      let foundCorrectAnswerIndex = newQuestion.answers.findIndex(a => a.is_correct);
+      console.log("Correct answers: " + foundCorrectAnswerIndex);
+      return foundCorrectAnswerIndex.toString(); // TODO: Check why this works when it's not a list
     }
     else if (newQuestion.question_type === "cb")
     {
       // TODO
-      let foundCorrectAnswers = newQuestion.answers.filter(a => a.is_correct);
-      return foundCorrectAnswers.map(m => m.id.toString());
+      let correctAnswersList = [];
+      newQuestion.answers.forEach((answer, index) => {
+        if (answer.is_correct)
+        {
+          correctAnswersList.push(index.toString());
+        }
+      });
+
+      return correctAnswersList;
     }
     else {
       return ['undefined'];
     }
   };
 
-  const onChangeCheckboxAnswer = (e) => {
+  const onChangeCheckboxAnswer1 = (e) => {
     const newAnswers = newQuestion.answers.map(a => (a.id === e.target.valueAsNumber) ? { ...a, is_correct: false } : { ...a });
     setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
-
 
   const onChangeCorrectAnswers = (e) => {
     /*
@@ -550,21 +568,114 @@ export default function QuizCreation() {
     }
   };
 
+  const onChangeCorrectAnswers2 = (e) => {
+    let newAnswers;
+    
+    if (newQuestion.question_type === "mc")
+    { 
+      newAnswers = newQuestion.answers.map(a => (a.id === e.toString()) ? { ...a, is_correct: true } : { ...a, is_correct: false });
+      setNewQuestion({ ...newQuestion, answers: newAnswers });
+    }
+    else if (newQuestion.question_type === "sa")
+    {
+      newAnswers = newQuestion.answers.map(a => (a.id === e.target.valueAsNumber) ? { ...a, is_correct: true } : { ...a, is_correct: false });
+      setNewQuestion({ ...newQuestion, answers: newAnswers });
+    }
+    else if (newQuestion.question_type === "cb")
+    {
+      newAnswers = newQuestion.answers.map(a => (e.target.value.includes(a.id)) ? { ...a, is_correct: true } : { ...a, is_correct: false });
+      setNewQuestion({ ...newQuestion, answers: newAnswers });
+    }
+  };
+
+  const onChangeRadioAnswer = (e) => {
+    const newAnswers = newQuestion.answers.map((answer, index) => (index === +e) ? { ...answer, is_correct: true } : { ...answer, is_correct: false });
+    // console.log(newAnswers);
+    setNewQuestion({ ...newQuestion, answers: newAnswers });
+  };
+
+  const onChangeShortAnswer = (e) => {
+
+  };
+
+  const onChangeCheckboxAnswer = (idx) => (e) => {
+    // const newAnswers = newQuestion.answers.map((answer, index) => (e.includes(index)) ? { ...answer, is_correct: true } : { ...answer, is_correct: false });
+    const newAnswers = newQuestion.answers.map((answer, index) => (index === idx) ? { ...answer, is_correct: e.target.checked } : answer);
+    setNewQuestion({ ...newQuestion, answers: newAnswers });
+  };
+
+  const onChangeCorrectAnswer = (idx) => {
+    if (newQuestion.question_type === "mc")
+    {
+      
+    }
+    else if (newQuestion.question_type === "sa")
+    {
+
+    }
+    else if (newQuestion.question_type === "cb")
+    {
+
+    }
+  };
+
+  const onChangeAnswerText = (ans) => {
+
+  };
+
+  const renderAnswerItem = (ans) => {
+    let answerItem;
+
+    if (newQuestion.question_type === "mc")
+    {
+      // Multiple choice
+      answerItem = <Radio key={ans.id} value={ans.id.toString()} onChange={onChangeRadioAnswer} />
+    }
+    else if (newQuestion.question_type === "sa")
+    {
+      // Short answer
+      answerItem = <Textarea onChange={onChangeShortAnswer} value={correctAnswers[0]} />
+    }
+    else if (newQuestion.question_type === "cb")
+    {
+      // Checkboxes
+      answerItem = <Checkbox key={ans.id} value={ans.id.toString()} onChange={onChangeCheckboxAnswer} />
+    }
+
+    return answerItem;
+  }
+
   const renderPossibleAnswers = (question) => {
     if (question.question_type === "mc")
     {
-      // Radio buttons
       return (
         <Box>
-          <p>Answers (select the correct answer): </p>
-          {question.question_text}
-          <RadioGroup onChange={onChangeCorrectAnswers} value={correctAnswers[0]}>
+          <RadioGroup onChange={onChangeRadioAnswer} value={getCorrectAnswers()}>
             <Stack>
-              {question.answers.map(a => 
-                <Box>
-                  <Radio key={a.id} value={a.id.toString()}>{a.answer_text}</Radio>
-                  <SmallCloseIcon color="red.500" ml={10} onClick={() => deletePossibleAnswer(a.id)}/>
-                </Box>
+              {Object.entries(question.answers).map(([i, ans]) =>
+                <FormControl isInvalid={!ans} mb={2} key={i}>
+                  <InputGroup>
+                    <InputLeftElement px={4} width="2.5rem">
+                      <Radio key={i} value={i} />
+                    </InputLeftElement>
+                    <Input
+                      pl="2.5rem"
+                      value={ans.answer_text}
+                      onChange={onChangeAnswerText(+i)}
+                    />
+                    <InputRightElement width="6rem" zIndex="0">
+                      <Button
+                        colorScheme="red"
+                        variant="outline"
+                        size="sm"
+                        height="1.75rem"
+                        // isDisabled={question.answers.length <= 2}
+                      >
+                        Delete
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
+                </FormControl>
               )}
             </Stack>
           </RadioGroup>
@@ -577,7 +688,7 @@ export default function QuizCreation() {
       return (
         <Box>
           <Text>Enter a possible correct answer: </Text>
-          <Textarea onChange={onChangeCorrectAnswers} value={correctAnswers[0]} />
+          <Textarea onChange={onChangeShortAnswer} value={getCorrectAnswers()} />
         </Box>
       );
     }
@@ -585,19 +696,36 @@ export default function QuizCreation() {
     {
       // Checkboxes
       // Loop through list of possible answers
-      const t = "Hello";
 
       return (
         <Box>
           <p>Answers (select the correct answer/s): </p>
-          <CheckboxGroup colorScheme="green" onChange={onChangeCorrectAnswers} value={correctAnswers}> 
+          <CheckboxGroup colorScheme="green" defaultValue={getCorrectAnswers()}> 
             <Stack>
-              {question.answers.map(a => 
-                <Box>
-                  <Checkbox key={a.id} value={a.id.toString()}>{a.answer_text}</Checkbox>
-                  
-                    <SmallCloseIcon color="red.500" ml={10} onClick={() => deletePossibleAnswer(a.id)}/>
-                </Box>
+              {Object.entries(question.answers).map(([i, ans]) =>
+                <FormControl isInvalid={!ans} mb={2} key={i}>
+                  <InputGroup>
+                    <InputLeftElement px={4} width="2.5rem">
+                      <Checkbox key={i} value={i} isChecked={ans.is_correct} onChange={onChangeCheckboxAnswer(+i)} />
+                    </InputLeftElement>
+                    <Input
+                      pl="2.5rem"
+                      value={ans.answer_text}
+                      onChange={onChangeAnswerText(+i)}
+                    />
+                    <InputRightElement width="6rem" zIndex="0">
+                      <Button
+                        colorScheme="red"
+                        variant="outline"
+                        size="sm"
+                        height="1.75rem"
+                        // isDisabled={question.answers.length <= 2}
+                      >
+                        Delete
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
+                </FormControl>
               )}
             </Stack>
           </CheckboxGroup>
@@ -645,7 +773,18 @@ export default function QuizCreation() {
       )
     }
     */
-   return (<>{correctAnswers.map(a => {return <p key={a.id}>{a}</p>})}</>);
+  //  return (<>{correctAnswers.map(a => {return <p key={a.id}>{a}</p>})}</>);
+
+    const correctAnswersList = [];
+
+    newQuestion?.answers?.forEach(ans => {
+      if (ans.is_correct)
+      {
+        correctAnswersList.push(ans.answer_text);
+      }
+    });
+
+    return correctAnswersList.toString();
   };
 
   return (
