@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { SmallCloseIcon } from '@chakra-ui/icons'
+import { SmallCloseIcon, WarningIcon } from '@chakra-ui/icons'
 import { 
           Box,
           Button,
+          Center,
           Checkbox, 
-          CheckboxGroup, 
+          CheckboxGroup,
+          Flex, 
           FormControl,
           FormErrorIcon,
           FormErrorMessage,
@@ -375,17 +377,20 @@ export default function QuizCreation() {
     return (
       <Box>
         <Heading>New Question</Heading>
-        <Box display="inline-flex">
-          <p>Question type:</p>
+
+        <Box my="5">
+          <Text mb="1">Question type:</Text>
           <Select defaultValue="mc" onChange={onChangeQuestionType} value={newQuestion.question_type}>
             <option value="mc">Multiple choice</option>
             <option value="sa">Short answer</option>
             <option value="cb">Checkboxes</option>
           </Select>
         </Box>
-        
-        <Text>Question text: </Text>
-        <Textarea placeholder="Enter question" onChange={onChangeQuestionText} value={newQuestion.question_text} />
+
+        <Box mb="3">
+          <Text>Question text: </Text>
+          <Textarea placeholder="Enter question" onChange={onChangeQuestionText} value={newQuestion.question_text} />
+        </Box>
         {renderPossibleAnswers(newQuestion)}
       </Box>
     );
@@ -513,10 +518,11 @@ export default function QuizCreation() {
 
   const addQuestionToQuiz = () => {
     // TODO: Check if correct answer/s has been selected
-    const correctAnswerExists = (ans) => ans.is_correct;
+    const correctAnswerExists = (ans) => ans.is_correct && ans.answer_text !== "";
     const hasSetCorrectAnswers = newQuestion.answers.some(correctAnswerExists);
+    const isValidQuestionText = newQuestion.question_text !== "";
 
-    if (!hasSetCorrectAnswers)
+    if (!hasSetCorrectAnswers || !isValidQuestionText)
     {
       // TODO: Render user-friendly error message when not valid
       setIsValidQuestion(false);
@@ -715,10 +721,11 @@ export default function QuizCreation() {
     {
       return (
         <Box>
-          <RadioGroup onChange={onChangeRadioAnswer} value={getCorrectAnswers()}>
+          <Text>Answers (select the correct answer):</Text>
+          <RadioGroup mt="1" onChange={onChangeRadioAnswer} value={getCorrectAnswers()}>
             <Stack>
               {Object.entries(question.answers).map(([i, ans]) =>
-                <FormControl isInvalid={!ans} mb={2} key={i}>
+                <FormControl isInvalid={!ans} mb={1} key={i}>
                   <InputGroup>
                     <InputLeftElement px={4} width="2.5rem">
                       <Radio value={i} />
@@ -767,10 +774,10 @@ export default function QuizCreation() {
       return (
         <Box>
           <p>Answers (select the correct answer/s): </p>
-          <CheckboxGroup colorScheme="green" defaultValue={getCorrectAnswers()}> 
+          <CheckboxGroup mt="1" colorScheme="green" defaultValue={getCorrectAnswers()}> 
             <Stack>
               {Object.entries(question.answers).map(([i, ans]) =>
-                <FormControl isInvalid={!ans} mb={2} key={i}>
+                <FormControl isInvalid={!ans} key={i}>
                   <InputGroup>
                     <InputLeftElement px={4} width="2.5rem">
                       <Checkbox key={i} value={i} isChecked={ans.is_correct} onChange={onChangeCheckboxAnswer(+i)} />
@@ -859,26 +866,37 @@ export default function QuizCreation() {
   };
 
   const printInvalidQuestionError = () => {
-    return <Text color="red">Invalid question - please set a correct answer</Text>
+    return (
+      <Flex mt="3" pb="1" borderWidth="1px" borderRadius="lg" bgColor="red.100">
+        <Center mx="3">
+          <WarningIcon w={5} h={5} color="red.500" />
+        </Center>
+        <Text mt="3" color="red">Question was not added to quiz - question text is empty or a correct answer was not set.</Text>
+      </Flex>
+    );
   }
 
   return (
-    <Box>
-      {renderQuizDetails()}
+    <Box w="40%" margin="auto" top={0} right={0} left={0} bottom={0}>
+      {/* {renderQuizDetails()} */}
       {renderNewQuestionEntry()}
 
-      <Button colorScheme="orange" variant="solid" onClick={addPossibleAnswer}>Add new possible answer</Button>
-      {/* Add question button */}
-      <Button colorScheme="teal" variant="solid" onClick={addQuestionToQuiz}>Add to quiz</Button>
+      {!isValidQuestion && printInvalidQuestionError()}
+
+      <Box d="flex" justifyContent="flex-end" mt="6">
+        <Button colorScheme="orange" variant="solid" mr="8" onClick={addPossibleAnswer}>Add new answer</Button>
+        {/* Add question button */}
+        <Button colorScheme="teal" variant="solid" onClick={addQuestionToQuiz}>Add to quiz</Button>
+      </Box>
+
 
       {/* <Button colorScheme="blue" variant="solid" onClick={resetQuestionFields}>Reset fields</Button> */}
 
       {/* <Button colorScheme="red" variant="solid" onClick={createNewQuestion}>Create new question</Button> */}
 
-      <p style={{ color: "red" }}>Correct answer will be: </p>
-      {printCorrectAnswers()}
-      
-      {!isValidQuestion && printInvalidQuestionError()}
+      {/* <p style={{ color: "red" }}>Correct answer will be: </p> */}
+      {/* {printCorrectAnswers()} */}
+    
 
       {/* <Heading>Questions</Heading> */}
       {/* {renderQuiz()} */}

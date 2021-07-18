@@ -35,7 +35,6 @@ export default function Assessments() {
 
   return (
     <div>
-      <p>Assessments</p>
       <QuizCreation />
     </div>
   );
