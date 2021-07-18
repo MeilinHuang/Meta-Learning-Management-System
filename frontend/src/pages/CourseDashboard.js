@@ -41,13 +41,6 @@ function CourseDashboard() {
     }
 
     const handleAddPostSubmit = ({ title, details, date }) => {
-        console.log(JSON.stringify({
-            author: dummyAuthor,
-            attachments: [],
-            title,
-            content: details,
-            postDate: date,
-        }))
         fetch(`http://localhost:8000/${dummyCourse}/announcement/new`, {
             method: 'POST',
             body: JSON.stringify({
@@ -63,13 +56,7 @@ function CourseDashboard() {
             }
         }).then(r => {
             if (r.status === 200) {
-                toast({
-                    title: 'Post created',
-                    description: 'Refresh the page to view announcement',
-                    status: 'success',
-                    duration: 3000,
-                    isClosable: true,
-                })
+                fetch(`http://localhost:8000/${dummyCourse}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))
             } 
             // TODO: Handle error case
         })
