@@ -884,7 +884,7 @@ export default function QuizCreation() {
       {!isValidQuestion && printInvalidQuestionError()}
 
       <Box d="flex" justifyContent="flex-end" mt="6">
-        <Button colorScheme="orange" variant="solid" mr="8" onClick={addPossibleAnswer}>Add new answer</Button>
+        {newQuestion.question_type !== "sa" && <Button colorScheme="orange" variant="solid" mr="8" onClick={addPossibleAnswer}>Add new answer</Button>}
         {/* Add question button */}
         <Button colorScheme="teal" variant="solid" onClick={addQuestionToQuiz}>Add to quiz</Button>
       </Box>
