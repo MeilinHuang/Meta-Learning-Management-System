@@ -345,6 +345,7 @@ export default function QuizCreation() {
   const [quiz, setQuiz] = useState({}); // list of dictionaries [{}, {}, ...]
   const [newQuestion, setNewQuestion] = useState({});
   const [testValue, setTestValue] = useState("");
+  const [isValidQuestion, setIsValidQuestion] = useState(true);
 
   useEffect(() => {
     // Generate new quiz
@@ -425,10 +426,69 @@ export default function QuizCreation() {
     );
   }
 
+  const getDefaultAnswers = (questionType) => {
+    let defaultAnswers = [];
+
+    // Reset answers based on question type
+    if (questionType === "mc")
+    {
+      defaultAnswers = [
+        {
+          id: 1,
+          answer_text: "answer1",
+          is_correct: true,
+          explanation: ""
+        },
+        {
+          id: 2,
+          answer_text: "answer2",
+          is_correct: false,
+          explanation: ""
+        },
+      ];
+    }
+    else if (questionType === "sa")
+    {
+      defaultAnswers = [
+        {
+          id: 1,
+          answer_text: "",
+          is_correct: true,
+          explanation: ""
+        }
+      ];
+    }
+    else if (questionType === "cb")
+    {
+      defaultAnswers = [
+        {
+          id: 1,
+          answer_text: "answer1",
+          is_correct: true,
+          explanation: ""
+        },
+        {
+          id: 2,
+          answer_text: "answer2",
+          is_correct: false,
+          explanation: ""
+        },
+        {
+          id: 3,
+          answer_text: "answer3",
+          is_correct: false,
+          explanation: ""
+        },
+      ];
+    }
+
+    return defaultAnswers;
+  };
+
   const onChangeQuestionType = (e) => {
-    // Reset correctAnswers
-    setCorrectAnswers([]);
-    setNewQuestion({ ...newQuestion, question_type: e.target.value });
+    const defaultAnswers = getDefaultAnswers(e.target.value);
+
+    setNewQuestion({ ...newQuestion, question_type: e.target.value, answers: defaultAnswers });
   };
 
   const onChangeQuestionText = (e) => {
@@ -452,17 +512,21 @@ export default function QuizCreation() {
   };
 
   const addQuestionToQuiz = () => {
-    // TODO
-    
-    // TODO: Check if any field is invalid
-    let isValid = true;
-    if (!isValid)
+    // TODO: Check if correct answer/s has been selected
+    const correctAnswerExists = (ans) => ans.is_correct;
+    const hasSetCorrectAnswers = newQuestion.answers.some(correctAnswerExists);
+
+    if (!hasSetCorrectAnswers)
     {
       // TODO: Render user-friendly error message when not valid
+      setIsValidQuestion(false);
       return;
     }
 
-    setQuiz({ num_questions: quiz.num_questions + 1});
+    setIsValidQuestion(true);
+    const updatedQuestions = quiz.questions.concat([newQuestion])
+
+    setQuiz({ ...quiz, num_questions: quiz.num_questions + 1, questions: updatedQuestions});
   };
 
   const createNewQuestion = () => {
@@ -471,8 +535,8 @@ export default function QuizCreation() {
     // Render new question onto screen 
   };
 
-  const deletePossibleAnswer = (answerId) => {
-    const updatedPossibleAnswers = newQuestion.answers.filter(a => a.id !== answerId);
+  const deletePossibleAnswer = (idx) => {
+    const updatedPossibleAnswers = newQuestion.answers.filter((answer, index) => index !== idx);
 
     setNewQuestion({ ...newQuestion, answers: updatedPossibleAnswers });
   };
@@ -503,12 +567,22 @@ export default function QuizCreation() {
 
   const getCorrectAnswers = () => {
 
-    if (newQuestion.question_type === "mc" || newQuestion.question_type === "sa")
+    if (newQuestion.question_type === "mc")
     {
       // TODO
       let foundCorrectAnswerIndex = newQuestion.answers.findIndex(a => a.is_correct);
       console.log("Correct answers: " + foundCorrectAnswerIndex);
       return foundCorrectAnswerIndex.toString(); // TODO: Check why this works when it's not a list
+    }
+    else if (newQuestion.question_type === "sa")
+    {
+      if (newQuestion.answers.length > 0)
+      {
+        return newQuestion.answers[0].answer_text;
+      }
+      else {
+        return "";
+      }
     }
     else if (newQuestion.question_type === "cb")
     {
@@ -595,7 +669,8 @@ export default function QuizCreation() {
   };
 
   const onChangeShortAnswer = (e) => {
-
+    const newAnswers = newQuestion.answers.map((answer, index) => (index === 0) ? { ...answer, answer_text: e.target.value } : { ...answer, is_correct: false });
+    setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
 
   const onChangeCheckboxAnswer = (idx) => (e) => {
@@ -604,22 +679,12 @@ export default function QuizCreation() {
     setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
 
-  const onChangeCorrectAnswer = (idx) => {
-    if (newQuestion.question_type === "mc")
-    {
-      
-    }
-    else if (newQuestion.question_type === "sa")
-    {
-
-    }
-    else if (newQuestion.question_type === "cb")
-    {
-
-    }
+  const onChangeAnswerText = (idx) => (e) => {
+    const newAnswers = newQuestion.answers.map((answer, index) => (index === idx) ? { ...answer, answer_text: e.target.value } : answer);
+    setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
 
-  const onChangeAnswerText = (ans) => {
+  const deleteAnswer = (idx) => {
 
   };
 
@@ -656,7 +721,7 @@ export default function QuizCreation() {
                 <FormControl isInvalid={!ans} mb={2} key={i}>
                   <InputGroup>
                     <InputLeftElement px={4} width="2.5rem">
-                      <Radio key={i} value={i} />
+                      <Radio value={i} />
                     </InputLeftElement>
                     <Input
                       pl="2.5rem"
@@ -669,6 +734,7 @@ export default function QuizCreation() {
                         variant="outline"
                         size="sm"
                         height="1.75rem"
+                        onClick={() => deletePossibleAnswer(+i)}
                         // isDisabled={question.answers.length <= 2}
                       >
                         Delete
@@ -684,6 +750,7 @@ export default function QuizCreation() {
     }
     else if (question.question_type === "sa")
     {
+
       // Text box
       return (
         <Box>
@@ -719,6 +786,7 @@ export default function QuizCreation() {
                         variant="outline"
                         size="sm"
                         height="1.75rem"
+                        onClick={() => deletePossibleAnswer(+i)}
                         // isDisabled={question.answers.length <= 2}
                       >
                         Delete
@@ -737,7 +805,10 @@ export default function QuizCreation() {
   };
 
   const resetQuestionFields = () => {
-    setNewQuestion(generateNewQuestion());
+    // TODO: Fix this
+    const defaultAnswers = getDefaultAnswers(newQuestion.question_type);
+
+    setNewQuestion({ ...newQuestion, answers: defaultAnswers });
   };
 
   const renderQuiz = () => {
@@ -787,9 +858,12 @@ export default function QuizCreation() {
     return correctAnswersList.toString();
   };
 
+  const printInvalidQuestionError = () => {
+    return <Text color="red">Invalid question - please set a correct answer</Text>
+  }
+
   return (
     <Box>
-      {newQuestion.question_type}
       {renderQuizDetails()}
       {renderNewQuestionEntry()}
 
@@ -797,13 +871,16 @@ export default function QuizCreation() {
       {/* Add question button */}
       <Button colorScheme="teal" variant="solid" onClick={addQuestionToQuiz}>Add to quiz</Button>
 
-      <Button colorScheme="blue" variant="solid" onClick={resetQuestionFields}>Reset fields</Button>
+      {/* <Button colorScheme="blue" variant="solid" onClick={resetQuestionFields}>Reset fields</Button> */}
 
-      <Button colorScheme="red" variant="solid" onClick={createNewQuestion}>Create new question</Button>
+      {/* <Button colorScheme="red" variant="solid" onClick={createNewQuestion}>Create new question</Button> */}
 
       <p style={{ color: "red" }}>Correct answer will be: </p>
       {printCorrectAnswers()}
       
+      {!isValidQuestion && printInvalidQuestionError()}
+
+      {/* <Heading>Questions</Heading> */}
       {/* {renderQuiz()} */}
     </Box>
   );
