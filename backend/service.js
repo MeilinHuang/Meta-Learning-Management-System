@@ -744,7 +744,32 @@ async function getAllTags (request, response) {
 async function postTag (request, response) {
   try {
     const tagName = request.body.tagName;
+    let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) like lower($1))`, [tagName]);
+
+    if (dupTagCheck.rows[0].exists) {
+      throw (`Tag '${tagName}' already exists`);
+    } 
+
     let resp = await pool.query(`INSERT INTO tags(tag_id, name) VALUES(default, $1)`, [tagName]);
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  } 
+};
+
+// Update tag
+async function putTag (request, response) {
+  try {
+    let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) 
+    like lower($1))`, [request.body.tagName]);
+
+    if (dupTagCheck.rows[0].exists) {
+      throw (`Tag '${request.body.tagName}' already exists`);
+    } 
+
+    let resp = await pool.query(`UPDATE tags SET name = $1 WHERE tag_id = $2`, 
+    [request.body.tagName, request.params.tagId]);
     response.sendStatus(200);
   } catch(e) {
     response.status(400);
@@ -818,13 +843,17 @@ async function postAnnouncement (request, response) {
   const postDate = request.body.postDate;
   const attachments = request.body.attachments;
 
+  /* for (const file of request.files) {
+    console.log(file);
+  } */
+
   try {
     let resp = await pool.query(
       `INSERT INTO announcements(id, author, topic_group, title, content, post_date) 
       VALUES(default, $1, $2, $3, $4, $5) RETURNING id`,
       [author, topic_group, title, content, postDate])
     const aId = resp.rows[0].id;
-
+  
     // Loop to add attachments to db
     if (attachments.length) {
       for (const item of attachments) {
@@ -836,8 +865,7 @@ async function postAnnouncement (request, response) {
 
     response.sendStatus(200);
   } catch(e) {
-    response.sendStatus(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 };
 
@@ -1421,9 +1449,8 @@ async function getAllQuestionBankQuestions (request, response) {
 
 // Get specific question from question bank
 async function getQuestionFromQuestionBank (request, response) {
-  const questionId = request.params.questionId;
-
   try {
+    const questionId = request.params.questionId;
     let resp = await pool.query(
       `SELECT * FROM quiz_question WHERE id = $1`
     , [questionId]);
@@ -1633,6 +1660,7 @@ async function getStudentAnswerCount (request, response) {
 };
 
 module.exports = {
+  putTag,
   putAnnouncementComment,
   putAnnouncement,
   getAnnouncementById,

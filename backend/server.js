@@ -2,9 +2,14 @@ const express = require("express");
 var cors = require('cors');
 const app = express();
 const database =  require('./service.js');
+const fileUpload = require('express-fileupload');
+const multer = require('multer');
+var upload = multer({ dest: 'tmp_files/' });
+
 app.use(cors());
-// Body parsing
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
+app.use(fileUpload());
+
 
 /***************************************************************
                        Swagger API
@@ -142,8 +147,8 @@ app.put('/forum/post/pin/:postId/:isPinned', async(request, response) => {
   await database.putPostPin(request, response);
 });
 
-app.put('/forum/tags', async(request, response) => {
-  await database.getAllTags(request, response);
+app.put('/forum/tags/:tagId', async(request, response) => {
+  await database.putTag(request, response);
 });
 
 app.post('/forum/tags', async(request, response) => {

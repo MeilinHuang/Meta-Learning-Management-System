@@ -1358,6 +1358,10 @@
       "post": {
         "tags": ["Course Pages"],
         "summary": "Create new announcement",
+        "consumes": [
+          "multipart/form-data",
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "topicGroup",
@@ -1365,6 +1369,13 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "uploadFile",
+            "description": "File upload",
+            "in": "formData",
+            "type": "file",
+            "required": false
           },
           {
             "name": "announcementBody",

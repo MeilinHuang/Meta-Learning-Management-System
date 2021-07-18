@@ -157,15 +157,3 @@ VALUES(3, 2, 5, 1);
 INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll A', current_timestamp, current_timestamp, false, 'Poll type A');
 INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll B', current_timestamp, current_timestamp, false, 'Poll type B');
 INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll C', current_timestamp, current_timestamp, false, 'Poll type C');
-
-
-SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
-array_agg(DISTINCT user_admin.admin_id) as admin_list,
-array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
-array_agg(DISTINCT announcements.id) as announcements_list
-FROM topic_group tp_group 
-LEFT JOIN user_admin ON user_admin.topic_group_id = tp_group.id
-LEFT JOIN topics ON topics.topic_group_id = tp_group.id
-LEFT JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
-LEFT JOIN announcements ON topics.topic_group_id = announcements.topic_group
-GROUP BY tp_group.id
