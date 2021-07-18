@@ -34,7 +34,7 @@ function ForumOverviewPage() {
         fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
         fetch('http://localhost:8000/forum/pinned').then(r => r.json()).then(data => {
             setPinnedPosts(data)
-            setShowPinned(true)
+            setShowPinned(!!data.length)
         })
     }, [setPosts, setPinnedPosts, setShowPinned])
 
@@ -48,7 +48,7 @@ function ForumOverviewPage() {
         if (searchTerm === '') {
             fetch('http://localhost:8000/forum').then(r => r.json()).then(data => {
                 setPosts(data)
-                setShowPinned(true)
+                setShowPinned(!!data.length)
             })
             return
         }

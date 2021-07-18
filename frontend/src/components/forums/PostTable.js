@@ -13,7 +13,7 @@ import {
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri'
 import { StoreContext } from '../../utils/store'
 
-const getRow = ({ post_id, title, published_date, replies, comments, ispinned }, setPosts, setPinnedPosts) => {
+const getRow = ({ post_id, title, published_date, replies, comments, ispinned }, setPosts, setPinnedPosts, setShowPinned) => {
     const date = new Date(published_date)
     const dateString = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
 
@@ -24,6 +24,7 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned },
                     fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
                     fetch('http://localhost:8000/forum/pinned').then(r => r.json()).then(data => {
                         setPinnedPosts(data)
+                        setShowPinned(!!data.length)
                     })
                 }
             })
@@ -51,7 +52,7 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned },
 function PostTable({ isAdmin, posts: postData }) {
     const orderedPosts = [...postData].reverse()
     const context = useContext(StoreContext)
-    const { posts: [, setPosts], pinnedPosts: [, setPinnedPosts] } = context;
+    const { posts: [, setPosts], pinnedPosts: [, setPinnedPosts], showPinned: [, setShowPinned] } = context;
 
     return (
         <Table variant="simple">
@@ -65,7 +66,7 @@ function PostTable({ isAdmin, posts: postData }) {
                 </Tr>
             </Thead>
             <Tbody>
-                {orderedPosts.map(post => getRow(post, setPosts, setPinnedPosts))}
+                {orderedPosts.map(post => getRow(post, setPosts, setPinnedPosts, setShowPinned))}
             </Tbody>
         </Table>
     )
