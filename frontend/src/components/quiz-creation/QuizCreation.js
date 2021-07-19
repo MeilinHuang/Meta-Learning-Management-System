@@ -23,8 +23,10 @@ import {
           Text, 
           Textarea 
         } from "@chakra-ui/react"
+import DatePicker from "react-datepicker";
 
 import './QuizCreation.css'
+import "react-datepicker/dist/react-datepicker.css";
 
 // GET /quizzes
 const quizzes = {
@@ -303,10 +305,17 @@ const sampleQuiz = {
   ]
 }
 
+const topics = [
+  "Arrays",
+  "Variables",
+  "Linked lists",
+  "Functions"
+]
+
 function generateNewQuiz() {
   return {
     name: "New Quiz",
-    due_date: "2021-07-30 12:00:00-00",
+    due_date: new Date(),
     time_given: 30,
     num_questions: 0,
     questions: [
@@ -322,13 +331,11 @@ function generateNewQuestion() {
     related_topic_id: 0, // Obtained via GET /topics
     answers: [
       {
-        id: 1,
         answer_text: "answer1",
         is_correct: true,
         explanation: ""
       },
       {
-        id: 2,
         answer_text: "answer2",
         is_correct: false,
         explanation: ""
@@ -340,13 +347,11 @@ function generateNewQuestion() {
 const API_URL = "http://localhost:8000";
 
 export default function QuizCreation() {
-  // const [questionNumber, setQuestionNumber] = useState(1);
+  const [dueDate, setDueDate] = useState(new Date());
   const [questionText, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState("mc");
-  const [correctAnswers, setCorrectAnswers] = useState([""]); // can be one or multiple answers
   const [quiz, setQuiz] = useState({}); // list of dictionaries [{}, {}, ...]
   const [newQuestion, setNewQuestion] = useState({});
-  const [testValue, setTestValue] = useState("");
   const [isValidQuestion, setIsValidQuestion] = useState(true);
 
   useEffect(() => {
@@ -362,11 +367,7 @@ export default function QuizCreation() {
   }, []);
 
   const generateNewAnswer = () => {
-    // TODO: Change so ids aren't used anymore in newQuestion
-    const ans_id = newQuestion.answers.length + 5;
-  
     return {
-      id: ans_id,
       answer_text: "new_answer",
       is_correct: false,
       explanation: ""
@@ -378,7 +379,26 @@ export default function QuizCreation() {
       <Box>
         <Heading>New Question</Heading>
 
-        <Box my="5">
+        <Box mt="5">
+          <Text>Question text: </Text>
+          <Textarea placeholder="Enter question" onChange={onChangeQuestionText} value={newQuestion.question_text} />
+        </Box>
+
+        <Box my="3">
+          <Text>Marks awarded: </Text>
+          <Textarea placeholder="Enter number" onChange={onChangeQuestionText} value={newQuestion.question_text} />
+        </Box>
+
+        <Box my="3">
+          <Text>Related topic: </Text>
+          {/* TODO: Replace values with backend GET /topics */}
+          <Select defaultValue="0">
+            <option key="0" value="0">None</option>
+            {topics.map((t, i) => <option key={i} value={i}>{t}</option>)};
+          </Select>
+        </Box>
+
+        <Box my="3">
           <Text mb="1">Question type:</Text>
           <Select defaultValue="mc" onChange={onChangeQuestionType} value={newQuestion.question_type}>
             <option value="mc">Multiple choice</option>
@@ -387,31 +407,7 @@ export default function QuizCreation() {
           </Select>
         </Box>
 
-        <Box mb="3">
-          <Text>Question text: </Text>
-          <Textarea placeholder="Enter question" onChange={onChangeQuestionText} value={newQuestion.question_text} />
-        </Box>
         {renderPossibleAnswers(newQuestion)}
-      </Box>
-    );
-  };
-
-  const renderQuestionEntry = () => {
-    return (
-      <Box>
-        <Heading>Question</Heading>
-        <Box display="inline-flex">
-          <p>Question type:</p>
-          <Select defaultValue="Multiple choice" onChange={onChangeQuestionType} value={questionType}>
-            <option value="Multiple choice">Multiple choice</option>
-            <option value="Short answer">Short answer</option>
-            <option value="Checkboxes">Checkboxes</option>
-          </Select>
-        </Box>
-        
-        <Text>Question: </Text>
-        <Textarea placeholder="Enter question" onChange={(e) => setQuestionText(e.target.value)} value={questionText} />
-
       </Box>
     );
   };
@@ -421,17 +417,31 @@ export default function QuizCreation() {
       <Box>        
         <Heading>Quiz Details</Heading>
         <Box display="inline-flex">
-          <p>Name: </p>
+          <Text>Name: </Text>
           <Textarea placeholder="Enter quiz name" size="sm" onChange={(e) => setQuiz({ name: e.target.value })} value={quiz.name} />
         </Box>
-        <p>Due date: {quiz.due_date}</p> {/*TODO: Add date-picker dropdown */}
+
+        <Box d="flex">
+          <Text>Due date: </Text>
+          <DatePicker
+            selected={quiz.due_date}
+            onChange={onChangeDueDate}
+            showTimeSelect
+            dateFormat="Pp"
+          />
+        </Box>
+
         <p>Time given: {quiz.time_given}</p>
         <p>Number of questions: {quiz.num_questions}</p>
       </Box>
     );
   }
 
-  const getDefaultAnswers = (questionType) => {
+  const onChangeDueDate = (date) => {
+    quiz.due_date = date;
+  }
+
+  const getDefaultAnswers = () => {
     let defaultAnswers = [];
 
     // Reset answers based on question type
@@ -491,8 +501,7 @@ export default function QuizCreation() {
   };
 
   const onChangeQuestionType = (e) => {
-    const defaultAnswers = getDefaultAnswers(e.target.value);
-
+    const defaultAnswers = getDefaultAnswers();
     setNewQuestion({ ...newQuestion, question_type: e.target.value, answers: defaultAnswers });
   };
 
@@ -501,15 +510,6 @@ export default function QuizCreation() {
   };
 
   const addPossibleAnswer = () => {
-    /*
-    let newAnswers = newQuestion.answers.concat({
-      id: newQuestion.answers.length + 1,
-      answer_text: "new answer",
-      is_correct: false,
-      explanation: ""
-    })
-    */
-
     const newAns = generateNewAnswer();
     const newAnsList = newQuestion.answers.concat(newAns);
 
@@ -552,125 +552,40 @@ export default function QuizCreation() {
   };
 
   const renderQuestionText = () => {
-    return (
-      <>
-      <Textarea placeholder="Enter question" onChange={(e) => setQuestionText(e.target.value)} value={questionText} />
-      </>
-    );
-  };
-
-  const handleChangeCorrectAnswers = () => {
-    // Multiple choice & 
-
-    // Short answer
-
-    // Checkboxes
-  };
-
-  const handleChangeCorrectAnswer = (ans) => {
-
+    return <Textarea placeholder="Enter question" onChange={(e) => setQuestionText(e.target.value)} value={questionText} />
   };
 
   const getCorrectAnswers = () => {
-
     if (newQuestion.question_type === "mc")
     {
-      // TODO
       let foundCorrectAnswerIndex = newQuestion.answers.findIndex(a => a.is_correct);
-      console.log("Correct answers: " + foundCorrectAnswerIndex);
-      return foundCorrectAnswerIndex.toString(); // TODO: Check why this works when it's not a list
+      return foundCorrectAnswerIndex.toString();
     }
-    else if (newQuestion.question_type === "sa")
+
+    if (newQuestion.question_type === "sa")
     {
-      if (newQuestion.answers.length > 0)
-      {
-        return newQuestion.answers[0].answer_text;
-      }
-      else {
-        return "";
-      }
+      const suggestedAnswer = (newQuestion.answers.length > 0) ? newQuestion.answers[0].answer_text : "";
+      return suggestedAnswer;
     }
-    else if (newQuestion.question_type === "cb")
+
+    if (newQuestion.question_type === "cb")
     {
-      // TODO
-      let correctAnswersList = [];
+      let correctAnswers = [];
       newQuestion.answers.forEach((answer, index) => {
         if (answer.is_correct)
         {
-          correctAnswersList.push(index.toString());
+          correctAnswers.push(index.toString());
         }
       });
 
-      return correctAnswersList;
+      return correctAnswers;
     }
-    else {
-      return ['undefined'];
-    }
-  };
 
-  const onChangeCheckboxAnswer1 = (e) => {
-    const newAnswers = newQuestion.answers.map(a => (a.id === e.target.valueAsNumber) ? { ...a, is_correct: false } : { ...a });
-    setNewQuestion({ ...newQuestion, answers: newAnswers });
-  };
-
-  const onChangeCorrectAnswers = (e) => {
-    /*
-    let newAnswers;
-    
-    if (newQuestion.question_type === "mc")
-    { 
-      newAnswers = newQuestion.answers.map(a => (a.id === e.toString()) ? { ...a, is_correct: true } : { ...a, is_correct: false });
-      setNewQuestion({ ...newQuestion, answers: newAnswers });
-    }
-    else if (newQuestion.question_type === "sa")
-    {
-      newAnswers = newQuestion.answers.map(a => (a.id === e.target.valueAsNumber) ? { ...a, is_correct: true } : { ...a, is_correct: false });
-      setNewQuestion({ ...newQuestion, answers: newAnswers });
-    }
-    else if (newQuestion.question_type === "cb")
-    {
-      newAnswers = newQuestion.answers.map(a => (e.target.value.includes(a.id)) ? { ...a, is_correct: true } : { ...a, is_correct: false });
-      setNewQuestion({ ...newQuestion, answers: newAnswers });
-    }
-    */
-
-    if (newQuestion.question_type === "mc")
-    { 
-      setCorrectAnswers([e]);
-    }
-    else if (newQuestion.question_type === "sa")
-    {
-      setCorrectAnswers([e.target.value]);
-    }
-    else if (newQuestion.question_type === "cb")
-    {
-      setCorrectAnswers(e);
-    }
-  };
-
-  const onChangeCorrectAnswers2 = (e) => {
-    let newAnswers;
-    
-    if (newQuestion.question_type === "mc")
-    { 
-      newAnswers = newQuestion.answers.map(a => (a.id === e.toString()) ? { ...a, is_correct: true } : { ...a, is_correct: false });
-      setNewQuestion({ ...newQuestion, answers: newAnswers });
-    }
-    else if (newQuestion.question_type === "sa")
-    {
-      newAnswers = newQuestion.answers.map(a => (a.id === e.target.valueAsNumber) ? { ...a, is_correct: true } : { ...a, is_correct: false });
-      setNewQuestion({ ...newQuestion, answers: newAnswers });
-    }
-    else if (newQuestion.question_type === "cb")
-    {
-      newAnswers = newQuestion.answers.map(a => (e.target.value.includes(a.id)) ? { ...a, is_correct: true } : { ...a, is_correct: false });
-      setNewQuestion({ ...newQuestion, answers: newAnswers });
-    }
+    return [""];
   };
 
   const onChangeRadioAnswer = (e) => {
     const newAnswers = newQuestion.answers.map((answer, index) => (index === +e) ? { ...answer, is_correct: true } : { ...answer, is_correct: false });
-    // console.log(newAnswers);
     setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
 
@@ -680,7 +595,6 @@ export default function QuizCreation() {
   };
 
   const onChangeCheckboxAnswer = (idx) => (e) => {
-    // const newAnswers = newQuestion.answers.map((answer, index) => (e.includes(index)) ? { ...answer, is_correct: true } : { ...answer, is_correct: false });
     const newAnswers = newQuestion.answers.map((answer, index) => (index === idx) ? { ...answer, is_correct: e.target.checked } : answer);
     setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
@@ -689,32 +603,10 @@ export default function QuizCreation() {
     const newAnswers = newQuestion.answers.map((answer, index) => (index === idx) ? { ...answer, answer_text: e.target.value } : answer);
     setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
-
-  const deleteAnswer = (idx) => {
-
-  };
-
-  const renderAnswerItem = (ans) => {
-    let answerItem;
-
-    if (newQuestion.question_type === "mc")
-    {
-      // Multiple choice
-      answerItem = <Radio key={ans.id} value={ans.id.toString()} onChange={onChangeRadioAnswer} />
-    }
-    else if (newQuestion.question_type === "sa")
-    {
-      // Short answer
-      answerItem = <Textarea onChange={onChangeShortAnswer} value={correctAnswers[0]} />
-    }
-    else if (newQuestion.question_type === "cb")
-    {
-      // Checkboxes
-      answerItem = <Checkbox key={ans.id} value={ans.id.toString()} onChange={onChangeCheckboxAnswer} />
-    }
-
-    return answerItem;
-  }
+  
+  const onClickAddExplanation = (idx) => {
+    // TODO: Open up explanation textarea box to edit and cancel/save
+  }; 
 
   const renderPossibleAnswers = (question) => {
     if (question.question_type === "mc")
@@ -735,17 +627,30 @@ export default function QuizCreation() {
                       value={ans.answer_text}
                       onChange={onChangeAnswerText(+i)}
                     />
-                    <InputRightElement width="6rem" zIndex="0">
-                      <Button
-                        colorScheme="red"
-                        variant="outline"
-                        size="sm"
-                        height="1.75rem"
-                        onClick={() => deletePossibleAnswer(+i)}
-                        // isDisabled={question.answers.length <= 2}
-                      >
-                        Delete
-                      </Button>
+                    <InputRightElement width="15rem" zIndex="0">
+                      <Box d="flex">
+                        <Button
+                          colorScheme="blue"
+                          variant="outline"
+                          size="sm"
+                          height="1.75rem"
+                          mr="3"
+                          onClick={() => onClickAddExplanation(+i)}
+                          // isDisabled={question.answers.length <= 2}
+                        >
+                          Add explanation
+                        </Button>
+                        <Button
+                          colorScheme="red"
+                          variant="outline"
+                          size="sm"
+                          height="1.75rem"
+                          onClick={() => deletePossibleAnswer(+i)}
+                          // isDisabled={question.answers.length <= 2}
+                        >
+                          Delete
+                        </Button>
+                      </Box>
                     </InputRightElement>
                   </InputGroup>
                 </FormControl>
@@ -757,7 +662,6 @@ export default function QuizCreation() {
     }
     else if (question.question_type === "sa")
     {
-
       // Text box
       return (
         <Box>
@@ -787,17 +691,30 @@ export default function QuizCreation() {
                       value={ans.answer_text}
                       onChange={onChangeAnswerText(+i)}
                     />
-                    <InputRightElement width="6rem" zIndex="0">
-                      <Button
-                        colorScheme="red"
-                        variant="outline"
-                        size="sm"
-                        height="1.75rem"
-                        onClick={() => deletePossibleAnswer(+i)}
-                        // isDisabled={question.answers.length <= 2}
-                      >
-                        Delete
-                      </Button>
+                    <InputRightElement width="15rem" zIndex="0">
+                      <Box d="flex">
+                          <Button
+                            colorScheme="blue"
+                            variant="outline"
+                            size="sm"
+                            height="1.75rem"
+                            mr="3"
+                            onClick={() => onClickAddExplanation(+i)}
+                            // isDisabled={question.answers.length <= 2}
+                          >
+                            Add explanation
+                          </Button>
+                          <Button
+                            colorScheme="red"
+                            variant="outline"
+                            size="sm"
+                            height="1.75rem"
+                            onClick={() => deletePossibleAnswer(+i)}
+                            // isDisabled={question.answers.length <= 2}
+                          >
+                            Delete
+                          </Button>
+                        </Box>
                     </InputRightElement>
                   </InputGroup>
                 </FormControl>
@@ -808,13 +725,12 @@ export default function QuizCreation() {
       );
     }
       
-    return (<p>Possible answers were not fetched properly</p>);
+    return (<Text color="gray.500">Possible answers were not fetched properly</Text>);
   };
 
   const resetQuestionFields = () => {
     // TODO: Fix this
-    const defaultAnswers = getDefaultAnswers(newQuestion.question_type);
-
+    const defaultAnswers = getDefaultAnswers();
     setNewQuestion({ ...newQuestion, answers: defaultAnswers });
   };
 
@@ -827,32 +743,6 @@ export default function QuizCreation() {
   };
 
   const printCorrectAnswers = () => {
-    /*
-    const correctAnswers = getCorrectAnswers();
-    if (!isNaN(correctAnswers))
-    {
-      return (
-        <>
-          <p>{correctAnswers}</p>
-        </>
-      )
-    }
-    else if (Array.isArray(correctAnswers))
-    {
-      return (
-        <>
-          {correctAnswers.map(a => {return <p key={a.id}>{a}</p>})}
-        </>
-      )
-    }
-    else {
-      return (
-        <p>Correct answers could not be found: {typeof correctAnswers} {correctAnswers}</p>
-      )
-    }
-    */
-  //  return (<>{correctAnswers.map(a => {return <p key={a.id}>{a}</p>})}</>);
-
     const correctAnswersList = [];
 
     newQuestion?.answers?.forEach(ans => {
@@ -878,25 +768,20 @@ export default function QuizCreation() {
 
   return (
     <Box w="40%" margin="auto" top={0} right={0} left={0} bottom={0}>
-      {/* {renderQuizDetails()} */}
+      {renderQuizDetails()}
       {renderNewQuestionEntry()}
 
-      {!isValidQuestion && printInvalidQuestionError()}
+      {/* {!isValidQuestion && printInvalidQuestionError()} */}
 
       <Box d="flex" justifyContent="flex-end" mt="6">
         {newQuestion.question_type !== "sa" && <Button colorScheme="orange" variant="solid" mr="8" onClick={addPossibleAnswer}>Add new answer</Button>}
-        {/* Add question button */}
+        {/* <Button colorScheme="blue" variant="solid" mr="8" onClick={resetQuestionFields}>Reset fields</Button> */}
+
         <Button colorScheme="teal" variant="solid" onClick={addQuestionToQuiz}>Add to quiz</Button>
       </Box>
 
-
-      {/* <Button colorScheme="blue" variant="solid" onClick={resetQuestionFields}>Reset fields</Button> */}
-
-      {/* <Button colorScheme="red" variant="solid" onClick={createNewQuestion}>Create new question</Button> */}
-
-      {/* <p style={{ color: "red" }}>Correct answer will be: </p> */}
-      {/* {printCorrectAnswers()} */}
-    
+      <p style={{ color: "red" }}>Correct answer will be: </p>
+      {printCorrectAnswers()}
 
       {/* <Heading>Questions</Heading> */}
       {/* {renderQuiz()} */}
