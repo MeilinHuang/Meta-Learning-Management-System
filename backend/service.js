@@ -264,7 +264,7 @@ async function deleteTopic(request, response) {
     response.status(400).json({error: "Could not find topic in database"});
     return;
   }
-  let topicId = tmp.rows[0];
+  let topicId = tmp.rows[0].id;
   await pool.query(`DELETE FROM prerequisites WHERE topic = $1 or prereq = $1`, [topicId]);
   await pool.query(`DELETE FROM topics WHERE id = $1`, [topicId]);
   response.status(200).json({ success: true, topicId: topicId});

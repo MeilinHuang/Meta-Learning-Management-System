@@ -2455,26 +2455,42 @@
               "$ref": "#/definitions/403"
             }
           }
-        },
-        "delete": {
-          "tags": ["Topic Tree"],
-          "summary": "Delete a topic",
-          "responses": {
-            "200": {
-              "description": "OK",
-              "schema": {
-                "$ref": "#/definitions/Topic"
-              }
-            },
-            "400": {
-              "schema": { 
-                "$ref": "#/definitions/400"
-              }
-            },
-            "403": {
-              "schema": {
-                "$ref": "#/definitions/403"
-              }
+        }
+      },
+      "delete": {
+        "tags": ["Topic Tree"],
+        "summary": "Delete a topic",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "required": true,
+            "description": "Name of topic group",
+            "type": "string"
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "required": true,
+            "description": "Name of new topic",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Topic"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
             }
           }
         }
