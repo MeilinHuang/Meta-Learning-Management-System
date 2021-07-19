@@ -2,7 +2,9 @@ import React, { useState } from "react"
 import Header from "../components/Header.js"
 import Sidebar from "../components/Sidebar.js"
 import WidgetsBar from "../components/WidgetsBar.js"
+import AnnouncementPage from "../pages/AnnouncementPage.js"
 import CourseContentPage from "../pages/CourseContentPage.js"
+import CourseDashboard from "../pages/CourseDashboard.js"
 import ForumOverviewPage from "../pages/ForumOverviewPage.js"
 import ForumPostPage from '../pages/ForumPostPage'
 import {
@@ -55,6 +57,8 @@ function CoursePage() {
                 <Container marginTop={50} mx={{ base: "0", md: "24px"}} maxWidth="100%">
                     <Switch>
                         {/* Add your page as a Route here */}
+                        <Route exact path="/" component={CourseDashboard} />
+                        <Route exact path="/announcement/:id" component={AnnouncementPage} />
                         <Route exact path="/forums" component={ForumOverviewPage} />
                         <Route exact path="/content"><CourseContentPage /></Route>
                         <Route exact path="/forums/:id" component={ForumPostPage} />
