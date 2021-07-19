@@ -6,7 +6,6 @@ import {
     BrowserRouter as Router,
     Switch,
     Route,
-    Redirect,
 } from "react-router-dom"
 import TopicTree from "./components/topictree/TopicTree.js"
 

@@ -1,9 +1,8 @@
 import React from "react"
-import { Flex, Box, Input, InputGroup, InputLeftElement, Center, Divider, Container, Avatar, Menu, MenuButton, MenuList, MenuItem, Portal, Heading} from "@chakra-ui/react"
-import { HamburgerIcon, ChevronDownIcon, ChevronRightIcon, SearchIcon } from '@chakra-ui/icons'
+import { Flex, Box, Divider, Avatar, Menu, MenuButton, MenuList, MenuItem, Portal, Heading} from "@chakra-ui/react"
+import { HamburgerIcon, ChevronDownIcon, ChevronRightIcon} from '@chakra-ui/icons'
 
-function Header({sideBarLinks, setOpen}) {
-
+function Header({setOpen}) {
     return (
         <Box height="100%">
             <Flex bg="blue.500" height={55}>
@@ -28,17 +27,8 @@ function Header({sideBarLinks, setOpen}) {
                         <MenuItem>COMP1531</MenuItem>
                     </MenuList>
                 </Menu>
-                <Flex grow={1}>
-                    <Center height="100%" width="100%">
-                        <Container>
-                            <InputGroup variant="filled">
-                                <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
-                                <Input placeholder="Search"></Input>
-                            </InputGroup>
-                        </Container>
-                        <Divider orientation="vertical"></Divider>
-                    </Center>
-                </Flex>
+                <Flex grow={1}></Flex>
+                <Divider orientation="vertical"></Divider>
                 <Flex>
                     <Flex align="center" paddingInline={5} margin={0}>
                         <Menu isLazy>
