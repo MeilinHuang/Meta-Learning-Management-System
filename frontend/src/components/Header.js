@@ -6,7 +6,7 @@ import { HamburgerIcon, ChevronDownIcon, ChevronRightIcon, SearchIcon } from '@c
 function Header({sideBarLinks, setOpen}) {
     const [loggedIn, setLoggedIn] = useState(sessionStorage.getItem('token')!==null)
     const history = useHistory()
-
+    
     return (
         <Box height="100%">
             <Flex bg="blue.500" height={55}>
@@ -31,17 +31,8 @@ function Header({sideBarLinks, setOpen}) {
                         <MenuItem>COMP1531</MenuItem>
                     </MenuList>
                 </Menu>
-                <Flex grow={1}>
-                    <Center height="100%" width="100%">
-                        <Container>
-                            <InputGroup variant="filled">
-                                <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
-                                <Input placeholder="Search"></Input>
-                            </InputGroup>
-                        </Container>
-                        <Divider orientation="vertical"></Divider>
-                    </Center>
-                </Flex>
+                <Flex grow={1}></Flex>
+                <Divider orientation="vertical"></Divider>
                 <Flex>
                     <Flex align="center" paddingInline={5} margin={0}>
                         <Menu isLazy>
