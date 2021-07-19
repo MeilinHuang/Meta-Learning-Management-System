@@ -5,10 +5,11 @@ import { ChakraProvider } from "@chakra-ui/react"
 import {
     BrowserRouter as Router,
     Switch,
-    Route,
-    Redirect,
+    Route
 } from "react-router-dom"
 import TopicTree from "./components/topictree/TopicTree.js"
+import LoginForm from "./components/login/LoginForm";
+import CourseInvite from "./components/enrollment/JoinCourse";
 
 function App() {
     return (
@@ -16,6 +17,8 @@ function App() {
             <Router>
                 <Switch>
                     <Route exact path="/topictree"><TopicTree /></Route>
+                    <Route exact path="/login"><LoginForm /></Route>
+                    <Route path="/invite/:code?"><CourseInvite/></Route>
                     <Route path="/" ><CoursePage /></Route>
                 </Switch>
             </Router>

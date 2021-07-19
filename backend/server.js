@@ -21,9 +21,13 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
                        Auth Functions
 ***************************************************************/
 
-app.post('/auth/login');
+app.post('/auth/login', async(request, response) => {
+  await database.login(request, response);
+})
 
-app.post('/auth/logout');
+app.post('/auth/register', async(request, response) => {
+  await database.register(request, response);
+})
 
 /***************************************************************
                        User Functions
@@ -77,6 +81,16 @@ app.delete('/topicGroup/:topicGroupName', async(request, response) => {
 app.post('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
   await database.postTopic(request, response);
 })
+
+/***************************************************************
+                    Enrollment Functions
+***************************************************************/
+
+app.post('/enroll/code/:topicGroupName', async (request, response) => {
+  await database.generateCode(request, response)
+})
+
+app.put('/enroll/code/:inviteCode')
 
 /***************************************************************
                        Forum Functions

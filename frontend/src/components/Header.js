@@ -1,8 +1,11 @@
-import React from "react"
+import React, { useState } from "react"
+import { useHistory } from "react-router-dom"
 import { Flex, Box, Input, InputGroup, InputLeftElement, Center, Divider, Container, Avatar, Menu, MenuButton, MenuList, MenuItem, Portal, Heading} from "@chakra-ui/react"
 import { HamburgerIcon, ChevronDownIcon, ChevronRightIcon, SearchIcon } from '@chakra-ui/icons'
 
 function Header({sideBarLinks, setOpen}) {
+    const [loggedIn, setLoggedIn] = useState(sessionStorage.getItem('token')!==null)
+    const history = useHistory()
 
     return (
         <Box height="100%">
@@ -54,7 +57,12 @@ function Header({sideBarLinks, setOpen}) {
                                 <MenuList>
                                     <MenuItem>Profile</MenuItem>
                                     <MenuItem>Settings</MenuItem>
-                                    <MenuItem>Logout</MenuItem>
+                                    {loggedIn
+                                    ? <MenuItem onClick={() => {history.push('/login')}}>Login</MenuItem> 
+                                    : <MenuItem onClick={() => {
+                                        sessionStorage.removeItem('token')
+                                        setLoggedIn(false)
+                                    }}>Logout</MenuItem>}
                                 </MenuList>
                             </Portal>
                         </Menu>

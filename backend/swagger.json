@@ -33,6 +33,10 @@
       "description": "API for Course Pages feature"
     },
     {
+      "name": "Enrollment",
+      "description": "Endpoints for enrolling users into topics"
+    },
+    {
       "name": "Gamification",
       "description": "API for Gamification feature"
     },
@@ -1157,7 +1161,7 @@
         }
       }
     },
-    "/login": {
+    "/auth/login": {
       "post": {
         "tags": ["Authentication"],
         "summary": "Logs in the user",
@@ -1173,7 +1177,145 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/LoginReturn"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Registers a new user",
+        "parameters": [
+          {
+            "name": "registerBody",
+            "in": "body",
+            "description": "Register Body",
+            "schema": {
+              "$ref": "#/definitions/RegisterBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/LoginReturn"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/enroll/code/{topicGroupName}": {
+      "post" : {
+        "tags": ["Enrollment"],
+        "summary": "Generate an enroll code for a topic group",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "description": "Bearer [Token]",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhheWRlbkB1bnN3LmVkdS5hdSIsImlhdCI6MTYwMzk0MzIzMH0.b37PfwlcH_cue6yhgvDt2IiNvhRACf79hTNtacYB94Q"
+            }
+          },
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "required": true,
+            "description": "Name of topic group"
+          },
+          {
+            "name": "codeGenBody",
+            "in": "body",
+            "description": "Code Generation Body - BOTH OPTIONAL",
+            "schema": {
+              "properties": {
+                "uses": {
+                  "type": "integer",
+                  "example": "5"
+                },
+                "expiration": {
+                  "type": "integer",
+                  "example": "10"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/200"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/enroll/code/{inviteCode}": {
+      "put" : {
+        "tags": ["Enrollment"],
+        "summary": "Enrolls a user in a topic group from a join code",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "description": "Bearer [Token]",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhheWRlbkB1bnN3LmVkdS5hdSIsImlhdCI6MTYwMzk0MzIzMH0.b37PfwlcH_cue6yhgvDt2IiNvhRACf79hTNtacYB94Q"
+            }
+          },
+          {
+            "name": "inviteCode",
+            "in": "path",
+            "required": true,
+            "description": "The invite code of the topic group to enrol the user in"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/200"
+            }
           },
           "400": {
             "schema": { 
@@ -3793,6 +3935,47 @@
               }
             }
           }
+        }
+      }
+    },
+    "LoginBody": {
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "test@test.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "P@ssw0rd"
+        }
+      }
+    },
+    "RegisterBody": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "John Smith"
+        },
+        "email": {
+          "type": "string",
+          "example": "test@test.com"
+        },
+        "zid": {
+          "type": "string",
+          "example": "z12345678"
+        },
+        "password": {
+          "type": "string",
+          "example": "P@ssw0rd"
+        }
+      }
+    },
+    "LoginReturn": {
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "JWT Token to provide Authorization",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ6aWQiOiJ6NTE2NjEwNiIsImlhdCI6MTYyNjU3MTkxOH0.U1MUr74yULrROmLbZf5a3TPI-lkMXo9TCkzOUqVvtCI"
         }
       }
     },

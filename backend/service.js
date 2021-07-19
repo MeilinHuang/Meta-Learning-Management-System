@@ -1,7 +1,101 @@
-
+const jwt = require('jsonwebtoken');
 const pool = require('./db/database');
 
-// TODO : ADD AUTH AND JWTOKEN
+const JWT_SECRET = 'metalms'
+
+/***************************************************************
+                       Auth Functions
+***************************************************************/
+async function getZIdFromAuthorization (auth){
+  try {
+    const token = auth.replace('Bearer ', '')
+    const zId = jwt.verify(token, JWT_SECRET).zid
+
+    resp = await pool.query(
+      `SELECT zId, email, password FROM users
+      where zId = '${zId}'`
+    )
+    if (resp.rows.length === 0) { throw "Invalid Token" }
+
+    return zId
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+async function login(request, response) {
+  let email = request.body.email
+  let password = request.body.password
+
+  try {
+    resp = await pool.query(
+      `SELECT zId, email, password FROM users
+      where email = '${email}'`
+    )
+    //If no matching email
+    if (resp.rows.length != 1) {
+      response.status(400).send('Incorrect Login Details')
+      throw "Incorrect Login Details"
+    }
+    //If password incorrect
+    if (password !== resp.rows[0].password) {
+      response.status(400).send('Incorrect Login Details')
+      throw "Incorrect Login Details"
+    } 
+
+    //Do login
+    let zid = resp.rows[0].zid
+    let token = jwt.sign({ zid }, JWT_SECRET, { algorithm: 'HS256', })
+    response.status(200).send({ 'token':token })
+    
+
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+async function register(request, response) {
+  let name = request.body.name
+  let email = request.body.email
+  let zid = request.body.zid
+  let password = request.body.password
+
+  try {
+    resp = await pool.query(
+      `SELECT zId, email, password FROM users
+      where email = '${email}'`
+    )
+    console.log(resp)
+    //If an existing email
+    if (resp.rows.length > 0) {
+      response.status(400).send('An account already exists with this email')
+      throw "an account already exists with this email"
+    }
+
+    resp = await pool.query(
+      `SELECT zId, email, password FROM users
+      where zId = '${zid}'`
+    )
+    //If an existing zid
+    if (resp.rows.length > 0) {
+      response.status(400).send('An account already exists with this zId')
+      throw "an account already exists with this zId"
+    }
+
+    resp = await pool.query(
+      `INSERT INTO users VALUES(default, $1, $2, $3, $4)`, 
+      [name, email, password, zid]
+    )
+
+    //Do login
+    let token = jwt.sign({ zid }, JWT_SECRET, { algorithm: 'HS256', })
+    response.status(200).send({ 'token':token })
+
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 
 /***************************************************************
                        User Functions
@@ -258,6 +352,85 @@ async function postTopic (request, response) {
     [topicGroupId, topicName]);
 
   response.status(200).send(`Topic created with name: ${topicGroupName}`)
+}
+
+
+/***************************************************************
+                    Enrollment Functions
+***************************************************************/
+/**
+ * Generates a random alphanumeric string of a specified lenght
+ * @param {number} the length of the required string 
+ * @returns a random alphanumeric string
+ */
+const randomString = (length) => {
+  let result = ''
+  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmonpqrstuvwxyz0123456789'
+  let charactersLength = characters.length
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+  }
+
+  return result;
+}
+
+
+async function generateCode (request, response) {
+  const topicGroupName = request.params.topicGroupName
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header('Authorization'))
+    if (zId == null) {
+      response.status(403).send({ error:"Invalid Token" })
+      throw "Invalid Token"
+    }
+    //TODO check if zid is admin
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(
+      `SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]
+    )
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`)
+      throw `No topic group with name ${topicGroupName}`
+    }
+    const topicGroupId = resp.rows[0].id
+
+    //generate a code, insert into db
+    const code = randomString(8) // TODO check code uniqueness
+
+    // TODO figure out optional parameters
+
+    if (request.body.hasOwnProperty('uses')) {
+      const uses = request.body.uses
+      if (request.body.hasOwnProperty('expiration')) {
+        const expiration = request.body.expiration
+        let insResp = await pool.query(
+          `INSERT INTO enroll_codes(id, code, topic_group_id, uses, expiration) VALUES(default, $1, $2, $3, $4)`, [code, topicGroupId, uses, expiration]
+        )
+      } else {
+        let insResp = await pool.query(
+          `INSERT INTO enroll_codes(id, code, topic_group_id, uses) VALUES(default, $1, $2, $3)`, [code, topicGroupId, uses]
+        )
+      }
+    } else {
+      if (request.body.hasOwnProperty('expiration')) {
+        const expiration = request.body.expiration
+        let insResp = await pool.query(
+          `INSERT INTO enroll_codes(id, code, topic_group_id, expiration) VALUES(default, $1, $2, $3)`, [code, topicGroupId, expiration]
+        )
+      } else {
+        let insResp = await pool.query(
+          `INSERT INTO enroll_codes(id, code, topic_group_id) VALUES(default, $1, $2)`, [code, topicGroupId]
+        )
+      }
+    }
+    //return the code
+    response.status(200).send(code)
+
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 /***************************************************************
@@ -1597,5 +1770,9 @@ module.exports = {
   putLevel,
   deleteLevel,
   postLevel,
-  postQuizQuestion
+  postQuizQuestion,
+  login,
+  register,
+  getZIdFromAuthorization,
+  generateCode
 };

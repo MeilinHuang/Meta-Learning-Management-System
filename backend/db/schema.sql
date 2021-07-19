@@ -62,6 +62,15 @@ CREATE TABLE IF NOT EXISTS "topic_files" (
   due_date TIMESTAMP
 );
 
+DROP TABLE IF EXISTS "enroll_codes" CASCADE;
+CREATE TABLE IF NOT EXISTS "enroll_codes" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  code TEXT NOT NULL,
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
+  uses INTEGER,
+  expiration INTEGER
+);
+
 CREATE INDEX prereq_idx ON prerequisites(prereq);
 CREATE INDEX topic_idx ON prerequisites(topic);
 
