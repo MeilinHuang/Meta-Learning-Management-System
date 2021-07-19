@@ -2234,6 +2234,103 @@
         }
       }
     },
+    "/forum/post/endorse/{postId}/{isEndorsed}": {
+      "put": {
+        "tags": ["Forums"],
+        "summary": "Endorses or un-endorses post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Id of post we want to endorse/un-endorse",
+            "type": "integer"
+          },
+          {
+            "name": "isEndorsed",
+            "in": "path",
+            "required": true,
+            "description": "Set isEndorsed to true or false",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/like/{postId}": {
+      "put": {
+        "tags": ["Forums"],
+        "summary": "Adds upvote for post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Id of post we want to add upvote for",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/unlike/{postId}": {
+      "put": {
+        "tags": ["Forums"],
+        "summary": "Removes upvote for post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Id of post we want to remove upvote for",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
     "/{topicGroup}/remove-level/{level}": {
       "delete": {
         "tags": ["Gamification"],
@@ -2951,6 +3048,18 @@
           "type": "boolean",
           "example": true
         },
+        "related_link": {
+          "type": "string",
+          "example": "/content"
+        },
+        "num_of_upvotes": {
+          "type": "integer",
+          "example": 3
+        },
+        "isEndorsed": {
+          "type": "boolean",
+          "example": true
+        },
         "tags": {
           "type": "array",
           "items": {
@@ -3328,6 +3437,18 @@
               "isPinned": {
                 "type": "boolean",
                 "example": true
+              },
+              "related_link": {
+                "type": "string",
+                "example": "/content"
+              },
+              "num_of_upvotes": {
+                "type": "integer",
+                "example": 3
+              },
+              "isEndorsed": {
+                "type": "boolean",
+                "example": true
               }
             }
           }
@@ -3367,6 +3488,10 @@
               }
             }
           }
+        },
+        "related_link": {
+          "type": "string",
+          "example": "/content"
         }
       }
     },

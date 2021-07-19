@@ -72,7 +72,10 @@ CREATE TABLE IF NOT EXISTS "forum_posts" (
   author TEXT NOT NULL,
   published_date TIMESTAMP,
   description TEXT,
-  isPinned BOOLEAN NOT NULL
+  isPinned BOOLEAN NOT NULL,
+  related_link TEXT,
+  num_of_upvotes INTEGER NOT NULL,
+  isEndorsed BOOLEAN NOT NULL
 );
 
 DROP TABLE IF EXISTS "tags" CASCADE;
