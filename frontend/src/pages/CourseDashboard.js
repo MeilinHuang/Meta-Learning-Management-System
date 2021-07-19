@@ -77,7 +77,7 @@ function CourseDashboard() {
                     </Box>
                 </Center>
             </Flex>
-            {announcements.map(announcement => <Announcement announcement={announcement} />)}
+            {announcements.map(announcement => <Announcement announcement={announcement} course={dummyCourse} setAnnouncements={setAnnouncements} />)}
         </>
     )
 }
