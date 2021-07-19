@@ -843,9 +843,8 @@ async function postAnnouncement (request, response) {
   const postDate = request.body.postDate;
   const attachments = request.body.attachments;
 
-  /* for (const file of request.files) {
-    console.log(file);
-  } */
+  console.log(author);
+  console.log(request.files);
 
   try {
     let resp = await pool.query(
