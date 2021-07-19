@@ -177,8 +177,8 @@ CREATE TABLE "announcement_comment" (
 DROP TABLE IF EXISTS "announcement_files" CASCADE;
 CREATE TABLE "announcement_files" (
   id SERIAL NOT NULL PRIMARY KEY,
-  name TEXT NOT NULL,
-  file_id TEXT NOT NULL,
+  name TEXT NOT NULL, 
+  file BYTEA NOT NULL,
   announcement_id INTEGER NOT NULL REFERENCES announcements(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -190,7 +190,7 @@ CREATE TABLE "announcement_comment_files" (
   comment_id INTEGER NOT NULL REFERENCES announcement_comment(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- Gamification
+/* -- Gamification
 DROP TABLE IF EXISTS "levels" CASCADE;
 CREATE TABLE "levels" (
   id SERIAL PRIMARY KEY,
@@ -227,7 +227,7 @@ CREATE TABLE "topic_group_levels" (
   Topic_Group_ID INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
   LevelsId INTEGER NOT NULL REFERENCES levels(id) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY (topic_group_id, LevelsId)
-);
+); */
 
 -- Assessment 
 DROP TABLE IF EXISTS "quiz" CASCADE;

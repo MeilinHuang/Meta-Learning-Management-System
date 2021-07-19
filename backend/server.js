@@ -149,6 +149,10 @@ app.put('/forum/tags/:tagId', async(request, response) => {
   await database.putTag(request, response);
 });
 
+app.put('/forum/tags', async(request, response) => {
+  await database.getAllTags(request, response);
+});
+
 app.post('/forum/tags', async(request, response) => {
   await database.postTag(request, response);
 });

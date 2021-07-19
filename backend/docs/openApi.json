@@ -2035,7 +2035,7 @@
         },
         "x-codegen-request-body-name": "announcementBody"
       }
-    },
+    }, 
     "/{topicGroup}/announcement/{announcementId}": {
       "get": {
         "tags": [
