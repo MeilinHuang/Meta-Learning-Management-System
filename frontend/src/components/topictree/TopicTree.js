@@ -2,9 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import './TopicTree.css';
 import TopicTreeHeader from "./TopicTreeHeader.js"
+import { Spinner } from '@chakra-ui/spinner';
+import { Button, Text, Heading, Box, Input, Flex, InputGroup, InputLeftElement, Stack, Divider } from '@chakra-ui/react';
+import { SearchIcon, ArrowRightIcon } from '@chakra-ui/icons'
 import TopicTreeViewResource from "./TopicTreeViewResource.js"
 import { useDisclosure } from '@chakra-ui/hooks';
-import { backend_url, get_topics_url } from '../../Constants.js';
+import { backend_url, get_topics_url, get_topic_groups } from '../../Constants.js';
 
 var g;
 var svg
@@ -14,6 +17,9 @@ function zoomed() {
 }
 
 export default function TopicTree() {
+
+    const [view, setView] = useState("Graph View")
+
     const ref = useRef();
     const dataset = [100, 200, 300, 400, 500];
     const [data, setData] = useState([]);
@@ -107,7 +113,7 @@ export default function TopicTree() {
         let prereqs = [];
         for (let i = 0; i < data.nodes.length; i++) {
             for (let j = 0; j < linksArray.length; j++) {
-                if (data.nodes[i].id == linksArray[j]) {
+                if (data.nodes[i].id === linksArray[j]) {
                     prereqs.push(data.nodes[i].title);
                     break;
                 }
@@ -116,7 +122,6 @@ export default function TopicTree() {
         console.log('prereqs', prereqs);
         setListPrereqs(prereqs);
     }
-
 
     useEffect(() => {
 
@@ -140,9 +145,16 @@ export default function TopicTree() {
             .force("charge", d3.forceManyBody().strength(-70))
             .force("center", d3.forceCenter(width / 2, height / 2));
 
-        
+        //fetching topic groups
+        //could be done in a promise all to improve performance
+        fetch(get_topic_groups()).then(e => {
+            return e.json()
+        }).then(e => {
+            setData(e)
+        })
+
         // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
-        fetch(get_topics_url('Introduction to Programming'))
+        fetch(get_topics_url('C++ Programming'))
         .then((res) => {
             return res.json();
         })
@@ -277,14 +289,78 @@ export default function TopicTree() {
                 d.fy = null;
             }
         });
-    }, [data]);
+    }, [view]);
 
-    return (
-        <div>
-            <TopicTreeHeader id="topic-tree-header"></TopicTreeHeader>
-            <div id="graph" ref={ref} />
-            <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} />
-        </div>
+    let pageView = null
+    if (view === "Graph View") {
+        pageView = (
+            <div>
+                <TopicTreeHeader id="topic-tree-header" view={view} setView={setView}></TopicTreeHeader>
+                <div id="graph" ref={ref} />
+                <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} />
+            </div>
+        )
+    }
+    else {
+        if (data != null) {
+            //Data is a list of topic groups
+            pageView = (
+            <div>
+                <TopicTreeHeader id="topic-tree-header" view={view} setView={setView}></TopicTreeHeader>
+                <Box paddingInline={[5, 15, 30]} paddingBlock={10}>
+                    <Flex flexDirection={["column", "column", "row"]}>
+                        <Heading>Topic Groups</Heading>
+                        <InputGroup variant="filled" marginLeft={["0", "0", "20%"]} width={["80%", "70%", "30%"]} alignSelf="center">
+                            <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
+                            <Input placeholder="Search"></Input>
+                        </InputGroup>
+                    </Flex>
+                    <Stack spacing={5} divider={<Divider></Divider>} marginTop={10}>
+                        {data.map(e => {
+                            let num_topics = e.topics_list.length + " topics"
+                            if (e.topics_list.length == 1) {
+                                num_topics.substring(0, num_topics.length - 1)
+                            }
+                            //TODO add links to topics when user clicks on topic group
+                            // also direct to course page if user clicks on visit course page button
+                            // could also show prerequesite topic groups
+                            return (
+                                <Flex key={"topic-group-" + e.id} padding={5} justifyContent="auto">
+                                    <Button as={Flex} bg="white" cursor="pointer" flexGrow={1}>
+                                        <ArrowRightIcon color="blue.500" alignSelf="center" display={["none", "block"]} marginRight={10}></ArrowRightIcon>
+                                        <Flex flexDirection={["column", "column", "row"]}>
+                                            <Box width={[200]}>
+                                                <Heading fontSize="lg">
+                                                    {e.name}
+                                                </Heading>
+                                            </Box>
+                                            <Box>
+                                                <Text>
+                                                    {e.topic_code}
+                                                </Text>
+                                            </Box>
+                                        </Flex>
+                                        <Box marginLeft={10} fontSize="sm" display={["none", "none", "block"]}>
+                                            <Text>
+                                                {num_topics}
+                                            </Text>
+                                        </Box>
+                                        <Box flexGrow={1}></Box>
+                                    </Button>
+                                    <Button bg="blue.500" color="white">Course Page</Button>
+                                </Flex>
+                            )
+                        })}
+                    </Stack>
+                </Box>
+                
+            </div>
+            )
+        }
+        else {
+            pageView = <Spinner></Spinner>
+        }
+    }
 
-    )
+    return pageView
 }
