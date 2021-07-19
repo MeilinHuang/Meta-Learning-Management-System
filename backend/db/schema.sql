@@ -186,7 +186,7 @@ DROP TABLE IF EXISTS "announcement_comment_files" CASCADE;
 CREATE TABLE "announcement_comment_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  file_id TEXT NOT NULL,
+  file BYTEA NOT NULL,
   comment_id INTEGER NOT NULL REFERENCES announcement_comment(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 

@@ -6,11 +6,7 @@ const fileUpload = require('express-fileupload');
 
 app.use(cors());
 app.use(express.json({limit: '50mb'}));
-app.use(fileUpload({
-    useTempFiles : true,
-    tempFileDir : '/tmp/'
-}));
-
+app.use(fileUpload());
 
 /***************************************************************
                        Open API / Swagger

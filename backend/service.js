@@ -865,7 +865,7 @@ async function getAnnouncements (request, response) {
       for (const attachment of object.attachments) {
         if (attachment != null) { 
           let fileQ = await pool.query(`
-          SELECT id, name, encode(announcement_files.file, 'base64') as files
+          SELECT id, name, encode(announcement_files.file, 'base64') as file
           FROM announcement_files WHERE announcement_id = $1 AND id = $2
           `, [object.id, attachment])
           fileArr.push(fileQ.rows[0]);
@@ -903,7 +903,7 @@ async function getAnnouncementById (request, response) {
 async function postAnnouncement (request, response) {
   try {
     const topicGroupName = request.params.topicGroup;
-    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
     const topic_group = tmpQ.rows[0].id;
     const author = request.body.author;
     const title = request.body.title;
@@ -925,6 +925,7 @@ async function postAnnouncement (request, response) {
         INSERT INTO announcement_files(id, name, file, announcement_id)
         VALUES(default, $1, $2, $3)`, 
         [request.files.uploadFile.name, request.files.uploadFile.data, resp.rows[0].id]);
+      console.log(request.files.uploadFile);
     }
 
     response.sendStatus(200);
