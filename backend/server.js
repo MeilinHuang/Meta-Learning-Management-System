@@ -70,6 +70,10 @@ app.post('/topicGroup/:topicGroupName', async(request, response) => {
   await database.postTopicGroup(request, response);
 });
 
+app.delete('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
+  await database.deleteTopic(request, response);
+});
+
 app.delete('/topicGroup/:topicGroupName', async(request, response) => {
   await database.deleteTopicGroup(request, response);
 });

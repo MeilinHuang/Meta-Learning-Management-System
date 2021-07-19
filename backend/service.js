@@ -1,4 +1,5 @@
 
+const { json } = require('express');
 const pool = require('./db/database');
 
 // TODO : ADD AUTH AND JWTOKEN
@@ -247,10 +248,37 @@ async function deleteTopicGroup (request, response) {
   response.status(200).send(`Topic Group deleted with name: ${topicGroupName}`)
 }
 
+async function deleteTopic(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const topicName = request.params.topicName;
+  const idResp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
+  if (idResp.rows.length == 0) {
+    response.status(400).json({error: "Could not find topic group"});
+    return;
+  }
+  const topicGroupId = idResp.rows[0].id;
+  let tmp = await pool.query(
+    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+  , [topicName, topicGroupId]);
+  if (tmp.rows.length == 0) {
+    response.status(400).json({error: "Could not find topic in database"});
+    return;
+  }
+  let topicId = tmp.rows[0];
+  await pool.query(`DELETE FROM prerequisites WHERE topic = $1 or prereq = $1`, [topicId]);
+  await pool.query(`DELETE FROM topics WHERE id = $1`, [topicId]);
+  response.status(200).json({ success: true, topicId: topicId});
+
+}
+
 async function postTopic (request, response) {
   const topicGroupName = request.params.topicGroupName;
   const topicName = request.params.topicName;
   const idResp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
+  if (idResp.rows.length == 0) {
+    response.status(400).json({error: "Could not find topic group"});
+    return;
+  }
   const topicGroupId = idResp.rows[0].id;
 
   let resp = await pool.query(
@@ -260,8 +288,11 @@ async function postTopic (request, response) {
   let tmp = await pool.query(
     `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
   , [topicName, topicGroupId]);
+  if (tmp.rows.length == 0) {
+    response.status(400).json({error: "Could not find newly created topic in database"});
+    return;
+  }
   let topicId = tmp.rows[0];
-
 
   response.status(200).json(topicId);
 }
@@ -1590,6 +1621,7 @@ module.exports = {
   deletePreReq,
   postTopicGroup,
   deleteTopicGroup,
+  deleteTopic,
   postTopic,
   getAllForumPosts,
   getAllPinnedPosts,
