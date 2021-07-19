@@ -49,10 +49,10 @@ INSERT INTO user_enrolled(topic_group_id, user_id, user_progress) values(1, 2, 8
 INSERT INTO user_enrolled(topic_group_id, user_id, user_progress) values(2, 1, 26.34);
 
 -- Create Forum Posts
-INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned) 
-VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false);
-INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned) 
-VALUES(default, 'Assignment 1 Help', 1, 'David Nguyen', current_timestamp, 'Ask questions here for help', true);
+INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
+VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false, NULL, 3, true);
+INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
+VALUES(default, 'Assignment 1 Help', 1, 'David Nguyen', current_timestamp, 'Ask questions here for help', true, NULL, 0, false);
 
 -- Create Tags
 INSERT INTO tags(tag_id, name) VALUES(default, 'Introduction');

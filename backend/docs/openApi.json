@@ -1,0 +1,5278 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Meta LMS CRUD",
+    "description": "Meta LMS API",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "API for authentication"
+    },
+    {
+      "name": "User",
+      "description": "API for users"
+    },
+    {
+      "name": "Topic Tree",
+      "description": "API for Topic Tree feature"
+    },
+    {
+      "name": "Forums",
+      "description": "API for Forums feature"
+    },
+    {
+      "name": "Course Pages",
+      "description": "API for Course Pages feature"
+    },
+    {
+      "name": "Gamification",
+      "description": "API for Gamification feature"
+    },
+    {
+      "name": "Assessment",
+      "description": "API for Assessment feature"
+    },
+    {
+      "name": "Lectures and Tutorials",
+      "description": "API for Lectures and Tutorials feature"
+    }
+  ],
+  "paths": {
+    "/quiz": {
+      "post": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Create new quiz",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostQuiz"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "quizBody"
+      }
+    },
+    "/quiz/{quizId}": {
+      "get": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Get quiz containing questions from specified quiz id",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz we want to get",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetQuizQuestions"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Update quiz details from quiz id",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Quiz"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "quizBody"
+      },
+      "delete": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Delete quiz",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz we want to delete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quiz/{quizId}/question/{questionId}": {
+      "get": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Get specific question from specified quiz",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz we want to get",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizQuestion"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Update question details from quiz id",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz we want to get",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutQuizQuestion"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      }
+    },
+    "/questionBank/{questionBankId}": {
+      "get": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Get list of questions with matching question bank id",
+        "parameters": [
+          {
+            "name": "questionBankId",
+            "in": "path",
+            "description": "Question bank Id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetQuestionBankQuestions"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Update name of question bank",
+        "parameters": [
+          {
+            "name": "questionBankId",
+            "in": "path",
+            "description": "Question bank Id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutQuestionBank"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBankName"
+      },
+      "delete": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Delete question bank",
+        "parameters": [
+          {
+            "name": "questionBankId",
+            "in": "path",
+            "description": "Question bank Id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questionBank": {
+      "get": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Get list questions from question banks",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetQuestionBankQuestions"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questionBank/question/{questionId}": {
+      "get": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Get question from question bank with specified question id",
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizQuestion"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/poll": {
+      "post": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Create new poll",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostPoll"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "pollBody"
+      }
+    },
+    "/poll/{pollId}": {
+      "get": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Get poll from specified poll id",
+        "parameters": [
+          {
+            "name": "pollId",
+            "in": "path",
+            "description": "Id of poll",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poll"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Change data of poll",
+        "parameters": [
+          {
+            "name": "pollId",
+            "in": "path",
+            "description": "Id of poll we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostPoll"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "pollBody"
+      },
+      "delete": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Delete Poll",
+        "parameters": [
+          {
+            "name": "pollId",
+            "in": "path",
+            "description": "Id of poll we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quiz/studentAnswers/student/{studentId}": {
+      "get": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Get list of student_answer matching the student ID",
+        "parameters": [
+          {
+            "name": "studentId",
+            "in": "path",
+            "description": "Id of student we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetStudentAnswer"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quiz/results/question/{questionId}/answerCount": {
+      "get": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Get number of students that selected each answer for a question",
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAnswerCount"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questionBank/{questionBankId}/question": {
+      "post": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Create new question for question bank",
+        "parameters": [
+          {
+            "name": "questionBankId",
+            "in": "path",
+            "description": "Id of questionBank we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostQuizQuestion"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      }
+    },
+    "/quiz_question_answer": {
+      "post": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Create new quiz question answer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostQuizQuestionAnswer"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "quizQuestionAnswerBody"
+      }
+    },
+    "/student_answer": {
+      "post": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Create new student answer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizStudentAnswer"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "studentAnswerBody"
+      }
+    },
+    "/quiz/{quizId}/question/{questionId}/answer/{quizQuestionAnswerId}": {
+      "put": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Update quiz question answer",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "quizQuestionAnswerId",
+            "in": "path",
+            "description": "Id of quiz question answer we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutQuizQuestionAnswer"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "quizQuestionAnswerBody"
+      }
+    },
+    "/question/{questionId}/delete": {
+      "delete": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Delete question from id",
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questionBank/{questionBankId}/question/{questionId}": {
+      "delete": {
+        "tags": [
+          "Assessment"
+        ],
+        "summary": "Delete question from question bank",
+        "parameters": [
+          {
+            "name": "questionBankId",
+            "in": "path",
+            "description": "Id of questionBank we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions": {
+      "get": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Get all gamification questions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllQuestions"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions/new": {
+      "post": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Create new question",
+        "requestBody": {
+          "description": "New question body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      }
+    },
+    "/questions/{questionId}": {
+      "get": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Get all level data from question id",
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question to get level data from",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Level"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Edit existing question data",
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question to edit",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Details of updated question",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "editQuestion"
+      },
+      "delete": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Delete question from question id",
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/levels": {
+      "get": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Get all gamification levels",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllLevels"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/levels/{levelId}": {
+      "get": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Get level data for specified level id",
+        "parameters": [
+          {
+            "name": "levelId",
+            "in": "path",
+            "description": "Id of level we want data for",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Level"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Edit existing level data",
+        "parameters": [
+          {
+            "name": "levelId",
+            "in": "path",
+            "description": "Id of level",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Details of updated level",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutLevel"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Level"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "editLevel"
+      },
+      "delete": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Delete level from level id",
+        "parameters": [
+          {
+            "name": "levelId",
+            "in": "path",
+            "description": "Id of level we want to delete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/levels/new": {
+      "post": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Create new level",
+        "requestBody": {
+          "description": "New level body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostLevel"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "levelBody"
+      }
+    },
+    "/{level}/questions": {
+      "get": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Get all questions linked to level",
+        "parameters": [
+          {
+            "name": "level",
+            "in": "path",
+            "description": "Name of level to get questions for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllQuestions"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logs in the user",
+        "requestBody": {
+          "description": "Login body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginBody"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "loginBody"
+      }
+    },
+    "/user/{userId}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get user from id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Delete user from id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{userId}/{topicGroupId}": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Make user an admin for a topic group",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user we want to make an admin",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "description": "Id of topic group to make admin for",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Delete admin user from id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "description": "Id of topic group to make admin for",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroup}/announcement": {
+      "get": {
+        "tags": [
+          "Course Pages"
+        ],
+        "summary": "Get all announcements",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get announcements",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllAnnouncements"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroup}/announcement/new": {
+      "post": {
+        "tags": [
+          "Course Pages"
+        ],
+        "summary": "Create new announcement",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic Group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "author": {
+                    "type": "integer",
+                    "example": 3
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "First announcement"
+                  },
+                  "content": {
+                    "type": "string",
+                    "example": "Description of the first announcement"
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "announcementBody"
+      }
+    },
+    "/{topicGroup}/announcement/{announcementId}": {
+      "get": {
+        "tags": [
+          "Course Pages"
+        ],
+        "summary": "Get announcement by id",
+        "parameters": [
+          {
+            "name": "announcementId",
+            "in": "path",
+            "description": "Announcement Id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Announcement"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Course Pages"
+        ],
+        "summary": "Update announcement details",
+        "parameters": [
+          {
+            "name": "announcementId",
+            "in": "path",
+            "description": "Announcement Id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Announcement body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutAnnouncement"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "announcementBody"
+      },
+      "delete": {
+        "tags": [
+          "Course Pages"
+        ],
+        "summary": "Delete announcement",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic Group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "announcementId",
+            "in": "path",
+            "description": "Announcement id to delete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroup}/announcement/{announcementId}/comment": {
+      "post": {
+        "tags": [
+          "Course Pages"
+        ],
+        "summary": "Create new announcement comment",
+        "parameters": [
+          {
+            "name": "announcementId",
+            "in": "path",
+            "description": "Id of announcement to comment",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Comment body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostAnnouncementComment"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "commentBody"
+      }
+    },
+    "/{topicGroup}/announcement/{announcementId}/comment/{commentId}": {
+      "put": {
+        "tags": [
+          "Course Pages"
+        ],
+        "summary": "Update announcement comment",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "Id of comment to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Comment body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutAnnouncementComment"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "commentBody"
+      },
+      "delete": {
+        "tags": [
+          "Course Pages"
+        ],
+        "summary": "Delete announcement comment",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "Id of comment to delete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum": {
+      "get": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Get all forum posts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllForumPosts"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/pinned": {
+      "get": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Get all pinned forum posts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllForumPosts"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/search/{forumSearchTerm}": {
+      "get": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Get all forum posts related to the search query",
+        "parameters": [
+          {
+            "name": "forumSearchTerm",
+            "in": "path",
+            "description": "Search term to include all posts with the search term",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllForumPosts"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/{forumFilterTerm}": {
+      "get": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Get all forum posts related to the filter term",
+        "parameters": [
+          {
+            "name": "forumFilterTerm",
+            "in": "path",
+            "description": "Filter term to include all posts with the filter term",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllForumPosts"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/post": {
+      "post": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Make new post",
+        "requestBody": {
+          "description": "New post",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostForum"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostForum"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "New forum post"
+      }
+    },
+    "/forum/post/{postId}": {
+      "get": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Get post details of post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want details for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForumPost"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Edit post details with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want to edit",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Details of updated post",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutForumPost"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForumPost"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "editPost"
+      },
+      "delete": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Delete forum post by id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/{postId}/reply": {
+      "post": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Create a reply on post by postId",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want to reply to",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Details of post reply",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostReply"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "replyDetails"
+      }
+    },
+    "/forum/post/{postId}/reply/{replyId}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Update reply on a post with id",
+        "parameters": [
+          {
+            "name": "replyId",
+            "in": "path",
+            "description": "Id of reply we want to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Details of updated post reply",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutReply"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "replyDetails"
+      },
+      "delete": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Delete forum post reply",
+        "parameters": [
+          {
+            "name": "replyId",
+            "in": "path",
+            "description": "Id of reply we want to delete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/{postId}/comment": {
+      "post": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Create comment on post",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want to comment to",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Details of comment body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostComment"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "commentDetails"
+      }
+    },
+    "/forum/post/{postId}/comment/{commentId}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Updates post comment",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "Id of comment",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Id of comment",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutComment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "commentBody"
+      },
+      "delete": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Deletes forum comment",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "Id of comment",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/pin/{postId}/{isPinned}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Pins or unpins post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want to pin/unpin",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "isPinned",
+            "in": "path",
+            "description": "Set pinned to true or false",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/tags": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Get list of all tags",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllForumTags"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Create new tag",
+        "requestBody": {
+          "description": "Body with tag name",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForumTag"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "tagName"
+      }
+    },
+    "/forum/tags/{tagId}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Update forum tag",
+        "parameters": [
+          {
+            "name": "tagId",
+            "in": "path",
+            "description": "Id of tag",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "New tag name",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForumTag"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "tagBody"
+      },
+      "delete": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Delete forum tag",
+        "parameters": [
+          {
+            "name": "tagId",
+            "in": "path",
+            "description": "Id of tag",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/endorse/{postId}/{isEndorsed}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Endorses or un-endorses post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want to endorse/un-endorse",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "isEndorsed",
+            "in": "path",
+            "description": "Set isEndorsed to true or false",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/like/{postId}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Adds upvote for post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want to add upvote for",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/unlike/{postId}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Removes upvote for post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want to remove upvote for",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroup}/remove-level/{level}": {
+      "delete": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Delete level from topic group",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "level",
+            "in": "path",
+            "description": "Name of level we want to remove from topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{topicGroupId}/newLevel": {
+      "post": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Create a new level for topic group",
+        "parameters": [
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "description": "Id of topic group we want to add new level to",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "New level body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Level"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "levelBody"
+      }
+    },
+    "/topicGroup/{topicGroupId}/levels": {
+      "get": {
+        "tags": [
+          "Gamification"
+        ],
+        "summary": "Get a list of levels for provided topic group",
+        "parameters": [
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "description": "Id of topic group",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllLevels"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup": {
+      "get": {
+        "tags": [
+          "Topic Tree"
+        ],
+        "summary": "Get a list of topic groups, their information (tutorial times, course outline) and the Topic they contain",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllTopicGroups"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{topicGroupName}/topic": {
+      "get": {
+        "tags": [
+          "Topic Tree"
+        ],
+        "summary": "Get list of Topics",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Gets topics from topic group name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllTopics"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{topicGroupName}/topic/{topicName}/prerequisite": {
+      "get": {
+        "tags": [
+          "Topic Tree"
+        ],
+        "summary": "Get prerequisites of topic",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group we want topics for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic we want pre-requisites for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPreRequisites"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Topic Tree"
+        ],
+        "summary": "Create a new prerequisite with prerequisite in POST body",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group we want topics for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic we want pre-requisites for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Topic with new pre-requisite(s)",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreRequisite"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "Pre-Requisite"
+      },
+      "delete": {
+        "tags": [
+          "Topic Tree"
+        ],
+        "summary": "Delete prerequisites",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group we want topics for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic we want pre-requisites to delete for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "PreRequisite delete body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreRequisite"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "Pre-Requisite"
+      }
+    },
+    "/topicGroup/{topicGroupName}": {
+      "post": {
+        "tags": [
+          "Topic Tree"
+        ],
+        "summary": "Create a topic group",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "New Topic Group",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopicGroup"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "TopicGroup"
+      },
+      "delete": {
+        "tags": [
+          "Topic Tree"
+        ],
+        "summary": "Delete a topic group",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group we want to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{topicGroupName}/topic/{topicName}": {
+      "post": {
+        "tags": [
+          "Topic Tree"
+        ],
+        "summary": "Create a new topic",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of new topic",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "400": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message returned from server",
+            "example": "Invalid input"
+          }
+        },
+        "description": "Bad Input"
+      },
+      "403": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message returned from server",
+            "example": "Invalid Token"
+          }
+        },
+        "description": "Forbidden"
+      },
+      "Poll": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Poll 1"
+          },
+          "is_closed": {
+            "type": "boolean",
+            "example": false
+          },
+          "poll_type": {
+            "type": "string",
+            "example": "Type A"
+          }
+        }
+      },
+      "PostPoll": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Poll 1"
+          },
+          "is_closed": {
+            "type": "boolean",
+            "example": false
+          },
+          "poll_type": {
+            "type": "string",
+            "example": "Type A"
+          }
+        }
+      },
+      "PutQuestionBank": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Algorithms Question Bank"
+          }
+        }
+      },
+      "PutQuizQuestion": {
+        "type": "object",
+        "properties": {
+          "quiz_type": {
+            "type": "string",
+            "example": "mpc | sa | la"
+          },
+          "description": {
+            "type": "string",
+            "example": "What is 2 + 2?"
+          },
+          "related_topic_id": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "PostQuizQuestion": {
+        "type": "object",
+        "properties": {
+          "quiz_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "quiz_type": {
+            "type": "string",
+            "example": "mpc | sa | la"
+          },
+          "description": {
+            "type": "string",
+            "example": "What is 2 + 2?"
+          },
+          "related_topic_id": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "GetQuizQuestions": {
+        "type": "object",
+        "properties": {
+          "quiz": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 0
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Question 1"
+                },
+                "timeGiven": {
+                  "type": "integer",
+                  "example": 40
+                }
+              }
+            }
+          }
+        }
+      },
+      "PostLevel": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Level"
+          },
+          "topicGroupId": {
+            "type": "integer"
+          },
+          "levelType": {
+            "type": "string"
+          },
+          "questionNumbers": {
+            "type": "integer",
+            "example": 3
+          },
+          "estimatedTimeRequired": {
+            "type": "integer",
+            "example": 15
+          }
+        }
+      },
+      "PostAnnouncement": {
+        "type": "object",
+        "properties": {
+          "author": {
+            "type": "integer",
+            "example": 3
+          },
+          "title": {
+            "type": "string",
+            "example": "First announcement"
+          },
+          "content": {
+            "type": "string",
+            "example": "Description of the first announcement"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "file",
+              "format": "binary",
+              "example": "announcement.img"
+            }
+          }
+        }
+      },
+      "PostAnnouncementComment": {
+        "type": "object",
+        "properties": {
+          "author": {
+            "type": "integer",
+            "example": 1
+          },
+          "content": {
+            "type": "string",
+            "example": "New announcement comment incoming"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "file",
+              "format": "binary",
+              "example": "image.png"
+            }
+          }
+        }
+      },
+      "Announcement": {
+        "type": "object",
+        "properties": {
+          "announcementId": {
+            "type": "integer"
+          },
+          "author": {
+            "type": "string",
+            "example": "Mark Saylor"
+          },
+          "description": {
+            "type": "string",
+            "example": "All tutorials will be online"
+          },
+          "externalFiles": {
+            "type": "file",
+            "format": "binary",
+            "example": "dog.img"
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "commentId": {
+                  "type": "integer"
+                },
+                "author": {
+                  "type": "string",
+                  "example": "Harold Jenkins"
+                },
+                "comment": {
+                  "type": "string",
+                  "example": "Awesome"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ForumTag": {
+        "type": "object",
+        "properties": {
+          "tagName": {
+            "type": "string",
+            "example": "FinalExam"
+          }
+        }
+      },
+      "PutForumPost": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Some new description"
+          }
+        }
+      },
+      "ForumPost": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string",
+            "example": "How to start Assignment 1"
+          },
+          "author": {
+            "type": "string",
+            "example": "John Smith"
+          },
+          "description": {
+            "type": "string",
+            "example": "Lorem ipsum ipsum ipsum ipsum ipsum"
+          },
+          "isPinned": {
+            "type": "boolean",
+            "example": true
+          },
+          "related_link": {
+            "type": "string",
+            "example": "/content"
+          },
+          "num_of_upvotes": {
+            "type": "integer",
+            "example": 3
+          },
+          "isEndorsed": {
+            "type": "boolean",
+            "example": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Ass1"
+                }
+              }
+            }
+          },
+          "replies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "integer"
+                },
+                "author": {
+                  "type": "string",
+                  "example": "Jessica Smith"
+                },
+                "reply": {
+                  "type": "string",
+                  "example": "Lorem lorem lorem lorem lorem lorem lorem"
+                }
+              }
+            }
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "integer"
+                },
+                "author": {
+                  "type": "string",
+                  "example": "Harold Jenkins"
+                },
+                "comment": {
+                  "type": "string",
+                  "example": "Check the assigment spec for more info"
+                }
+              }
+            }
+          }
+        }
+      },
+      "PreRequisite": {
+        "type": "object",
+        "properties": {
+          "preReqId": {
+            "type": "integer",
+            "example": 1
+          },
+          "topicId": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "Topic": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string",
+            "example": "Sorting"
+          },
+          "courseMaterials": {
+            "type": "array"
+          },
+          "topicGroups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "example": "Algorithm"
+            }
+          },
+          "preRequisites": {
+            "type": "array"
+          }
+        }
+      },
+      "TopicGroup": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Algorithms"
+          },
+          "topic_code": {
+            "type": "string",
+            "example": "COMP3821"
+          },
+          "course_outline": {
+            "type": "file",
+            "format": "binary",
+            "example": "course_outline.pdf"
+          }
+        }
+      },
+      "GetAllTopics": {
+        "type": "object",
+        "properties": {
+          "topics": {
+            "type": "array",
+            "description": "List of all topics",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Sorting"
+                },
+                "courseMaterials": {
+                  "type": "array"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetAllTopicGroups": {
+        "type": "object",
+        "properties": {
+          "TopicGroups": {
+            "type": "array",
+            "description": "List of all topic groups",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Algorithms"
+                },
+                "topics": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 0
+                      },
+                      "topic_group_id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Arrays"
+                      }
+                    }
+                  }
+                },
+                "tutorialList": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 0
+                      },
+                      "tutor_id": {
+                        "type": "integer",
+                        "example": 3
+                      },
+                      "topic_group_id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "tutorial_code": {
+                        "type": "string",
+                        "example": "W82A1"
+                      },
+                      "timeslot": {
+                        "type": "string",
+                        "example": "10:00-11:00"
+                      },
+                      "curr_capacity": {
+                        "type": "integer",
+                        "example": 0
+                      },
+                      "max_capacity": {
+                        "type": "integer",
+                        "example": 30
+                      }
+                    }
+                  }
+                },
+                "courseOutline": {
+                  "type": "file",
+                  "format": "binary",
+                  "example": "course_outline.pdf"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetPreRequisites": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "example": "Sorting"
+          },
+          "preRequisites": {
+            "type": "array",
+            "description": "List of pre-requisites for topic",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "C++ Basics"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetAllForumTags": {
+        "type": "object",
+        "properties": {
+          "tags": {
+            "type": "array",
+            "description": "List of forum tags",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tag_id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "tagName": {
+                  "type": "string",
+                  "example": "Ass1"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetAllForumPosts": {
+        "type": "object",
+        "properties": {
+          "forumPosts": {
+            "type": "array",
+            "description": "List of all forum posts",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "integer"
+                },
+                "title": {
+                  "type": "string",
+                  "example": "How to start Assignment 1"
+                },
+                "author": {
+                  "type": "string",
+                  "example": "John Smith"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Lorem ipsum ipsum ipsum ipsum ipsum"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Ass1"
+                      }
+                    }
+                  }
+                },
+                "replies": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "integer"
+                      },
+                      "author": {
+                        "type": "string",
+                        "example": "Jessica Smith"
+                      },
+                      "reply": {
+                        "type": "string",
+                        "example": "Lorem lorem lorem lorem lorem lorem lorem"
+                      }
+                    }
+                  }
+                },
+                "comments": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "integer"
+                      },
+                      "author": {
+                        "type": "string",
+                        "example": "Harold Jenkins"
+                      },
+                      "comment": {
+                        "type": "string",
+                        "example": "Check the assigment spec for more info"
+                      }
+                    }
+                  }
+                },
+                "isPinned": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "related_link": {
+                  "type": "string",
+                  "example": "/content"
+                },
+                "num_of_upvotes": {
+                  "type": "integer",
+                  "example": 3
+                },
+                "isEndorsed": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "PostForum": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Final exam marks release date?"
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 0
+          },
+          "description": {
+            "type": "string",
+            "example": "When do the final marks get released?"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tag_id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "tag": {
+                  "type": "string",
+                  "example": "FinalExam"
+                }
+              }
+            }
+          },
+          "related_link": {
+            "type": "string",
+            "example": "/content"
+          }
+        }
+      },
+      "PostReply": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "reply": {
+            "type": "string",
+            "example": "The final exam marks have already been released"
+          }
+        }
+      },
+      "PutReply": {
+        "type": "object",
+        "properties": {
+          "reply": {
+            "type": "string",
+            "example": "The final exam marks have already been released"
+          }
+        }
+      },
+      "PostComment": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "comment": {
+            "type": "string",
+            "example": "The final exam hasn't happened yet"
+          }
+        }
+      },
+      "PutAnnouncementComment": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "example": "Some new comment description"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer"
+          },
+          "user_name": {
+            "type": "string",
+            "example": "John Smitty"
+          },
+          "zid": {
+            "type": "string",
+            "example": "z5123842"
+          },
+          "enrolledCourses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "name": {
+                  "type": "string",
+                  "example": "C++ Programming"
+                },
+                "topic_code": {
+                  "type": "string",
+                  "example": "COMP5661"
+                },
+                "course_outline": {
+                  "type": "string",
+                  "example": "Course_outline.pdf"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetAllAnnouncements": {
+        "type": "object",
+        "properties": {
+          "announcements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "announcementId": {
+                  "type": "integer"
+                },
+                "author": {
+                  "type": "string",
+                  "example": "Mark Saylor"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "All tutorials will be online"
+                },
+                "externalFiles": {
+                  "type": "file",
+                  "format": "binary",
+                  "example": "dog.img"
+                },
+                "comments": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "commentId": {
+                        "type": "integer"
+                      },
+                      "author": {
+                        "type": "string",
+                        "example": "Harold Jenkins"
+                      },
+                      "comment": {
+                        "type": "string",
+                        "example": "Awesome"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetAllLevels": {
+        "type": "object",
+        "properties": {
+          "levels": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "integer"
+                },
+                "title": {
+                  "type": "string",
+                  "example": "Level"
+                },
+                "topicGroupId": {
+                  "type": "integer"
+                },
+                "levelType": {
+                  "type": "string"
+                },
+                "questionNumbers": {
+                  "type": "integer",
+                  "example": 3
+                },
+                "estimatedTimeRequired": {
+                  "type": "integer",
+                  "example": 15
+                }
+              },
+              "description": "List of levels"
+            }
+          }
+        }
+      },
+      "GetAllLevelQuestions": {
+        "type": "object",
+        "properties": {
+          "levelQuestions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "integer"
+                },
+                "title": {
+                  "type": "string",
+                  "example": "What is the day today?"
+                },
+                "questionType": {
+                  "type": "string",
+                  "example": "Multiple Choice"
+                },
+                "correctAnswer": {
+                  "type": "string",
+                  "example": "Friday"
+                },
+                "mediaLink": {
+                  "type": "string",
+                  "example": "123.png"
+                },
+                "estimatedTimeRequired": {
+                  "type": "integer",
+                  "example": 1
+                }
+              },
+              "description": "List of questions for level"
+            }
+          }
+        }
+      },
+      "PutAnnouncement": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Some title"
+          },
+          "content": {
+            "type": "string",
+            "example": "Some new description"
+          }
+        }
+      },
+      "GetAllQuestions": {
+        "type": "object",
+        "properties": {
+          "questions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "integer"
+                },
+                "title": {
+                  "type": "string",
+                  "example": "What is the day today?"
+                },
+                "questionType": {
+                  "type": "string",
+                  "example": "Multiple Choice"
+                },
+                "correctAnswer": {
+                  "type": "string",
+                  "example": "Friday"
+                },
+                "numberOfAnswers": {
+                  "type": "integer",
+                  "example": 4
+                },
+                "mediaLink": {
+                  "type": "string",
+                  "example": "123.png"
+                },
+                "estimatedTimeRequired": {
+                  "type": "integer",
+                  "example": 1
+                }
+              },
+              "description": "List of questions"
+            }
+          }
+        }
+      },
+      "PutComment": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "string",
+            "example": "New comment description"
+          }
+        }
+      },
+      "PutLevel": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Level"
+          },
+          "topicGroupId": {
+            "type": "integer"
+          },
+          "levelType": {
+            "type": "string"
+          },
+          "questionNumbers": {
+            "type": "integer",
+            "example": 3
+          },
+          "estimatedTimeRequired": {
+            "type": "integer",
+            "example": 15
+          }
+        }
+      },
+      "Level": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string",
+            "example": "Level"
+          },
+          "topicGroupId": {
+            "type": "integer"
+          },
+          "levelType": {
+            "type": "string"
+          },
+          "questionNumbers": {
+            "type": "integer",
+            "example": 3
+          },
+          "estimatedTimeRequired": {
+            "type": "integer",
+            "example": 15
+          }
+        }
+      },
+      "Question": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "What is the day today?"
+          },
+          "questionType": {
+            "type": "string",
+            "example": "mpc"
+          },
+          "correctAnswer": {
+            "type": "string",
+            "example": "Friday"
+          },
+          "numberOfAnswers": {
+            "type": "integer",
+            "example": 4
+          },
+          "mediaLink": {
+            "type": "string",
+            "example": "123.png"
+          },
+          "estimatedTimeRequired": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "PostQuiz": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Mid Sem Quiz"
+          },
+          "timeGiven": {
+            "type": "integer",
+            "example": 30
+          }
+        }
+      },
+      "Quiz": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Mid Sem Quiz"
+          },
+          "timeGiven": {
+            "type": "integer",
+            "example": 30
+          }
+        }
+      },
+      "QuizQuestion": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer"
+          },
+          "quizId": {
+            "type": "integer"
+          },
+          "question_bank_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "quizType": {
+            "type": "string",
+            "example": "shortAnswer"
+          },
+          "marksAwarded": {
+            "type": "integer",
+            "example": 2
+          },
+          "topicId": {
+            "type": "integer",
+            "example": 3
+          }
+        }
+      },
+      "PutQuizQuestionAnswer": {
+        "type": "object",
+        "properties": {
+          "isCorrectAnswer": {
+            "type": "boolean",
+            "example": false
+          },
+          "description": {
+            "type": "string",
+            "example": "2 + 2 = 4"
+          }
+        }
+      },
+      "PostQuizQuestionAnswer": {
+        "type": "object",
+        "properties": {
+          "quizId": {
+            "type": "integer",
+            "example": 2
+          },
+          "questionId": {
+            "type": "integer",
+            "example": 4
+          },
+          "isCorrectAnswer": {
+            "type": "boolean",
+            "example": false
+          },
+          "description": {
+            "type": "string",
+            "example": "2 + 2 = 4"
+          }
+        }
+      },
+      "QuizQuestionAnswer": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer",
+            "example": 3
+          },
+          "quizId": {
+            "type": "integer",
+            "example": 2
+          },
+          "questionId": {
+            "type": "integer",
+            "example": 4
+          },
+          "isCorrectAnswer": {
+            "type": "boolean",
+            "example": false
+          },
+          "description": {
+            "type": "string",
+            "example": "2 + 2 = 4"
+          }
+        }
+      },
+      "QuizStudentAnswer": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "integer",
+            "example": 1
+          },
+          "quizId": {
+            "type": "integer",
+            "example": 2
+          },
+          "questionId": {
+            "type": "integer",
+            "example": 5
+          },
+          "answerSelectedId": {
+            "type": "integer",
+            "example": 3
+          }
+        }
+      },
+      "QuestionBank": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Question Bank 1"
+          }
+        }
+      },
+      "GetAnswerCount": {
+        "type": "object",
+        "properties": {
+          "QuizQuestionAnswer": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "quiz_id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "question_id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "is_correct_answer": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "description": {
+                  "type": "string",
+                  "example": "5 x 5 = 12"
+                },
+                "answer_count": {
+                  "type": "integer",
+                  "example": 30
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetStudentAnswer": {
+        "type": "object",
+        "properties": {
+          "studentAnswers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "studentId": {
+                  "type": "string",
+                  "example": "z2103091"
+                },
+                "quizId": {
+                  "type": "integer",
+                  "example": 2
+                },
+                "questionId": {
+                  "type": "integer",
+                  "example": 5
+                },
+                "answerSelectedId": {
+                  "type": "integer",
+                  "example": 3
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetQuestionBankQuestions": {
+        "type": "object",
+        "properties": {
+          "questionBankQuestions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "integer"
+                },
+                "quizId": {
+                  "type": "integer"
+                },
+                "quizType": {
+                  "type": "string",
+                  "example": "shortAnswer"
+                },
+                "marksAwarded": {
+                  "type": "integer",
+                  "example": 2
+                },
+                "topicId": {
+                  "type": "integer",
+                  "example": 3
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

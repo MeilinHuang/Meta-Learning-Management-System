@@ -1,5 +1,4 @@
 -- \i 'C:/Users/Dave/Desktop/COMP4962 - Thesis B/metalms/backend/db/schema.sql';
-
 -- \i '/Users/davidnguyen/Desktop/COMP - Thesis B/metalms/backend/db/schema.sql';
 
 -- Reset Schema
@@ -83,7 +82,10 @@ CREATE TABLE IF NOT EXISTS "forum_posts" (
   author TEXT NOT NULL,
   published_date TIMESTAMP,
   description TEXT,
-  isPinned BOOLEAN NOT NULL
+  isPinned BOOLEAN NOT NULL,
+  related_link TEXT,
+  num_of_upvotes INTEGER NOT NULL,
+  isEndorsed BOOLEAN NOT NULL
 );
 
 DROP TABLE IF EXISTS "tags" CASCADE;
@@ -188,7 +190,7 @@ CREATE TABLE "announcement_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   file_id TEXT NOT NULL,
-  announcement_id INTEGER NOT NULL REFERENCES announcements(id)
+  announcement_id INTEGER NOT NULL REFERENCES announcements(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "announcement_comment_files" CASCADE;
@@ -196,7 +198,7 @@ CREATE TABLE "announcement_comment_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   file_id TEXT NOT NULL,
-  comment_id INTEGER NOT NULL REFERENCES announcement_comment(id)
+  comment_id INTEGER NOT NULL REFERENCES announcement_comment(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- Gamification

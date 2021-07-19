@@ -11,26 +11,57 @@ import CommentResponse from "../CommentResponse/CommentResponse"
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './CommentsResponses.module.css'
 
-function CommentsResponses({ isComments, posts }) {
+const dummyAuthor = 1
+
+function CommentsResponses({ isComments, posts, post_id, setPost }) {
+    const [ editorState, setEditorState ] = useState('')
     const [details, setDetails] = useState('')
 
     const handleSubmit = e => {
         e.preventDefault()
-        console.log(details)
+        const date = new Date(Date.now()).toISOString()
+
+        const body = isComments ? 
+            {
+                user_id: dummyAuthor,
+                published_date: date,
+                comment: details,
+            } : {
+                user_id: dummyAuthor,
+                published_date: date,
+                reply: details,
+            }
+
+        fetch(`http://localhost:8000/forum/post/${post_id}/${isComments ? 'comment' : 'reply'}`, {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).then(r => {
+            if (r.status === 200) {
+                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
+                    setPost(data[0])
+                    setEditorState('') // TODO: work out how to clear editor on save
+                })
+            } 
+            // TODO: Handle error case
+        })
     }
 
     return (
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md" mb="12px" textTransform="uppercase">{isComments ? 'Comments' : 'Responses'}</Heading>
-            {posts && posts.map(post => (
-                <CommentResponse {...post} />
+            {posts && posts[0] !== null && posts.map(post => (
+                post !== null && <CommentResponse {...post} post_id={post_id} setPost={setPost} />
             ))}
-            <form id="createCommentResponse" onSubmit={handleSubmit}>
+            <form id={`create${isComments ? 'Comment' : 'Response'}`} onSubmit={handleSubmit}>
                 <Flex>
                     <InputGroup variant="filled" mr="8px">
-                        <DraftEditor setDetails={setDetails} className={styles.editor} />
+                        <DraftEditor content={editorState} setDetails={setDetails} className={styles.editor} />
                     </InputGroup>
-                    <Button pr="8px" leftIcon={<AiOutlineSend />} form="createCommentResponse" type="submit" />
+                    <Button pr="8px" leftIcon={<AiOutlineSend />} form={`create${isComments ? 'Comment' : 'Response'}`} type="submit" />
                 </Flex>
             </form>
         </Box>
