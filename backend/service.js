@@ -73,48 +73,61 @@ const deleteAdmin = (request, response) => {
 
 async function getAllTopicGroups(request, response) {
   void (request);
-  let resp;
   try {
-    resp = await pool.query(
-      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
-      array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list
-      FROM topic_group tp_group 
-      JOIN topics ON topics.topic_group_id = tp_group.id
-      JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
-      GROUP BY tp_group.id;`);
+    let resp = await pool.query(
+    `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
+    array_agg(DISTINCT user_admin.admin_id) as admin_list,
+    array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
+    array_agg(DISTINCT announcements.id) as announcements_list
+    FROM topic_group tp_group 
+    LEFT JOIN user_admin ON user_admin.topic_group_id = tp_group.id
+    LEFT JOIN topics ON topics.topic_group_id = tp_group.id
+    LEFT JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
+    LEFT JOIN announcements ON topics.topic_group_id = announcements.topic_group
+    GROUP BY tp_group.id`);
 
-    var finalQuery = resp.rows;
-
-    for (var object of finalQuery) { // Loop through list of topic groups
+    for (var object of resp.rows) { // Loop through list of topic groups
+      var adminArr = [];
       var topicArr = [];
       var tutArr = [];
-      for (const topic_id of object.topics_list) {
-        let tmp = await pool.query(`SELECT * FROM topics WHERE id = $1`, [topic_id]);
+      var announcementArr = [];
+
+      for (const topicId of object.topics_list) {
+        let tmp = await pool.query(`SELECT * FROM topics WHERE id = $1`, [topicId]);
         topicArr.push(tmp.rows[0]);
       };
   
-      for (const tutorial_id of object.tutorial_list) {
-        let tmp = await pool.query(`SELECT * FROM tutorials WHERE id = $1`, [tutorial_id]);
+      for (const tutorialId of object.tutorial_list) {
+        let tmp = await pool.query(`SELECT * FROM tutorials WHERE id = $1`, [tutorialId]);
         tutArr.push(tmp.rows[0]);
+      };
+
+      for (const adminId of object.admin_list) {
+        let tmp = await pool.query(`SELECT * FROM users WHERE id = $1`, [adminId]);
+        adminArr.push(tmp.rows[0]);
+      };
+
+      for (const announcementId of object.announcements_list) {
+        let tmp = await pool.query(`SELECT * FROM announcements WHERE id = $1`, [announcementId]);
+        announcementArr.push(tmp.rows[0]);
       };
 
       object.topics_list = topicArr;
       object.tutorial_list = tutArr;
+      object.announcements_list = announcementArr;
+      object.admin_list = adminArr;
     }
-
+    response.status(200).json(resp.rows);
   } catch (e) {
-    console.log(e);
+    response.sendStatus(400);
+    response.send(e);
   }
-
-  response.status(200).json(finalQuery);
 }
 
 async function getTopics (request, response) { 
-  const topicGroupName = request.params.topicGroupName;
-  let resp;
-
   try {
-    resp = await pool.query(
+    const topicGroupName = request.params.topicGroupName;
+    let resp = await pool.query(
       `SELECT array_agg(DISTINCT topics.id) AS topics_list
       FROM topic_group tp_group 
       JOIN topics ON topics.topic_group_id = tp_group.id
@@ -126,43 +139,52 @@ async function getTopics (request, response) {
     for (var object of finalQuery) { 
       var topicArr = [];
       for (const topic_id of object.topics_list) {
-
+        console.log('topic_id', topic_id);
         let tmp = await pool.query(
-          `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(topic_files.id) as course_materials 
+          `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(topic_files.id) as course_materials, array_agg(DISTINCT prerequisites.prereq) as prereqs
           FROM topics 
-          JOIN topic_files ON topic_files.topic_id = topics.id
+          FULL OUTER JOIN topic_files ON topic_files.topic_id = topics.id
+          FULL OUTER JOIN prerequisites ON prerequisites.topic = topics.id
           WHERE topics.id = $1
           GROUP BY topics.id`
           , [topic_id]);
 
-        var courseMaterialsArr = [];
 
-        for (var material_id of tmp.rows[0].course_materials) {
-          let tmp2 = await pool.query(`SELECT * from topic_files WHERE id = $1`, [material_id]);
-          courseMaterialsArr.push(tmp2.rows[0]);
+        console.log(tmp.rows);
+        if (tmp.rows.length > 0) {
+          console.log('tmp', tmp.rows);
+          var courseMaterialsArr = [];
+          if (tmp.rows[0].course_materials[0] !== null) {
+            for (var material_id of tmp.rows[0].course_materials) {
+              let tmp2 = await pool.query(`SELECT * from topic_files WHERE id = $1`, [material_id]);
+              courseMaterialsArr.push(tmp2.rows[0]);
+            }
+          }
+          if (tmp.rows[0].prereqs[0] === null) {
+            tmp.rows[0].prereqs = [];
+          }
+          tmp.rows[0].course_materials = courseMaterialsArr;
+          topicArr.push(tmp.rows[0]);
+
         }
 
-        tmp.rows[0].course_materials = courseMaterialsArr;
-        topicArr.push(tmp.rows[0]);
+
       };
 
       object.topics_list = topicArr;
     }
-
+    response.status(200).json(finalQuery[0]);
   } catch(e) {
-    console.log(e);
+    response.sendStatus(400);
+    response.send(e);
   }
-
-  response.status(200).json(finalQuery[0]);
 }
 
 async function getTopicPreReqs (request, response) {
-  const topicGroupName = request.params.topicGroupName;
-  const topicName = request.params.topicName;
-  let resp;
-    
   try {
-    resp = await pool.query(
+    const topicGroupName = request.params.topicGroupName;
+    const topicName = request.params.topicName;
+    let resp = await pool.query(
       `SELECT array_agg(DISTINCT p.prereq) as prerequisites_list 
       FROM prerequisites p
       JOIN topic_group ON name = $1
@@ -179,11 +201,11 @@ async function getTopicPreReqs (request, response) {
     }
 
     finalQuery[0].prerequisites_list = preReqsArr;
+    response.status(200).json(finalQuery[0]);
   } catch(e) {
-    console.log(e);
+    response.sendStatus(400);
+    response.send(e);
   }
-
-  response.status(200).json(finalQuery[0]);
 }
 
 // Create new pre requisite (Modify for topic name instead of IDs ??)
@@ -355,10 +377,9 @@ async function getAllPinnedPosts (request, response) {
 
 // Get all posts related search term
 async function getSearchPosts (request, response) {
-  const forumSearchTerm = request.params.forumSearchTerm;
-  let resp;
   try {
-    resp = await pool.query(
+    const forumSearchTerm = request.params.forumSearchTerm;
+    let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp 
@@ -368,8 +389,8 @@ async function getSearchPosts (request, response) {
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
-      WHERE LOWER (fp.title) LIKE $1
-      OR LOWER (fp.description) LIKE $1
+      WHERE LOWER (fp.title) LIKE LOWER($1)
+      OR LOWER (fp.description) LIKE LOWER($1)
       GROUP BY fp.post_id`, [`%${forumSearchTerm}%`]);
 
     var finalQuery = resp.rows;
@@ -398,20 +419,19 @@ async function getSearchPosts (request, response) {
       object.replies = repliesArr;
       object.comments = commentsArr;
     }
-
+    response.status(200).json(finalQuery);
   } catch (e) {
-    console.log(e);
+    response.sendStatus(400);
+    response.send(e);
   }
 
-  response.status(200).json(finalQuery);
 }
 
 // Get all posts related tag term
 async function getFilterPosts (request, response) {
-  const forumFilterTerm = request.params.forumFilterTerm;
-  let resp;
   try {
-    resp = await pool.query(
+    const forumFilterTerm = request.params.forumFilterTerm;
+    let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
@@ -421,12 +441,12 @@ async function getFilterPosts (request, response) {
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
-      WHERE LOWER(t.name) LIKE $1
+      WHERE LOWER(t.name) LIKE LOWER($1)
       GROUP BY fp.post_id`, [`%${forumFilterTerm}%`]);
 
     var finalQuery = resp.rows;
 
-    for (var object of finalQuery) { // Loop through list of topic groups
+    for (var object of finalQuery) {
       var tagsArr = [];
       var repliesArr = [];
       var commentsArr = [];
@@ -450,37 +470,42 @@ async function getFilterPosts (request, response) {
       object.replies = repliesArr;
       object.comments = commentsArr;
     }
-
+    response.status(200).json(finalQuery);
   } catch (e) {
-    console.log(e);
+    response.send(e);
   }
-
-  response.status(200).json(finalQuery);
 }
 
 // Create new post on forum (TAGS MUST ALREADY EXIST and USER MUST EXIST)
 async function postForum (request, response) {
-  const title = request.body.title;
-  const author = request.body.author;
-  const idReq = await pool.query(`SELECT id FROM users WHERE name = $1`, [author]);
-  const user_id = idReq.rows[0].id;
-  const publishedDate = request.body.publishedDate;
-  const description = request.body.description;
-  const tags = request.body.tags;
+  try {
+    const title = request.body.title;
+    const user_id = request.body.user_id;
+    const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [user_id]);
 
-  let resp = await pool.query(
-    `INSERT INTO forum_posts(post_id, title, user_id, 
-      author, published_date, description, isPinned) 
-      values(default, $1, $2, $3, $4, $5, false) 
-      RETURNING post_id`,
-    [title, user_id, author, publishedDate, description]);
+    if (!authReq.rows[0]) { throw (`User does not exist with id: ${user_id}`); }
 
-  for (const tag of tags) { // Insert linked tags
-    let linkPostTag = await pool.query(
-      `INSERT INTO post_tags(post_id, tag_id) VALUES($1, $2)`, [resp.rows[0].post_id, tag.tag_id]);
+    const author = authReq.rows[0].name;
+    const publishedDate = request.body.publishedDate;
+    const description = request.body.description;
+    const tags = request.body.tags;
+  
+    let resp = await pool.query(
+      `INSERT INTO forum_posts(post_id, title, user_id, 
+        author, published_date, description, isPinned) 
+        values(default, $1, $2, $3, $4, $5, false) 
+        RETURNING post_id`,
+      [title, user_id, author, publishedDate, description]);
+  
+    for (const tag of tags) { // Insert linked tags
+      let linkPostTag = await pool.query(
+        `INSERT INTO post_tags(post_id, tag_id) VALUES($1, $2)`, [resp.rows[0].post_id, tag.tag_id]);
+    }
+
+    response.sendStatus(200);
+  } catch (e) {
+    response.status(400).send(e);
   }
-
-  response.status(200).send(resp.rows[0].post_id);
 };
 
 // Get post details of selected post
@@ -549,6 +574,19 @@ async function putPost (request, response) {
   }
 };
 
+// delete forum post
+async function deletePost (request, response) {
+  try {
+    const postId = request.params.postId;
+    let resp = await pool.query(`DELETE FROM forum_posts WHERE post_id = $1`,
+    [postId]);
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+};
+
 // Update post reply with id
 async function putPostReply (request, response) {
   const replyId = request.params.replyId;
@@ -565,16 +603,34 @@ async function putPostReply (request, response) {
   }
 };
 
+// Update post reply with id
+async function deletePostReply (request, response) {
+  try {
+    const replyId = request.params.replyId;
+
+    let resp = await pool.query(`DELETE FROM replies WHERE reply_id = $1`,
+    [replyId]);
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.sendStatus(400);
+    response.send(e);
+  }
+};
+
 // Create new reply
 async function postReply (request, response) {
-  const author = request.body.author;
-  const postId = request.params.postId;
-  const idReq = await pool.query(`SELECT id FROM users WHERE name = $1`, [author]);
-  const user_id = idReq.rows[0].id;
-  const publishedDate = request.body.published_date;
-  const reply = request.body.reply;
-
   try {
+    const user_id = request.body.user_id;
+    const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [user_id]);
+
+    if (typeof authReq.rows[0].name == 'undefined') { throw (`User doesn't exist with id: ${user_id}`) }
+
+    const author = authReq.rows[0].name;
+    const postId = request.params.postId;
+    const publishedDate = request.body.published_date;
+    const reply = request.body.reply;
+
     let resp = await pool.query(
       `INSERT INTO replies(reply_id, user_id, author, published_date, reply) 
       VALUES(default, $1, $2, $3, $4) RETURNING reply_id`,
@@ -583,22 +639,24 @@ async function postReply (request, response) {
     let linkReply = await pool.query(`INSERT INTO post_replies(post_id, reply_id) 
     VALUES($1, $2)`, [postId, resp.rows[0].reply_id]);
   
-    response.status(200).send("Update success");
+    response.sendStatus(200);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400);
+    response.send(e);
   }
 };
 
 // Post new comment
 async function postComment (request, response) {
-  const author = request.body.author;
-  const postId = request.params.postId;
-  const idReq = await pool.query(`SELECT id FROM users WHERE name = $1`, [author]);
-  const user_id = idReq.rows[0].id;
-  const publishedDate = request.body.published_date;
-  const comment = request.body.comment;
-
   try {
+    const user_id = request.body.user_id;
+    const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [user_id]);
+    if (typeof authReq.rows[0].name == 'undefined') { throw (`User doesn't exist with id: ${user_id}`) }
+    const author = authReq.rows[0].name;
+    const postId = request.params.postId;
+    const publishedDate = request.body.published_date;
+    const comment = request.body.comment;
+
     let resp = await pool.query(
       `INSERT INTO comments(comment_id, user_id, author, published_date, comment) 
       VALUES(default, $1, $2, $3, $4) RETURNING comment_id`,
@@ -607,23 +665,66 @@ async function postComment (request, response) {
     let linkComment = await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
     VALUES($1, $2)`, [postId, resp.rows[0].comment_id]);
 
-    response.status(200).send("Update success");
+    response.sendStatus(200);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400);
+    response.send(e);
+  }
+};
+
+// Put comment
+async function putComment (request, response) {
+  try {
+    const commentId = request.params.commentId;
+    const commentDescription = request.body.comment;
+
+    let resp = await pool.query(
+      `UPDATE comments SET comment = $1 WHERE comment_id = $2`,
+      [commentDescription, commentId]);
+  
+    /* let linkComment = await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
+    VALUES($1, $2)`, [postId, resp.rows[0].comment_id]); */
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+};
+
+// Delete new comment
+async function deleteComment (request, response) {
+  try {
+    //const postId = request.params.postId;
+    const commentId = request.params.commentId;
+
+    let resp = await pool.query(
+    `DELETE FROM comments WHERE comment_id = $1`,
+    [commentId]);
+  
+    /* let linkComment = await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
+    VALUES($1, $2)`, [postId, resp.rows[0].comment_id]); */
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
   }
 };
 
 // Pins or unpins forum post
 async function putPostPin (request, response) {
-  const postId = request.params.postId;
-  const isPinned = request.params.isPinned;
-
   try {
+    const postId = request.params.postId;
+    const isPinned = request.params.isPinned;
+
     let resp = await pool.query(`UPDATE forum_posts SET ispinned = $1 WHERE post_id = $2`,
     [isPinned, postId]);
-    response.status(200).send('Update success');
+
+    response.sendStatus(200);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400);
+    response.send(e);
   }
 }
 
@@ -634,20 +735,57 @@ async function getAllTags (request, response) {
     let resp = await pool.query(`SELECT * FROM tags`);
     response.status(200).json(resp.rows);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400)
+    response.send(e);
   }
 };
 
 // Posts tag
 async function postTag (request, response) {
-  const tagName = request.body.tagName;
-
   try {
-    let resp = await pool.query(`INSERT INTO tags(tag_id, name) VALUES(default, $1)`,
-     [tagName]);
-    response.status(200).send(`Tag created with name: ${tagName}`);
+    const tagName = request.body.tagName;
+    let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) like lower($1))`, [tagName]);
+
+    if (dupTagCheck.rows[0].exists) {
+      throw (`Tag '${tagName}' already exists`);
+    } 
+
+    let resp = await pool.query(`INSERT INTO tags(tag_id, name) VALUES(default, $1)`, [tagName]);
+    response.sendStatus(200);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400);
+    response.send(e);
+  } 
+};
+
+// Update tag
+async function putTag (request, response) {
+  try {
+    let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) 
+    like lower($1))`, [request.body.tagName]);
+
+    if (dupTagCheck.rows[0].exists) {
+      throw (`Tag '${request.body.tagName}' already exists`);
+    } 
+
+    let resp = await pool.query(`UPDATE tags SET name = $1 WHERE tag_id = $2`, 
+    [request.body.tagName, request.params.tagId]);
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  } 
+};
+
+// Posts tag
+async function deleteTag (request, response) {
+  try {
+    const tagId = request.params.tagId;
+    let resp = await pool.query(`DELETE FROM tags WHERE tag_id = $1`, [tagId]);
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
   } 
 };
 
@@ -657,20 +795,40 @@ async function postTag (request, response) {
 
 // Get all announcements of topic group / course
 async function getAnnouncements (request, response) {
-  const topicGroupName = request.params.topicGroup;
-  const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
-  const topicGroupId = tmpQ.rows[0].id;
-
   try {
+    const topicGroupName = request.params.topicGroup;
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
     let resp = await pool.query(
-      `SELECT a.id, a.author, a.topic_group, a.title, a.content, a.post_date, array_agg(af.name) as attachments
+      `SELECT a.id, a.author, a.topic_group, a.title, a.content, a.post_date,
+      array_agg(af.name) as attachments
       FROM announcements a
       LEFT JOIN announcement_files af ON af.announcement_id = a.id
       WHERE a.topic_group = $1
       GROUP BY a.id`, [topicGroupId])
     response.status(200).json(resp.rows);
   } catch(e) {
-    response.status(400).send(e);
+    response.sendStatus(400);
+    response.send(e);
+  }
+};
+
+// Get announcement by id 
+async function getAnnouncementById (request, response) {
+  try {
+    const announcementId = request.params.announcementId;
+    let resp = await pool.query(`
+      SELECT a.id, a.author, a.topic_group, a.title, a.content, a.post_date,
+      array_agg(af.name) as attachments
+      FROM announcements a
+      LEFT JOIN announcement_files af ON af.announcement_id = a.id
+      WHERE a.id = $1
+      GROUP BY a.id
+    `, [announcementId]);
+    response.status(200).json(resp.rows[0]);
+  } catch (e) {
+    response.sendStatus(400);
+    response.send(e);
   }
 };
 
@@ -685,12 +843,17 @@ async function postAnnouncement (request, response) {
   const postDate = request.body.postDate;
   const attachments = request.body.attachments;
 
+  /* for (const file of request.files) {
+    console.log(file);
+  } */
+
   try {
     let resp = await pool.query(
       `INSERT INTO announcements(id, author, topic_group, title, content, post_date) 
-      VALUES(default, $1, $2, $3, $4, $5) RETURNING id`, [author, topic_group, title, content, postDate])
+      VALUES(default, $1, $2, $3, $4, $5) RETURNING id`,
+      [author, topic_group, title, content, postDate])
     const aId = resp.rows[0].id;
-
+  
     // Loop to add attachments to db
     if (attachments.length) {
       for (const item of attachments) {
@@ -700,40 +863,100 @@ async function postAnnouncement (request, response) {
       }
     }
 
-    response.status(200).send("Post success");
+    response.sendStatus(200);
   } catch(e) {
     response.status(400).send(e);
   }
 };
 
+// Update announcement by id
+async function putAnnouncement (request, response) {
+  try {
+    const announcementId = request.params.announcementId;
+    const title = request.body.title;
+    const content = request.body.content;
+
+    let resp = pool.query(`
+    UPDATE announcements SET title = $1, content = $2
+    WHERE id = $3
+    `, [title, content, announcementId]);
+
+    response.sendStatus(200);
+  } catch (e) {
+    response.sendStatus(400);
+    response.send(e);
+  }
+};
+
+// Delete announcement by id
+async function deleteAnnouncement (request, response) {
+  try {
+    const announcementId = request.params.announcementId;
+    let resp = await pool.query(
+      `DELETE FROM announcements WHERE id = $1`, [announcementId]);
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+};
+
 // Create new comment for announcement
 async function postAnnouncementComment (request, response) {
-  //const topicGroupName = request.params.topicGroup;
-  const announcementId = request.body.announcementId;
-  const author = request.body.author;
-  const content = request.body.content;
-  const postDate = request.body.postDate;
-  const attachments = request.body.attachments;
-
-  let resp = await pool.query(
-    `INSERT INTO announcement_comment(id, announcement_id, author, content, post_date) 
-    VALUES(default, $1, $2, $3, $4) RETURNING id`, [announcementId, author, content, postDate])
-  const aId = resp.rows[0].id;
-
-  // Loop to add attachments to db
-  if (attachments.length) {
-    for (const item of attachments) {
-      let addItem = await pool.query(
-        `INSERT INTO announcement_comment_files(id, name, file_id, comment_id)
-        VALUES(default, $1, $1, $2)`, [item, aId])
-    }
-  }
-
-  response.status(200).send("Post comment success");
   try {
-    
+    //const topicGroupName = request.params.topicGroup;
+    const announcementId = request.params.announcementId;
+    const author = request.body.author;
+    const content = request.body.content;
+    const postDate = request.body.postDate;
+    const attachments = request.body.attachments;
+
+    let resp = await pool.query(
+      `INSERT INTO announcement_comment(id, announcement_id, author, content, post_date) 
+      VALUES(default, $1, $2, $3, $4) RETURNING id`, [announcementId, author, content, postDate])
+    const aId = resp.rows[0].id;
+
+    // Loop to add attachments to db
+    if (attachments.length) {
+      for (const item of attachments) {
+        let addItem = await pool.query(
+          `INSERT INTO announcement_comment_files(id, name, file_id, comment_id)
+          VALUES(default, $1, $1, $2)`, [item, aId])
+      }
+    }
+
+    response.sendStatus(200);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400)
+    response.send(e);
+  }
+};
+
+// Update announcement comment
+async function putAnnouncementComment (request, response) {
+  try {
+    const commentId = request.params.commentId;
+    const content = request.body.content;
+    let resp = await pool.query(
+      `UPDATE announcement_comment SET content = $1 WHERE id = $2`,
+      [content, commentId]);
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+};
+
+// Delete announcement comment by id
+async function deleteAnnouncementComment (request, response) {
+  try {
+    const commentId = request.params.commentId;
+    let resp = await pool.query(
+      `DELETE FROM announcement_comment WHERE id = $1`, [commentId]);
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
   }
 };
 
@@ -1226,9 +1449,8 @@ async function getAllQuestionBankQuestions (request, response) {
 
 // Get specific question from question bank
 async function getQuestionFromQuestionBank (request, response) {
-  const questionId = request.params.questionId;
-
   try {
+    const questionId = request.params.questionId;
     let resp = await pool.query(
       `SELECT * FROM quiz_question WHERE id = $1`
     , [questionId]);
@@ -1438,6 +1660,17 @@ async function getStudentAnswerCount (request, response) {
 };
 
 module.exports = {
+  putTag,
+  putAnnouncementComment,
+  putAnnouncement,
+  getAnnouncementById,
+  deleteAnnouncement,
+  deleteAnnouncementComment,
+  deletePost,
+  deleteComment,
+  putComment,
+  deletePostReply,
+  deleteTag,
   getStudentAnswerCount,
   putQuestionAnswer,
   deleteAssessmentQuestion,

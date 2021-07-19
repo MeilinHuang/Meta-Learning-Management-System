@@ -101,8 +101,8 @@ CREATE TABLE IF NOT EXISTS "comments" (
 
 DROP TABLE IF EXISTS "post_author" CASCADE;
 CREATE TABLE IF NOT EXISTS "post_author"(
-  post_id INT NOT NULL,
-  user_id INT NOT NULL,
+  post_id INT NOT NULL REFERENCES forum_posts(post_id),
+  user_id INT NOT NULL REFERENCES users(id),
   author TEXT NOT NULL,
   PRIMARY KEY(post_id, user_id)
 );
@@ -117,16 +117,16 @@ CREATE TABLE IF NOT EXISTS "comments_author"(
 
 DROP TABLE IF EXISTS "replies_author" CASCADE;
 CREATE TABLE IF NOT EXISTS "replies_author"(
-  reply_id INT NOT NULL,
-  user_id INT NOT NULL,
+  reply_id INT NOT NULL REFERENCES replies(reply_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   author TEXT NOT NULL,
   PRIMARY KEY(reply_id, user_id)
 );
 
 DROP TABLE IF EXISTS "post_replies" CASCADE;
 CREATE TABLE IF NOT EXISTS "post_replies"(
-  post_id INT NOT NULL,
-  reply_id INT NOT NULL,
+  post_id INT NOT NULL REFERENCES forum_posts(post_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  reply_id INT NOT NULL REFERENCES replies(reply_id) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY(post_id, reply_id)
 );
 
@@ -177,7 +177,7 @@ CREATE TABLE "announcement_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   file_id TEXT NOT NULL,
-  announcement_id INTEGER NOT NULL REFERENCES announcements(id)
+  announcement_id INTEGER NOT NULL REFERENCES announcements(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "announcement_comment_files" CASCADE;
@@ -185,7 +185,7 @@ CREATE TABLE "announcement_comment_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   file_id TEXT NOT NULL,
-  comment_id INTEGER NOT NULL REFERENCES announcement_comment(id)
+  comment_id INTEGER NOT NULL REFERENCES announcement_comment(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- Gamification

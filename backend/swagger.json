@@ -1358,6 +1358,10 @@
       "post": {
         "tags": ["Course Pages"],
         "summary": "Create new announcement",
+        "consumes": [
+          "multipart/form-data",
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "topicGroup",
@@ -1365,6 +1369,13 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "uploadFile",
+            "description": "File upload",
+            "in": "formData",
+            "type": "file",
+            "required": false
           },
           {
             "name": "announcementBody",
@@ -1392,17 +1403,121 @@
         }
       }
     },
-    "/{topicGroup}/announcement/comment": {
+    "/{topicGroup}/announcement/{announcementId}": {
+      "get": {
+        "tags": ["Course Pages"],
+        "summary": "Get announcement by id",
+        "parameters": [
+          {
+            "name": "announcementId",
+            "description": "Announcement Id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Announcement"
+            }
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Course Pages"],
+        "summary": "Update announcement details",
+        "parameters": [
+          {
+            "name": "announcementId",
+            "description": "Announcement Id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "announcementBody",
+            "in": "body",
+            "description": "Announcement body",
+            "schema": {
+              "$ref": "#/definitions/PutAnnouncement"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Course Pages"],
+        "summary": "Delete announcement",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "description": "Name of topic Group",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "announcementId",
+            "description": "Announcement id to delete",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroup}/announcement/{announcementId}/comment": {
       "post": {
         "tags": ["Course Pages"],
         "summary": "Create new announcement comment",
         "parameters": [
           {
-            "name": "topicGroup",
-            "description": "Name of topic Group to create announcement for",
+            "name": "announcementId",
+            "description": "Id of announcement to comment",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer"
           },
           {
             "name": "commentBody",
@@ -1411,6 +1526,72 @@
             "schema": {
               "$ref": "#/definitions/PostAnnouncementComment"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroup}/announcement/{announcementId}/comment/{commentId}": {
+      "put": {
+        "tags": ["Course Pages"],
+        "summary": "Update announcement comment",
+        "parameters": [
+          {
+            "name": "commentId",
+            "description": "Id of comment to update",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "commentBody",
+            "in": "body",
+            "description": "Comment body",
+            "schema": {
+              "$ref": "#/definitions/PutAnnouncementComment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Course Pages"],
+        "summary": "Delete announcement comment",
+        "parameters": [
+          {
+            "name": "commentId",
+            "description": "Id of comment to delete",
+            "in": "path",
+            "required": true,
+            "type": "integer"
           }
         ],
         "responses": {
@@ -1648,34 +1829,17 @@
             }
           }
         }
-      }
-    },
-    "/forum/post/{postId}/reply/{replyId}": {
-      "put": {
+      },
+      "delete": {
         "tags": ["Forums"],
-        "summary": "Update reply on a post with id",
+        "summary": "Delete forum post by id",
         "parameters": [
-          {
-            "name": "replyId",
-            "in": "path",
-            "required": true,
-            "description": "Id of reply we want to update",
-            "type": "integer"
-          },
           {
             "name": "postId",
             "in": "path",
-            "required": false,
-            "description": "Id of post",
-            "type": "integer"
-          },
-          {
-            "name": "replyDetails",
-            "in": "body",
-            "description": "Details of updated post reply",
-            "schema": {
-              "$ref": "#/definitions/PutReply"
-            }
+            "required": true,
+            "description": "Id of post we want to delete",
+            "type": "string"
           }
         ],
         "responses": {
@@ -1733,6 +1897,78 @@
         }
       }
     },
+    "/forum/post/{postId}/reply/{replyId}": {
+      "put": {
+        "tags": ["Forums"],
+        "summary": "Update reply on a post with id",
+        "parameters": [
+          {
+            "name": "replyId",
+            "in": "path",
+            "required": true,
+            "description": "Id of reply we want to update",
+            "type": "integer"
+          },
+          {
+            "name": "postId",
+            "in": "path",
+            "required": false,
+            "description": "Id of post",
+            "type": "integer"
+          },
+          {
+            "name": "replyDetails",
+            "in": "body",
+            "description": "Details of updated post reply",
+            "schema": {
+              "$ref": "#/definitions/PutReply"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Forums"],
+        "summary": "Delete forum post reply",
+        "parameters": [
+          {
+            "name": "replyId",
+            "in": "path",
+            "required": true,
+            "description": "Id of reply we want to delete",
+            "type": "integer"
+          },
+          {
+            "name": "postId",
+            "in": "path",
+            "required": false,
+            "description": "Id of post",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": {
+            "schema": { "$ref": "#/definitions/400" }
+          },
+          "403": { "schema": { "$ref": "#/definitions/403" } }
+        }
+      }
+    },
     "/forum/post/{postId}/comment": {
       "post": {
         "tags": ["Forums"],
@@ -1752,6 +1988,87 @@
             "schema": {
               "$ref": "#/definitions/PostComment"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/{postId}/comment/{commentId}": {
+      "put": {
+        "tags": ["Forums"],
+        "summary": "Updates post comment",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": false,
+            "description": "Id of post",
+            "type": "integer"
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "description": "Id of comment",
+            "type": "integer"
+          },
+          {
+            "name": "commentBody",
+            "in": "body",
+            "required": true,
+            "description": "Id of comment",
+            "schema": {
+              "$ref": "#/definitions/PutComment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Forums"],
+        "summary": "Deletes forum comment",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": false,
+            "description": "Id of post",
+            "type": "integer"
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "description": "Id of comment",
+            "type": "integer"
           }
         ],
         "responses": {
@@ -1842,6 +2159,73 @@
             "schema": {
               "$ref": "#/definitions/ForumTag"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      }
+    },
+    "/forum/tags/{tagId}": {
+      "put": {
+        "tags": ["Forums"],
+        "summary": "Update forum tag",
+        "parameters": [
+          {
+            "name": "tagId",
+            "type": "integer",
+            "required": true,
+            "description": "Id of tag",
+            "in": "path"
+          },
+          {
+            "name": "tagBody",
+            "required": true,
+            "description": "New tag name",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ForumTag"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "schema": { 
+              "$ref": "#/definitions/400"
+            }
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/403"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Forums"],
+        "summary": "Delete forum tag",
+        "parameters": [
+          {
+            "name": "tagId",
+            "type": "integer",
+            "required": true,
+            "description": "Id of tag",
+            "in": "path"
           }
         ],
         "responses": {
@@ -2467,10 +2851,6 @@
     },
     "PostAnnouncementComment": {
       "properties": {
-        "announcementId": {
-          "type": "integer",
-          "example": 1
-        },
         "author": {
           "type": "integer",
           "example": 1
@@ -2971,9 +3351,9 @@
           "type": "string",
           "example": "Final exam marks release date?"
         },
-        "author": {
-          "type": "string",
-          "example": "Billy Hendryk"
+        "user_id": {
+          "type": "integer",
+          "example": 0
         },
         "publishedDate": {
           "type": "dateTime",
@@ -3003,9 +3383,9 @@
     },
     "PostReply": {
       "properties": {
-        "author": {
-          "type": "string",
-          "example": "Lecturey Lecturer"
+        "user_id": {
+          "type": "integer",
+          "example": 1
         },
         "published_date": {
           "type": "dateTime",
@@ -3027,9 +3407,9 @@
     },
     "PostComment": {
       "properties": {
-        "author": {
-          "type": "string",
-          "example": "Lecturey Lecturer"
+        "user_id": {
+          "type": "integer",
+          "example": 1
         },
         "published_date": {
           "type": "dateTime",
@@ -3038,6 +3418,14 @@
         "comment": {
           "type": "string",
           "example": "The final exam hasn't happened yet"
+        }
+      }
+    },
+    "PutAnnouncementComment": {
+      "properties": {
+        "content": {
+          "type": "string",
+          "example": "Some new comment description"
         }
       }
     },
@@ -3222,6 +3610,18 @@
         }
       }
     },
+    "PutAnnouncement": {
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Some title"
+        },
+        "content": {
+          "type": "string",
+          "example": "Some new description"
+        }
+      }
+    },
     "GetAllQuestions": {
       "properties": {
         "questions": {
@@ -3268,6 +3668,14 @@
               }
             }
           }
+        }
+      }
+    },
+    "PutComment": {
+      "properties": {
+        "comment": {
+          "type": "string",
+          "example": "New comment description"
         }
       }
     },

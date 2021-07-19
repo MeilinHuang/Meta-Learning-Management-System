@@ -1,9 +1,15 @@
 const express = require("express");
+var cors = require('cors');
 const app = express();
 const database =  require('./service.js');
+const fileUpload = require('express-fileupload');
+const multer = require('multer');
+var upload = multer({ dest: 'tmp_files/' });
 
-// Body parsing
-app.use(express.json());
+app.use(cors());
+app.use(express.json({limit: '50mb'}));
+app.use(fileUpload());
+
 
 /***************************************************************
                        Swagger API
@@ -41,6 +47,7 @@ app.delete('/user/:userId/:topicGroupId', database.deleteAdmin);
 /***************************************************************
                        Topic Group Functions
 ***************************************************************/
+
 
 app.get('/topicGroup', async(request, response) => {
   await database.getAllTopicGroups(request, response);
@@ -108,6 +115,10 @@ app.put('/forum/post/:postId', async(request, response) => {
   await database.putPost(request, response);
 });
 
+app.delete('/forum/post/:postId', async(request, response) => {
+  await database.deletePost(request, response);
+});
+
 app.put('/forum/post/:postId/reply/:replyId', async(request, response) => {
   await database.putPostReply(request, response);
 });
@@ -116,20 +127,36 @@ app.post('/forum/post/:postId/reply', async(request, response) => {
   await database.postReply(request, response);
 });
 
+app.delete('/forum/post/:postId/reply/:replyId', async(request, response) => {
+  await database.deletePostReply(request, response);
+});
+
 app.post('/forum/post/:postId/comment', async(request, response) => {
   await database.postComment(request, response);
+});
+
+app.put('/forum/post/:postId/comment/:commentId', async(request, response) => {
+  await database.putComment(request, response);
+});
+
+app.delete('/forum/post/:postId/comment/:commentId', async(request, response) => {
+  await database.deleteComment(request, response);
 });
 
 app.put('/forum/post/pin/:postId/:isPinned', async(request, response) => {
   await database.putPostPin(request, response);
 });
 
-app.put('/forum/tags', async(request, response) => {
-  await database.getAllTags(request, response);
+app.put('/forum/tags/:tagId', async(request, response) => {
+  await database.putTag(request, response);
 });
 
 app.post('/forum/tags', async(request, response) => {
   await database.postTag(request, response);
+});
+
+app.delete('/forum/tags/:tagId', async(request, response) => {
+  await database.deleteTag(request, response);
 });
 
 /***************************************************************
@@ -144,8 +171,28 @@ app.post('/:topicGroup/announcement/new', async(request, response) => {
   await database.postAnnouncement(request, response);
 })
 
-app.post('/:topicGroup/announcement/comment', async(request, response) => {
+app.get('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.getAnnouncementById(request, response);
+})
+
+app.put('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.putAnnouncement(request, response);
+})
+
+app.delete('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.deleteAnnouncement(request, response);
+})
+
+app.post('/:topicGroup/announcement/:announcementId/comment', async(request, response) => {
   await database.postAnnouncementComment(request, response);
+})
+
+app.put('/:topicGroup/announcement/:announcementId/comment/:commentId', async(request, response) => {
+  await database.putAnnouncementComment(request, response);
+})
+
+app.delete('/:topicGroup/announcement/:announcementId/comment/:commentId', async(request, response) => {
+  await database.deleteAnnouncementComment(request, response);
 })
 
 /***************************************************************

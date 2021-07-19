@@ -66,6 +66,33 @@ export default function TopicTree() {
         onClose: onCloseModal 
     } = useDisclosure();
 
+    const treeStructure = (jsonData) => {
+        let newJson = {
+            "nodes": [{}],
+            "links": []
+        };
+        for (let topic of jsonData.topics_list) {
+            let node = {};
+            node["id"] = topic.id;
+            node["title"] = topic.name;
+            node["materials_strings"] = {};
+            node.materials_strings["content"] = [];
+            for (let course_material of topic.course_materials) {
+                node.materials_strings.content.push(course_material.name);
+            }
+            console.log('topic', topic);
+            newJson.nodes.push(node);
+            for (let prereq of topic.prereqs) {
+                newJson.links.push({
+                    'source': prereq,
+                    'target': topic.id
+                });
+            }
+        }
+        console.log('newJson', newJson);
+        return newJson;
+    }
+
 
     const getListOfPrerequisites = (id, data) => {
         console.log('id', id);
@@ -115,10 +142,23 @@ export default function TopicTree() {
 
         
         // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
-        fetch('/topic-tree-example.json')
-        .then((res) => res.json())
+        fetch(get_topics_url('Introduction to Programming'))
+        .then((res) => {
+            return res.json();
+        })
+        .then((res) => {
+            console.log('old json', res);
+            return treeStructure(res);
+        })
         .then( function(data) {
-            
+            let preprocessedData = {};
+            // make it easier to access instead of having to traverse data.nodes each time
+            for (let node of data.nodes) {
+                if (node.hasOwnProperty('id')) {
+                    preprocessedData[node.id.toString()] = node;
+                }
+            }
+            console.log('data');
             // arrow heads
             svg.append("svg:defs").selectAll("marker")
                 .data(["end"])
@@ -186,13 +226,21 @@ export default function TopicTree() {
                 .text(function(d) {
                   return d.title;
                 })
-                
-        
+            
+            var linkNodes = [];
+            data.links.forEach(function(link) {
+                linkNodes.push({
+                    source: preprocessedData[link.source],
+                    target: preprocessedData[link.target]
+                });
+            });
+            
+            console.log('linkNodes', linkNodes);
             simulation
-                .nodes(data.nodes)
+                .nodes(data.nodes.concat(linkNodes))
                 .on("tick", ticked);
             simulation.force("link")
-                .links(data.links);
+                .links(data.links.concat(linkNodes));
 
     
             // This function is run at each iteration of the force algorithm, updating the nodes position.
