@@ -19,18 +19,24 @@ import {
 } from '@draft-js-plugins/buttons';
 import { convertToHTML } from 'draft-convert'
 
-const staticToolbarPlugin = createToolbarPlugin();
-const { Toolbar } = staticToolbarPlugin;
-const plugins = [
-    createMarkdownShortcutsPlugin(),
-    staticToolbarPlugin,
-];
+
 
 export default class SimpleStaticToolbarEditor extends Component {
-  state = {
-    editorState: this.props.content ? EditorState.createWithContent(this.props.content) : createEditorStateWithText(''),
-  };
-
+  constructor(props) {
+    super(props);
+    const staticToolbarPlugin = createToolbarPlugin();
+    this.PluginComponents = {
+      Toolbar: staticToolbarPlugin.Toolbar
+    };
+    this.plugins = [
+      createMarkdownShortcutsPlugin(),
+      staticToolbarPlugin,
+    ];
+    this.state = {
+      editorState: this.props.content ? EditorState.createWithContent(this.props.content) : createEditorStateWithText(''),
+    };
+  }
+  
   onChange = (editorState) => {
     this.setState({
       editorState,
@@ -74,6 +80,8 @@ export default class SimpleStaticToolbarEditor extends Component {
         }
     }
 
+    const { Toolbar } = this.PluginComponents
+
     return (
         <>
             <div className={classnames(styles.editor, this.props.className)} onClick={this.focus}>
@@ -82,10 +90,8 @@ export default class SimpleStaticToolbarEditor extends Component {
                 customStyleMap={styleMap}
                 editorState={this.state.editorState}
                 onChange={this.onChange}
-                plugins={plugins}
-                ref={(element) => {
-                this.editor = element;
-                }}
+                plugins={this.plugins}
+                ref={(element) => { this.editor = element; }}
             />
             <Toolbar>
                 {

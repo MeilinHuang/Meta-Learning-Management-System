@@ -3278,6 +3278,144 @@
         }
       }
     },
+    "/forum/post/endorse/{postId}/{isEndorsed}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Endorses or un-endorses post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want to endorse/un-endorse",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "isEndorsed",
+            "in": "path",
+            "description": "Set isEndorsed to true or false",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/like/{postId}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Adds upvote for post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want to add upvote for",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forum/post/unlike/{postId}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Removes upvote for post associated with post id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post we want to remove upvote for",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/{topicGroup}/remove-level/{level}": {
       "delete": {
         "tags": [
@@ -4023,6 +4161,14 @@
           "content": {
             "type": "string",
             "example": "Description of the first announcement"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "file",
+              "format": "binary",
+              "example": "announcement.img"
+            }
           }
         }
       },
@@ -4124,6 +4270,18 @@
             "example": "Lorem ipsum ipsum ipsum ipsum ipsum"
           },
           "isPinned": {
+            "type": "boolean",
+            "example": true
+          },
+          "related_link": {
+            "type": "string",
+            "example": "/content"
+          },
+          "num_of_upvotes": {
+            "type": "integer",
+            "example": 3
+          },
+          "isEndorsed": {
             "type": "boolean",
             "example": true
           },
@@ -4472,6 +4630,18 @@
                 "isPinned": {
                   "type": "boolean",
                   "example": true
+                },
+                "related_link": {
+                  "type": "string",
+                  "example": "/content"
+                },
+                "num_of_upvotes": {
+                  "type": "integer",
+                  "example": 3
+                },
+                "isEndorsed": {
+                  "type": "boolean",
+                  "example": true
                 }
               }
             }
@@ -4508,6 +4678,10 @@
                 }
               }
             }
+          },
+          "related_link": {
+            "type": "string",
+            "example": "/content"
           }
         }
       },

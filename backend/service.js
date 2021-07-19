@@ -278,7 +278,7 @@ async function getAllForumPosts (request, response) {
   let resp;
   try {
     resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -329,7 +329,7 @@ async function getAllPinnedPosts (request, response) {
   let resp;
   try {
     resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp 
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -380,7 +380,7 @@ async function getSearchPosts (request, response) {
   try {
     const forumSearchTerm = request.params.forumSearchTerm;
     let resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp 
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -432,7 +432,7 @@ async function getFilterPosts (request, response) {
   try {
     const forumFilterTerm = request.params.forumFilterTerm;
     let resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -489,13 +489,14 @@ async function postForum (request, response) {
     const publishedDate = request.body.publishedDate;
     const description = request.body.description;
     const tags = request.body.tags;
+    const related_link = request.body.related_link;
   
     let resp = await pool.query(
       `INSERT INTO forum_posts(post_id, title, user_id, 
-        author, published_date, description, isPinned) 
-        values(default, $1, $2, $3, $4, $5, false) 
+        author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
+        values(default, $1, $2, $3, $4, $5, false, $6, 0, false) 
         RETURNING post_id`,
-      [title, user_id, author, publishedDate, description]);
+      [title, user_id, author, publishedDate, description, related_link]);
   
     for (const tag of tags) { // Insert linked tags
       let linkPostTag = await pool.query(
@@ -514,7 +515,7 @@ async function getPostById (request, response) {
   let resp;
   try {
     resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -788,6 +789,58 @@ async function deleteTag (request, response) {
     response.send(e);
   } 
 };
+
+// Endorses or un-endorses forum post
+async function putPostEndorse (request, response) {
+  try {
+    const postId = request.params.postId;
+    const isEndorsed = request.params.isEndorsed;
+
+    let resp = await pool.query(`UPDATE forum_posts SET isendorsed = $1 WHERE post_id = $2`,
+    [isEndorsed, postId]);
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+}
+
+// Likes a forum post
+async function putPostLike (request, response) {
+  try {
+    const postId = request.params.postId;
+
+    const upvotesResp = await pool.query(`SELECT num_of_upvotes FROM forum_posts WHERE post_id = $1`, [postId])
+    const upvotes = upvotesResp.rows[0].num_of_upvotes + 1
+
+    let resp = await pool.query(`UPDATE forum_posts SET num_of_upvotes = $1 WHERE post_id = $2`,
+    [upvotes, postId]);
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+}
+
+// Unlikes a forum post
+async function putPostUnlike (request, response) {
+  try {
+    const postId = request.params.postId;
+
+    let upvotesResp = await pool.query(`SELECT num_of_upvotes FROM forum_posts WHERE post_id = $1`, [postId])
+    const upvotes = upvotesResp.rows[0].num_of_upvotes === 0 ? upvotesResp.rows[0].num_of_upvotes : upvotesResp.rows[0].num_of_upvotes - 1
+
+    let resp = await pool.query(`UPDATE forum_posts SET num_of_upvotes = $1 WHERE post_id = $2`,
+    [upvotes, postId]);
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+}
 
 /***************************************************************
                        Course Pages Functions
@@ -1721,6 +1774,9 @@ module.exports = {
   putPostPin,
   getAllTags,
   postTag,
+  putPostEndorse,
+  putPostLike,
+  putPostUnlike,
   getAnnouncements,
   postAnnouncement,
   postAnnouncementComment,

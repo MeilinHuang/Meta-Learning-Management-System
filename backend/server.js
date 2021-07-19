@@ -157,6 +157,19 @@ app.delete('/forum/tags/:tagId', async(request, response) => {
   await database.deleteTag(request, response);
 });
 
+app.put('/forum/post/endorse/:postId/:isEndorsed', async(request, response) => {
+  await database.putPostEndorse(request, response);
+});
+
+app.put('/forum/post/like/:postId', async(request, response) => {
+  await database.putPostLike(request, response);
+});
+
+app.put('/forum/post/unlike/:postId', async(request, response) => {
+  await database.putPostUnlike(request, response);
+});
+
+
 /***************************************************************
                        Course Pages Functions
 ***************************************************************/
