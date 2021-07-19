@@ -865,8 +865,8 @@ async function getAnnouncements (request, response) {
       for (const attachment of object.attachments) {
         if (attachment != null) { 
           let fileQ = await pool.query(`
-          SELECT id, name from announcement_files WHERE announcement_id = $1
-          AND id = $2
+          SELECT id, name, encode(announcement_files.file, 'base64') as files
+          FROM announcement_files WHERE announcement_id = $1 AND id = $2
           `, [object.id, attachment])
           fileArr.push(fileQ.rows[0]);
         }
