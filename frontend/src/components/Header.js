@@ -4,7 +4,7 @@ import { HamburgerIcon, ChevronDownIcon, ChevronRightIcon} from '@chakra-ui/icon
 
 function Header({setOpen}) {
     return (
-        <Box height="100%">
+        <Box height="100%" >
             <Flex bg="blue.500" height={55}>
                 <Box bg="blue.400" display={["block", "block", "none"]} onClick={() => {setOpen(true)}} cursor="pointer" color="white">
                     <Flex align="center" mr={5} paddingInline={5} margin={0} height="100%" width="100%">

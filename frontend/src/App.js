@@ -1,6 +1,7 @@
 import React from "react"
 import './App.css';
 import CoursePage from "./pages/CoursePage";
+import MainPage from "./pages/MainPage";
 import { ChakraProvider } from "@chakra-ui/react"
 import {
     BrowserRouter as Router,
@@ -15,7 +16,8 @@ function App() {
             <Router>
                 <Switch>
                     <Route exact path="/topictree"><TopicTree /></Route>
-                    <Route path="/" ><CoursePage /></Route>
+                    <Route path="/course-page/:code" ><CoursePage /></Route>
+                    <Route path="/"><MainPage/></Route>
                 </Switch>
             </Router>
         </ChakraProvider>

@@ -28,7 +28,7 @@ function CourseContentPage() {
     )
     if (data != null) {
         pageView =  (
-            <div>
+            <Box marginInline={[0, 0, 0, 100]}>
                 <Box marginBottom={10}>
                     <Flex alignItems="center">
                         <Heading flexGrow={1}size="lg">Course Content</Heading>
@@ -118,7 +118,7 @@ function CourseContentPage() {
                         }
                     }}>DOWNLOAD</Button>
                 </Center>
-            </div>
+            </Box>
         )
     }
     return pageView

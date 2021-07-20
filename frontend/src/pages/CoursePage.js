@@ -12,7 +12,7 @@ import {
     Route,
 } from "react-router-dom"
 
-import { useBreakpointValue, Flex, Container } from "@chakra-ui/react"
+import { useBreakpointValue, Flex, Container, Box } from "@chakra-ui/react"
 
 function CoursePage() {
     //currently hardcoded sidebar content
@@ -50,21 +50,27 @@ function CoursePage() {
 
     return (
         <div>
-            
-            <Header setOpen={setOpen}></Header>
-            <Flex>
-                <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
+            <Box position="sticky" width="100%" top={0} zIndex={100}>
+                <Header setOpen={setOpen}></Header>
+                <Box position="fixed" left={0}>
+                    <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
+                </Box>
+                <Box position="fixed" right={0}>
+                    <WidgetsBar></WidgetsBar>
+                </Box>
+            </Box>
+            <Flex marginLeft={[0, 0, 200, 100]} marginRight={[0, 0, 0, 100]}>
                 <Container marginTop={50} mx={{ base: "0", md: "24px"}} maxWidth="100%">
                     <Switch>
                         {/* Add your page as a Route here */}
-                        <Route exact path="/" component={CourseDashboard} />
-                        <Route exact path="/announcement/:id" component={AnnouncementPage} />
-                        <Route exact path="/forums" component={ForumOverviewPage} />
-                        <Route exact path="/content"><CourseContentPage /></Route>
-                        <Route exact path="/forums/:id" component={ForumPostPage} />
+                        <Route exact path="/course-page/:code/announcement/:id" component={AnnouncementPage} />
+                        <Route exact path="/course-page/:code/forums" component={ForumOverviewPage} />
+                        <Route exact path="/course-page/:code/content"><CourseContentPage /></Route>
+                        <Route exact path="/course-page/:code/forums/:id" component={ForumPostPage} />
+                        <Route path="/" component={CourseDashboard} />
                     </Switch>
                 </Container>
-                <WidgetsBar></WidgetsBar>
+                
             </Flex>
         </div>
     )
