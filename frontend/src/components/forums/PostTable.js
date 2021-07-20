@@ -12,6 +12,7 @@ import {
     Td,
 } from "@chakra-ui/react"
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri'
+import { TiArrowUpOutline, TiArrowUpThick } from 'react-icons/ti'
 import { StoreContext } from '../../utils/store'
 
 const getRow = ({ post_id, title, published_date, replies, comments, ispinned, description }, setPosts, setPinnedPosts, setShowPinned) => {
@@ -31,7 +32,7 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned, d
             })
     }
 
-    let plainTextDesc = description.replace(/<[^>]+>/g, '')
+    let plainTextDesc = description.replace(/<[^>]+>/g, ' ')
     plainTextDesc = plainTextDesc.length > 120 ? plainTextDesc.substring(0, 119) + '...' : plainTextDesc
 
     return (
@@ -52,6 +53,15 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned, d
             <Td>{dateString}</Td>
             <Td isNumeric>{replies.length}</Td>
             <Td isNumeric>{comments.length}</Td>
+            <Td>
+                {/* <IconButton 
+                    // aria-label={ispinned ? 'Unpin post' : 'Pin post'}
+                    // icon={ispinned ? <RiPushpin2Fill /> : <RiPushpin2Line />} 
+                    icon={<TiArrowUpOutline />}
+                    backgroundColor="white"
+                    onClick={handlePinUnpin}
+                />   */}
+            </Td>
         </Tr>
     )
 }
@@ -71,6 +81,7 @@ function PostTable({ isAdmin, posts: postData }) {
                     <Th>Date created</Th>
                     <Th isNumeric>Replies</Th>
                     <Th isNumeric>Comments</Th>
+                    {/* <Th /> */}
                 </Tr>
             </Thead>
             <Tbody>

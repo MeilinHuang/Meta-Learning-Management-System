@@ -28,7 +28,8 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
 
     const handleSubmit = e => {
         e.preventDefault()
-        const date = new Date(Date.now()).toISOString()
+        const timeZoneOffset = (new Date()).getTimezoneOffset() * 60000
+        const date = new Date(Date.now() - timeZoneOffset).toISOString()
 
         const postDetails = {
             title,
