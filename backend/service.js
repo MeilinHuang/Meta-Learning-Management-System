@@ -748,14 +748,15 @@ async function postTag (request, response) {
     let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) like lower($1))`, [tagName]);
 
     if (dupTagCheck.rows[0].exists) {
-      throw (`Tag '${tagName}' already exists`);
+      response.status(400).json({ error: `Tag '${tagName}' already exists`})
+      return
     } 
 
     let resp = await pool.query(`INSERT INTO tags(tag_id, name) VALUES(default, $1)`, [tagName]);
     response.sendStatus(200);
   } catch(e) {
     response.status(400);
-    response.send(e);
+    response.json(e);
   } 
 };
 
@@ -766,7 +767,8 @@ async function putTag (request, response) {
     like lower($1))`, [request.body.tagName]);
 
     if (dupTagCheck.rows[0].exists) {
-      throw (`Tag '${request.body.tagName}' already exists`);
+      response.status(400).json({ error: `Tag '${tagName}' already exists`})
+      return
     } 
 
     let resp = await pool.query(`UPDATE tags SET name = $1 WHERE tag_id = $2`, 
@@ -774,7 +776,7 @@ async function putTag (request, response) {
     response.sendStatus(200);
   } catch(e) {
     response.status(400);
-    response.send(e);
+    response.json(e);
   } 
 };
 
