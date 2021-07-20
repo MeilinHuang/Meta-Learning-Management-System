@@ -4,6 +4,7 @@ import {
     IconButton,
     Link,
     Table,
+    Text,
     Thead,
     Tbody,
     Tr,
@@ -13,7 +14,7 @@ import {
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri'
 import { StoreContext } from '../../utils/store'
 
-const getRow = ({ post_id, title, published_date, replies, comments, ispinned }, setPosts, setPinnedPosts, setShowPinned) => {
+const getRow = ({ post_id, title, published_date, replies, comments, ispinned, description }, setPosts, setPinnedPosts, setShowPinned) => {
     const date = new Date(published_date)
     const dateString = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
 
@@ -30,6 +31,9 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned },
             })
     }
 
+    let plainTextDesc = description.replace(/<[^>]+>/g, '')
+    plainTextDesc = plainTextDesc.length > 120 ? plainTextDesc.substring(0, 119) + '...' : plainTextDesc
+
     return (
         <Tr>
             {/* Only show if admin/staff */}
@@ -41,7 +45,10 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned },
                     onClick={handlePinUnpin}
                 />
             </Td>
-            <Td width="40%" pl="0"><Link as={RouterLink} color="blue.500" to={`/forums/${post_id}`}>{title}</Link></Td>
+            <Td width="40%" pl="0">
+                <Link as={RouterLink} color="blue.500" to={`/forums/${post_id}`}>{title}</Link>
+                <Text fontSize="13px" lineHeight="16px" mt="4px">{plainTextDesc}</Text>
+            </Td>
             <Td>{dateString}</Td>
             <Td isNumeric>{replies.length}</Td>
             <Td isNumeric>{comments.length}</Td>
@@ -53,6 +60,7 @@ function PostTable({ isAdmin, posts: postData }) {
     const orderedPosts = [...postData].reverse()
     const context = useContext(StoreContext)
     const { posts: [, setPosts], pinnedPosts: [, setPinnedPosts], showPinned: [, setShowPinned] } = context;
+    console.log(orderedPosts)
 
     return (
         <Table variant="simple">

@@ -40,8 +40,6 @@ function Filter() {
             })
         })
     }, [setPosts, setShowPinned, filteredTags])
-    
-    // TODO: need to update the list of options in tagSelect when new tag added
 
     return (
         <Flex my="24px" mx="auto" pb="8px" width={{ base: '100%', lg: '80%' }} justifyContent="space-between">
