@@ -60,7 +60,7 @@ function ForumOverviewPage() {
         console.log(searchTerm)
     }
 
-    const handleAddPostSubmit = ({ title, details, tags, date }) => {
+    const handleAddPostSubmit = ({ title, details, selectedTags, date }) => {
         fetch(`http://localhost:8000/forum/post`, {
             method: 'POST',
             body: JSON.stringify({
@@ -68,7 +68,8 @@ function ForumOverviewPage() {
                 user_id: dummyAuthor,
                 publishedDate: date,
                 description: details,
-                tags,
+                tags: selectedTags,
+                related_link: '/', // TODO: handle related link
             }),
             headers: {
                 'Accept': 'application/json',

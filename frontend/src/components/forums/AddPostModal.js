@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
     Button,
     Flex,
@@ -20,6 +20,11 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
     const [details, setDetails] = useState('')
     const [image, setImage] = useState({})
     const [tags, setTags] = useState([])
+    const [selectedTags, setSelectedTags] = useState([])
+
+    useEffect(() => {
+        fetch(`http://localhost:8000/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
+    }, [])
 
     const handleSubmit = e => {
         e.preventDefault()
@@ -28,7 +33,7 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
         const postDetails = {
             title,
             details,
-            tags,
+            selectedTags,
             image,
             date,
         }
@@ -63,7 +68,7 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
                         </Flex> */}
                         {showTags && <Flex flexDirection="column">
                             <Heading size="sm" mb="4px">Tags</Heading>
-                            <TagSelect setTags={setTags} />
+                            <TagSelect setSelectedTags={setSelectedTags} tags={tags} />
                         </Flex>}
                     </form>
                     </ModalBody>
