@@ -1,5 +1,6 @@
 Database 
   - Add ON DELETE CASCADE, ON UPDATE CASCADE
+  - Change file storage to paths or use S3
 
 Topic group
   - API for adding/deleting/updating topic files
