@@ -255,7 +255,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
         <div>
             <TopicTreeHeader id="topic-tree-header" topicGroupName={topicGroup}></TopicTreeHeader>
             <div id="graph" ref={ref} />
-            <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} />
+            <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} topicGroupName={topicGroup} />
         </div>
 
     )

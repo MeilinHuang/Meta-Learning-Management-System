@@ -268,7 +268,6 @@ async function deleteTopic(request, response) {
   await pool.query(`DELETE FROM prerequisites WHERE topic = $1 or prereq = $1`, [topicId]);
   await pool.query(`DELETE FROM topics WHERE id = $1`, [topicId]);
   response.status(200).json({ success: true, topicId: topicId});
-
 }
 
 async function postTopic (request, response) {

@@ -19,6 +19,7 @@ import {
   } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import Select from "./ChakraReactSelect.js";
+import { get_topics_url } from "../../Constants.js";
 
 import TopicTreeAddTopic from './TopicTreeAddTopic.js';
 
@@ -44,6 +45,8 @@ const NavLink = ({ onClick, children }) => (
   
 export default function TopicTreeHeader({id, topicGroupName=''}) {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [topics, setTopics] = useState([]);
+    const [selectedTopic, setSelectedTopic] = useState("");
 
     const { 
         isOpen:isOpenModal, 
@@ -59,6 +62,35 @@ export default function TopicTreeHeader({id, topicGroupName=''}) {
         { value: "yellow", label: "Yellow", color: "#FFC400" },
         { value: "green", label: "Green", color: "#36B37E" }
     ];
+
+
+
+    const convertToList = (jsonData) => {
+        let tempTopics = [];
+        for (let topic of jsonData.topics_list) {
+            topic['value'] = topic.name;
+            topic['label'] = topic.name;
+            tempTopics.push(topic);
+        }
+
+        return tempTopics;
+    };
+
+    const onChangeSearch = (value, action) => {
+        console.log('setting selected topic', value.target.value);
+        setSelectedTopic(value.target.value);
+    }
+
+    useEffect(() => {
+        if (topicGroupName != '') {
+            fetch(get_topics_url(topicGroupName))
+            .then(response => response.json())
+            .then(function (data) {
+                setTopics(convertToList(data));
+            });
+        }
+
+    }, []);
   
     return (
         <div id={id}>
@@ -83,16 +115,12 @@ export default function TopicTreeHeader({id, topicGroupName=''}) {
                             <FormControl id="new-topic-dependencies">
                                 <Select
                                     name="searchTopic"
-                                    options={colourOptions}
+                                    options={topics}
                                     placeholder="Search a topic"
                                     closeMenuOnSelect={true}
                                     size="sm"
                                     w={5000}
-                                    onKeyDown={(key) => {
-                                        if (key.code == "Enter") {
-                                            
-                                        }
-                                    }}
+                                    onChange={onChangeSearch}
                                 />
                             </FormControl>
                         </Box>

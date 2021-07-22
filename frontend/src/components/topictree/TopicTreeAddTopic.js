@@ -121,7 +121,7 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
                         {showAlert ? 
                         <Alert status="error" mb={2}>
                             <AlertIcon />
-                            <AlertDescription mr={2}>Please enter a topic title</AlertDescription>
+                            <AlertDescription mr={2}>{alertTitle}</AlertDescription>
                             <CloseButton onClick={closeAlert} position="absolute" right="8px" top="8px" />
                         </Alert>
                         : <></>
