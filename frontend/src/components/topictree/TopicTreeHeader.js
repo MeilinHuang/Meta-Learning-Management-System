@@ -19,7 +19,8 @@ import {
   } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import Select from "./ChakraReactSelect.js";
-import { get_topics_url } from "../../Constants.js";
+import { get_topics_url, get_prereqs} from "../../Constants.js";
+import TopicTreeViewResource from "./TopicTreeViewResource.js";
 
 import TopicTreeAddTopic from './TopicTreeAddTopic.js';
 
@@ -85,11 +86,23 @@ export default function TopicTreeHeader({id, topicGroupName=''}) {
         return tempTopics;
     };
 
-    const onChangeSearch = (value, action) => {
+    const onChangeSearch = async (value, action) => {
         console.log('setting selected topic', value);
+        value['materials_strings'] = {};
+        value.materials_strings['content'] = [];
+        value['title'] = value.name;
         setSelectedNode(value);
 
-        
+        let response = await fetch(get_prereqs(topicGroupName, value.name));
+        let responseJson = await response.json();
+        let prereqList = [];
+        for (let prereq of responseJson.prerequisites_list) {
+            prereqList.push(prereq.name);
+        }
+        setListPrereqs(prereqList);
+        console.log('selectedNode', value);
+        console.log('prereqs', prereqList);
+        onOpenViewModal();
     }
 
     useEffect(() => {
@@ -172,6 +185,7 @@ export default function TopicTreeHeader({id, topicGroupName=''}) {
             ) : null}
             </Box>
             <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} topicGroupName={topicGroupName} />
+            <TopicTreeViewResource data={selectedNode} isOpen={isOpenViewModal} onClose={onCloseViewModal} prereqs={listPrereqs} topicGroupName={topicGroupName} />
         </div>
     );
   }
