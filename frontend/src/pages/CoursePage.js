@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import Header from "../components/Header.js"
 import Sidebar from "../components/Sidebar.js"
 import WidgetsBar from "../components/WidgetsBar.js"
 import AnnouncementPage from "../pages/AnnouncementPage.js"
@@ -51,16 +50,15 @@ function CoursePage() {
     return (
         <div>
             <Box position="sticky" width="100%" top={0} zIndex={100}>
-                <Header setOpen={setOpen}></Header>
                 <Box position="fixed" left={0}>
-                    <Sidebar links={links} isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
+                    <Sidebar links={links} page="course" isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
                 </Box>
                 <Box position="fixed" right={0}>
                     <WidgetsBar></WidgetsBar>
                 </Box>
             </Box>
             <Flex marginLeft={[0, 0, 200, 100]} marginRight={[0, 0, 0, 100]}>
-                <Container marginTop={50} mx={{ base: "0", md: "24px"}} maxWidth="100%">
+                <Container marginTop={[70, 70, 50]} mx={{ base: "0", md: "24px"}} maxWidth="100%">
                     <Switch>
                         {/* Add your page as a Route here */}
                         <Route exact path="/course-page/:code/announcement/:id" component={AnnouncementPage} />

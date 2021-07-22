@@ -3,7 +3,7 @@ import { Box, Container, Text, Divider, Stack, Skeleton } from "@chakra-ui/react
 
 function WidgetsBar() {
     return (
-        <Box display={["none", "none", "none", "block"]} minWidth={200} width={200} borderLeftWidth={1}>
+        <Box display={["none", "none", "none", "block"]} minWidth={200} width={200} borderLeftWidth={1} height="100vh">
             <Stack spacing={10}>
                 <Container>
                     <Text size="sm">Course Progress</Text>
@@ -24,8 +24,7 @@ function WidgetsBar() {
                     <Skeleton width="100%" marginTop={5} height={5}></Skeleton>
                     <Skeleton width="100%" marginTop={5} height={5}></Skeleton>
                 </Container>
-            </Stack>
-            
+            </Stack>   
         </Box>
     )
 }
