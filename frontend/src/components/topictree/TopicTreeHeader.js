@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import {
     Box,
     Flex,
@@ -46,24 +46,33 @@ const NavLink = ({ onClick, children }) => (
 export default function TopicTreeHeader({id, topicGroupName=''}) {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [topics, setTopics] = useState([]);
-    const [selectedTopic, setSelectedTopic] = useState("");
+    const [listPrereqs, setListPrereqs] = useState([]);
+    const [selectedNode, setSelectedNode] = useState({
+        "id": 0,
+        "title": "",
+        "prerequisite_strings": [],
+        "description": "",
+        "materials_strings": {
+            "preparation": [],
+            "content": [],
+            "practice": [],
+            "assessment": []
+        },
+        "group": "",
+        "discipline": "",
+        "creator": ""
+    });
+    const { 
+        isOpen: isOpenViewModal, 
+        onOpen: onOpenViewModal, 
+        onClose: onCloseViewModal 
+    } = useDisclosure();
 
     const { 
         isOpen:isOpenModal, 
         onOpen: onOpenModal, 
         onClose: onCloseModal 
     } = useDisclosure();
-
-    var colourOptions = [
-        { value: "blue", label: "Blue", color: "#0052CC" },
-        { value: "purple", label: "Purple", color: "#5243AA" },
-        { value: "red", label: "Red", color: "#FF5630" },
-        { value: "orange", label: "Orange", color: "#FF8B00" },
-        { value: "yellow", label: "Yellow", color: "#FFC400" },
-        { value: "green", label: "Green", color: "#36B37E" }
-    ];
-
-
 
     const convertToList = (jsonData) => {
         let tempTopics = [];
@@ -77,8 +86,10 @@ export default function TopicTreeHeader({id, topicGroupName=''}) {
     };
 
     const onChangeSearch = (value, action) => {
-        console.log('setting selected topic', value.target.value);
-        setSelectedTopic(value.target.value);
+        console.log('setting selected topic', value);
+        setSelectedNode(value);
+
+        
     }
 
     useEffect(() => {

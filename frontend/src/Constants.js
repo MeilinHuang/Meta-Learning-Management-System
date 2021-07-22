@@ -18,3 +18,7 @@ export function post_new_prereq(topicGroupName, newTopicName) {
     return backend_url + "topicGroup/" + topicGroupName + "/topic/" + newTopicName + "/prerequisite";
 }
 
+export function get_prereqs(topicGroupName, newTopicName) {
+    return backend_url + "topicGroup/" + topicGroupName + "/topic/" + newTopicName + "/prerequisite";
+}
+

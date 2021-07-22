@@ -182,7 +182,8 @@ async function getTopicPreReqs (request, response) {
       JOIN topic_group ON name = $1
       JOIN topics ON topics.topic_group_id = topic_group.id
       WHERE topics.name = $2
-      AND topics.topic_group_id = p.topic`, [topicGroupName, topicName]);
+      AND topics.topic_group_id = topic_group.id
+      AND topics.id = p.topic`, [topicGroupName, topicName]);
 
     var finalQuery = resp.rows;
     var preReqsArr = [];
