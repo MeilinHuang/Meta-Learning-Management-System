@@ -20,7 +20,7 @@ function Filter() {
         if (!tags.length) {
             fetch('http://localhost:8000/forum').then(r => r.json()).then(data => {
                 setPosts(data)
-                setShowPinned(true)
+                setShowPinned(!!data.length)
             })
             return
         }

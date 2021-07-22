@@ -15,7 +15,7 @@ import {
 import DraftEditor from './DraftEditor/DraftEditor'
 import TagSelect from './TagSelect/TagSelect'
 
-function AddPostModal({ isOpen, onClose }) {
+function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
     const [title, setTitle] = useState('')
     const [details, setDetails] = useState('')
     const [image, setImage] = useState({})
@@ -23,13 +23,16 @@ function AddPostModal({ isOpen, onClose }) {
 
     const handleSubmit = e => {
         e.preventDefault()
+        const date = new Date(Date.now()).toISOString()
+
         const postDetails = {
             title,
             details,
             tags,
             image,
+            date,
         }
-        console.log(postDetails)
+        onSubmit(postDetails)
     }
 
     const handleUpload = e => {
@@ -58,10 +61,10 @@ function AddPostModal({ isOpen, onClose }) {
                             <Heading size="sm" mb="4px">Attach Images</Heading>
                             <input type="file" name="images" onChange={handleUpload} />
                         </Flex> */}
-                        <Flex flexDirection="column">
+                        {showTags && <Flex flexDirection="column">
                             <Heading size="sm" mb="4px">Tags</Heading>
                             <TagSelect setTags={setTags} />
-                        </Flex>
+                        </Flex>}
                     </form>
                     </ModalBody>
                     <ModalFooter>

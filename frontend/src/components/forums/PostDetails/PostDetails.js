@@ -9,7 +9,7 @@ import {
     useToast,
 } from "@chakra-ui/react"
 import { GrEdit, GrShare } from 'react-icons/gr'
-import { AiOutlineSend } from "react-icons/ai"
+import { AiOutlineClose, AiOutlineSend } from "react-icons/ai"
 import { ContentState, convertFromHTML } from 'draft-js'
 import AuthorDetails from '../AuthorDetails'
 import DraftEditor from '../DraftEditor/DraftEditor'
@@ -44,15 +44,19 @@ function PostDetails({ post: { author, post_id, published_date, description }}) 
     const handleSubmit = e => {
         e.preventDefault()
         console.log(post_id)
-        // fetch(
-        //     `http://localhost:8000/forum/post/${post_id}`,
-        //     {
-        //         method: 'PUT',
-        //         body: JSON.stringify({
-        //             description: details,
-        //         }),
-        //     }
-        // ).then(r => console.log(r))
+        fetch(
+            `http://localhost:8000/forum/post/${post_id}`,
+            {
+                method: 'PUT',
+                body: JSON.stringify({
+                    description: details,
+                }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then(r => console.log(r)) // TODO: handle errors (maybe don't change the value in the frontend until this is okay)
         setEditorState('')
     }
 
@@ -66,7 +70,10 @@ function PostDetails({ post: { author, post_id, published_date, description }}) 
                             <InputGroup variant="filled" mr="8px" width="100%">
                                 <DraftEditor content={editorState} setDetails={setDetails} /> 
                             </InputGroup>
-                            <Button pr="8px" leftIcon={<AiOutlineSend />} form="editPost" type="submit" />
+                            <Flex flexDirection="column" justifyContent="space-between">
+                                <Button pr="8px" leftIcon={<AiOutlineClose />} onClick={() => setEditorState('')} />
+                                <Button pr="8px" mb="16px" height="160px" leftIcon={<AiOutlineSend />} form="editPost" type="submit" />
+                            </Flex>
                         </Flex>
                     </form>
                 :

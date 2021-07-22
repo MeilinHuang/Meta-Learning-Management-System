@@ -2,20 +2,23 @@ const express = require("express");
 var cors = require('cors');
 const app = express();
 const database =  require('./service.js');
+const fileUpload = require('express-fileupload');
+
 app.use(cors());
-// Body parsing
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
+app.use(fileUpload());
+
 
 /***************************************************************
-                       Swagger API
+                       Open API / Swagger
 ***************************************************************/
 
-const swaggerUi = require('swagger-ui-express'),
-swaggerDocument = require('./swagger.json');
+const swaggerUi = require('swagger-ui-express');
+const openApiDocument = require('./docs/openApi');
 
 // Redirect to swagger
 app.get('/', (req, res) => res.redirect('/docs'));
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 /***************************************************************
                        Auth Functions
@@ -146,6 +149,10 @@ app.put('/forum/post/pin/:postId/:isPinned', async(request, response) => {
   await database.putPostPin(request, response);
 });
 
+app.put('/forum/tags/:tagId', async(request, response) => {
+  await database.putTag(request, response);
+});
+
 app.put('/forum/tags', async(request, response) => {
   await database.getAllTags(request, response);
 });
@@ -157,6 +164,19 @@ app.post('/forum/tags', async(request, response) => {
 app.delete('/forum/tags/:tagId', async(request, response) => {
   await database.deleteTag(request, response);
 });
+
+app.put('/forum/post/endorse/:postId/:isEndorsed', async(request, response) => {
+  await database.putPostEndorse(request, response);
+});
+
+app.put('/forum/post/like/:postId', async(request, response) => {
+  await database.putPostLike(request, response);
+});
+
+app.put('/forum/post/unlike/:postId', async(request, response) => {
+  await database.putPostUnlike(request, response);
+});
+
 
 /***************************************************************
                        Course Pages Functions
@@ -170,8 +190,28 @@ app.post('/:topicGroup/announcement/new', async(request, response) => {
   await database.postAnnouncement(request, response);
 })
 
-app.post('/:topicGroup/announcement/comment', async(request, response) => {
+app.get('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.getAnnouncementById(request, response);
+})
+
+app.put('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.putAnnouncement(request, response);
+})
+
+app.delete('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.deleteAnnouncement(request, response);
+})
+
+app.post('/:topicGroup/announcement/:announcementId/comment', async(request, response) => {
   await database.postAnnouncementComment(request, response);
+})
+
+app.put('/:topicGroup/announcement/:announcementId/comment/:commentId', async(request, response) => {
+  await database.putAnnouncementComment(request, response);
+})
+
+app.delete('/:topicGroup/announcement/:announcementId/comment/:commentId', async(request, response) => {
+  await database.deleteAnnouncementComment(request, response);
 })
 
 /***************************************************************
