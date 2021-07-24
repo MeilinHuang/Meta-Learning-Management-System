@@ -22,7 +22,7 @@ function SidebarContent({history, links}) {
             {links.map(({name, url}) => {
                 counter += 1
                 return (
-                    <Flex key={"sidebar-link-" + counter} onClick={() => {history.push(path + url)}} minWidth={200} height={70} alignContent="center" borderRadius={0} cursor="pointer" padding={4} _hover={{background:"white", color:"black", borderRadius:"30px 0px 0px 30px"}}>
+                    <Flex key={"sidebar-link-" + counter} onClick={() => {history.push(path + url)}} width={200} height={70} alignContent="center" borderRadius={0} cursor="pointer" padding={4} _hover={{background:"white", color:"black", borderRadius:"0px 0px 0px 0px"}}>
                         <Flex alignItems="center">
                             <Text fontSize={["md", "md", "lg"]} marginLeft={1} textAlign="left" letterSpacing="wide">{name}</Text>
                         </Flex>
@@ -35,14 +35,16 @@ function SidebarContent({history, links}) {
 
 function Sidebar({links, isOpen, setOpen, variant, page}) {
     const history = useHistory()
+    //MAYBE STORE IN LOCAL STORAGE INSTEAD OF FETCHING EVERYTIME
+    const course = history.location.pathname.split("/").filter(e => e !== "")[1]
 
     let title = (
         <Menu isLazy placement="right">
             <MenuButton>
-                <Flex flexDirection="column" bg="blue.500" color="white" height={90} textAlign="left" justifyContent="center" cursor="pointer">
+                <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
                     <Box marginLeft={1} padding={4} fontSize="larger">
                         <Text fontWeight="medium" letterSpacing="wider">COMP1234</Text>
-                        <Text fontSize="medium" letterSpacing="wider">C++ Programming</Text>
+                        <Text fontSize="medium" letterSpacing="wider">{course}</Text>
                     </Box>
                 </Flex>
             </MenuButton>
@@ -127,25 +129,25 @@ function Sidebar({links, isOpen, setOpen, variant, page}) {
     }
     else {
         return (
-            <Box display={["none", "none", "block"]} bg="blue.400" height="100vh" borderRightWidth={1} flexDirection="column" width={200}>
+            <Box display={["none", "none", "flex"]} bg="blue.400" height="100vh" flexDirection="column" width={200}>
                 {title}
                 <Flex margin={0} paddingInline={0} color="white">
                     <SidebarContent history={history} links={links}></SidebarContent>
                 </Flex>
                 <Flex grow={1}></Flex>
                 { page==="course" &&
-                <Flex>
-                    <Flex key={"sidebar-link-return"} onClick={() => history.push("/")} color="white" minWidth={200} height={70} alignContent="center" bg="blue.400" cursor="pointer" padding={4} _hover={{background:"white", color:"black", borderRadius:"30px 0px 0px 30px"}}>
-                        <Flex alignItems="center">
-                            <Flex borderRadius={100} bg="white" width="30px" height="30px" justifyContent="center" alignItems="center">
-                                <Flex borderRadius={100} bg="blue.400" width="26px" height="26px" justifyContent="center" alignitems="center">
-                                    <ArrowBackIcon color="white" boxSize={5} alignSelf="center"></ArrowBackIcon>
+                    <Flex>
+                        <Flex key={"sidebar-link-return"} onClick={() => history.push("/")} color="white" width={200} height={70} alignContent="center" bg="blue.400" cursor="pointer" padding={4} _hover={{background:"white", color:"black", borderRadius:"0px 0px 0px 0px"}}>
+                            <Flex alignItems="center">
+                                <Flex borderRadius={100} bg="white" width="30px" height="30px" justifyContent="center" alignItems="center">
+                                    <Flex borderRadius={100} bg="blue.400" width="26px" height="26px" justifyContent="center" alignitems="center">
+                                        <ArrowBackIcon color="white" boxSize={5} alignSelf="center"></ArrowBackIcon>
+                                    </Flex>
                                 </Flex>
+                                <Text fontSize={["md", "md", "lg"]} marginLeft={3} textAlign="left" letterSpacing="wider">Return</Text>
                             </Flex>
-                            <Text fontSize={["md", "md", "lg"]} marginLeft={3} textAlign="left" letterSpacing="wider">Return</Text>
                         </Flex>
                     </Flex>
-                </Flex>
                 }
             </Box> 
         )

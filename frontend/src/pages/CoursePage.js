@@ -54,7 +54,7 @@ function CoursePage() {
                     <Sidebar links={links} page="course" isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
                 </Box>
                 <Box position="fixed" right={0}>
-                    <WidgetsBar></WidgetsBar>
+                    <WidgetsBar page="course"></WidgetsBar>
                 </Box>
             </Box>
             <Flex marginLeft={[0, 0, 200, 100]} marginRight={[0, 0, 0, 100]}>

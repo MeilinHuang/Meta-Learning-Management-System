@@ -5,6 +5,7 @@ import {
     Switch,
     Route,
 } from "react-router-dom"
+import MainSelection from "./MainSelection.js"
 import { useBreakpointValue, Flex, Container, Box } from "@chakra-ui/react"
 
 function CoursePage() {
@@ -34,14 +35,14 @@ function CoursePage() {
                     <Sidebar links={links} page="main" isOpen={isOpen} setOpen={setOpen} variant={variants}></Sidebar>
                 </Box>
                 <Box position="fixed" right={0}>
-                    <WidgetsBar></WidgetsBar>
+                    <WidgetsBar page="main"></WidgetsBar>
                 </Box>
             </Box>
-            <Flex marginLeft={[0, 0, 200, 100]} marginRight={[0, 0, 0, 100]}>
+            <Flex marginLeft={[0, 0, 200, 200]} marginRight={[0, 0, 0, 200]}>
                 <Container marginTop={50} mx={{ base: "0", md: "24px"}} maxWidth="100%">
                     <Switch>
                         {/* Add your page as a Route here */}
-                        <Route path="/"></Route>
+                        <Route path="/"><MainSelection/></Route>
                     </Switch>
                 </Container>
                 
