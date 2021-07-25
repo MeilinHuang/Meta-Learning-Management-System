@@ -3900,6 +3900,48 @@
       }
     },
     "/topicGroup/{topicGroupName}": {
+      "get": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Get topic group data from name",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Topic group to get data from",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetTopicGroup" }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "TopicGroup"
+      },
       "post": {
         "tags": [
           "Topic Tree"
@@ -5325,6 +5367,81 @@
                 "topicId": {
                   "type": "integer",
                   "example": 3
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetTopicGroup": {
+        "type": "object",
+        "properties": {
+          "topicGroup": {
+            "id": {
+              "type": "integer",
+              "example": 1
+            },
+            "name": {
+              "type": "string",
+              "example": "C++ Programming"
+            },
+            "topic_code": {
+              "type": "string",
+              "example": "COMP6771"
+            },
+            "course_materials": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "course_outline.pdf"
+                  },
+                  "file": {
+                    "type": "string",
+                    "example": "_files/{topicGroup}/course_outline.pdf"
+                  }
+                }
+              }
+            },
+            "topics_list": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Loops"
+                  },
+                  "course_materials": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 0
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "loops.pdf"
+                        },
+                        "file": {
+                          "type": "string",
+                          "example": "_files/{topicGroup}/{topic}/loops.pdf"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

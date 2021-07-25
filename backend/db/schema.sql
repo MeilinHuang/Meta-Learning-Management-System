@@ -54,7 +54,7 @@ DROP TABLE IF EXISTS "topic_files" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  file_id TEXT NOT NULL,
+  file TEXT NOT NULL,
   topic_id INTEGER NOT NULL REFERENCES topics(id),
   due_date TIMESTAMP
 );
