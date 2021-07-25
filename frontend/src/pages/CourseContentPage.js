@@ -9,10 +9,9 @@ function CourseContentPage() {
     const [files, setFiles] = useState([])
     const download = useToast()
     let history = useHistory()
-
+    let course = history.location.pathname.split("/").filter(e => e !== "")[1]
     useEffect(() => {
-        //TODO get course page content
-        fetch(get_topics_url("C++ Programming")).then(e => {
+        fetch(get_topics_url(course)).then(e => {
             return e.json()
         }).then(e => {
             setData(e)
@@ -28,7 +27,7 @@ function CourseContentPage() {
     )
     if (data != null) {
         pageView =  (
-            <div>
+            <Box marginInline={[0, 0, 0, 100]}>
                 <Box marginBottom={10}>
                     <Flex alignItems="center">
                         <Heading flexGrow={1}size="lg">Course Content</Heading>
@@ -39,7 +38,6 @@ function CourseContentPage() {
                 </Box>
                 <Center flexDirection="column">
                     <Accordion width="100%" allowMultiple>
-                        {/*TODO NEED TO CHANGE TO ACTUAL DATA*/}
                         { data.topics_list.map(e => {
                             return (
                                 <AccordionItem key={"section " + e.name}>
@@ -118,7 +116,7 @@ function CourseContentPage() {
                         }
                     }}>DOWNLOAD</Button>
                 </Center>
-            </div>
+            </Box>
         )
     }
     return pageView
