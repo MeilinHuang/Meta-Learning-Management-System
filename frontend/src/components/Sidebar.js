@@ -80,7 +80,7 @@ function Sidebar({links, isOpen, setOpen, variant, page}) {
                         <Menu isLazy>
                             <MenuButton>
                                 <Flex alignItems="center">
-                                    <Avatar name="Dan Abrahmov" src="https://bit.ly/dan-abramov" />
+                                    <Avatar name="John Smith" src="https://bit.ly/dan-abramov" />
                                     <Box display={["none", "block", "block"]}>
                                         <ChevronDownIcon boxSize={6} color="white"></ChevronDownIcon>
                                     </Box>
