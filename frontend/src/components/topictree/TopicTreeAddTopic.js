@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import {
     Modal,
     ModalOverlay,
@@ -11,19 +11,106 @@ import {
     FormControl,
     FormLabel,
     Input,
-    Box
+    Box,
+    Alert,
+    AlertIcon,
+    AlertDescription,
+    CloseButton
   } from "@chakra-ui/react"
 import Select from "./ChakraReactSelect.js";
+import { get_topics_url, post_new_topic_url, post_new_prereq } from "../../Constants.js";
 
-export default function TopicTreeAddTopic({isOpen, onClose}) {
-    var colourOptions = [
-        { value: "blue", label: "Blue", color: "#0052CC" },
-        { value: "purple", label: "Purple", color: "#5243AA" },
-        { value: "red", label: "Red", color: "#FF5630" },
-        { value: "orange", label: "Orange", color: "#FF8B00" },
-        { value: "yellow", label: "Yellow", color: "#FFC400" },
-        { value: "green", label: "Green", color: "#36B37E" }
-    ];
+export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
+
+
+    const [topics, setTopics] = useState([]);
+    const [selectedTopics, setSelectedTopics] = useState([]);
+    const [newTopicName, setNewTopicName] = useState("");
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertTitle, setAlertTitle] = useState("");
+
+    const convertToList = (jsonData) => {
+        let tempTopics = [];
+        for (let topic of jsonData.topics_list) {
+            topic['value'] = topic.name;
+            topic['label'] = topic.name;
+            tempTopics.push(topic);
+        }
+
+        return tempTopics;
+    };
+
+    const onChangePrerequisites = (value, action) => {
+        console.log('value', value);
+        setSelectedTopics(value);
+    }
+
+    const onChangeNewName = (value) => {
+        console.log('value', value.target.value);
+        setNewTopicName(value.target.value);
+    }
+
+    const onSubmitTopic = async () => {
+        if (newTopicName == "") {
+            setShowAlert(true);
+            setAlertTitle("Please enter a topic title");
+            return;
+        }
+        
+        let response = await fetch(post_new_topic_url(topicGroupName, newTopicName), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        let responseJson = await response.json();
+
+        if (response.status != 200) {
+            setAlertTitle(responseJson.error);
+            return;
+        }
+        console.log(responseJson);
+
+        let groupId = responseJson.id;
+        for (let prereq of selectedTopics) {
+            console.log('Sending prereqs with body', {
+                "preReqId": prereq.id,
+                "topicId": groupId
+            });
+            response = await fetch(post_new_prereq(topicGroupName, newTopicName), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "preReqId": prereq.id,
+                    "topicId": groupId
+                })
+            });
+
+            if (response.status != 200) {
+                setAlertTitle(response.json().error);
+                return;
+            }
+        }
+        window.location.reload();
+    }
+
+    const closeAlert = () => {
+        setShowAlert(false);
+    }
+
+    useEffect(() => {
+        if (topicGroupName !== '') {
+            fetch(get_topics_url(topicGroupName))
+            .then(response => response.json())
+            .then(function (data) {
+                setTopics(convertToList(data));
+            });
+        }
+
+    }, []);
     return (
         <>
         
@@ -34,26 +121,35 @@ export default function TopicTreeAddTopic({isOpen, onClose}) {
                 <ModalCloseButton />
                 <ModalBody>
                     <Box>
+                        {showAlert ? 
+                        <Alert status="error" mb={2}>
+                            <AlertIcon />
+                            <AlertDescription mr={2}>{alertTitle}</AlertDescription>
+                            <CloseButton onClick={closeAlert} position="absolute" right="8px" top="8px" />
+                        </Alert>
+                        : <></>
+                        }
                         <FormControl mb={3} id="new-topic-name">
                             <FormLabel>Topic Name</FormLabel>
-                            <Input type="text" />
+                            <Input onChange={onChangeNewName} placeholder="Enter topic name..." type="text" />
                         </FormControl>
                         <FormControl id="new-topic-dependencies">
                             <FormLabel>Select Topic Prerequisites</FormLabel>
                             <Select
                                 isMulti
                                 name="topics"
-                                options={colourOptions}
+                                options={topics}
                                 placeholder="Select some topics..."
                                 closeMenuOnSelect={false}
                                 size="sm"
+                                onChange={onChangePrerequisites}
                             />
                         </FormControl>
                     </Box>
                 </ModalBody>
         
                 <ModalFooter>
-                    <Button colorScheme="blue" mr={3}>Submit</Button>
+                    <Button colorScheme="blue" onClick={onSubmitTopic} mr={3}>Submit</Button>
                     <Button variant="ghost" onClick={onClose}>
                     Close
                     </Button>

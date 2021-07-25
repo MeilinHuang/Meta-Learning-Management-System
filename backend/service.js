@@ -1,4 +1,5 @@
 
+const { json } = require('express');
 const pool = require('./db/database');
 
 // TODO : ADD AUTH AND JWTOKEN
@@ -81,7 +82,7 @@ async function getAllTopicGroups(request, response) {
     array_agg(DISTINCT announcements.id) as announcements_list
     FROM topic_group tp_group 
     LEFT JOIN user_admin ON user_admin.topic_group_id = tp_group.id
-    LEFT JOIN topics ON topics.topic_group_id = tp_group.id
+    FULL OUTER JOIN topics ON topics.topic_group_id = tp_group.id
     LEFT JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
     LEFT JOIN announcements ON topics.topic_group_id = announcements.topic_group
     GROUP BY tp_group.id`);
@@ -190,7 +191,8 @@ async function getTopicPreReqs (request, response) {
       JOIN topic_group ON name = $1
       JOIN topics ON topics.topic_group_id = topic_group.id
       WHERE topics.name = $2
-      AND topics.topic_group_id = p.topic`, [topicGroupName, topicName]);
+      AND topics.topic_group_id = topic_group.id
+      AND topics.id = p.topic`, [topicGroupName, topicName]);
 
     var finalQuery = resp.rows;
     var preReqsArr = [];
@@ -256,17 +258,52 @@ async function deleteTopicGroup (request, response) {
   response.status(200).send(`Topic Group deleted with name: ${topicGroupName}`)
 }
 
+async function deleteTopic(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const topicName = request.params.topicName;
+  const idResp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
+  if (idResp.rows.length == 0) {
+    response.status(400).json({error: "Could not find topic group"});
+    return;
+  }
+  const topicGroupId = idResp.rows[0].id;
+  let tmp = await pool.query(
+    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+  , [topicName, topicGroupId]);
+  if (tmp.rows.length == 0) {
+    response.status(400).json({error: "Could not find topic in database"});
+    return;
+  }
+  let topicId = tmp.rows[0].id;
+  await pool.query(`DELETE FROM prerequisites WHERE topic = $1 or prereq = $1`, [topicId]);
+  await pool.query(`DELETE FROM topics WHERE id = $1`, [topicId]);
+  response.status(200).json({ success: true, topicId: topicId});
+}
+
 async function postTopic (request, response) {
   const topicGroupName = request.params.topicGroupName;
   const topicName = request.params.topicName;
   const idResp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
+  if (idResp.rows.length == 0) {
+    response.status(400).json({error: "Could not find topic group"});
+    return;
+  }
   const topicGroupId = idResp.rows[0].id;
 
   let resp = await pool.query(
     'INSERT INTO topics(id, topic_group_id, name) values(default, $1, $2)',
     [topicGroupId, topicName]);
+  
+  let tmp = await pool.query(
+    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+  , [topicName, topicGroupId]);
+  if (tmp.rows.length == 0) {
+    response.status(400).json({error: "Could not find newly created topic in database"});
+    return;
+  }
+  let topicId = tmp.rows[0];
 
-  response.status(200).send(`Topic created with name: ${topicGroupName}`)
+  response.status(200).json(topicId);
 }
 
 /***************************************************************
@@ -1785,6 +1822,7 @@ module.exports = {
   deletePreReq,
   postTopicGroup,
   deleteTopicGroup,
+  deleteTopic,
   postTopic,
   getAllForumPosts,
   getAllPinnedPosts,

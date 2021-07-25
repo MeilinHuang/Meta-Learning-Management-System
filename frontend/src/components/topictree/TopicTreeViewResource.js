@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useEffect} from "react"
 import {
     Modal,
     ModalOverlay,
@@ -11,7 +11,9 @@ import {
     FormControl,
     FormLabel,
     Input,
+    Flex,
     Box,
+    Spacer,
     Table,
     Thead,
     Tbody,
@@ -23,10 +25,22 @@ import {
     Heading,
     UnorderedList,
     ListItem
-} from "@chakra-ui/react"  
+} from "@chakra-ui/react";
+import { delete_topic_url } from "../../Constants";
 
 
-export default function TopicTreeHeader({data, isOpen, onClose, prereqs}) {
+export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, topicGroupName}) {
+
+  const deleteTopic = async () => {
+    await fetch(delete_topic_url(topicGroupName, data.title), {
+      method: 'DELETE',
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    });
+    console.log('deleting topic', data);
+    window.location.reload();
+  };
   return (
     <>
     
@@ -41,7 +55,7 @@ export default function TopicTreeHeader({data, isOpen, onClose, prereqs}) {
             <UnorderedList mb={10}>
               {prereqs.map((prereq) => {
                 return (
-                  <ListItem>{prereq}</ListItem>
+                  <ListItem key={prereq}>{prereq}</ListItem>
                 );
               })}
             </UnorderedList>
@@ -69,7 +83,10 @@ export default function TopicTreeHeader({data, isOpen, onClose, prereqs}) {
         </ModalBody>
 
         <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>Close</Button>
+            <Flex>
+              <Button colorScheme="red" mr={3} onClick={deleteTopic}>Delete Topic</Button>
+              <Button colorScheme="blue" mr={3} onClick={onClose}>Close</Button>
+            </Flex>
         </ModalFooter>
         </ModalContent>
       </Modal>
