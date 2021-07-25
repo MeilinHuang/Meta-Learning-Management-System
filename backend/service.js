@@ -125,6 +125,55 @@ async function getAllTopicGroups(request, response) {
   }
 }
 
+// Get topic group data by name
+async function getTopicGroup (request, response) {
+  try {
+    const topicGroup = request.params.topicGroupName;
+    var tgId = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroup]);
+    const topicGroupId = tgId.rows[0].id;
+
+    let resp = await pool.query(
+      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, array_agg(DISTINCT topics.id) AS topics_list
+      FROM topic_group tp_group 
+      JOIN topics ON topics.topic_group_id = tp_group.id
+      WHERE tp_group.id = $1
+      GROUP BY tp_group.id`, [topicGroupId]);
+
+    var topicArr = [];
+    for (const topic_id of resp.rows[0].topics_list) {
+      let tmp = await pool.query(
+        `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(topic_files.id) as course_materials, 
+        array_agg(DISTINCT prerequisites.prereq) as prereqs
+        FROM topics 
+        FULL OUTER JOIN topic_files ON topic_files.topic_id = topics.id
+        FULL OUTER JOIN prerequisites ON prerequisites.topic = topics.id
+        WHERE topics.id = $1
+        GROUP BY topics.id`
+        , [topic_id]);
+
+      if (tmp.rows.length > 0) {
+        var courseMaterialsArr = [];
+        if (tmp.rows[0].course_materials[0] !== null) {
+          for (var material_id of tmp.rows[0].course_materials) {
+            let tmp2 = await pool.query(`SELECT * from topic_files WHERE id = $1`, [material_id]);
+            courseMaterialsArr.push(tmp2.rows[0]);
+          }
+        }
+        if (tmp.rows[0].prereqs[0] === null) { tmp.rows[0].prereqs = []; }
+        tmp.rows[0].course_materials = courseMaterialsArr;
+        topicArr.push(tmp.rows[0]);
+      }
+    };
+
+    resp.rows[0].topics_list = topicArr;
+
+    response.status(200).json(resp.rows[0]);
+  } catch (e) {
+    response.status(400).send(e);
+  }
+}
+
+// Get topics of topic group
 async function getTopics (request, response) { 
   try {
     const topicGroupName = request.params.topicGroupName;
@@ -132,17 +181,15 @@ async function getTopics (request, response) {
       `SELECT array_agg(DISTINCT topics.id) AS topics_list
       FROM topic_group tp_group 
       JOIN topics ON topics.topic_group_id = tp_group.id
-      WHERE tp_group.name = $1
+      WHERE LOWER(tp_group.name) = LOWER($1)
       GROUP BY tp_group.id;`, [topicGroupName]);
 
-    var finalQuery = resp.rows;
-
-    for (var object of finalQuery) { 
+    for (var object of resp.rows) { 
       var topicArr = [];
       for (const topic_id of object.topics_list) {
-        console.log('topic_id', topic_id);
         let tmp = await pool.query(
-          `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(topic_files.id) as course_materials, array_agg(DISTINCT prerequisites.prereq) as prereqs
+          `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(DISTINCT topic_files.id) as course_materials, 
+          array_agg(DISTINCT prerequisites.prereq) as prereqs
           FROM topics 
           FULL OUTER JOIN topic_files ON topic_files.topic_id = topics.id
           FULL OUTER JOIN prerequisites ON prerequisites.topic = topics.id
@@ -150,10 +197,7 @@ async function getTopics (request, response) {
           GROUP BY topics.id`
           , [topic_id]);
 
-
-        console.log(tmp.rows);
         if (tmp.rows.length > 0) {
-          console.log('tmp', tmp.rows);
           var courseMaterialsArr = [];
           if (tmp.rows[0].course_materials[0] !== null) {
             for (var material_id of tmp.rows[0].course_materials) {
@@ -168,16 +212,13 @@ async function getTopics (request, response) {
           topicArr.push(tmp.rows[0]);
 
         }
-
-
       };
 
       object.topics_list = topicArr;
     }
-    response.status(200).json(finalQuery[0]);
+    response.status(200).json(resp.rows[0]);
   } catch(e) {
-    response.sendStatus(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 }
 
@@ -188,12 +229,11 @@ async function getTopicPreReqs (request, response) {
     let resp = await pool.query(
       `SELECT array_agg(DISTINCT p.prereq) as prerequisites_list 
       FROM prerequisites p
-      JOIN topic_group ON name = $1
+      JOIN topic_group ON LOWER(name) = LOWER($1)
       JOIN topics ON topics.topic_group_id = topic_group.id
-      WHERE topics.name = $2
+      WHERE LOWER(topics.name) = LOWER($2)
       AND topics.topic_group_id = p.topic`, [topicGroupName, topicName]);
 
-    var finalQuery = resp.rows;
     var preReqsArr = [];
 
     for (var prereq_id of resp.rows[0].prerequisites_list) {
@@ -201,11 +241,10 @@ async function getTopicPreReqs (request, response) {
       preReqsArr.push(tmp.rows[0]);
     }
 
-    finalQuery[0].prerequisites_list = preReqsArr;
-    response.status(200).json(finalQuery[0]);
+    resp.rows[0].prerequisites_list = preReqsArr;
+    response.status(200).json(resp.rows[0]);
   } catch(e) {
-    response.sendStatus(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 }
 
@@ -251,16 +290,17 @@ async function deleteTopicGroup (request, response) {
   const topicGroupName = request.params.topicGroupName;
 
   let resp = await pool.query(
-    'DELETE FROM topic_group WHERE name = $1',
+    'DELETE FROM topic_group WHERE LOWER(name) = LOWER($1)',
     [topicGroupName]);
 
   response.status(200).send(`Topic Group deleted with name: ${topicGroupName}`)
 }
 
+// Create topic
 async function postTopic (request, response) {
   const topicGroupName = request.params.topicGroupName;
   const topicName = request.params.topicName;
-  const idResp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
+  const idResp = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
   const topicGroupId = idResp.rows[0].id;
 
   let resp = await pool.query(
@@ -1967,5 +2007,6 @@ module.exports = {
   putLevel,
   deleteLevel,
   postLevel,
-  postQuizQuestion
+  postQuizQuestion,
+  getTopicGroup
 };
