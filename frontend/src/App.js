@@ -9,6 +9,7 @@ import {
 } from "react-router-dom"
 import TopicTree from "./components/topictree/TopicTree.js"
 import TopicGroupList from "./components/topictree/TopicGroupList.js";
+import TopicTreeList from "./components/topictree/TopicTreeList.js";
 
 function App() {
     return (
@@ -17,6 +18,7 @@ function App() {
                 <Switch>
                     <Route exact path="/topictree"><TopicGroupList /></Route>
                     <Route exact path="/topictree/:topicGroup" component={TopicTree} />
+                    <Route exact path="/topictreelist"><TopicTreeList /></Route>
                     <Route path="/" ><CoursePage /></Route>
                 </Switch>
             </Router>

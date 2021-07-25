@@ -102,11 +102,14 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
     }
 
     useEffect(() => {
-        fetch(get_topics_url(topicGroupName))
-        .then(response => response.json())
-        .then(function (data) {
-            setTopics(convertToList(data));
-        });
+        if (topicGroupName !== '') {
+            fetch(get_topics_url(topicGroupName))
+            .then(response => response.json())
+            .then(function (data) {
+                setTopics(convertToList(data));
+            });
+        }
+
     }, []);
     return (
         <>

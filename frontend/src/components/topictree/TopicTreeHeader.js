@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { useHistory } from 'react-router-dom'
 import {
     Box,
     Flex,
@@ -18,9 +19,9 @@ import {
     FormControl,
     FormLabel,
     Switch,
-    Divider
+    Divider,
   } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, CloseIcon, AddIcon, SearchIcon } from '@chakra-ui/icons';
 import Select from "./ChakraReactSelect.js";
 import { get_topics_url, get_prereqs} from "../../Constants.js";
 import TopicTreeViewResource from "./TopicTreeViewResource.js";
@@ -48,8 +49,10 @@ const NavLink = ({ onClick, children }) => (
 
 
   
-export default function TopicTreeHeader({id, topicGroupName='', view, setView}) {
+export default function TopicTreeHeader({id, topicGroupName='', view}) {
+    const history = useHistory();
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [tempView, setTempView] = useState(view);
     const [topics, setTopics] = useState([]);
     const [listPrereqs, setListPrereqs] = useState([]);
     const [selectedNode, setSelectedNode] = useState({
@@ -110,7 +113,8 @@ export default function TopicTreeHeader({id, topicGroupName='', view, setView}) 
     }
 
     useEffect(() => {
-        if (topicGroupName != '') {
+        console.log('topicGroupName', topicGroupName !== '');
+        if (topicGroupName !== '') {
             fetch(get_topics_url(topicGroupName))
             .then(response => response.json())
             .then(function (data) {
@@ -119,6 +123,22 @@ export default function TopicTreeHeader({id, topicGroupName='', view, setView}) 
         }
 
     }, []);
+
+    function setView() {
+        console.log('tempView', tempView);
+        if (tempView == 'Graph View') {
+            setTempView('List View');
+            history.push('/topictreelist');
+        } else {
+            setTempView('Graph View');
+            history.push('/topictree');
+        }
+    }
+
+    function isChecked() {
+        console.log('checked', tempView == 'Graph View');
+        return tempView == "Graph View";
+    }
   
     return (
         <div id={id}>
@@ -137,7 +157,8 @@ export default function TopicTreeHeader({id, topicGroupName='', view, setView}) 
                         as={'nav'}
                         spacing={4}
                         display={{ base: 'none', md: 'flex' }}>
-                        
+                        {topicGroupName !== '' ? 
+                        <>
                         <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
                         <Box bg='white' w={200}>
                             <FormControl id="new-topic-dependencies">
@@ -152,6 +173,8 @@ export default function TopicTreeHeader({id, topicGroupName='', view, setView}) 
                                 />
                             </FormControl>
                         </Box>
+                        </> : <></>
+                        }
                     </HStack>
                 </HStack>
                 <Flex alignItems={'center'} height="100%">
@@ -159,7 +182,8 @@ export default function TopicTreeHeader({id, topicGroupName='', view, setView}) 
                         <FormLabel htmlFor="topic-tree-view" color="white">
                             {view}
                         </FormLabel>
-                        <Switch id="topic-tree-view" onChange={e => { if (e.target.checked) { setView("Graph View")} else setView("List View")}} defaultChecked/>
+                        <Switch id="topic-tree-view" onChange={e => { if (e.target.checked) { setView("Graph View")} else setView("List View")}} 
+                            isChecked={isChecked()}/>
                     </FormControl>
                     <Divider orientation="vertical"></Divider>
                     <Menu>
