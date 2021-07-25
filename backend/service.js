@@ -9,30 +9,30 @@ var fs = require('fs');
 ***************************************************************/
 
 async function getUser(request, response) {
-  const id = parseInt(request.params.userId);
-  let resp;
   try {
-    resp = await pool.query(
+    const id = parseInt(request.params.userId);
+    let resp = await pool.query(
       `SELECT id, zid, u.name AS user_name, t.enrolled_courses 
-      FROM users u JOIN (SELECT us.user_id AS id, array_agg(t.id) 
+      FROM users u 
+      LEFT JOIN (SELECT us.user_id AS id, array_agg(t.id) 
       AS enrolled_courses FROM user_enrolled us 
-      JOIN topic_group t ON t.id = us.topic_group_id 
+      LEFT JOIN topic_group t ON t.id = us.topic_group_id 
       GROUP BY us.user_id) t USING (id) WHERE id = $1`,
       [id]);
-    var finalQuery = resp.rows[0];
     var holderArr = [];
-  
-    for (const topic_id of resp.rows[0].enrolled_courses) {
-      let tmp = await pool.query(`SELECT * FROM topic_group WHERE id = $1`, [topic_id]);
-      holderArr.push(tmp.rows[0]);
-    };
 
-    finalQuery.enrolled_courses = holderArr;
+    if (resp.rows[0].enrolled_courses) {
+      for (const topic_id of resp.rows[0].enrolled_courses) {
+        let tmp = await pool.query(`SELECT * FROM topic_group WHERE id = $1`, [topic_id]);
+        holderArr.push(tmp.rows[0]);
+      };
+      resp.rows[0].enrolled_courses = holderArr;
+    }
+    
+    response.status(200).json(resp.rows[0]);
   } catch (e) {
-    console.log(e);
+    response.status(400).send(e);
   }
-
-  response.status(200).json(finalQuery);
 }
 
 const deleteUser = (request, response) => {
