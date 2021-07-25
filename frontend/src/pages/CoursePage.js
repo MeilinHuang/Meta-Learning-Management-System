@@ -37,10 +37,6 @@ function CoursePage() {
             name: 'Support',
             url: '/support',
         },
-        {
-            name: 'Topic Tree',
-            url: '/topictree'
-        }
     ]
     const smVariant = 'drawer'
     const mdVariant = 'sidebar'

@@ -2101,15 +2101,37 @@
           }
         ],
         "requestBody": {
-          "description": "Announcement body",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PutAnnouncement"
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "example": "Some new title"
+                  },
+                  "content": {
+                    "type": "string",
+                    "example": "Some comment description"
+                  },
+                  "fileList": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -2206,15 +2228,30 @@
           }
         ],
         "requestBody": {
-          "description": "Comment body",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PostAnnouncementComment"
+                "type": "object",
+                "properties": {
+                  "author": {
+                    "type": "integer",
+                    "example": 2
+                  },
+                  "content": {
+                    "type": "string",
+                    "example": "Some comment description"
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -2245,31 +2282,52 @@
     },
     "/{topicGroup}/announcement/{announcementId}/comment/{commentId}": {
       "put": {
-        "tags": [
-          "Course Pages"
-        ],
+        "tags": [ "Course Pages" ],
         "summary": "Update announcement comment",
         "parameters": [
+          {
+            "name": "announcementId",
+            "in": "path",
+            "description": "Id of announcement",
+            "required": true,
+            "schema": { "type": "integer" }
+          },
           {
             "name": "commentId",
             "in": "path",
             "description": "Id of comment to update",
             "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "schema": { "type": "integer" }
           }
         ],
         "requestBody": {
-          "description": "Comment body",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PutAnnouncementComment"
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "example": "Some comment description"
+                  },
+                  "fileList": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
