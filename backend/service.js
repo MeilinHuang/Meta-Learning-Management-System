@@ -1,5 +1,7 @@
 
+const { json } = require('express');
 const pool = require('./db/database');
+var fs = require('fs');
 
 // TODO : ADD AUTH AND JWTOKEN
 
@@ -8,30 +10,30 @@ const pool = require('./db/database');
 ***************************************************************/
 
 async function getUser(request, response) {
-  const id = parseInt(request.params.userId);
-  let resp;
   try {
-    resp = await pool.query(
+    const id = parseInt(request.params.userId);
+    let resp = await pool.query(
       `SELECT id, zid, u.name AS user_name, t.enrolled_courses 
-      FROM users u JOIN (SELECT us.user_id AS id, array_agg(t.id) 
+      FROM users u 
+      LEFT JOIN (SELECT us.user_id AS id, array_agg(t.id) 
       AS enrolled_courses FROM user_enrolled us 
-      JOIN topic_group t ON t.id = us.topic_group_id 
+      LEFT JOIN topic_group t ON t.id = us.topic_group_id 
       GROUP BY us.user_id) t USING (id) WHERE id = $1`,
       [id]);
-    var finalQuery = resp.rows[0];
     var holderArr = [];
-  
-    for (const topic_id of resp.rows[0].enrolled_courses) {
-      let tmp = await pool.query(`SELECT * FROM topic_group WHERE id = $1`, [topic_id]);
-      holderArr.push(tmp.rows[0]);
-    };
 
-    finalQuery.enrolled_courses = holderArr;
+    if (resp.rows[0].enrolled_courses) {
+      for (const topic_id of resp.rows[0].enrolled_courses) {
+        let tmp = await pool.query(`SELECT * FROM topic_group WHERE id = $1`, [topic_id]);
+        holderArr.push(tmp.rows[0]);
+      };
+      resp.rows[0].enrolled_courses = holderArr;
+    }
+    
+    response.status(200).json(resp.rows[0]);
   } catch (e) {
-    console.log(e);
+    response.status(400).send(e);
   }
-
-  response.status(200).json(finalQuery);
 }
 
 const deleteUser = (request, response) => {
@@ -81,7 +83,7 @@ async function getAllTopicGroups(request, response) {
     array_agg(DISTINCT announcements.id) as announcements_list
     FROM topic_group tp_group 
     LEFT JOIN user_admin ON user_admin.topic_group_id = tp_group.id
-    LEFT JOIN topics ON topics.topic_group_id = tp_group.id
+    FULL OUTER JOIN topics ON topics.topic_group_id = tp_group.id
     LEFT JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
     LEFT JOIN announcements ON topics.topic_group_id = announcements.topic_group
     GROUP BY tp_group.id`);
@@ -124,6 +126,55 @@ async function getAllTopicGroups(request, response) {
   }
 }
 
+// Get topic group data by name
+async function getTopicGroup (request, response) {
+  try {
+    const topicGroup = request.params.topicGroupName;
+    var tgId = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroup]);
+    const topicGroupId = tgId.rows[0].id;
+
+    let resp = await pool.query(
+      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, array_agg(DISTINCT topics.id) AS topics_list
+      FROM topic_group tp_group 
+      JOIN topics ON topics.topic_group_id = tp_group.id
+      WHERE tp_group.id = $1
+      GROUP BY tp_group.id`, [topicGroupId]);
+
+    var topicArr = [];
+    for (const topic_id of resp.rows[0].topics_list) {
+      let tmp = await pool.query(
+        `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(topic_files.id) as course_materials, 
+        array_agg(DISTINCT prerequisites.prereq) as prereqs
+        FROM topics 
+        FULL OUTER JOIN topic_files ON topic_files.topic_id = topics.id
+        FULL OUTER JOIN prerequisites ON prerequisites.topic = topics.id
+        WHERE topics.id = $1
+        GROUP BY topics.id`
+        , [topic_id]);
+
+      if (tmp.rows.length > 0) {
+        var courseMaterialsArr = [];
+        if (tmp.rows[0].course_materials[0] !== null) {
+          for (var material_id of tmp.rows[0].course_materials) {
+            let tmp2 = await pool.query(`SELECT * from topic_files WHERE id = $1`, [material_id]);
+            courseMaterialsArr.push(tmp2.rows[0]);
+          }
+        }
+        if (tmp.rows[0].prereqs[0] === null) { tmp.rows[0].prereqs = []; }
+        tmp.rows[0].course_materials = courseMaterialsArr;
+        topicArr.push(tmp.rows[0]);
+      }
+    };
+
+    resp.rows[0].topics_list = topicArr;
+
+    response.status(200).json(resp.rows[0]);
+  } catch (e) {
+    response.status(400).send(e);
+  }
+}
+
+// Get topics of topic group
 async function getTopics (request, response) { 
   try {
     const topicGroupName = request.params.topicGroupName;
@@ -131,17 +182,15 @@ async function getTopics (request, response) {
       `SELECT array_agg(DISTINCT topics.id) AS topics_list
       FROM topic_group tp_group 
       JOIN topics ON topics.topic_group_id = tp_group.id
-      WHERE tp_group.name = $1
+      WHERE LOWER(tp_group.name) = LOWER($1)
       GROUP BY tp_group.id;`, [topicGroupName]);
 
-    var finalQuery = resp.rows;
-
-    for (var object of finalQuery) { 
+    for (var object of resp.rows) { 
       var topicArr = [];
       for (const topic_id of object.topics_list) {
-        console.log('topic_id', topic_id);
         let tmp = await pool.query(
-          `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(topic_files.id) as course_materials, array_agg(DISTINCT prerequisites.prereq) as prereqs
+          `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(DISTINCT topic_files.id) as course_materials, 
+          array_agg(DISTINCT prerequisites.prereq) as prereqs
           FROM topics 
           FULL OUTER JOIN topic_files ON topic_files.topic_id = topics.id
           FULL OUTER JOIN prerequisites ON prerequisites.topic = topics.id
@@ -149,10 +198,7 @@ async function getTopics (request, response) {
           GROUP BY topics.id`
           , [topic_id]);
 
-
-        console.log(tmp.rows);
         if (tmp.rows.length > 0) {
-          console.log('tmp', tmp.rows);
           var courseMaterialsArr = [];
           if (tmp.rows[0].course_materials[0] !== null) {
             for (var material_id of tmp.rows[0].course_materials) {
@@ -167,16 +213,13 @@ async function getTopics (request, response) {
           topicArr.push(tmp.rows[0]);
 
         }
-
-
       };
 
       object.topics_list = topicArr;
     }
-    response.status(200).json(finalQuery[0]);
+    response.status(200).json(resp.rows[0]);
   } catch(e) {
-    response.sendStatus(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 }
 
@@ -187,12 +230,12 @@ async function getTopicPreReqs (request, response) {
     let resp = await pool.query(
       `SELECT array_agg(DISTINCT p.prereq) as prerequisites_list 
       FROM prerequisites p
-      JOIN topic_group ON name = $1
+      JOIN topic_group ON LOWER(name) = LOWER($1)
       JOIN topics ON topics.topic_group_id = topic_group.id
-      WHERE topics.name = $2
-      AND topics.topic_group_id = p.topic`, [topicGroupName, topicName]);
+      WHERE LOWER(topics.name) = LOWER($2)
+      AND topics.topic_group_id = topic_group.id
+      AND topics.id = p.topic`, [topicGroupName, topicName]);
 
-    var finalQuery = resp.rows;
     var preReqsArr = [];
 
     for (var prereq_id of resp.rows[0].prerequisites_list) {
@@ -200,11 +243,10 @@ async function getTopicPreReqs (request, response) {
       preReqsArr.push(tmp.rows[0]);
     }
 
-    finalQuery[0].prerequisites_list = preReqsArr;
-    response.status(200).json(finalQuery[0]);
+    resp.rows[0].prerequisites_list = preReqsArr;
+    response.status(200).json(resp.rows[0]);
   } catch(e) {
-    response.sendStatus(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 }
 
@@ -250,23 +292,58 @@ async function deleteTopicGroup (request, response) {
   const topicGroupName = request.params.topicGroupName;
 
   let resp = await pool.query(
-    'DELETE FROM topic_group WHERE name = $1',
+    'DELETE FROM topic_group WHERE LOWER(name) = LOWER($1)',
     [topicGroupName]);
 
   response.status(200).send(`Topic Group deleted with name: ${topicGroupName}`)
+}
+
+async function deleteTopic(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const topicName = request.params.topicName;
+  const idResp = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+  if (idResp.rows.length == 0) {
+    response.status(400).json({error: "Could not find topic group"});
+    return;
+  }
+  const topicGroupId = idResp.rows[0].id;
+  let tmp = await pool.query(
+    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+  , [topicName, topicGroupId]);
+  if (tmp.rows.length == 0) {
+    response.status(400).json({error: "Could not find topic in database"});
+    return;
+  }
+  let topicId = tmp.rows[0].id;
+  await pool.query(`DELETE FROM prerequisites WHERE topic = $1 or prereq = $1`, [topicId]);
+  await pool.query(`DELETE FROM topics WHERE id = $1`, [topicId]);
+  response.status(200).json({ success: true, topicId: topicId});
 }
 
 async function postTopic (request, response) {
   const topicGroupName = request.params.topicGroupName;
   const topicName = request.params.topicName;
   const idResp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
+  if (idResp.rows.length == 0) {
+    response.status(400).json({error: "Could not find topic group"});
+    return;
+  }
   const topicGroupId = idResp.rows[0].id;
 
   let resp = await pool.query(
     'INSERT INTO topics(id, topic_group_id, name) values(default, $1, $2)',
     [topicGroupId, topicName]);
+  
+  let tmp = await pool.query(
+    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+  , [topicName, topicGroupId]);
+  if (tmp.rows.length == 0) {
+    response.status(400).json({error: "Could not find newly created topic in database"});
+    return;
+  }
+  let topicId = tmp.rows[0];
 
-  response.status(200).send(`Topic created with name: ${topicGroupName}`)
+  response.status(200).json(topicId);
 }
 
 /***************************************************************
@@ -855,25 +932,39 @@ async function getAnnouncements (request, response) {
     const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
     const topicGroupId = tmpQ.rows[0].id;
     let resp = await pool.query(
-      `SELECT a.id, a.author, a.topic_group, a.title, a.content, a.post_date,
-      array_agg(af.id) as attachments
+      `SELECT a.id, a.author, a.topic_group, a.title, a.content, a.post_date, 
+      array_agg(c.id) as comments, array_agg(af.id) as attachments
       FROM announcements a
+      LEFT JOIN announcement_comment c ON c.announcement_id = a.id
       LEFT JOIN announcement_files af ON af.announcement_id = a.id
       WHERE a.topic_group = $1
       GROUP BY a.id`, [topicGroupId]);
 
     for (const object of resp.rows) {
       var fileArr = [];
+      var commentArr = [];
       for (const attachment of object.attachments) {
         if (attachment != null) { 
           let fileQ = await pool.query(`
-          SELECT id, name from announcement_files WHERE announcement_id = $1
-          AND id = $2
+          SELECT id, name, file
+          FROM announcement_files WHERE announcement_id = $1 AND id = $2
           `, [object.id, attachment])
           fileArr.push(fileQ.rows[0]);
         }
       }
+
+      if (object.comments.length) {
+        for (const comment of object.comments) {
+          let commQ = await pool.query(`
+          SELECT id, author, content, post_date
+          FROM announcement_comment WHERE announcement_id = $1 AND id = $2
+          `, [object.id, comment])
+          commentArr.push(commQ.rows[0]);
+        }
+      }
+      
       object.attachments = fileArr;
+      object.comments = commentArr;
     }
 
     response.status(200).json(resp.rows);
@@ -888,16 +979,55 @@ async function getAnnouncementById (request, response) {
     const announcementId = request.params.announcementId;
     let resp = await pool.query(`
       SELECT a.id, a.author, a.topic_group, a.title, a.content, a.post_date,
-      array_agg(af.name) as attachments
+      array_agg(c.id) as comments, array_agg(af.id) as attachments
       FROM announcements a
+      LEFT JOIN announcement_comment c ON c.announcement_id = a.id
       LEFT JOIN announcement_files af ON af.announcement_id = a.id
       WHERE a.id = $1
       GROUP BY a.id
     `, [announcementId]);
+
+    var fileArr = [];
+    var commArr = [];
+
+    if (resp.rows[0].comments.length) {
+      for (const commId of resp.rows[0].comments) {
+        let commQ = await pool.query(
+        `SELECT ac.id, ac.author, ac.content, ac.post_date, array_agg(acf.id) as attachments
+        FROM announcement_comment ac 
+        LEFT JOIN announcement_comment_files acf ON acf.comment_id = ac.id 
+        WHERE ac.id = $1
+        GROUP BY ac.id`, [commId]);
+
+        var commFileArr = [];
+        if (commQ.rows[0].attachments.length) {
+          for (const file of commQ.rows[0].attachments) {
+            let commFileQ = await pool.query(`
+            SELECT id, name, file FROM announcement_comment_files 
+            WHERE id = $1`, [file]);
+            commFileArr.push(commFileQ.rows[0]);
+          }
+          commQ.rows[0].attachments = commFileArr;
+        }
+        commArr.push(commQ.rows[0]);
+      }
+      resp.rows[0].comments = commArr;
+    }
+
+    for (const attachment of resp.rows[0].attachments) {
+      if (attachment != null) { 
+        let fileQ = await pool.query(`
+        SELECT id, name, file
+        FROM announcement_files WHERE announcement_id = $1 AND id = $2
+        `, [announcementId, attachment])
+        fileArr.push(fileQ.rows[0]);
+      }
+    }
+    resp.rows[0].attachments = fileArr;
+
     response.status(200).json(resp.rows[0]);
   } catch (e) {
-    response.sendStatus(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 };
 
@@ -905,7 +1035,7 @@ async function getAnnouncementById (request, response) {
 async function postAnnouncement (request, response) {
   try {
     const topicGroupName = request.params.topicGroup;
-    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
     const topic_group = tmpQ.rows[0].id;
     const author = request.body.author;
     const title = request.body.title;
@@ -917,16 +1047,24 @@ async function postAnnouncement (request, response) {
       [author, topic_group, title, content])
   
     if (request.files.uploadFile.length > 1) {
+      if (!fs.existsSync(`_files/announcement${resp.rows[0].id}`)) { fs.mkdirSync(`_files/announcement${resp.rows[0].id}`) }
       for (const file of request.files.uploadFile) {
         let upQuery = await pool.query(`
         INSERT INTO announcement_files(id, name, file, announcement_id)
-        VALUES(default, $1, $2, $3)`, [file.name, file.data, resp.rows[0].id]);
+        VALUES(default, $1, $2, $3)`, [file.name, (`_files/announcement${resp.rows[0].id}/${file.name}`), 
+        resp.rows[0].id]);
+        fs.writeFile(`_files/announcement${resp.rows[0].id}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
       }
     } else {
+      if (!fs.existsSync(`_files/announcement${resp.rows[0].id}`)) { fs.mkdirSync(`_files/announcement${resp.rows[0].id}`) }
       let upQuery = await pool.query(`
-        INSERT INTO announcement_files(id, name, file, announcement_id)
-        VALUES(default, $1, $2, $3)`, 
-        [request.files.uploadFile.name, request.files.uploadFile.data, resp.rows[0].id]);
+      INSERT INTO announcement_files(id, name, file, announcement_id)
+      VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
+      (`_files/announcement${resp.rows[0].id}/${request.files.uploadFile.name}`), resp.rows[0].id]);
+      fs.writeFile(`_files/announcement${resp.rows[0].id}/${request.files.uploadFile.name}`, 
+      request.files.uploadFile.data, "binary", function (err) {
+        if (err) throw err;
+      });
     }
 
     response.sendStatus(200);
@@ -935,34 +1073,55 @@ async function postAnnouncement (request, response) {
   }
 };
 
-// Get announcement file by id
-async function getAnnouncementFile (request, response) {
-  try {
-    const fileId = request.params.fileId;
-    let resp = await pool.query(`
-    SELECT file FROM announcement_files WHERE id = $1`, [fileId]);
-    response.status(200).json(resp.rows[0]);
-  } catch (e) {
-    response.sendStatus(400);
-  }
-}
-
 // Update announcement by id
 async function putAnnouncement (request, response) {
   try {
     const announcementId = request.params.announcementId;
     const title = request.body.title;
     const content = request.body.content;
+    const fileDeleteList = request.body.fileList;
 
     let resp = pool.query(`
     UPDATE announcements SET title = $1, content = $2
-    WHERE id = $3
-    `, [title, content, announcementId]);
+    WHERE id = $3`, [title, content, announcementId]);
+
+    if (fileDeleteList.length) {  // Deletes files specified in delete list
+      for (const fileId of fileDeleteList) {
+        let tmpQ = await pool.query(`DELETE FROM announcement_files WHERE id = $1 RETURNING file`, [fileId]);
+        fs.unlinkSync(tmpQ.rows[0].file);
+      }
+    }
+
+    if (request.files.uploadFile.length > 1) {
+      if (!fs.existsSync(`_files/announcement${announcementId}`)) { 
+        fs.mkdirSync(`_files/announcement${announcementId}`);
+      } 
+
+      for (const file of request.files.uploadFile) {
+        await pool.query(`
+        INSERT INTO announcement_files(id, name, file, announcement_id)
+        VALUES(default, $1, $2, $3)`, [file.name, (`_files/announcement${announcementId}/${file.name}`), 
+        announcementId]);
+        fs.writeFile(`_files/announcement${announcementId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+      }
+    } else {
+      if (!fs.existsSync(`_files/announcement${announcementId}`)) { 
+        fs.mkdirSync(`_files/announcement${announcementId}`);
+      } 
+
+      let upQuery = await pool.query(`
+      INSERT INTO announcement_files(id, name, file, announcement_id)
+      VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
+      (`_files/announcement${announcementId}/${request.files.uploadFile.name}`), announcementId]);
+      fs.writeFile(`_files/announcement${announcementId}/${request.files.uploadFile.name}`, 
+      request.files.uploadFile.data, "binary", function (err) {
+        if (err) throw err;
+      });
+    }
 
     response.sendStatus(200);
   } catch (e) {
-    response.sendStatus(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 };
 
@@ -972,41 +1131,63 @@ async function deleteAnnouncement (request, response) {
     const announcementId = request.params.announcementId;
     let resp = await pool.query(
       `DELETE FROM announcements WHERE id = $1`, [announcementId]);
+    if (fs.existsSync(`_files/announcement${announcementId}`)) { 
+      fs.rmdir(`_files/announcement${announcementId}`, { recursive: true }, (err) => {
+        if (err) { throw err; }
+      }); 
+    }
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 };
 
 // Create new comment for announcement
 async function postAnnouncementComment (request, response) {
   try {
-    //const topicGroupName = request.params.topicGroup;
     const announcementId = request.params.announcementId;
     const author = request.body.author;
     const content = request.body.content;
-    const postDate = request.body.postDate;
-    const attachments = request.body.attachments;
 
     let resp = await pool.query(
       `INSERT INTO announcement_comment(id, announcement_id, author, content, post_date) 
-      VALUES(default, $1, $2, $3, $4) RETURNING id`, [announcementId, author, content, postDate])
-    const aId = resp.rows[0].id;
+      VALUES(default, $1, $2, $3, CURRENT_TIMESTAMP) RETURNING id`, [announcementId, author, content]);
+    const commId = resp.rows[0].id;
 
-    // Loop to add attachments to db
-    if (attachments.length) {
-      for (const item of attachments) {
-        let addItem = await pool.query(
-          `INSERT INTO announcement_comment_files(id, name, file_id, comment_id)
-          VALUES(default, $1, $1, $2)`, [item, aId])
+    if (request.files.uploadFile.length > 1) {
+      if (!fs.existsSync(`_files/announcement${announcementId}`)) { 
+        fs.mkdirSync(`_files/announcement${announcementId}`);
+        fs.mkdirSync(`_files/announcement${announcementId}/comment${commId}`) 
+      } else if (!fs.existsSync(`_files/announcement${announcementId}/comment${commId}`)) { 
+        fs.mkdirSync(`_files/announcement${announcementId}/comment${commId}`) 
       }
+      for (const file of request.files.uploadFile) {
+        let upQuery = await pool.query(`
+        INSERT INTO announcement_comment_files(id, name, file, comment_id)
+        VALUES(default, $1, $2, $3)`, [file.name, (`_files/announcement${announcementId}/comment${commId}/${file.name}`), 
+        commId]);
+        fs.writeFile(`_files/announcement${announcementId}/comment${commId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+      }
+    } else {
+      if (!fs.existsSync(`_files/announcement${announcementId}`)) { 
+        fs.mkdirSync(`_files/announcement${announcementId}`);
+        fs.mkdirSync(`_files/announcement${announcementId}/comment${commId}`);
+      } else if (!fs.existsSync(`_files/announcement${announcementId}/comment${commId}`)) { 
+        fs.mkdirSync(`_files/announcement${announcementId}/comment${commId}`) 
+      }
+      let upQuery = await pool.query(`
+      INSERT INTO announcement_comment_files(id, name, file, comment_id)
+      VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
+      (`_files/announcement${announcementId}/comment${commId}/${request.files.uploadFile.name}`), commId]);
+      fs.writeFile(`_files/announcement${announcementId}/comment${commId}/${request.files.uploadFile.name}`, 
+      request.files.uploadFile.data, "binary", function (err) {
+        if (err) throw err;
+      });
     }
 
     response.sendStatus(200);
   } catch(e) {
-    response.status(400)
-    response.send(e);
+    response.status(400).send(e);
   }
 };
 
@@ -1014,10 +1195,52 @@ async function postAnnouncementComment (request, response) {
 async function putAnnouncementComment (request, response) {
   try {
     const commentId = request.params.commentId;
+    const announcementId = request.params.announcementId;;
     const content = request.body.content;
+    const fileDeleteList = request.body.fileList; // List of files to delete associated with commentid
+
     let resp = await pool.query(
       `UPDATE announcement_comment SET content = $1 WHERE id = $2`,
       [content, commentId]);
+
+    if (fileDeleteList.length) {  // Deletes files specified in delete list
+      for (const fileId of fileDeleteList) {
+        let tmpQ = await pool.query(`DELETE FROM announcement_comment_files WHERE id = $1 RETURNING file`, [fileId]);
+        fs.unlinkSync(tmpQ.rows[0].file);
+      }
+    }
+
+    if (request.files.uploadFile.length > 1) {
+      if (!fs.existsSync(`_files/announcement${announcementId}`)) { 
+        fs.mkdirSync(`_files/announcement${announcementId}`);
+        fs.mkdirSync(`_files/announcement${announcementId}/comment${commentId}`) 
+      } else if (!fs.existsSync(`_files/announcement${announcementId}/comment${commentId}`)) { 
+        fs.mkdirSync(`_files/announcement${announcementId}/comment${commentId}`) 
+      }
+      for (const file of request.files.uploadFile) {
+        await pool.query(`
+        INSERT INTO announcement_comment_files(id, name, file, comment_id)
+        VALUES(default, $1, $2, $3)`, [file.name, (`_files/announcement${announcementId}/comment${commentId}/${file.name}`), 
+        commentId]);
+        fs.writeFile(`_files/announcement${announcementId}/comment${commentId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+      }
+    } else {
+      if (!fs.existsSync(`_files/announcement${announcementId}`)) { 
+        fs.mkdirSync(`_files/announcement${announcementId}`);
+        fs.mkdirSync(`_files/announcement${announcementId}/comment${commentId}`);
+      } else if (!fs.existsSync(`_files/announcement${announcementId}/comment${commentId}`)) { 
+        fs.mkdirSync(`_files/announcement${announcementId}/comment${commentId}`) 
+      }
+      let upQuery = await pool.query(`
+      INSERT INTO announcement_comment_files(id, name, file, comment_id)
+      VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
+      (`_files/announcement${announcementId}/comment${commentId}/${request.files.uploadFile.name}`), commentId]);
+      fs.writeFile(`_files/announcement${announcementId}/comment${commentId}/${request.files.uploadFile.name}`, 
+      request.files.uploadFile.data, "binary", function (err) {
+        if (err) throw err;
+      });
+    }
+
     response.sendStatus(200);
   } catch(e) {
     response.status(400);
@@ -1029,12 +1252,18 @@ async function putAnnouncementComment (request, response) {
 async function deleteAnnouncementComment (request, response) {
   try {
     const commentId = request.params.commentId;
+    let tmp = await pool.query(`SELECT announcement_id FROM announcement_comment WHERE id = $1`, [commentId]);
+    const aId = tmp.rows[0].announcement_id;
     let resp = await pool.query(
       `DELETE FROM announcement_comment WHERE id = $1`, [commentId]);
+    if (fs.existsSync(`_files/announcement${aId}/comment${commentId}`)) { 
+      fs.rmdir(`_files/announcement${aId}/comment${commentId}`, { recursive: true }, (err) => {
+        if (err) { throw err; }
+      }); 
+    }
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 };
 
@@ -1738,7 +1967,6 @@ async function getStudentAnswerCount (request, response) {
 };
 
 module.exports = {
-  getAnnouncementFile,
   putTag,
   putAnnouncementComment,
   putAnnouncement,
@@ -1787,6 +2015,7 @@ module.exports = {
   deletePreReq,
   postTopicGroup,
   deleteTopicGroup,
+  deleteTopic,
   postTopic,
   getAllForumPosts,
   getAllPinnedPosts,
@@ -1817,5 +2046,6 @@ module.exports = {
   putLevel,
   deleteLevel,
   postLevel,
-  postQuizQuestion
+  postQuizQuestion,
+  getTopicGroup
 };

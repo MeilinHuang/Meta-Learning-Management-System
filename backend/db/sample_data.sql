@@ -1,4 +1,3 @@
--- SAMPLE DATA INSERTION
 -- \i 'C:/Users/Dave/Desktop/COMP4962 - Thesis B/metalms/backend/db/sample_data.sql';
 -- \i '/Users/davidnguyen/Desktop/COMP - Thesis B/metalms/backend/db/sample_data.sql';
 
@@ -7,7 +6,6 @@ INSERT INTO users(id, name, zid) values(default, 'David Nguyen', 'z5166106');
 INSERT INTO users(id, name, zid) values(default, 'John Smith', 'z5123821');
 INSERT INTO users(id, name, zid) values(default, 'Tutory Tutorer', 'z5921738');
 INSERT INTO users(id, name, zid) values(default, 'Lecturey Lecturer', 'z5928712');
-
 
 -- Create Topic Groups
 INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, 'C++ Programming', 'COMP6771', 'Course_Outline.pdf');

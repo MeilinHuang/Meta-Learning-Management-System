@@ -1,6 +1,6 @@
-
 Database 
   - Add ON DELETE CASCADE, ON UPDATE CASCADE
+  - Change file storage to paths or use S3
 
 Topic group
   - API for adding/deleting/updating topic files
@@ -10,7 +10,3 @@ Topic group
 API
   - Make query calls case insensitive from parameters
   - Make sure for INSERT / POST there is no duplicate inserts
-
-Course pages
-  - Add to get all announcements (files list) (comments too)
-  - add to get announcement by id (files list)

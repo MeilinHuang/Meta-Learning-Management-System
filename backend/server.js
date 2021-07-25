@@ -8,7 +8,6 @@ app.use(cors());
 app.use(express.json({limit: '50mb'}));
 app.use(fileUpload());
 
-
 /***************************************************************
                        Open API / Swagger
 ***************************************************************/
@@ -51,6 +50,10 @@ app.get('/topicGroup', async(request, response) => {
   await database.getAllTopicGroups(request, response);
 });
 
+app.get('/topicGroup/:topicGroupName', async(request, response) => {
+  await database.getTopicGroup(request, response);
+});
+
 app.get('/topicGroup/:topicGroupName/topic', async(request, response) => {
   await database.getTopics(request, response);
 });
@@ -71,6 +74,10 @@ app.delete('/topicGroup/:topicGroupName/topic/:topicName/prerequisite', async(re
 
 app.post('/topicGroup/:topicGroupName', async(request, response) => {
   await database.postTopicGroup(request, response);
+});
+
+app.delete('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
+  await database.deleteTopic(request, response);
 });
 
 app.delete('/topicGroup/:topicGroupName', async(request, response) => {
