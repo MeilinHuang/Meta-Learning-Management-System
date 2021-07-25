@@ -168,8 +168,8 @@ CREATE TABLE IF NOT EXISTS "announcements" (
 DROP TABLE IF EXISTS "announcement_comment" CASCADE;
 CREATE TABLE "announcement_comment" (
   id SERIAL PRIMARY KEY,
-  announcement_id INTEGER NOT NULL REFERENCES announcements(id),
-  author INTEGER NOT NULL REFERENCES users(id),
+  announcement_id INTEGER NOT NULL REFERENCES announcements(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  author INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   content TEXT NOT NULL,
   post_date TIMESTAMP
 );
@@ -178,7 +178,7 @@ DROP TABLE IF EXISTS "announcement_files" CASCADE;
 CREATE TABLE "announcement_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL, 
-  file BYTEA NOT NULL,
+  file TEXT NOT NULL,
   announcement_id INTEGER NOT NULL REFERENCES announcements(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -186,7 +186,7 @@ DROP TABLE IF EXISTS "announcement_comment_files" CASCADE;
 CREATE TABLE "announcement_comment_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  file_id TEXT NOT NULL,
+  file TEXT NOT NULL,
   comment_id INTEGER NOT NULL REFERENCES announcement_comment(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
