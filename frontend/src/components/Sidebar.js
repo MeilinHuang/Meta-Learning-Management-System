@@ -1,7 +1,8 @@
-import React from "react"
+import React, { useState, useEffect} from "react"
 import { useHistory } from 'react-router-dom'
 import { Stack, Text, Box, Flex, Drawer, DrawerOverlay, DrawerCloseButton, DrawerContent, Select, Avatar, DrawerHeader, Menu, MenuButton, Portal, MenuList, MenuItem} from "@chakra-ui/react"
 import { ChevronDownIcon, ArrowBackIcon, HamburgerIcon } from '@chakra-ui/icons'
+import { get_topic_group } from "../Constants.js"
 
 
 function SidebarContent({history, links}) {
@@ -35,15 +36,17 @@ function SidebarContent({history, links}) {
 
 function Sidebar({links, isOpen, setOpen, variant, page}) {
     const history = useHistory()
+    const [code, setCode] = useState("")
     //MAYBE STORE IN LOCAL STORAGE INSTEAD OF FETCHING EVERYTIME
     const course = history.location.pathname.split("/").filter(e => e !== "")[1]
+    fetch(get_topic_group(course)).then(e => e.json()).then(e => setCode(e.topic_code))
 
     let title = (
         <Menu isLazy placement="right">
             <MenuButton>
                 <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
                     <Box marginLeft={1} padding={4} fontSize="larger">
-                        <Text fontWeight="medium" letterSpacing="wider">COMP1234</Text>
+                        <Text fontWeight="medium" letterSpacing="wider">{code}</Text>
                         <Text fontSize="medium" letterSpacing="wider">{course}</Text>
                     </Box>
                 </Flex>
@@ -101,9 +104,9 @@ function Sidebar({links, isOpen, setOpen, variant, page}) {
                     <DrawerContent>
                         <DrawerCloseButton></DrawerCloseButton>
                         <DrawerHeader>
-                            <Select placeholder="COMP1511" width="80%" size="lg" fontSize="xl" fontWeight="bold">
-                                <option>COMP1521</option>
-                                <option>COMP1531</option>
+                            <Select placeholder={code} width="80%" size="lg" fontSize="xl" fontWeight="bold">
+                                <option>Placeholder 1</option>
+                                <option>Placeholder 2</option>
                             </Select>
                         </DrawerHeader>
                         <Box marginTop={15} fontWeight="medium">
