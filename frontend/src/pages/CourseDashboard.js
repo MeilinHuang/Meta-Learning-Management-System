@@ -9,7 +9,6 @@ import {
     InputLeftElement,
     useBreakpointValue,
     useDisclosure,
-    useToast,
 } from "@chakra-ui/react"
 import { GrAdd } from 'react-icons/gr'
 import { SearchIcon } from '@chakra-ui/icons'
@@ -26,7 +25,6 @@ function CourseDashboard() {
     const buttonContents = useBreakpointValue({ base: '', md: 'Add Post' })
     const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null })
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const toast = useToast()
 
     useEffect(() => {
         fetch(`http://localhost:8000/${dummyCourse}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))

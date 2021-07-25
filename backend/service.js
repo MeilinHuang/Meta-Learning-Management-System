@@ -278,7 +278,7 @@ async function getAllForumPosts (request, response) {
   let resp;
   try {
     resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -329,7 +329,7 @@ async function getAllPinnedPosts (request, response) {
   let resp;
   try {
     resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp 
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -380,7 +380,7 @@ async function getSearchPosts (request, response) {
   try {
     const forumSearchTerm = request.params.forumSearchTerm;
     let resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp 
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -432,7 +432,7 @@ async function getFilterPosts (request, response) {
   try {
     const forumFilterTerm = request.params.forumFilterTerm;
     let resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -489,13 +489,14 @@ async function postForum (request, response) {
     const publishedDate = request.body.publishedDate;
     const description = request.body.description;
     const tags = request.body.tags;
+    const related_link = request.body.related_link;
   
     let resp = await pool.query(
       `INSERT INTO forum_posts(post_id, title, user_id, 
-        author, published_date, description, isPinned) 
-        values(default, $1, $2, $3, $4, $5, false) 
+        author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
+        values(default, $1, $2, $3, $4, $5, false, $6, 0, false) 
         RETURNING post_id`,
-      [title, user_id, author, publishedDate, description]);
+      [title, user_id, author, publishedDate, description, related_link]);
   
     for (const tag of tags) { // Insert linked tags
       let linkPostTag = await pool.query(
@@ -514,7 +515,7 @@ async function getPostById (request, response) {
   let resp;
   try {
     resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -789,6 +790,58 @@ async function deleteTag (request, response) {
   } 
 };
 
+// Endorses or un-endorses forum post
+async function putPostEndorse (request, response) {
+  try {
+    const postId = request.params.postId;
+    const isEndorsed = request.params.isEndorsed;
+
+    let resp = await pool.query(`UPDATE forum_posts SET isendorsed = $1 WHERE post_id = $2`,
+    [isEndorsed, postId]);
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+}
+
+// Likes a forum post
+async function putPostLike (request, response) {
+  try {
+    const postId = request.params.postId;
+
+    const upvotesResp = await pool.query(`SELECT num_of_upvotes FROM forum_posts WHERE post_id = $1`, [postId])
+    const upvotes = upvotesResp.rows[0].num_of_upvotes + 1
+
+    let resp = await pool.query(`UPDATE forum_posts SET num_of_upvotes = $1 WHERE post_id = $2`,
+    [upvotes, postId]);
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+}
+
+// Unlikes a forum post
+async function putPostUnlike (request, response) {
+  try {
+    const postId = request.params.postId;
+
+    let upvotesResp = await pool.query(`SELECT num_of_upvotes FROM forum_posts WHERE post_id = $1`, [postId])
+    const upvotes = upvotesResp.rows[0].num_of_upvotes === 0 ? upvotesResp.rows[0].num_of_upvotes : upvotesResp.rows[0].num_of_upvotes - 1
+
+    let resp = await pool.query(`UPDATE forum_posts SET num_of_upvotes = $1 WHERE post_id = $2`,
+    [upvotes, postId]);
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400);
+    response.send(e);
+  }
+}
+
 /***************************************************************
                        Course Pages Functions
 ***************************************************************/
@@ -797,19 +850,33 @@ async function deleteTag (request, response) {
 async function getAnnouncements (request, response) {
   try {
     const topicGroupName = request.params.topicGroup;
-    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
     const topicGroupId = tmpQ.rows[0].id;
     let resp = await pool.query(
       `SELECT a.id, a.author, a.topic_group, a.title, a.content, a.post_date,
-      array_agg(af.name) as attachments
+      array_agg(af.id) as attachments
       FROM announcements a
       LEFT JOIN announcement_files af ON af.announcement_id = a.id
       WHERE a.topic_group = $1
-      GROUP BY a.id`, [topicGroupId])
+      GROUP BY a.id`, [topicGroupId]);
+
+    for (const object of resp.rows) {
+      var fileArr = [];
+      for (const attachment of object.attachments) {
+        if (attachment != null) { 
+          let fileQ = await pool.query(`
+          SELECT id, name from announcement_files WHERE announcement_id = $1
+          AND id = $2
+          `, [object.id, attachment])
+          fileArr.push(fileQ.rows[0]);
+        }
+      }
+      object.attachments = fileArr;
+    }
+
     response.status(200).json(resp.rows);
   } catch(e) {
-    response.sendStatus(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 };
 
@@ -834,33 +901,30 @@ async function getAnnouncementById (request, response) {
 
 // Create new announcement for topic group / course
 async function postAnnouncement (request, response) {
-  const topicGroupName = request.params.topicGroup;
-  const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
-  const topic_group = tmpQ.rows[0].id;
-  const author = request.body.author;
-  const title = request.body.title;
-  const content = request.body.content;
-  const postDate = request.body.postDate;
-  const attachments = request.body.attachments;
-
-  /* for (const file of request.files) {
-    console.log(file);
-  } */
-
   try {
+    const topicGroupName = request.params.topicGroup;
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
+    const topic_group = tmpQ.rows[0].id;
+    const author = request.body.author;
+    const title = request.body.title;
+    const content = request.body.content;
+
     let resp = await pool.query(
       `INSERT INTO announcements(id, author, topic_group, title, content, post_date) 
-      VALUES(default, $1, $2, $3, $4, $5) RETURNING id`,
-      [author, topic_group, title, content, postDate])
-    const aId = resp.rows[0].id;
+      VALUES(default, $1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING id`,
+      [author, topic_group, title, content])
   
-    // Loop to add attachments to db
-    if (attachments.length) {
-      for (const item of attachments) {
-        let addItem = await pool.query(
-          `INSERT INTO announcement_files(id, name, file_id, announcement_id)
-          VALUES(default, $1, $1, $2)`, [item, aId])
+    if (request.files.uploadFile.length > 1) {
+      for (const file of request.files.uploadFile) {
+        let upQuery = await pool.query(`
+        INSERT INTO announcement_files(id, name, file, announcement_id)
+        VALUES(default, $1, $2, $3)`, [file.name, file.data, resp.rows[0].id]);
       }
+    } else {
+      let upQuery = await pool.query(`
+        INSERT INTO announcement_files(id, name, file, announcement_id)
+        VALUES(default, $1, $2, $3)`, 
+        [request.files.uploadFile.name, request.files.uploadFile.data, resp.rows[0].id]);
     }
 
     response.sendStatus(200);
@@ -868,6 +932,18 @@ async function postAnnouncement (request, response) {
     response.status(400).send(e);
   }
 };
+
+// Get announcement file by id
+async function getAnnouncementFile (request, response) {
+  try {
+    const fileId = request.params.fileId;
+    let resp = await pool.query(`
+    SELECT file FROM announcement_files WHERE id = $1`, [fileId]);
+    response.status(200).json(resp.rows[0]);
+  } catch (e) {
+    response.sendStatus(400);
+  }
+}
 
 // Update announcement by id
 async function putAnnouncement (request, response) {
@@ -1660,6 +1736,7 @@ async function getStudentAnswerCount (request, response) {
 };
 
 module.exports = {
+  getAnnouncementFile,
   putTag,
   putAnnouncementComment,
   putAnnouncement,
@@ -1722,6 +1799,9 @@ module.exports = {
   putPostPin,
   getAllTags,
   postTag,
+  putPostEndorse,
+  putPostLike,
+  putPostUnlike,
   getAnnouncements,
   postAnnouncement,
   postAnnouncementComment,

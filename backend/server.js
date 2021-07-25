@@ -3,8 +3,6 @@ var cors = require('cors');
 const app = express();
 const database =  require('./service.js');
 const fileUpload = require('express-fileupload');
-const multer = require('multer');
-var upload = multer({ dest: 'tmp_files/' });
 
 app.use(cors());
 app.use(express.json({limit: '50mb'}));
@@ -12,15 +10,15 @@ app.use(fileUpload());
 
 
 /***************************************************************
-                       Swagger API
+                       Open API / Swagger
 ***************************************************************/
 
-const swaggerUi = require('swagger-ui-express'),
-swaggerDocument = require('./swagger.json');
+const swaggerUi = require('swagger-ui-express');
+const openApiDocument = require('./docs/openApi');
 
 // Redirect to swagger
 app.get('/', (req, res) => res.redirect('/docs'));
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 /***************************************************************
                        Auth Functions
@@ -151,6 +149,10 @@ app.put('/forum/tags/:tagId', async(request, response) => {
   await database.putTag(request, response);
 });
 
+app.put('/forum/tags', async(request, response) => {
+  await database.getAllTags(request, response);
+});
+
 app.post('/forum/tags', async(request, response) => {
   await database.postTag(request, response);
 });
@@ -158,6 +160,19 @@ app.post('/forum/tags', async(request, response) => {
 app.delete('/forum/tags/:tagId', async(request, response) => {
   await database.deleteTag(request, response);
 });
+
+app.put('/forum/post/endorse/:postId/:isEndorsed', async(request, response) => {
+  await database.putPostEndorse(request, response);
+});
+
+app.put('/forum/post/like/:postId', async(request, response) => {
+  await database.putPostLike(request, response);
+});
+
+app.put('/forum/post/unlike/:postId', async(request, response) => {
+  await database.putPostUnlike(request, response);
+});
+
 
 /***************************************************************
                        Course Pages Functions

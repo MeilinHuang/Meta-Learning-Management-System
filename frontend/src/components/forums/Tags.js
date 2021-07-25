@@ -7,9 +7,14 @@ import {
 function Tags({ tags }) {
     return (
         <Flex>
-            {tags && tags.map(({ id, name }) => (
-                <Tag key={id} my="8px" mx="4px" px="12px" borderRadius="full" variant="outline">{name}</Tag>
-            ))}
+            {tags && tags[0] !== null && tags.map(tag => {
+                if (tag === null) {
+                    return null
+                }
+
+                const { id, name } = tag
+                return <Tag key={id} my="8px" mx="4px" px="12px" borderRadius="full" variant="outline">{name}</Tag>
+            })}
         </Flex>
     )
 }

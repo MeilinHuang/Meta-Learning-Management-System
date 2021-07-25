@@ -11,7 +11,7 @@ function TagSelect({ isFilter, setTags: setSelectedTags }) {
         fetch(`http://localhost:8000/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => {
             setTags(data.map(({ tag_id, name }) => ({ value: tag_id, label: name })))
         })
-    }, [])
+    }, [setTags])
 
     const handleSelect = selectedTags => {
         let currentTags = []

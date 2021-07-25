@@ -39,15 +39,15 @@ INSERT INTO tutorials(id, tutor_id, topic_group_id, tutorial_code, timeslot, cur
 INSERT INTO user_admin(admin_id, topic_group_id) values(3, 1);
 
 -- Enroll Students
-INSERT INTO user_enrolled(topic_group_id, user_id, user_progress) values(1, 1, 5.3);
-INSERT INTO user_enrolled(topic_group_id, user_id, user_progress) values(1, 2, 8);
-INSERT INTO user_enrolled(topic_group_id, user_id, user_progress) values(2, 1, 26.34);
+INSERT INTO user_enrolled(topic_group_id, user_id) values(1, 1);
+INSERT INTO user_enrolled(topic_group_id, user_id) values(1, 2);
+INSERT INTO user_enrolled(topic_group_id, user_id) values(2, 1);
 
 -- Create Forum Posts
-INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned) 
-VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false);
-INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned) 
-VALUES(default, 'Assignment 1 Help', 1, 'David Nguyen', current_timestamp, 'Ask questions here for help', true);
+INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
+VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false, NULL, 3, true);
+INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
+VALUES(default, 'Assignment 1 Help', 1, 'David Nguyen', current_timestamp, 'Ask questions here for help', true, NULL, 0, false);
 
 -- Create Tags
 INSERT INTO tags(tag_id, name) VALUES(default, 'Introduction');
@@ -91,7 +91,7 @@ VALUES(default, 2, 2, 'First actual announcement for DBS', 'This is the real DBS
 INSERT INTO announcement_comment(id, announcement_id, author, content, post_date) VALUES(default, 1, 1, 'This is the wrong course', current_timestamp);
 INSERT INTO announcement_comment(id, announcement_id, author, content, post_date) VALUES(default, 2, 3, 'There is a duplicate', current_timestamp);
 
--- Create Gamification Questions
+/* -- Create Gamification Questions
 INSERT INTO gamification_question(id, title, questiontype, potentialAnswers, correctAnswer, availableFrom, numberOfAnswers, mediaLink, estimatedTimeRequired)
 VALUES(default, 'Gamification Question 1', 'mpc', 'a', 'a', current_timestamp, 4, 'question_image1.png', 2);
 INSERT INTO gamification_question(id, title, questiontype, potentialAnswers, correctAnswer, availableFrom, numberOfAnswers, mediaLink, estimatedTimeRequired)
@@ -111,7 +111,7 @@ VALUES(3, 2);
 
 -- Link levels to topic group
 INSERT INTO topic_group_levels(topic_group_id, levelsid) 
-VALUES(1, 2);
+VALUES(1, 2); */
 
 -- Create quiz
 INSERT INTO quiz(id, name, due_date, time_given) VALUES(default, 'Quiz 1', '2016-06-22 19:10:25-07', 30);
@@ -123,35 +123,35 @@ INSERT INTO quiz_question_bank(id, name) VALUES(default, 'Question Bank 1');
 INSERT INTO quiz_question_bank(id, name) VALUES(default, 'Question Bank 2');
 
 -- Create quiz questions
-INSERT INTO quiz_question(id, quiz_id, question_bank_id, quiz_type, marks_awarded, description, related_topic_id) 
-VALUES(default, 1, 1, 'mpc', 2,'Questions Description', 1);
-INSERT INTO quiz_question(id, quiz_id, question_bank_id, quiz_type, marks_awarded, description, related_topic_id) 
-VALUES(default, 1, 1, 'mpc', 5,'Questions Description', 1);
-INSERT INTO quiz_question(id, quiz_id, question_bank_id, quiz_type, marks_awarded, description, related_topic_id) 
-VALUES(default, 2, 2, 'mpc', 1.5,'Questions Description', 2);
+INSERT INTO quiz_question(id, quiz_id, quiz_type, marks_awarded, description, related_topic_id) 
+VALUES(default, 1, 'mpc', 2,'Questions Description', 1);
+INSERT INTO quiz_question(id, quiz_id, quiz_type, marks_awarded, description, related_topic_id) 
+VALUES(default, 1, 'mpc', 5,'Questions Description', 1);
+INSERT INTO quiz_question(id, quiz_id, quiz_type, marks_awarded, description, related_topic_id) 
+VALUES(default, 2, 'mpc', 1.5,'Questions Description', 2);
 
 -- Link Question Bank to Questions
-INSERT INTO question_bank_question(question_bank_id, question_id) VALUES(3, 4);
-INSERT INTO question_bank_question(question_bank_id, question_id) VALUES(3, 5);
-INSERT INTO question_bank_question(question_bank_id, question_id) VALUES(2, 6);
+INSERT INTO question_bank_question(question_bank_id, question_id) VALUES(1, 1);
+INSERT INTO question_bank_question(question_bank_id, question_id) VALUES(2, 2);
+INSERT INTO question_bank_question(question_bank_id, question_id) VALUES(2, 3);
 
 -- Create quiz question answer
-INSERT INTO quiz_question_anwer(id, quiz_id, question_id, is_correct_anwer, description)
+INSERT INTO quiz_question_answer(id, quiz_id, question_id, is_correct_answer, description)
 VALUES(default, 1, 1, false, '1 + 1 = 3');
-INSERT INTO quiz_question_anwer(id, quiz_id, question_id, is_correct_anwer, description)
+INSERT INTO quiz_question_answer(id, quiz_id, question_id, is_correct_answer, description)
 VALUES(default, 1, 1, true, '1 + 1 = 2');
-INSERT INTO quiz_question_anwer(id, quiz_id, question_id, is_correct_anwer, description)
+INSERT INTO quiz_question_answer(id, quiz_id, question_id, is_correct_answer, description)
 VALUES(default, 1, 1, false, '1 + 1 = 0');
-INSERT INTO quiz_question_anwer(id, quiz_id, question_id, is_correct_anwer, description)
+INSERT INTO quiz_question_answer(id, quiz_id, question_id, is_correct_answer, description)
 VALUES(default, 2, 2, false, 'None of the above');
 
 -- Create student answer
 INSERT INTO quiz_student_answer(student_id, quiz_id, question_id, answer_selected_id) 
-VALUES(1, 2, 5, 1);
+VALUES(1, 2, 1, 1);
 INSERT INTO quiz_student_answer(student_id, quiz_id, question_id, answer_selected_id) 
-VALUES(2, 2, 5, 1);
+VALUES(2, 2, 2, 1);
 INSERT INTO quiz_student_answer(student_id, quiz_id, question_id, answer_selected_id) 
-VALUES(3, 2, 5, 1);
+VALUES(3, 2, 2, 1);
 
 -- Create poll
 INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll A', current_timestamp, current_timestamp, false, 'Poll type A');
