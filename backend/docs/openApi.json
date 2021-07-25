@@ -3405,6 +3405,23 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "User Id liking",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -3448,6 +3465,23 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "User Id unliking",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
         "responses": {
           "200": {
             "description": "OK",
