@@ -13,4 +13,3 @@
 *.synctex.gz
 .DS_Store
 node_modules
-public\_files\*
