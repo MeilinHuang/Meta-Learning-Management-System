@@ -352,10 +352,10 @@ async function postTopic (request, response) {
 
 async function getAllForumPosts (request, response) {
   void (request);
-  let resp;
   try {
-    resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed, 
+    let resp = await pool.query(
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
+      fp.isPinned, fp.related_link, fp.num_of_upvotes, array_agg(DISTINCT uv.user_id) as upvoters, fp.isEndorsed,
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -364,14 +364,19 @@ async function getAllForumPosts (request, response) {
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
+      LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       GROUP BY fp.post_id`);
 
-    var finalQuery = resp.rows;
-
-    for (var object of finalQuery) { // Loop through list of topic groups
+    for (var object of resp.rows) {
       var tagsArr = [];
       var repliesArr = [];
       var commentsArr = [];
+      var upvArr = [];
+
+      for (const upvId of object.upvoters) {
+        let tmp = await pool.query(`SELECT * FROM users WHERE id = $1`, [upvId]);
+        upvArr.push(tmp.rows[0]);
+      }
 
       for (const tagId of object.tags) {
         let tmp = await pool.query(`SELECT * FROM tags WHERE tag_id = $1`, [tagId]);
@@ -388,24 +393,22 @@ async function getAllForumPosts (request, response) {
         commentsArr.push(tmp.rows[0]);
       };
 
+      object.upvoters = upvArr;
       object.tags = tagsArr;
       object.replies = repliesArr;
       object.comments = commentsArr;
     }
-
+    response.status(200).json(resp.rows);
   } catch (e) {
-    console.log(e);
+    response.status(400).send(e.detail);
   }
-
-  response.status(200).json(finalQuery);
 }
 
 // Get all pinned forum posts
 async function getAllPinnedPosts (request, response) {
   void (request);
-  let resp;
   try {
-    resp = await pool.query(
+    let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp 
@@ -418,9 +421,7 @@ async function getAllPinnedPosts (request, response) {
       WHERE fp.isPinned = TRUE
       GROUP BY fp.post_id`);
 
-    var finalQuery = resp.rows;
-
-    for (var object of finalQuery) { // Loop through list of topic groups
+    for (var object of resp.rows) {
       var tagsArr = [];
       var repliesArr = [];
       var commentsArr = [];
@@ -444,12 +445,10 @@ async function getAllPinnedPosts (request, response) {
       object.replies = repliesArr;
       object.comments = commentsArr;
     }
-
+    response.status(200).json(resp.rows);
   } catch (e) {
-    console.log(e);
+    response.status(400).send(e.detail);
   }
-
-  response.status(200).json(finalQuery);
 }
 
 // Get all posts related search term
@@ -470,9 +469,7 @@ async function getSearchPosts (request, response) {
       OR LOWER (fp.description) LIKE LOWER($1)
       GROUP BY fp.post_id`, [`%${forumSearchTerm}%`]);
 
-    var finalQuery = resp.rows;
-
-    for (var object of finalQuery) { // Loop through list of topic groups
+    for (var object of resp.rows) { 
       var tagsArr = [];
       var repliesArr = [];
       var commentsArr = [];
@@ -496,12 +493,10 @@ async function getSearchPosts (request, response) {
       object.replies = repliesArr;
       object.comments = commentsArr;
     }
-    response.status(200).json(finalQuery);
+    response.status(200).json(resp.rows);
   } catch (e) {
-    response.sendStatus(400);
-    response.send(e);
+    response.status(400).send(e);
   }
-
 }
 
 // Get all posts related tag term
@@ -521,9 +516,7 @@ async function getFilterPosts (request, response) {
       WHERE LOWER(t.name) LIKE LOWER($1)
       GROUP BY fp.post_id`, [`%${forumFilterTerm}%`]);
 
-    var finalQuery = resp.rows;
-
-    for (var object of finalQuery) {
+    for (var object of resp.rows) {
       var tagsArr = [];
       var repliesArr = [];
       var commentsArr = [];
@@ -547,7 +540,7 @@ async function getFilterPosts (request, response) {
       object.replies = repliesArr;
       object.comments = commentsArr;
     }
-    response.status(200).json(finalQuery);
+    response.status(200).json(resp.rows);
   } catch (e) {
     response.send(e);
   }
@@ -588,11 +581,12 @@ async function postForum (request, response) {
 
 // Get post details of selected post
 async function getPostById (request, response) {
-  const postId = request.params.postId;
-  let resp;
   try {
-    resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
+    const postId = request.params.postId;
+
+    let resp = await pool.query(
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
+      fp.isPinned, fp.related_link, fp.num_of_upvotes, array_agg(DISTINCT uv.user_id) as upvoters, fp.isEndorsed,
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
@@ -601,15 +595,20 @@ async function getPostById (request, response) {
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
+      LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       WHERE fp.post_id = $1
       GROUP BY fp.post_id`, [postId]);
 
-    var finalQuery = resp.rows;
-
-    for (var object of finalQuery) { // Loop through list of topic groups
+    for (var object of resp.rows) {
       var tagsArr = [];
       var repliesArr = [];
       var commentsArr = [];
+      var upvArr = [];
+
+      for (const upvote of object.upvoters) {
+        let tmp = await pool.query(`SELECT * FROM users WHERE id = $1`, [upvote]);
+        upvArr.push(tmp.rows[0]);
+      }
 
       for (const tagId of object.tags) {
         let tmp = await pool.query(`SELECT * FROM tags WHERE tag_id = $1`, [tagId]);
@@ -626,27 +625,28 @@ async function getPostById (request, response) {
         commentsArr.push(tmp.rows[0]);
       };
 
+      object.upvoters = upvArr;
       object.tags = tagsArr;
       object.replies = repliesArr;
       object.comments = commentsArr;
     }
 
+    response.status(200).json(resp.rows[0]);
   } catch (e) {
-    console.log(e);
+    response.status(400).send(e.detail);
   }
-
-  response.status(200).json(finalQuery);
 };
 
 // Update post details
 async function putPost (request, response) {
-  const postId = request.params.postId;
-  const newDesc = request.body.description;
-
   try {
-    let resp = await pool.query(`UPDATE forum_posts SET description = $1 WHERE post_id = $2`,
+    const postId = request.params.postId;
+    const newDesc = request.body.description;
+
+    await pool.query(`UPDATE forum_posts SET description = $1 WHERE post_id = $2`,
     [newDesc, postId]);
-    response.status(200).send('Update success');
+
+    response.sendStatus(200);
   } catch(e) {
     response.status(400).send(e);
   }
@@ -656,28 +656,23 @@ async function putPost (request, response) {
 async function deletePost (request, response) {
   try {
     const postId = request.params.postId;
-    let resp = await pool.query(`DELETE FROM forum_posts WHERE post_id = $1`,
-    [postId]);
+     await pool.query(`DELETE FROM forum_posts WHERE post_id = $1`, [postId]);
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e.detail);
   }
 };
 
 // Update post reply with id
 async function putPostReply (request, response) {
-  const replyId = request.params.replyId;
-  const newReply = request.body.reply;
-
-  let resp = await pool.query(`UPDATE replies SET reply = $1 WHERE reply_id = $2`,
-    [newReply, replyId]);
-    response.status(200).send('Update success');
-
   try {
-    
+    const replyId = request.params.replyId;
+    const newReply = request.body.reply;
+    await pool.query(`UPDATE replies SET reply = $1 WHERE reply_id = $2`, [newReply, replyId]);
+
+    response.sendStatus(200);
   } catch(e) {
-    response.status(400).send(e);
+    response.status(400).send(e.detail);
   }
 };
 
@@ -685,14 +680,11 @@ async function putPostReply (request, response) {
 async function deletePostReply (request, response) {
   try {
     const replyId = request.params.replyId;
-
-    let resp = await pool.query(`DELETE FROM replies WHERE reply_id = $1`,
-    [replyId]);
+    await pool.query(`DELETE FROM replies WHERE reply_id = $1`, [replyId]);
 
     response.sendStatus(200);
   } catch(e) {
-    response.sendStatus(400);
-    response.send(e);
+    response.status(400).send(e.detail);
   }
 };
 
@@ -719,8 +711,7 @@ async function postReply (request, response) {
   
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 };
 
@@ -745,8 +736,7 @@ async function postComment (request, response) {
 
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 };
 
@@ -756,37 +746,25 @@ async function putComment (request, response) {
     const commentId = request.params.commentId;
     const commentDescription = request.body.comment;
 
-    let resp = await pool.query(
+    await pool.query(
       `UPDATE comments SET comment = $1 WHERE comment_id = $2`,
       [commentDescription, commentId]);
-  
-    /* let linkComment = await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
-    VALUES($1, $2)`, [postId, resp.rows[0].comment_id]); */
 
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e.detail);
   }
 };
 
 // Delete new comment
 async function deleteComment (request, response) {
   try {
-    //const postId = request.params.postId;
     const commentId = request.params.commentId;
-
-    let resp = await pool.query(
-    `DELETE FROM comments WHERE comment_id = $1`,
-    [commentId]);
-  
-    /* let linkComment = await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
-    VALUES($1, $2)`, [postId, resp.rows[0].comment_id]); */
+    await pool.query(`DELETE FROM comments WHERE comment_id = $1`, [commentId]);
 
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e.detail);
   }
 };
 
@@ -861,11 +839,10 @@ async function putTag (request, response) {
 async function deleteTag (request, response) {
   try {
     const tagId = request.params.tagId;
-    let resp = await pool.query(`DELETE FROM tags WHERE tag_id = $1`, [tagId]);
+    await pool.query(`DELETE FROM tags WHERE tag_id = $1`, [tagId]);
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e.detail);
   } 
 };
 
@@ -874,14 +851,11 @@ async function putPostEndorse (request, response) {
   try {
     const postId = request.params.postId;
     const isEndorsed = request.params.isEndorsed;
-
-    let resp = await pool.query(`UPDATE forum_posts SET isendorsed = $1 WHERE post_id = $2`,
-    [isEndorsed, postId]);
+    await pool.query(`UPDATE forum_posts SET isendorsed = $1 WHERE post_id = $2`, [isEndorsed, postId]);
 
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e.detail);
   }
 }
 
@@ -889,17 +863,18 @@ async function putPostEndorse (request, response) {
 async function putPostLike (request, response) {
   try {
     const postId = request.params.postId;
+    const userId = request.body.userId;
 
     const upvotesResp = await pool.query(`SELECT num_of_upvotes FROM forum_posts WHERE post_id = $1`, [postId])
     const upvotes = upvotesResp.rows[0].num_of_upvotes + 1
 
-    let resp = await pool.query(`UPDATE forum_posts SET num_of_upvotes = $1 WHERE post_id = $2`,
-    [upvotes, postId]);
+    // Add user to upvotes table and update forum_posts upvotes
+    await pool.query(`INSERT INTO upvotes (post_id, user_id) VALUES ($1, $2)`, [postId, userId]);
+    await pool.query(`UPDATE forum_posts SET num_of_upvotes = $1 WHERE post_id = $2`, [upvotes, postId]);
 
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e.detail);
   }
 }
 
@@ -907,17 +882,18 @@ async function putPostLike (request, response) {
 async function putPostUnlike (request, response) {
   try {
     const postId = request.params.postId;
+    const userId = request.body.userId;
 
     let upvotesResp = await pool.query(`SELECT num_of_upvotes FROM forum_posts WHERE post_id = $1`, [postId])
     const upvotes = upvotesResp.rows[0].num_of_upvotes === 0 ? upvotesResp.rows[0].num_of_upvotes : upvotesResp.rows[0].num_of_upvotes - 1
 
-    let resp = await pool.query(`UPDATE forum_posts SET num_of_upvotes = $1 WHERE post_id = $2`,
-    [upvotes, postId]);
+    // Delete user from upvotes table and update forum_posts upvotes
+    await pool.query(`DELETE FROM upvotes WHERE post_id = $1 AND user_id = $2`, [postId, userId]);
+    await pool.query(`UPDATE forum_posts SET num_of_upvotes = $1 WHERE post_id = $2`, [upvotes, postId]);
 
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 }
 
