@@ -159,17 +159,3 @@ VALUES(3, 2, 2, 1);
 INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll A', current_timestamp, current_timestamp, false, 'Poll type A');
 INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll B', current_timestamp, current_timestamp, false, 'Poll type B');
 INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll C', current_timestamp, current_timestamp, false, 'Poll type C');
-
-
-SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-fp.isPinned, fp.related_link, fp.num_of_upvotes, array_agg(DISTINCT uv.user_id) as upvoters, fp.isEndorsed,
-array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
-FROM forum_posts fp
-LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
-LEFT JOIN tags t ON t.tag_id = pt.tag_id
-LEFT JOIN post_replies pr ON pr.post_id = fp.post_id
-LEFT JOIN replies r ON r.reply_id = pr.reply_id
-LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
-LEFT JOIN comments ON comments.comment_id = pc.comment_id
-LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
-GROUP BY fp.post_id
