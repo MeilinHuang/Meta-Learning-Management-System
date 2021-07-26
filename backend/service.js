@@ -548,7 +548,8 @@ async function getFilterPosts (request, response) {
 
 // Create new post on forum (TAGS MUST ALREADY EXIST and USER MUST EXIST)
 async function postForum (request, response) {
-  const title = request.body.title;
+  try {
+    const title = request.body.title;
     const user_id = request.body.user_id;
     const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [user_id]);
 
@@ -557,7 +558,6 @@ async function postForum (request, response) {
     const author = authReq.rows[0].name;
     const publishedDate = request.body.publishedDate;
     const description = request.body.description;
-    const tags = request.body.tags.split(",");
     const related_link = request.body.related_link;
   
     let resp = await pool.query(
@@ -567,27 +567,32 @@ async function postForum (request, response) {
         RETURNING post_id`,
       [title, user_id, author, publishedDate, description, related_link]);
   
-    if (tags.length) {
-      for (const tag of tags) { // Insert linked tags
-        await pool.query(`INSERT INTO post_tags(post_id, tag_id) VALUES($1, $2)`, 
-        [resp.rows[0].post_id, tag]);
+    if (request.body.tags) {
+      const tags = request.body.tags.split(",");
+      if (tags.length) {
+        for (const tag of tags) { // Insert linked tags
+          await pool.query(`INSERT INTO post_tags(post_id, tag_id) VALUES($1, $2)`, 
+          [resp.rows[0].post_id, tag]);
+        }
       }
     }
-
+    
     if (request.files != null) {
-      if (!fs.existsSync(`_files/forum_post${resp.rows[0].post_id}`)) { fs.mkdirSync(`_files/forum_post${resp.rows[0].post_id}`) }
+      if (!fs.existsSync(`../frontend/public/_files/forum_post${resp.rows[0].post_id}`)) { 
+        fs.mkdirSync(`../frontend/public/_files/forum_post${resp.rows[0].post_id}`) 
+      }
       if (request.files.uploadFile.length > 1) {
         for (const file of request.files.uploadFile) {
           await pool.query(`INSERT INTO forum_post_files(id, name, file, post_id)
-          VALUES(default, $1, $2, $3)`, [file.name, (`_files/forum_post${resp.rows[0].post_id}/${file.name}`), 
+          VALUES(default, $1, $2, $3)`, [file.name, (`/_files/forum_post${resp.rows[0].post_id}/${file.name}`), 
           resp.rows[0].post_id]);
-          fs.writeFile(`_files/forum_post${resp.rows[0].post_id}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          fs.writeFile(`../frontend/public/_files/forum_post${resp.rows[0].post_id}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
         }
       } else {
         await pool.query(`INSERT INTO forum_post_files(id, name, file, post_id)
         VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
-        (`_files/forum_post${resp.rows[0].post_id}/${request.files.uploadFile.name}`), resp.rows[0].post_id]);
-        fs.writeFile(`_files/forum_post${resp.rows[0].post_id}/${request.files.uploadFile.name}`, 
+        (`/_files/forum_post${resp.rows[0].post_id}/${request.files.uploadFile.name}`), resp.rows[0].post_id]);
+        fs.writeFile(`../frontend/public/_files/forum_post${resp.rows[0].post_id}/${request.files.uploadFile.name}`, 
         request.files.uploadFile.data, "binary", function (err) {
           if (err) throw err;
         });
@@ -595,8 +600,6 @@ async function postForum (request, response) {
     }
 
     response.sendStatus(200);
-  try {
-    
   } catch (e) {
     response.status(400).send(e);
   }
@@ -665,9 +668,41 @@ async function putPost (request, response) {
   try {
     const postId = request.params.postId;
     const newDesc = request.body.description;
+    const relLink = request.body.related_link;
 
-    await pool.query(`UPDATE forum_posts SET description = $1 WHERE post_id = $2`,
-    [newDesc, postId]);
+    // Deletes files specified in delete list
+    if (request.body.fileDeleteList) {
+      const deleteList = request.body.fileDeleteList.split(",");
+      for (const fileId of deleteList) {
+        let fileResp = await pool.query(`DELETE FROM forum_post_files WHERE id = $1 RETURNING file`, [fileId]);
+        fs.unlinkSync("../frontend/public" + fileResp.rows[0].file);
+      }
+    }
+
+    await pool.query(`UPDATE forum_posts SET description = $1, related_link = $2 WHERE post_id = $3`,
+    [newDesc, relLink, postId]);
+
+    if (request.files != null) {
+      if (!fs.existsSync(`../frontend/public/_files/forum_post${postId}`)) { 
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}`) 
+      }
+      if (request.files.uploadFile.length > 1) {
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO forum_post_files(id, name, file, post_id)
+          VALUES(default, $1, $2, $3)`, [file.name, (`/_files/forum_post${postId}/${file.name}`), 
+          postId]);
+          fs.writeFile(`../frontend/public/_files/forum_post${postId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+        }
+      } else {
+        await pool.query(`INSERT INTO forum_post_files(id, name, file, post_id)
+        VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
+        (`/_files/forum_post${postId}/${request.files.uploadFile.name}`), postId]);
+        fs.writeFile(`../frontend/public/_files/forum_post${postId}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
 
     response.sendStatus(200);
   } catch(e) {
@@ -680,36 +715,11 @@ async function deletePost (request, response) {
   try {
     const postId = request.params.postId;
      await pool.query(`DELETE FROM forum_posts WHERE post_id = $1`, [postId]);
-     if (fs.existsSync(`_files/forum_post${postId}`)) { 
-      fs.rmdir(`_files/forum_post${postId}`, { recursive: true }, (err) => {
+     if (fs.existsSync(`../frontend/public/_files/forum_post${postId}`)) { 
+      fs.rmdir(`../frontend/public/_files/forum_post${postId}`, { recursive: true }, (err) => {
         if (err) { throw err; }
       }); 
     }
-    response.sendStatus(200);
-  } catch(e) {
-    response.status(400).send(e.detail);
-  }
-};
-
-// Update post reply with id
-async function putPostReply (request, response) {
-  try {
-    const replyId = request.params.replyId;
-    const newReply = request.body.reply;
-    await pool.query(`UPDATE replies SET reply = $1 WHERE reply_id = $2`, [newReply, replyId]);
-
-    response.sendStatus(200);
-  } catch(e) {
-    response.status(400).send(e.detail);
-  }
-};
-
-// Update post reply with id
-async function deletePostReply (request, response) {
-  try {
-    const replyId = request.params.replyId;
-    await pool.query(`DELETE FROM replies WHERE reply_id = $1`, [replyId]);
-
     response.sendStatus(200);
   } catch(e) {
     response.status(400).send(e.detail);
@@ -726,20 +736,112 @@ async function postReply (request, response) {
 
     const author = authReq.rows[0].name;
     const postId = request.params.postId;
-    const publishedDate = request.body.published_date;
     const reply = request.body.reply;
 
     let resp = await pool.query(
       `INSERT INTO replies(reply_id, user_id, author, published_date, reply) 
-      VALUES(default, $1, $2, $3, $4) RETURNING reply_id`,
-      [user_id, author, publishedDate, reply]);
+      VALUES(default, $1, $2, CURRENT_TIMESTAMP, $3) RETURNING reply_id`,
+      [user_id, author, reply]);
 
-    let linkReply = await pool.query(`INSERT INTO post_replies(post_id, reply_id) 
+    await pool.query(`INSERT INTO post_replies(post_id, reply_id) 
     VALUES($1, $2)`, [postId, resp.rows[0].reply_id]);
+
+    if (request.files != null) {
+      if (!fs.existsSync(`../frontend/public/_files/forum_post${postId}`)) { 
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}`);
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}/reply${resp.rows[0].reply_id}`);
+      } else if (!fs.existsSync(`../frontend/public/_files/forum_post${postId}/reply${resp.rows[0].reply_id}`)) {
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}/reply${resp.rows[0].reply_id}`);
+      }
+      if (request.files.uploadFile.length > 1) {
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO forum_reply_files(id, name, file, reply_id)
+          VALUES(default, $1, $2, $3)`, [file.name, (`/_files/forum_post${postId}/reply${resp.rows[0].reply_id}/${file.name}`), 
+          postId]);
+          fs.writeFile(`../frontend/public/_files/forum_post${postId}/reply${resp.rows[0].reply_id}/${file.name}`, 
+          file.name, "binary", function (err) { if (err) throw err; });
+        }
+      } else {
+        await pool.query(`INSERT INTO forum_reply_files(id, name, file, reply_id)
+        VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
+        (`/_files/forum_post${postId}/reply${resp.rows[0].reply_id}/${request.files.uploadFile.name}`), postId]);
+        fs.writeFile(`../frontend/public/_files/forum_post${postId}/reply${resp.rows[0].reply_id}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
   
     response.sendStatus(200);
   } catch(e) {
     response.status(400).send(e);
+  }
+};
+
+// Update post reply with id
+async function putPostReply (request, response) {
+  try {
+    const replyId = request.params.replyId;
+    const postId = request.params.postId;
+    const newReply = request.body.reply;
+
+    if (request.body.fileDeleteList) {
+      const deleteList = request.body.fileDeleteList.split(",");
+      for (const fileId of deleteList) {
+        let fileResp = await pool.query(`DELETE FROM forum_reply_files WHERE id = $1 RETURNING file`, [fileId]);
+        fs.unlinkSync("../frontend/public" + fileResp.rows[0].file);
+      }
+    }
+
+    await pool.query(`UPDATE replies SET reply = $1 WHERE reply_id = $2`, [newReply, replyId]);
+
+    if (request.files != null) {
+      if (!fs.existsSync(`../frontend/public/_files/forum_post${postId}`)) { 
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}`);
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}/reply${replyId}`);
+      } else if (!fs.existsSync(`../frontend/public/_files/forum_post${postId}/reply${replyId}`)) {
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}/reply${replyId}`);
+      }
+      if (request.files.uploadFile.length > 1) {
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO forum_reply_files(id, name, file, reply_id)
+          VALUES(default, $1, $2, $3)`, [file.name, (`/_files/forum_post${postId}/reply${replyId}/${file.name}`), 
+          postId]);
+          fs.writeFile(`../frontend/public/_files/forum_post${postId}/reply${replyId}/${file.name}`, 
+          file.name, "binary", function (err) { if (err) throw err; });
+        }
+      } else {
+        await pool.query(`INSERT INTO forum_reply_files(id, name, file, reply_id)
+        VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
+        (`/_files/forum_post${postId}/reply${replyId}/${request.files.uploadFile.name}`), postId]);
+        fs.writeFile(`../frontend/public/_files/forum_post${postId}/reply${replyId}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400).send(e.detail);
+  }
+};
+
+// Update post reply with id
+async function deletePostReply (request, response) {
+  try {
+    const replyId = request.params.replyId;
+    const postId = request.params.postId;
+    await pool.query(`DELETE FROM replies WHERE reply_id = $1`, [replyId]);
+    if (fs.existsSync(`../frontend/public/_files/forum_post${postId}/reply${replyId}`)) { 
+      fs.rmdir(`../frontend/public/_files/forum_post${postId}/reply${replyId}`, { recursive: true }, (err) => {
+        if (err) { throw err; }
+      }); 
+    }
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400).send(e.detail);
   }
 };
 
@@ -751,16 +853,41 @@ async function postComment (request, response) {
     if (typeof authReq.rows[0].name == 'undefined') { throw (`User doesn't exist with id: ${user_id}`) }
     const author = authReq.rows[0].name;
     const postId = request.params.postId;
-    const publishedDate = request.body.published_date;
     const comment = request.body.comment;
 
     let resp = await pool.query(
       `INSERT INTO comments(comment_id, user_id, author, published_date, comment) 
-      VALUES(default, $1, $2, $3, $4) RETURNING comment_id`,
-      [user_id, author, publishedDate, comment]);
+      VALUES(default, $1, $2, CURRENT_TIMESTAMP, $3) RETURNING comment_id`,
+      [user_id, author, comment]);
   
-    let linkComment = await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
+    await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
     VALUES($1, $2)`, [postId, resp.rows[0].comment_id]);
+
+    if (request.files != null) {
+      if (!fs.existsSync(`../frontend/public/_files/forum_post${postId}`)) { 
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}`);
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}/comment${resp.rows[0].comment_id}`);
+      } else if (!fs.existsSync(`../frontend/public/_files/forum_post${postId}/comment${resp.rows[0].comment_id}`)) {
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}/comment${resp.rows[0].comment_id}`);
+      }
+      if (request.files.uploadFile.length > 1) {
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO forum_comment_files(id, name, file, comment_id)
+          VALUES(default, $1, $2, $3)`, [file.name, (`/_files/forum_post${postId}/comment${resp.rows[0].comment_id}/${file.name}`), 
+          postId]);
+          fs.writeFile(`../frontend/public/_files/forum_post${postId}/comment${resp.rows[0].comment_id}/${file.name}`, 
+          file.name, "binary", function (err) { if (err) throw err; });
+        }
+      } else {
+        await pool.query(`INSERT INTO forum_comment_files(id, name, file, comment_id)
+        VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
+        (`/_files/forum_post${postId}/comment${resp.rows[0].comment_id}/${request.files.uploadFile.name}`), postId]);
+        fs.writeFile(`../frontend/public/_files/forum_post${postId}/comment${resp.rows[0].comment_id}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
 
     response.sendStatus(200);
   } catch(e) {
@@ -771,12 +898,47 @@ async function postComment (request, response) {
 // Put comment
 async function putComment (request, response) {
   try {
+    const postId = request.params.postId;
     const commentId = request.params.commentId;
     const commentDescription = request.body.comment;
+
+    if (request.body.fileDeleteList) {
+      const deleteList = request.body.fileDeleteList.split(",");
+      for (const fileId of deleteList) {
+        let fileResp = await pool.query(`DELETE FROM forum_comment_files WHERE id = $1 RETURNING file`, [fileId]);
+        fs.unlinkSync("../frontend/public" + fileResp.rows[0].file);
+      }
+    }
 
     await pool.query(
       `UPDATE comments SET comment = $1 WHERE comment_id = $2`,
       [commentDescription, commentId]);
+
+    if (request.files != null) {
+      if (!fs.existsSync(`../frontend/public/_files/forum_post${postId}`)) { 
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}`);
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}/comment${commentId}`);
+      } else if (!fs.existsSync(`../frontend/public/_files/forum_post${postId}/comment${commentId}`)) {
+        fs.mkdirSync(`../frontend/public/_files/forum_post${postId}/comment${commentId}`);
+      }
+      if (request.files.uploadFile.length > 1) {
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO forum_comment_files(id, name, file, comment_id)
+          VALUES(default, $1, $2, $3)`, [file.name, (`/_files/forum_post${postId}/comment${commentId}/${file.name}`), 
+          postId]);
+          fs.writeFile(`../frontend/public/_files/forum_post${postId}/comment${commentId}/${file.name}`, 
+          file.name, "binary", function (err) { if (err) throw err; });
+        }
+      } else {
+        await pool.query(`INSERT INTO forum_comment_files(id, name, file, comment_id)
+        VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
+        (`/_files/forum_post${postId}/comment${commentId}/${request.files.uploadFile.name}`), postId]);
+        fs.writeFile(`../frontend/public/_files/forum_post${postId}/comment${commentId}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
 
     response.sendStatus(200);
   } catch(e) {
@@ -788,7 +950,13 @@ async function putComment (request, response) {
 async function deleteComment (request, response) {
   try {
     const commentId = request.params.commentId;
+    const postId = request.params.postId;
     await pool.query(`DELETE FROM comments WHERE comment_id = $1`, [commentId]);
+    if (fs.existsSync(`../frontend/public/_files/forum_post${postId}/comment${commentId}`)) { 
+      fs.rmdir(`../frontend/public/_files/forum_post${postId}/comment${commentId}`, { recursive: true }, (err) => {
+        if (err) { throw err; }
+      }); 
+    }
 
     response.sendStatus(200);
   } catch(e) {
@@ -1079,18 +1247,20 @@ async function putAnnouncement (request, response) {
   const announcementId = request.params.announcementId;
     const title = request.body.title;
     const content = request.body.content;
-    const fileDeleteList = request.body.fileList.split(",");
 
     await pool.query(`UPDATE announcements SET title = $1, content = $2
     WHERE id = $3`, [title, content, announcementId]);
 
-    if (fileDeleteList.length) {  // Deletes files specified in delete list
-      for (const fileId of fileDeleteList) {
-        let tmpQ = await pool.query(`DELETE FROM announcement_files WHERE id = $1 RETURNING file`, [fileId]);
-        fs.unlinkSync("../frontend/public"+tmpQ.rows[0].file);
+    if (request.body.fileList) {
+      const fileDeleteList = request.body.fileList.split(",");
+      if (fileDeleteList.length) {  // Deletes files specified in delete list
+        for (const fileId of fileDeleteList) {
+          let tmpQ = await pool.query(`DELETE FROM announcement_files WHERE id = $1 RETURNING file`, [fileId]);
+          fs.unlinkSync("../frontend/public"+tmpQ.rows[0].file);
+        }
       }
     }
-
+    
     if (request.files != null) {
       if (!fs.existsSync(`../frontend/public/_files/announcement${announcementId}`)) { fs.mkdirSync(`../frontend/public/_files/announcement${announcementId}`); }
       if (request.files.uploadFile.length > 1) {
@@ -1184,14 +1354,16 @@ async function putAnnouncementComment (request, response) {
     const commentId = request.params.commentId;
     const announcementId = request.params.announcementId;;
     const content = request.body.content;
-    const fileDeleteList = request.body.fileList.split(","); // List of files to delete associated with commentid
 
     await pool.query(`UPDATE announcement_comment SET content = $1 WHERE id = $2`, [content, commentId]);
 
-    if (fileDeleteList.length) {  // Deletes files specified in delete list
-      for (const fileId of fileDeleteList) {
-        let tmpQ = await pool.query(`DELETE FROM announcement_comment_files WHERE id = $1 RETURNING file`, [fileId]);
-        fs.unlinkSync("../frontend/public" + tmpQ.rows[0].file);
+    if (request.body.fileList) {
+      const fileDeleteList = request.body.fileList.split(",");
+      if (fileDeleteList.length) {  // Deletes files specified in delete list
+        for (const fileId of fileDeleteList) {
+          let tmpQ = await pool.query(`DELETE FROM announcement_comment_files WHERE id = $1 RETURNING file`, [fileId]);
+          fs.unlinkSync("../frontend/public" + tmpQ.rows[0].file);
+        }
       }
     }
 
