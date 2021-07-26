@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS "topic_group" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_group" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  topic_code TEXT NOT NULL,
+  topic_code TEXT NOT NULL UNIQUE,
   course_outline TEXT
 );
 
@@ -99,6 +99,13 @@ CREATE TABLE IF NOT EXISTS "comments" (
   author TEXT NOT NULL,
   published_date TIMESTAMP,
   comment TEXT
+);
+
+DROP TABLE IF EXISTS "upvotes" CASCADE;
+CREATE TABLE IF NOT EXISTS "upvotes" (
+  post_id INTEGER NOT NULL REFERENCES forum_posts(post_id),
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  PRIMARY KEY (post_id, user_id)
 );
 
 DROP TABLE IF EXISTS "post_author" CASCADE;

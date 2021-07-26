@@ -43,9 +43,13 @@ INSERT INTO user_enrolled(topic_group_id, user_id) values(2, 1);
 
 -- Create Forum Posts
 INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
-VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false, NULL, 3, true);
+VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false, NULL, 2, true);
 INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
 VALUES(default, 'Assignment 1 Help', 1, 'David Nguyen', current_timestamp, 'Ask questions here for help', true, NULL, 0, false);
+
+-- Create upvotes
+INSERT INTO upvotes(post_id, user_id) VALUES (1, 2);
+INSERT INTO upvotes(post_id, user_id) VALUES (1, 3);
 
 -- Create Tags
 INSERT INTO tags(tag_id, name) VALUES(default, 'Introduction');
@@ -155,3 +159,17 @@ VALUES(3, 2, 2, 1);
 INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll A', current_timestamp, current_timestamp, false, 'Poll type A');
 INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll B', current_timestamp, current_timestamp, false, 'Poll type B');
 INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll C', current_timestamp, current_timestamp, false, 'Poll type C');
+
+
+SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
+fp.isPinned, fp.related_link, fp.num_of_upvotes, array_agg(DISTINCT uv.user_id) as upvoters, fp.isEndorsed,
+array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
+FROM forum_posts fp
+LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
+LEFT JOIN tags t ON t.tag_id = pt.tag_id
+LEFT JOIN post_replies pr ON pr.post_id = fp.post_id
+LEFT JOIN replies r ON r.reply_id = pr.reply_id
+LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
+LEFT JOIN comments ON comments.comment_id = pc.comment_id
+LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
+GROUP BY fp.post_id
