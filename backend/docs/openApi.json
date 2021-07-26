@@ -2169,7 +2169,7 @@
             "name": "topicGroup",
             "in": "path",
             "description": "Name of topic Group",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string"
             }
