@@ -548,8 +548,7 @@ async function getFilterPosts (request, response) {
 
 // Create new post on forum (TAGS MUST ALREADY EXIST and USER MUST EXIST)
 async function postForum (request, response) {
-  try {
-    const title = request.body.title;
+  const title = request.body.title;
     const user_id = request.body.user_id;
     const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [user_id]);
 
@@ -558,7 +557,7 @@ async function postForum (request, response) {
     const author = authReq.rows[0].name;
     const publishedDate = request.body.publishedDate;
     const description = request.body.description;
-    const tags = request.body.tags;
+    const tags = request.body.tags.split(",");
     const related_link = request.body.related_link;
   
     let resp = await pool.query(
@@ -568,12 +567,36 @@ async function postForum (request, response) {
         RETURNING post_id`,
       [title, user_id, author, publishedDate, description, related_link]);
   
-    for (const tag of tags) { // Insert linked tags
-      let linkPostTag = await pool.query(
-        `INSERT INTO post_tags(post_id, tag_id) VALUES($1, $2)`, [resp.rows[0].post_id, tag.tag_id]);
+    if (tags.length) {
+      for (const tag of tags) { // Insert linked tags
+        await pool.query(`INSERT INTO post_tags(post_id, tag_id) VALUES($1, $2)`, 
+        [resp.rows[0].post_id, tag]);
+      }
+    }
+
+    if (request.files != null) {
+      if (!fs.existsSync(`_files/forum_post${resp.rows[0].post_id}`)) { fs.mkdirSync(`_files/forum_post${resp.rows[0].post_id}`) }
+      if (request.files.uploadFile.length > 1) {
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO forum_post_files(id, name, file, post_id)
+          VALUES(default, $1, $2, $3)`, [file.name, (`_files/forum_post${resp.rows[0].post_id}/${file.name}`), 
+          resp.rows[0].post_id]);
+          fs.writeFile(`_files/forum_post${resp.rows[0].post_id}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+        }
+      } else {
+        await pool.query(`INSERT INTO forum_post_files(id, name, file, post_id)
+        VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
+        (`_files/forum_post${resp.rows[0].post_id}/${request.files.uploadFile.name}`), resp.rows[0].post_id]);
+        fs.writeFile(`_files/forum_post${resp.rows[0].post_id}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
     }
 
     response.sendStatus(200);
+  try {
+    
   } catch (e) {
     response.status(400).send(e);
   }
@@ -657,6 +680,11 @@ async function deletePost (request, response) {
   try {
     const postId = request.params.postId;
      await pool.query(`DELETE FROM forum_posts WHERE post_id = $1`, [postId]);
+     if (fs.existsSync(`_files/forum_post${postId}`)) { 
+      fs.rmdir(`_files/forum_post${postId}`, { recursive: true }, (err) => {
+        if (err) { throw err; }
+      }); 
+    }
     response.sendStatus(200);
   } catch(e) {
     response.status(400).send(e.detail);
@@ -1021,19 +1049,19 @@ async function postAnnouncement (request, response) {
       [author, topic_group, title, content])
 
     if (request.files != null) {
-      if (!fs.existsSync(`_files/announcement${resp.rows[0].id}`)) { fs.mkdirSync(`_files/announcement${resp.rows[0].id}`) }
+      if (!fs.existsSync(`../public/_files/announcement${resp.rows[0].id}`)) { fs.mkdirSync(`../public/_files/announcement${resp.rows[0].id}`) }
       if (request.files.uploadFile.length > 1) {
         for (const file of request.files.uploadFile) {
           await pool.query(`INSERT INTO announcement_files(id, name, file, announcement_id)
-          VALUES(default, $1, $2, $3)`, [file.name, (`_files/announcement${resp.rows[0].id}/${file.name}`), 
+          VALUES(default, $1, $2, $3)`, [file.name, (`../public/_files/announcement${resp.rows[0].id}/${file.name}`), 
           resp.rows[0].id]);
-          fs.writeFile(`_files/announcement${resp.rows[0].id}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          fs.writeFile(`../public/_files/announcement${resp.rows[0].id}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
         }
       } else {
         await pool.query(`INSERT INTO announcement_files(id, name, file, announcement_id)
         VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
-        (`_files/announcement${resp.rows[0].id}/${request.files.uploadFile.name}`), resp.rows[0].id]);
-        fs.writeFile(`_files/announcement${resp.rows[0].id}/${request.files.uploadFile.name}`, 
+        (`../public/_files/announcement${resp.rows[0].id}/${request.files.uploadFile.name}`), resp.rows[0].id]);
+        fs.writeFile(`../public/_files/announcement${resp.rows[0].id}/${request.files.uploadFile.name}`, 
         request.files.uploadFile.data, "binary", function (err) {
           if (err) throw err;
         });
@@ -1052,10 +1080,9 @@ async function putAnnouncement (request, response) {
     const announcementId = request.params.announcementId;
     const title = request.body.title;
     const content = request.body.content;
-    const fileDeleteList = request.body.fileList;
+    const fileDeleteList = request.body.fileList.split(",");
 
-    let resp = pool.query(`
-    UPDATE announcements SET title = $1, content = $2
+    await pool.query(`UPDATE announcements SET title = $1, content = $2
     WHERE id = $3`, [title, content, announcementId]);
 
     if (fileDeleteList.length) {  // Deletes files specified in delete list
@@ -1066,19 +1093,19 @@ async function putAnnouncement (request, response) {
     }
 
     if (request.files != null) {
-      if (!fs.existsSync(`_files/announcement${announcementId}`)) { fs.mkdirSync(`_files/announcement${announcementId}`); }
+      if (!fs.existsSync(`../public/_files/announcement${announcementId}`)) { fs.mkdirSync(`../public/_files/announcement${announcementId}`); }
       if (request.files.uploadFile.length > 1) {
         for (const file of request.files.uploadFile) {
           await pool.query(`INSERT INTO announcement_files(id, name, file, announcement_id)
-          VALUES(default, $1, $2, $3)`, [file.name, (`_files/announcement${announcementId}/${file.name}`), 
+          VALUES(default, $1, $2, $3)`, [file.name, (`../public/_files/announcement${announcementId}/${file.name}`), 
           announcementId]);
-          fs.writeFile(`_files/announcement${announcementId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          fs.writeFile(`../public/_files/announcement${announcementId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
         }
       } else {
         await pool.query(`INSERT INTO announcement_files(id, name, file, announcement_id)
         VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
-        (`_files/announcement${announcementId}/${request.files.uploadFile.name}`), announcementId]);
-        fs.writeFile(`_files/announcement${announcementId}/${request.files.uploadFile.name}`, 
+        (`../public/_files/announcement${announcementId}/${request.files.uploadFile.name}`), announcementId]);
+        fs.writeFile(`../public/_files/announcement${announcementId}/${request.files.uploadFile.name}`, 
         request.files.uploadFile.data, "binary", function (err) {
           if (err) throw err;
         });
@@ -1096,8 +1123,8 @@ async function deleteAnnouncement (request, response) {
   try {
     const announcementId = request.params.announcementId;
     await pool.query(`DELETE FROM announcements WHERE id = $1`, [announcementId]);
-    if (fs.existsSync(`_files/announcement${announcementId}`)) { 
-      fs.rmdir(`_files/announcement${announcementId}`, { recursive: true }, (err) => {
+    if (fs.existsSync(`../public/_files/announcement${announcementId}`)) { 
+      fs.rmdir(`../public/_files/announcement${announcementId}`, { recursive: true }, (err) => {
         if (err) { throw err; }
       }); 
     }
@@ -1120,24 +1147,24 @@ async function postAnnouncementComment (request, response) {
     const commId = resp.rows[0].id;
 
     if (request.files != null) {
-      if (!fs.existsSync(`_files/announcement${announcementId}`)) { 
-        fs.mkdirSync(`_files/announcement${announcementId}`);
-        fs.mkdirSync(`_files/announcement${announcementId}/comment${commId}`);
-      } else if (!fs.existsSync(`_files/announcement${announcementId}/comment${commId}`)) { 
-        fs.mkdirSync(`_files/announcement${announcementId}/comment${commId}`);
+      if (!fs.existsSync(`../public/_files/announcement${announcementId}`)) { 
+        fs.mkdirSync(`../public/_files/announcement${announcementId}`);
+        fs.mkdirSync(`../public/_files/announcement${announcementId}/comment${commId}`);
+      } else if (!fs.existsSync(`../public/_files/announcement${announcementId}/comment${commId}`)) { 
+        fs.mkdirSync(`../public/_files/announcement${announcementId}/comment${commId}`);
       }
       if (request.files.uploadFile.length > 1) {
         for (const file of request.files.uploadFile) {
           await pool.query(`INSERT INTO announcement_comment_files(id, name, file, comment_id)
-          VALUES(default, $1, $2, $3)`, [file.name, (`_files/announcement${announcementId}/comment${commId}/${file.name}`), 
+          VALUES(default, $1, $2, $3)`, [file.name, (`../public/_files/announcement${announcementId}/comment${commId}/${file.name}`), 
           commId]);
-          fs.writeFile(`_files/announcement${announcementId}/comment${commId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          fs.writeFile(`../public/_files/announcement${announcementId}/comment${commId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
         }
       } else {
         await pool.query(`INSERT INTO announcement_comment_files(id, name, file, comment_id)
         VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
-        (`_files/announcement${announcementId}/comment${commId}/${request.files.uploadFile.name}`), commId]);
-        fs.writeFile(`_files/announcement${announcementId}/comment${commId}/${request.files.uploadFile.name}`, 
+        (`../public/_files/announcement${announcementId}/comment${commId}/${request.files.uploadFile.name}`), commId]);
+        fs.writeFile(`../public/_files/announcement${announcementId}/comment${commId}/${request.files.uploadFile.name}`, 
         request.files.uploadFile.data, "binary", function (err) {
           if (err) throw err;
         });
@@ -1156,7 +1183,7 @@ async function putAnnouncementComment (request, response) {
     const commentId = request.params.commentId;
     const announcementId = request.params.announcementId;;
     const content = request.body.content;
-    const fileDeleteList = request.body.fileList; // List of files to delete associated with commentid
+    const fileDeleteList = request.body.fileList.split(","); // List of files to delete associated with commentid
 
     await pool.query(`UPDATE announcement_comment SET content = $1 WHERE id = $2`, [content, commentId]);
 
@@ -1168,24 +1195,24 @@ async function putAnnouncementComment (request, response) {
     }
 
     if (request.files != null) {
-      if (!fs.existsSync(`_files/announcement${announcementId}`)) { 
-        fs.mkdirSync(`_files/announcement${announcementId}`);
-        fs.mkdirSync(`_files/announcement${announcementId}/comment${commentId}`) 
-      } else if (!fs.existsSync(`_files/announcement${announcementId}/comment${commentId}`)) { 
-        fs.mkdirSync(`_files/announcement${announcementId}/comment${commentId}`) 
+      if (!fs.existsSync(`../public/_files/announcement${announcementId}`)) { 
+        fs.mkdirSync(`../public/_files/announcement${announcementId}`);
+        fs.mkdirSync(`../public/_files/announcement${announcementId}/comment${commentId}`) 
+      } else if (!fs.existsSync(`../public/_files/announcement${announcementId}/comment${commentId}`)) { 
+        fs.mkdirSync(`../public/_files/announcement${announcementId}/comment${commentId}`) 
       }
       if (request.files.uploadFile.length > 1) {
         for (const file of request.files.uploadFile) {
           await pool.query(`INSERT INTO announcement_comment_files(id, name, file, comment_id)
-          VALUES(default, $1, $2, $3)`, [file.name, (`_files/announcement${announcementId}/comment${commentId}/${file.name}`), 
+          VALUES(default, $1, $2, $3)`, [file.name, (`../public/_files/announcement${announcementId}/comment${commentId}/${file.name}`), 
           commentId]);
-          fs.writeFile(`_files/announcement${announcementId}/comment${commentId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          fs.writeFile(`../public/_files/announcement${announcementId}/comment${commentId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
         }
       } else {
         await pool.query(`INSERT INTO announcement_comment_files(id, name, file, comment_id)
         VALUES(default, $1, $2, $3)`, [request.files.uploadFile.name, 
-        (`_files/announcement${announcementId}/comment${commentId}/${request.files.uploadFile.name}`), commentId]);
-        fs.writeFile(`_files/announcement${announcementId}/comment${commentId}/${request.files.uploadFile.name}`, 
+        (`../public/_files/announcement${announcementId}/comment${commentId}/${request.files.uploadFile.name}`), commentId]);
+        fs.writeFile(`../public/_files/announcement${announcementId}/comment${commentId}/${request.files.uploadFile.name}`, 
         request.files.uploadFile.data, "binary", function (err) {
           if (err) throw err;
         });
@@ -1205,8 +1232,8 @@ async function deleteAnnouncementComment (request, response) {
     let tmp = await pool.query(`SELECT announcement_id FROM announcement_comment WHERE id = $1`, [commentId]);
     const aId = tmp.rows[0].announcement_id;
     await pool.query(`DELETE FROM announcement_comment WHERE id = $1`, [commentId]);
-    if (fs.existsSync(`_files/announcement${aId}/comment${commentId}`)) { 
-      fs.rmdir(`_files/announcement${aId}/comment${commentId}`, { recursive: true }, (err) => {
+    if (fs.existsSync(`../public/_files/announcement${aId}/comment${commentId}`)) { 
+      fs.rmdir(`../public/_files/announcement${aId}/comment${commentId}`, { recursive: true }, (err) => {
         if (err) { throw err; }
       }); 
     }

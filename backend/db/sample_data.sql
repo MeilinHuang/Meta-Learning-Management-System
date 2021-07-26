@@ -1,5 +1,4 @@
 -- \i 'C:/Users/Dave/Desktop/COMP4962 - Thesis B/metalms/backend/db/sample_data.sql';
--- \i '/Users/davidnguyen/Desktop/COMP - Thesis B/metalms/backend/db/sample_data.sql';
 
 -- Create Users
 INSERT INTO users(id, name, zid) values(default, 'David Nguyen', 'z5166106');
@@ -20,10 +19,10 @@ INSERT INTO topics(id, topic_group_id, name) values(default, 2, 'Schemas');
 INSERT INTO topics(id, topic_group_id, name) values(default, 2, 'ER-Diagrams');
 
 -- Add Topic Files
-INSERT INTO topic_files(id, name, file_id, topic_id, due_date) values(default, 'while_loops.pdf', 'while_loops_path', 1, NULL);
-INSERT INTO topic_files(id, name, file_id, topic_id, due_date) values(default, 'for_loops.pdf', 'for_loops_path', 1, NULL);
-INSERT INTO topic_files(id, name, file_id, topic_id, due_date) values(default, 'pointers1.pdf', 'pointers1_path', 2, NULL);
-INSERT INTO topic_files(id, name, file_id, topic_id, due_date) values(default, 'dynamic_arrays.pdf', 'dynamic_arrays_path', 3, NULL);
+INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'while_loops.pdf', 'while_loops_path', 1, NULL);
+INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'for_loops.pdf', 'for_loops_path', 1, NULL);
+INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'pointers1.pdf', 'pointers1_path', 2, NULL);
+INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'dynamic_arrays.pdf', 'dynamic_arrays_path', 3, NULL);
 
 -- Add prerequisites
 INSERT INTO prerequisites(prereq, topic) values(3, 1);
