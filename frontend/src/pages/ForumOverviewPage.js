@@ -57,7 +57,6 @@ function ForumOverviewPage() {
             setPosts(data)
             setShowPinned(false)
         })
-        console.log(searchTerm)
     }
 
     const handleAddPostSubmit = ({ title, details, selectedTags, date, relatedLink }) => {
@@ -88,7 +87,7 @@ function ForumOverviewPage() {
             <Flex justify="center">
                 <Center width={{ base: '100%', lg: '80%' }}>
                     <Button onClick={onOpen} leftIcon={buttonIcon} pr={{ base: '8px', md: '16px' }}>{buttonContents}</Button>
-                    <AddPostModal isOpen={isOpen} onClose={onClose} showTags onSubmit={handleAddPostSubmit} />
+                    <AddPostModal isOpen={isOpen} onClose={onClose} isForums onSubmit={handleAddPostSubmit} />
                     <Box as="form" onSubmit={handleSubmit} width="100%" ml={{ base: '16px', md: '24px'}}>
                         <InputGroup variant="outline">
                             <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>

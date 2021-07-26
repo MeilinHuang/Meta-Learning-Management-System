@@ -16,7 +16,7 @@ import {
 import DraftEditor from './DraftEditor/DraftEditor'
 import TagSelect from './TagSelect/TagSelect'
 
-function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
+function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
     const [title, setTitle] = useState('')
     const [details, setDetails] = useState('')
     const [relatedLink, setRelatedLink] = useState('')
@@ -68,7 +68,7 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
             <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false} isCentered size="xl" p="24px">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Create new post</ModalHeader>
+                    <ModalHeader>{isForums ? 'Create new forum post' : 'Create new post'}</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                     <form id="createPost" onSubmit={handleSubmit}>
@@ -84,7 +84,7 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
                             <Heading size="sm" mb="4px">Attach Images</Heading>
                             <input type="file" name="images" onChange={handleUpload} />
                         </Flex> */}
-                        {showTags &&
+                        {isForums &&
                             <>
                                 <Flex flexDirection="column">
                                     <Heading size="sm" mb="4px">Tags</Heading>

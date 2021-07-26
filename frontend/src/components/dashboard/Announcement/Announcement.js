@@ -16,6 +16,7 @@ import {
     PopoverArrow,
     PopoverCloseButton,
     Text,
+    useDisclosure,
     useToast,
 } from "@chakra-ui/react"
 import { GrEdit, GrShare } from 'react-icons/gr'
@@ -24,11 +25,13 @@ import { AiOutlineSend } from "react-icons/ai"
 import { ContentState, convertFromHTML } from 'draft-js'
 import DraftEditor from '../../forums/DraftEditor/DraftEditor'
 import AuthorDetails from '../../forums/AuthorDetails'
+import AddPostModal from '../../forums/AddPostModal'
 import styles from './Announcement.module.css'
 
 function Announcement({ announcement: { author, id, title, content, post_date }, course, setAnnouncements }) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState()
+    const { isOpen, onOpen, onClose } = useDisclosure()
     const toast = useToast()
 
     useEffect(() => {
@@ -93,6 +96,10 @@ function Announcement({ announcement: { author, id, title, content, post_date },
 
     }
 
+    const handleAddPostSubmit = () => {
+
+    }
+
     // TODO: handle file attachments
 
     return (
@@ -118,7 +125,10 @@ function Announcement({ announcement: { author, id, title, content, post_date },
                         <Flex justifyContent="space-between">
                             <Flex>
                                 <Button pr="8px" leftIcon={<GrShare />} onClick={shareLink} />
-                                <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
+                                <Button ml="8px" onClick={onOpen}>Ask a question</Button>
+                            </Flex>
+                            <Flex>
+                            <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
                                 <Popover>
                                     {({ onClose }) => (
                                         <>
@@ -144,6 +154,7 @@ function Announcement({ announcement: { author, id, title, content, post_date },
                                 </Popover>
                             </Flex>
                         </Flex>
+                        <AddPostModal isOpen={isOpen} onClose={onClose} onSubmit={handleAddPostSubmit} isForums />
                     </>
             }
         </Box>

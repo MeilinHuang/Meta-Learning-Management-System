@@ -1295,7 +1295,6 @@ async function getSearchAnnouncements (request, response) {
 
     response.status(200).json(resp.rows);
   } catch (e) {
-    console.log(e)
     response.sendStatus(400).send(e);
   }
 
