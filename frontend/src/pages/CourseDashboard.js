@@ -27,7 +27,23 @@ function CourseDashboard() {
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     useEffect(() => {
-        fetch(`http://localhost:8000/${dummyCourse}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))
+        fetch(`http://localhost:8000/${dummyCourse}/announcement`).then(r => r.json()).then(data => {
+            const promises = []
+
+            for (const post of data) {
+                promises.push(fetch(`http://localhost:8000/user/${post.author}`).then(r => r.json()))
+            }
+
+            Promise.all(promises)
+                .then(authorData => {
+                    const newPosts = []
+                    for (const i in authorData) {
+                        const withAuthor = {...data[i], author: authorData[i].user_name}
+                        newPosts.push(withAuthor)
+                    }
+                    setAnnouncements(newPosts.reverse())
+                })
+        })
     }, [setAnnouncements])
 
     console.log(announcements)
