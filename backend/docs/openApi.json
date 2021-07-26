@@ -2116,6 +2116,7 @@
                   },
                   "fileList": {
                     "type": "array",
+                    "desription": "List of files to remove",
                     "items": {
                       "type": "integer",
                       "example": 1
@@ -2578,15 +2579,45 @@
         ],
         "summary": "Make new post",
         "requestBody": {
-          "description": "New post",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PostForum"
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "example": 2
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "Welcome to COMP1234 2021!"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Hope you all had a fun break, this course is not going to be easy"
+                  },
+                  "related_link": {
+                    "type": "string",
+                    "example": "/content"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {

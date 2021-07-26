@@ -1,5 +1,0 @@
-
-- This is where the files are saved on disc (Sample schema below)
-  => Announcement1/{files}
-  => Announcement1/Coment1/{files}
-
