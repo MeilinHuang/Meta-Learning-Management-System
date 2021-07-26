@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Heading } from "@chakra-ui/react"
 
+import EditQuiz from '../components/edit-quiz/EditQuiz';
 import QuizCreation from '../components/quiz-creation/QuizCreation';
+import QuestionCreation from '../components/question-creation/QuestionCreation';
 
 export default function Assessments() {
   // const [id, setId] = useState(0);
@@ -35,7 +37,9 @@ export default function Assessments() {
 
   return (
     <div>
-      <QuizCreation />
+      <EditQuiz />
+      {/* <QuizCreation /> */}
+      {/* <QuestionCreation /> */}
     </div>
   );
 
