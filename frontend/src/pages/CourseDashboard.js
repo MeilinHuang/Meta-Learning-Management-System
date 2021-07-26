@@ -51,7 +51,44 @@ function CourseDashboard() {
     const handleSubmit = e => {
         e.preventDefault()
 
-        console.log(searchTerm)
+        if (searchTerm === '') {
+            fetch(`http://localhost:8000/${dummyCourse}/announcement`).then(r => r.json()).then(data => {
+                const promises = []
+
+                for (const post of data) {
+                    promises.push(fetch(`http://localhost:8000/user/${post.author}`).then(r => r.json()))
+                }
+
+                Promise.all(promises)
+                    .then(authorData => {
+                        const newPosts = []
+                        for (const i in authorData) {
+                            const withAuthor = {...data[i], author: authorData[i].user_name}
+                            newPosts.push(withAuthor)
+                        }
+                        setAnnouncements(newPosts.reverse())
+                    })
+            })
+            return
+        }
+
+        fetch(`http://localhost:8000/${dummyCourse}/announcement/search/${searchTerm.toLowerCase()}`).then(r => r.json()).then(data => {
+            const promises = []
+
+                for (const post of data) {
+                    promises.push(fetch(`http://localhost:8000/user/${post.author}`).then(r => r.json()))
+                }
+
+                Promise.all(promises)
+                    .then(authorData => {
+                        const newPosts = []
+                        for (const i in authorData) {
+                            const withAuthor = {...data[i], author: authorData[i].user_name}
+                            newPosts.push(withAuthor)
+                        }
+                        setAnnouncements(newPosts.reverse())
+                    })
+        })
     }
 
     const handleAddPostSubmit = ({ title, details, date }) => {
