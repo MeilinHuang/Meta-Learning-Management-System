@@ -21,7 +21,7 @@ import { StoreContext } from '../utils/store'
 const dummyAuthor = 3
 
 
-function ForumOverviewPage() {
+function ForumOverviewPage({ match: { params: { code }}}) {
     const context = useContext(StoreContext)
     const {
         posts: [posts, setPosts],
@@ -98,7 +98,7 @@ function ForumOverviewPage() {
                 </Center>
             </Flex>
             <Filter />
-            <PostTableContainer posts={posts} pinnedPosts={pinnedPosts} showPinned={showPinned} />
+            <PostTableContainer posts={posts} pinnedPosts={pinnedPosts} showPinned={showPinned} code={code} />
         </>
     )
 }

@@ -1,6 +1,8 @@
 import React, { useContext } from "react"
 import { Link as RouterLink } from 'react-router-dom'
 import {
+    Flex,
+    Icon,
     IconButton,
     Link,
     Table,
@@ -13,9 +15,10 @@ import {
 } from "@chakra-ui/react"
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri'
 import { TiArrowUpOutline, TiArrowUpThick } from 'react-icons/ti'
+import { FaCheckCircle } from 'react-icons/fa'
 import { StoreContext } from '../../utils/store'
 
-const getRow = ({ post_id, title, published_date, replies, comments, ispinned, description }, setPosts, setPinnedPosts, setShowPinned) => {
+const getRow = ({ post_id, title, published_date, replies, comments, ispinned, description, isendorsed }, setPosts, setPinnedPosts, setShowPinned, code) => {
     const date = new Date(published_date)
     const dateString = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
 
@@ -47,8 +50,14 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned, d
                 />
             </Td>
             <Td width="40%" pl="0">
-                <Link as={RouterLink} color="blue.500" to={`/forums/${post_id}`}>{title}</Link>
+                <Link as={RouterLink} color="blue.500" to={`/course-page/${code}/forums/${post_id}`}>{title}</Link>
                 <Text fontSize="13px" lineHeight="16px" mt="4px">{plainTextDesc}</Text>
+                {isendorsed && (
+                    <Flex alignItems="center" mt="12px">
+                        <Icon h="13px" w="13px" mr="4px" color="green" as={FaCheckCircle} />
+                        <Text fontSize="13px" color="green" fontWeight="bold">This post is endorsed by staff</Text>
+                    </Flex>
+                )}
             </Td>
             <Td>{dateString}</Td>
             <Td isNumeric>{replies.length}</Td>
@@ -66,7 +75,7 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned, d
     )
 }
 
-function PostTable({ isAdmin, posts: postData }) {
+function PostTable({ isAdmin, posts: postData, code }) {
     const orderedPosts = [...postData].reverse()
     const context = useContext(StoreContext)
     const { posts: [, setPosts], pinnedPosts: [, setPinnedPosts], showPinned: [, setShowPinned] } = context;
@@ -85,7 +94,7 @@ function PostTable({ isAdmin, posts: postData }) {
                 </Tr>
             </Thead>
             <Tbody>
-                {orderedPosts.map(post => getRow(post, setPosts, setPinnedPosts, setShowPinned))}
+                {orderedPosts.map(post => getRow(post, setPosts, setPinnedPosts, setShowPinned, code))}
             </Tbody>
         </Table>
     )

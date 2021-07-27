@@ -53,7 +53,7 @@ function CoursePage() {
                     <WidgetsBar page="course"></WidgetsBar>
                 </Box>
             </Box>
-            <Flex marginLeft={[0, 0, 200, 100]} marginRight={[0, 0, 0, 100]}>
+            <Flex marginLeft={[0, 0, 200, 200]} marginRight={[0, 0, 0, 200]}>
                 <Container marginTop={[70, 70, 50]} mx={{ base: "0", md: "24px"}} maxWidth="100%">
                     <Switch>
                         {/* Add your page as a Route here */}
