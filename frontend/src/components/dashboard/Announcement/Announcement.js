@@ -28,7 +28,7 @@ import AuthorDetails from '../../forums/AuthorDetails'
 import AddPostModal from '../../forums/AddPostModal'
 import styles from './Announcement.module.css'
 
-function Announcement({ announcement: { author, id, title, content, post_date }, course, setAnnouncements }) {
+function Announcement({ announcement: { attachments, author, id, title, content, post_date }, course, setAnnouncements }) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState()
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -100,14 +100,15 @@ function Announcement({ announcement: { author, id, title, content, post_date },
 
     }
 
-    // TODO: handle file attachments
+    const getImage = ({ id, name, file }) => (
+        <img className={styles.attachment} key={id} alt={name} src={file} />
+    )
 
     return (
         <Box id={`announcement-${id}`} width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md">{title}</Heading>
             <Divider my="16px" />
             <AuthorDetails author={author} date={post_date} />
-            {/* <Text className={styles.description} dangerouslySetInnerHTML={{ __html: content }} mb="16px;" /> */}
             {!!editorState 
                 ? 
                     <form id="editPost" onSubmit={handleSubmit}>
@@ -121,6 +122,7 @@ function Announcement({ announcement: { author, id, title, content, post_date },
                 :
                     <>
                         <Text className={styles.description} dangerouslySetInnerHTML={{ __html: details }} />
+                        {!!attachments.length && attachments.map(image => getImage(image))}
                         <Divider my="16px" />
                         <Flex justifyContent="space-between">
                             <Flex>
