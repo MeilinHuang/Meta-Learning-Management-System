@@ -1,6 +1,7 @@
 import React, { useContext } from "react"
 import { Link as RouterLink } from 'react-router-dom'
 import {
+    Button,
     Flex,
     Icon,
     IconButton,
@@ -18,7 +19,7 @@ import { TiArrowUpOutline, TiArrowUpThick } from 'react-icons/ti'
 import { FaCheckCircle } from 'react-icons/fa'
 import { StoreContext } from '../../utils/store'
 
-const getRow = ({ post_id, title, published_date, replies, comments, ispinned, description, isendorsed }, setPosts, setPinnedPosts, setShowPinned, code) => {
+const getRow = ({ post_id, title, published_date, replies, comments, ispinned, description, isendorsed, num_of_upvotes, upvoters }, setPosts, setPinnedPosts, setShowPinned, code) => {
     const date = new Date(published_date)
     const dateString = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
 
@@ -63,13 +64,9 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned, d
             <Td isNumeric>{replies.length}</Td>
             <Td isNumeric>{comments.length}</Td>
             <Td>
-                {/* <IconButton 
-                    // aria-label={ispinned ? 'Unpin post' : 'Pin post'}
-                    // icon={ispinned ? <RiPushpin2Fill /> : <RiPushpin2Line />} 
-                    icon={<TiArrowUpOutline />}
-                    backgroundColor="white"
-                    onClick={handlePinUnpin}
-                />   */}
+                {/* if user is in upvoters list, show filled icon */}
+                {/* TODO: handle upvote click */}
+                <Button leftIcon={<TiArrowUpOutline />} backgroundColor="white">{num_of_upvotes}</Button>
             </Td>
         </Tr>
     )
@@ -90,7 +87,7 @@ function PostTable({ isAdmin, posts: postData, code }) {
                     <Th>Date created</Th>
                     <Th isNumeric>Replies</Th>
                     <Th isNumeric>Comments</Th>
-                    {/* <Th /> */}
+                    <Th />
                 </Tr>
             </Thead>
             <Tbody>

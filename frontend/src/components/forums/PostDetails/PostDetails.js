@@ -12,12 +12,13 @@ import {
 import { GrEdit, GrShare } from 'react-icons/gr'
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai"
 import { FaRegCheckCircle, FaCheckCircle } from 'react-icons/fa'
+import { TiArrowUpOutline, TiArrowUpThick } from 'react-icons/ti'
 import { ContentState, convertFromHTML } from 'draft-js'
 import AuthorDetails from '../AuthorDetails'
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './PostDetails.module.css'
 
-function PostDetails({ post: { author, post_id, published_date, description, isendorsed }, setPost}) {
+function PostDetails({ post: { author, post_id, published_date, description, isendorsed, num_of_upvotes, upvoters }, setPost}) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState()
     const toast = useToast()
@@ -104,8 +105,9 @@ function PostDetails({ post: { author, post_id, published_date, description, ise
                         <Divider my="16px" />
                         <Flex justifyContent="space-between">
                             <Flex>
-                                <Button pr="8px" leftIcon={<GrShare />} onClick={shareLink} />
+                                <Button leftIcon={<TiArrowUpOutline />}>{num_of_upvotes}</Button>
                                 <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} /> {/* ONLY SHOW IF USER IS STAFF */}
+                                <Button pr="8px" leftIcon={<GrShare />} onClick={shareLink} ml="8px" />
                             </Flex>
                             <Flex>
                                 <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
