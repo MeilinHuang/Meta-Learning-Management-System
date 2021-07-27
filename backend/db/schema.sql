@@ -49,6 +49,15 @@ CREATE TABLE IF NOT EXISTS "prerequisites" (
   PRIMARY KEY (prereq, topic)
 );
 
+DROP TABLE IF EXISTS "topic_group_files" CASCADE;
+CREATE TABLE IF NOT EXISTS "topic_group_files" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  file TEXT NOT NULL,
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  due_date TIMESTAMP
+);
+
 DROP TABLE IF EXISTS "topic_files" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_files" (
   id SERIAL NOT NULL PRIMARY KEY,
@@ -56,6 +65,13 @@ CREATE TABLE IF NOT EXISTS "topic_files" (
   file TEXT NOT NULL,
   topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE ON UPDATE CASCADE,
   due_date TIMESTAMP
+);
+
+DROP TABLE IF EXISTS "topic_group_files_related_topics" CASCADE;
+CREATE TABLE IF NOT EXISTS "topic_group_files_topics" (
+  file_id INTEGER NOT NULL REFERENCES topic_group_files(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (file_id, topic_id)
 );
 
 CREATE INDEX prereq_idx ON prerequisites(prereq);

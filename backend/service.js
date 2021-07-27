@@ -2,6 +2,7 @@
 const { json } = require('express');
 const pool = require('./db/database');
 var fs = require('fs');
+const e = require('express');
 
 // TODO : ADD AUTH AND JWTOKEN
 
@@ -121,8 +122,7 @@ async function getAllTopicGroups(request, response) {
     }
     response.status(200).json(resp.rows);
   } catch (e) {
-    response.sendStatus(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 }
 
@@ -134,13 +134,39 @@ async function getTopicGroup (request, response) {
     const topicGroupId = tgId.rows[0].id;
 
     let resp = await pool.query(
-      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, array_agg(DISTINCT topics.id) AS topics_list
+      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, 
+      array_agg(DISTINCT user_admin.admin_id) as admin_list,
+      array_agg(DISTINCT topics.id) as topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
+      array_agg(DISTINCT announcements.id) as announcements_list
       FROM topic_group tp_group 
-      JOIN topics ON topics.topic_group_id = tp_group.id
+      LEFT JOIN user_admin ON user_admin.topic_group_id = tp_group.id
+      FULL OUTER JOIN topics ON topics.topic_group_id = tp_group.id
+      LEFT JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
+      LEFT JOIN announcements ON topics.topic_group_id = announcements.topic_group
       WHERE tp_group.id = $1
       GROUP BY tp_group.id`, [topicGroupId]);
 
+    var adminArr = [];
     var topicArr = [];
+    var tutArr = [];
+    var announcementArr = [];
+    var preReqsArr = [];
+
+    for (const tutorialId of resp.rows[0].tutorial_list) {
+      let tmp = await pool.query(`SELECT * FROM tutorials WHERE id = $1`, [tutorialId]);
+      tutArr.push(tmp.rows[0]);
+    };
+
+    for (const adminId of resp.rows[0].admin_list) {
+      let tmp = await pool.query(`SELECT * FROM users WHERE id = $1`, [adminId]);
+      adminArr.push(tmp.rows[0]);
+    };
+
+    for (const announcementId of resp.rows[0].announcements_list) {
+      let tmp = await pool.query(`SELECT * FROM announcements WHERE id = $1`, [announcementId]);
+      announcementArr.push(tmp.rows[0]);
+    };
+
     for (const topic_id of resp.rows[0].topics_list) {
       let tmp = await pool.query(
         `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(topic_files.id) as course_materials, 
@@ -161,12 +187,24 @@ async function getTopicGroup (request, response) {
           }
         }
         if (tmp.rows[0].prereqs[0] === null) { tmp.rows[0].prereqs = []; }
+        else {
+          for (const preReqId of tmp.rows[0].prereqs) {
+            let tmp = await pool.query(`
+            SELECT t.id, t.name from topics t WHERE t.id = $1
+            `, [preReqId]);
+            preReqsArr.push(tmp.rows[0]);
+          }
+          tmp.rows[0].prereqs = preReqsArr;
+        }
         tmp.rows[0].course_materials = courseMaterialsArr;
         topicArr.push(tmp.rows[0]);
       }
     };
 
     resp.rows[0].topics_list = topicArr;
+    resp.rows[0].tutorial_list = tutArr;
+    resp.rows[0].announcements_list = announcementArr;
+    resp.rows[0].admin_list = adminArr;
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
@@ -187,6 +225,7 @@ async function getTopics (request, response) {
 
     for (var object of resp.rows) { 
       var topicArr = [];
+      var preReqsArr = [];
       for (const topic_id of object.topics_list) {
         let tmp = await pool.query(
           `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(DISTINCT topic_files.id) as course_materials, 
@@ -208,10 +247,17 @@ async function getTopics (request, response) {
           }
           if (tmp.rows[0].prereqs[0] === null) {
             tmp.rows[0].prereqs = [];
+          } else {
+            for (const preReqId of tmp.rows[0].prereqs) {
+              let tmp = await pool.query(`
+              SELECT t.id, t.name from topics t WHERE t.id = $1
+              `, [preReqId]);
+              preReqsArr.push(tmp.rows[0]);
+            }
+            tmp.rows[0].prereqs = preReqsArr;
           }
           tmp.rows[0].course_materials = courseMaterialsArr;
           topicArr.push(tmp.rows[0]);
-
         }
       };
 
@@ -355,8 +401,10 @@ async function getAllForumPosts (request, response) {
   try {
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.num_of_upvotes, array_agg(DISTINCT uv.user_id) as upvoters, fp.isEndorsed,
-      array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
+      array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
+      array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
       LEFT JOIN tags t ON t.tag_id = pt.tag_id
@@ -364,6 +412,7 @@ async function getAllForumPosts (request, response) {
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
+      LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
       LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       GROUP BY fp.post_id`);
 
@@ -372,6 +421,7 @@ async function getAllForumPosts (request, response) {
       var repliesArr = [];
       var commentsArr = [];
       var upvArr = [];
+      var fileArr = [];
 
       for (const upvId of object.upvoters) {
         let tmp = await pool.query(`SELECT * FROM users WHERE id = $1`, [upvId]);
@@ -393,10 +443,16 @@ async function getAllForumPosts (request, response) {
         commentsArr.push(tmp.rows[0]);
       };
 
+      for (const fileId of object.attachments) {
+        let tmp = await pool.query(`SELECT * FROM forum_post_files WHERE id = $1`, [fileId]);
+        fileArr.push(tmp.rows[0]);
+      }
+
       object.upvoters = upvArr;
       object.tags = tagsArr;
       object.replies = repliesArr;
       object.comments = commentsArr;
+      object.attachments = fileArr;
     }
     response.status(200).json(resp.rows);
   } catch (e) {
@@ -409,42 +465,62 @@ async function getAllPinnedPosts (request, response) {
   void (request);
   try {
     let resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
-      array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
-      FROM forum_posts fp 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
+      array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
+      array_agg(DISTINCT comments.comment_id) as comments
+      FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
       LEFT JOIN tags t ON t.tag_id = pt.tag_id
       LEFT JOIN post_replies pr ON pr.post_id = fp.post_id
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
-      WHERE fp.isPinned = TRUE
+      LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
+      LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
+      WHERE fp.ispinned = TRUE
       GROUP BY fp.post_id`);
 
-    for (var object of resp.rows) {
-      var tagsArr = [];
-      var repliesArr = [];
-      var commentsArr = [];
-
-      for (const tagId of object.tags) {
-        let tmp = await pool.query(`SELECT * FROM tags WHERE tag_id = $1`, [tagId]);
-        tagsArr.push(tmp.rows[0]);
-      };
+      for (var object of resp.rows) {
+        var tagsArr = [];
+        var repliesArr = [];
+        var commentsArr = [];
+        var upvArr = [];
+        var fileArr = [];
   
-      for (const replyId of object.replies) {
-        let tmp = await pool.query(`SELECT * FROM replies WHERE reply_id = $1`, [replyId]);
-        repliesArr.push(tmp.rows[0]);
-      };
+        for (const upvId of object.upvoters) {
+          let tmp = await pool.query(`SELECT * FROM users WHERE id = $1`, [upvId]);
+          upvArr.push(tmp.rows[0]);
+        }
+  
+        for (const tagId of object.tags) {
+          let tmp = await pool.query(`SELECT * FROM tags WHERE tag_id = $1`, [tagId]);
+          tagsArr.push(tmp.rows[0]);
+        };
+    
+        for (const replyId of object.replies) {
+          let tmp = await pool.query(`SELECT * FROM replies WHERE reply_id = $1`, [replyId]);
+          repliesArr.push(tmp.rows[0]);
+        };
+  
+        for (const commentId of object.comments) {
+          let tmp = await pool.query(`SELECT * FROM comments WHERE comment_id = $1`, [commentId]);
+          commentsArr.push(tmp.rows[0]);
+        };
+  
+        for (const fileId of object.attachments) {
+          let tmp = await pool.query(`SELECT * FROM forum_post_files WHERE id = $1`, [fileId]);
+          fileArr.push(tmp.rows[0]);
+        }
+  
+        object.upvoters = upvArr;
+        object.tags = tagsArr;
+        object.replies = repliesArr;
+        object.comments = commentsArr;
+        object.attachments = fileArr;
+      }
 
-      for (const commentId of object.comments) {
-        let tmp = await pool.query(`SELECT * FROM comments WHERE comment_id = $1`, [commentId]);
-        commentsArr.push(tmp.rows[0]);
-      };
-
-      object.tags = tagsArr;
-      object.replies = repliesArr;
-      object.comments = commentsArr;
-    }
     response.status(200).json(resp.rows);
   } catch (e) {
     response.status(400).send(e.detail);
@@ -456,23 +532,35 @@ async function getSearchPosts (request, response) {
   try {
     const forumSearchTerm = request.params.forumSearchTerm;
     let resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
-      array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
-      FROM forum_posts fp 
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
+      array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
+      array_agg(DISTINCT comments.comment_id) as comments
+      FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
       LEFT JOIN tags t ON t.tag_id = pt.tag_id
       LEFT JOIN post_replies pr ON pr.post_id = fp.post_id
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
+      LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
+      LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       WHERE LOWER (fp.title) LIKE LOWER($1)
       OR LOWER (fp.description) LIKE LOWER($1)
       GROUP BY fp.post_id`, [`%${forumSearchTerm}%`]);
 
-    for (var object of resp.rows) { 
+    for (var object of resp.rows) {
       var tagsArr = [];
       var repliesArr = [];
       var commentsArr = [];
+      var upvArr = [];
+      var fileArr = [];
+
+      for (const upvId of object.upvoters) {
+        let tmp = await pool.query(`SELECT * FROM users WHERE id = $1`, [upvId]);
+        upvArr.push(tmp.rows[0]);
+      }
 
       for (const tagId of object.tags) {
         let tmp = await pool.query(`SELECT * FROM tags WHERE tag_id = $1`, [tagId]);
@@ -489,10 +577,18 @@ async function getSearchPosts (request, response) {
         commentsArr.push(tmp.rows[0]);
       };
 
+      for (const fileId of object.attachments) {
+        let tmp = await pool.query(`SELECT * FROM forum_post_files WHERE id = $1`, [fileId]);
+        fileArr.push(tmp.rows[0]);
+      }
+
+      object.upvoters = upvArr;
       object.tags = tagsArr;
       object.replies = repliesArr;
       object.comments = commentsArr;
+      object.attachments = fileArr;
     }
+
     response.status(200).json(resp.rows);
   } catch (e) {
     response.status(400).send(e);
@@ -504,8 +600,11 @@ async function getFilterPosts (request, response) {
   try {
     const forumFilterTerm = request.params.forumFilterTerm;
     let resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, fp.isPinned, fp.related_link, fp.num_of_upvotes, fp.isEndorsed,
-      array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
+      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
+      array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
+      array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
       LEFT JOIN tags t ON t.tag_id = pt.tag_id
@@ -513,33 +612,50 @@ async function getFilterPosts (request, response) {
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
+      LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
+      LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       WHERE LOWER(t.name) LIKE LOWER($1)
       GROUP BY fp.post_id`, [`%${forumFilterTerm}%`]);
 
-    for (var object of resp.rows) {
-      var tagsArr = [];
-      var repliesArr = [];
-      var commentsArr = [];
-
-      for (const tagId of object.tags) {
-        let tmp = await pool.query(`SELECT * FROM tags WHERE tag_id = $1`, [tagId]);
-        tagsArr.push(tmp.rows[0]);
-      };
+      for (var object of resp.rows) {
+        var tagsArr = [];
+        var repliesArr = [];
+        var commentsArr = [];
+        var upvArr = [];
+        var fileArr = [];
   
-      for (const replyId of object.replies) {
-        let tmp = await pool.query(`SELECT * FROM replies WHERE reply_id = $1`, [replyId]);
-        repliesArr.push(tmp.rows[0]);
-      };
+        for (const upvId of object.upvoters) {
+          let tmp = await pool.query(`SELECT * FROM users WHERE id = $1`, [upvId]);
+          upvArr.push(tmp.rows[0]);
+        }
+  
+        for (const tagId of object.tags) {
+          let tmp = await pool.query(`SELECT * FROM tags WHERE tag_id = $1`, [tagId]);
+          tagsArr.push(tmp.rows[0]);
+        };
+    
+        for (const replyId of object.replies) {
+          let tmp = await pool.query(`SELECT * FROM replies WHERE reply_id = $1`, [replyId]);
+          repliesArr.push(tmp.rows[0]);
+        };
+  
+        for (const commentId of object.comments) {
+          let tmp = await pool.query(`SELECT * FROM comments WHERE comment_id = $1`, [commentId]);
+          commentsArr.push(tmp.rows[0]);
+        };
+  
+        for (const fileId of object.attachments) {
+          let tmp = await pool.query(`SELECT * FROM forum_post_files WHERE id = $1`, [fileId]);
+          fileArr.push(tmp.rows[0]);
+        }
+  
+        object.upvoters = upvArr;
+        object.tags = tagsArr;
+        object.replies = repliesArr;
+        object.comments = commentsArr;
+        object.attachments = fileArr;
+      }
 
-      for (const commentId of object.comments) {
-        let tmp = await pool.query(`SELECT * FROM comments WHERE comment_id = $1`, [commentId]);
-        commentsArr.push(tmp.rows[0]);
-      };
-
-      object.tags = tagsArr;
-      object.replies = repliesArr;
-      object.comments = commentsArr;
-    }
     response.status(200).json(resp.rows);
   } catch (e) {
     response.send(e);
@@ -612,8 +728,10 @@ async function getPostById (request, response) {
 
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.num_of_upvotes, array_agg(DISTINCT uv.user_id) as upvoters, fp.isEndorsed,
-      array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, array_agg(DISTINCT comments.comment_id) as comments
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
+      array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
+      array_agg(DISTINCT comments.comment_id) as comments
       FROM forum_posts fp
       LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
       LEFT JOIN tags t ON t.tag_id = pt.tag_id
@@ -621,6 +739,7 @@ async function getPostById (request, response) {
       LEFT JOIN replies r ON r.reply_id = pr.reply_id
       LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
+      LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
       LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       WHERE fp.post_id = $1
       GROUP BY fp.post_id`, [postId]);
@@ -630,9 +749,10 @@ async function getPostById (request, response) {
       var repliesArr = [];
       var commentsArr = [];
       var upvArr = [];
+      var fileArr = [];
 
-      for (const upvote of object.upvoters) {
-        let tmp = await pool.query(`SELECT * FROM users WHERE id = $1`, [upvote]);
+      for (const upvId of object.upvoters) {
+        let tmp = await pool.query(`SELECT * FROM users WHERE id = $1`, [upvId]);
         upvArr.push(tmp.rows[0]);
       }
 
@@ -641,20 +761,54 @@ async function getPostById (request, response) {
         tagsArr.push(tmp.rows[0]);
       };
   
-      for (const replyId of object.replies) {
-        let tmp = await pool.query(`SELECT * FROM replies WHERE reply_id = $1`, [replyId]);
+      for (const replyId of object.replies) { // forum reply files
+        var replyFileArr = [];
+
+        let tmp = await pool.query(`
+        SELECT r.reply_id, r.user_id, r.author, r.published_date, r.reply,
+        array_agg(file.id) as attachments
+        FROM replies r
+        LEFT JOIN forum_reply_files file ON file.reply_id = r.reply_id
+        WHERE r.reply_id = $1
+        GROUP BY r.reply_id`, [replyId]);
+
+        for (const fileId of tmp.rows[0].attachments) { 
+          let tmp = await pool.query(`SELECT * FROM forum_reply_files WHERE id = $1`, [fileId]);
+          replyFileArr.push(tmp.rows[0]);
+        }
+        tmp.rows[0].attachments = replyFileArr;
         repliesArr.push(tmp.rows[0]);
       };
 
-      for (const commentId of object.comments) {
-        let tmp = await pool.query(`SELECT * FROM comments WHERE comment_id = $1`, [commentId]);
+      for (const commentId of object.comments) { // forum comment files
+        var commentFileArr = [];
+
+        let tmp = await pool.query(`
+        SELECT c.comment_id, c.user_id, c.author, c.published_date, c.comment,
+        array_agg(file.id) as attachments
+        FROM comments c
+        LEFT JOIN forum_comment_files file ON file.comment_id = c.comment_id
+        WHERE c.comment_id = $1
+        GROUP BY c.comment_id`, [commentId]);
+
+        for (const fileId of tmp.rows[0].attachments) {
+          let tmp = await pool.query(`SELECT * FROM forum_comment_files WHERE id = $1`, [fileId]);
+          commentFileArr.push(tmp.rows[0]);
+        }
+        tmp.rows[0].attachments = commentFileArr;
         commentsArr.push(tmp.rows[0]);
       };
+
+      for (const fileId of object.attachments) { // forum post files
+        let tmp = await pool.query(`SELECT * FROM forum_post_files WHERE id = $1`, [fileId]);
+        fileArr.push(tmp.rows[0]);
+      }
 
       object.upvoters = upvArr;
       object.tags = tagsArr;
       object.replies = repliesArr;
       object.comments = commentsArr;
+      object.attachments = fileArr;
     }
 
     response.status(200).json(resp.rows[0]);
