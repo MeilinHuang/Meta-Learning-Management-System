@@ -20,7 +20,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
     const [title, setTitle] = useState('')
     const [details, setDetails] = useState('')
     const [relatedLink, setRelatedLink] = useState('')
-    const [image, setImage] = useState({})
+    const [images, setImages] = useState([])
     const [tags, setTags] = useState([])
     const [selectedTags, setSelectedTags] = useState([])
     const toast = useToast()
@@ -50,7 +50,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
             title,
             details,
             selectedTags,
-            image,
+            images,
             date,
             relatedLink,
         }
@@ -59,9 +59,8 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
     }
 
     const handleUpload = e => {
-        setImage(e.target.files[0])
-        console.log([e.target.files[0]])
-        // console.log(e.target.files[0])
+        setImages(e.target.files)
+        console.log(e.target.files[0])
     }
 
     return (
