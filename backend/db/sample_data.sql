@@ -1,13 +1,10 @@
--- SAMPLE DATA INSERTION
 -- \i 'C:/Users/Dave/Desktop/COMP4962 - Thesis B/metalms/backend/db/sample_data.sql';
--- \i '/Users/davidnguyen/Desktop/COMP - Thesis B/metalms/backend/db/sample_data.sql';
 
 -- Create Users
 INSERT INTO users(id, name, zid) values(default, 'David Nguyen', 'z5166106');
 INSERT INTO users(id, name, zid) values(default, 'John Smith', 'z5123821');
 INSERT INTO users(id, name, zid) values(default, 'Tutory Tutorer', 'z5921738');
 INSERT INTO users(id, name, zid) values(default, 'Lecturey Lecturer', 'z5928712');
-
 
 -- Create Topic Groups
 INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, 'C++ Programming', 'COMP6771', 'Course_Outline.pdf');
@@ -22,10 +19,10 @@ INSERT INTO topics(id, topic_group_id, name) values(default, 2, 'Schemas');
 INSERT INTO topics(id, topic_group_id, name) values(default, 2, 'ER-Diagrams');
 
 -- Add Topic Files
-INSERT INTO topic_files(id, name, file_id, topic_id, due_date) values(default, 'while_loops.pdf', 'while_loops_path', 1, NULL);
-INSERT INTO topic_files(id, name, file_id, topic_id, due_date) values(default, 'for_loops.pdf', 'for_loops_path', 1, NULL);
-INSERT INTO topic_files(id, name, file_id, topic_id, due_date) values(default, 'pointers1.pdf', 'pointers1_path', 2, NULL);
-INSERT INTO topic_files(id, name, file_id, topic_id, due_date) values(default, 'dynamic_arrays.pdf', 'dynamic_arrays_path', 3, NULL);
+INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'while_loops.pdf', 'while_loops_path', 1, NULL);
+INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'for_loops.pdf', 'for_loops_path', 1, NULL);
+INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'pointers1.pdf', 'pointers1_path', 2, NULL);
+INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'dynamic_arrays.pdf', 'dynamic_arrays_path', 3, NULL);
 
 -- Add prerequisites
 INSERT INTO prerequisites(prereq, topic) values(3, 1);
@@ -45,9 +42,13 @@ INSERT INTO user_enrolled(topic_group_id, user_id) values(2, 1);
 
 -- Create Forum Posts
 INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
-VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false, NULL, 3, true);
+VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false, NULL, 2, true);
 INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
 VALUES(default, 'Assignment 1 Help', 1, 'David Nguyen', current_timestamp, 'Ask questions here for help', true, NULL, 0, false);
+
+-- Create upvotes
+INSERT INTO upvotes(post_id, user_id) VALUES (1, 2);
+INSERT INTO upvotes(post_id, user_id) VALUES (1, 3);
 
 -- Create Tags
 INSERT INTO tags(tag_id, name) VALUES(default, 'Introduction');

@@ -19,7 +19,8 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
 
     const handleSubmit = e => {
         e.preventDefault()
-        const date = new Date(Date.now()).toISOString()
+        const timeZoneOffset = (new Date()).getTimezoneOffset() * 60000
+        const date = new Date(Date.now() - timeZoneOffset).toISOString()
 
         const body = isComments ? 
             {
@@ -52,7 +53,7 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
 
     return (
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
-            <Heading size="md" mb="12px" textTransform="uppercase">{isComments ? 'Comments' : 'Responses'}</Heading>
+            <Heading size="md" mb="12px">{isComments ? 'Comments' : 'Responses'}</Heading>
             {posts && posts[0] !== null && posts.map(post => (
                 post !== null && <CommentResponse {...post} post_id={post_id} setPost={setPost} />
             ))}

@@ -1,5 +1,4 @@
 -- \i 'C:/Users/Dave/Desktop/COMP4962 - Thesis B/metalms/backend/db/schema.sql';
--- \i '/Users/davidnguyen/Desktop/COMP - Thesis B/metalms/backend/db/schema.sql';
 
 -- Reset Schema
 DROP SCHEMA public cascade;
@@ -17,7 +16,7 @@ DROP TABLE IF EXISTS "topic_group" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_group" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  topic_code TEXT NOT NULL,
+  topic_code TEXT NOT NULL UNIQUE,
   course_outline TEXT
 );
 
@@ -54,8 +53,8 @@ DROP TABLE IF EXISTS "topic_files" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  file_id TEXT NOT NULL,
-  topic_id INTEGER NOT NULL REFERENCES topics(id),
+  file TEXT NOT NULL,
+  topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE ON UPDATE CASCADE,
   due_date TIMESTAMP
 );
 
@@ -67,7 +66,7 @@ DROP TABLE IF EXISTS "forum_posts" CASCADE;
 CREATE TABLE IF NOT EXISTS "forum_posts" (
   post_id SERIAL NOT NULL PRIMARY KEY,
   title TEXT NOT NULL,
-  user_id INTEGER NOT NULL REFERENCES users(id),
+  user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   author TEXT NOT NULL,
   published_date TIMESTAMP,
   description TEXT,
@@ -86,7 +85,7 @@ CREATE TABLE IF NOT EXISTS "tags" (
 DROP TABLE IF EXISTS "replies" CASCADE;
 CREATE TABLE IF NOT EXISTS "replies" (
   reply_id SERIAL NOT NULL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id),
+  user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   author TEXT NOT NULL,
   published_date TIMESTAMP,
   reply TEXT
@@ -95,10 +94,41 @@ CREATE TABLE IF NOT EXISTS "replies" (
 DROP TABLE IF EXISTS "comments" CASCADE;
 CREATE TABLE IF NOT EXISTS "comments" (
   comment_id SERIAL NOT NULL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id),
+  user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   author TEXT NOT NULL,
   published_date TIMESTAMP,
   comment TEXT
+);
+
+DROP TABLE IF EXISTS "forum_post_files" CASCADE;
+CREATE TABLE "forum_post_files" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL, 
+  file TEXT NOT NULL,
+  post_id INTEGER NOT NULL REFERENCES forum_posts(post_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS "forum_reply_files" CASCADE;
+CREATE TABLE "forum_reply_files" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL, 
+  file TEXT NOT NULL,
+  reply_id INTEGER NOT NULL REFERENCES replies(reply_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS "forum_comment_files" CASCADE;
+CREATE TABLE "forum_comment_files" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL, 
+  file TEXT NOT NULL,
+  comment_id INTEGER NOT NULL REFERENCES comments(comment_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS "upvotes" CASCADE;
+CREATE TABLE IF NOT EXISTS "upvotes" (
+  post_id INTEGER NOT NULL REFERENCES forum_posts(post_id),
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  PRIMARY KEY (post_id, user_id)
 );
 
 DROP TABLE IF EXISTS "post_author" CASCADE;
@@ -111,8 +141,8 @@ CREATE TABLE IF NOT EXISTS "post_author"(
 
 DROP TABLE IF EXISTS "comments_author" CASCADE;
 CREATE TABLE IF NOT EXISTS "comments_author"(
-  comment_id INT NOT NULL,
-  user_id INT NOT NULL,
+  comment_id INT NOT NULL REFERENCES comments(comment_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   author TEXT NOT NULL,
   PRIMARY KEY(comment_id, user_id)
 );
@@ -134,15 +164,15 @@ CREATE TABLE IF NOT EXISTS "post_replies"(
 
 DROP TABLE IF EXISTS "post_comments" CASCADE;
 CREATE TABLE IF NOT EXISTS "post_comments"(
-  post_id INT NOT NULL,
-  comment_id INT NOT NULL,
+  post_id INT NOT NULL REFERENCES forum_posts(post_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  comment_id INT NOT NULL REFERENCES comments(comment_id) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY(post_id, comment_id)
 );
 
 DROP TABLE IF EXISTS "post_tags" CASCADE;
 CREATE TABLE IF NOT EXISTS "post_tags"(
-  post_id INT NOT NULL,
-  tag_id INT NOT NULL,
+  post_id INT NOT NULL REFERENCES forum_posts(post_id),
+  tag_id INT NOT NULL REFERENCES tags(tag_id),
   PRIMARY KEY(post_id, tag_id)
 );
 
@@ -168,8 +198,8 @@ CREATE TABLE IF NOT EXISTS "announcements" (
 DROP TABLE IF EXISTS "announcement_comment" CASCADE;
 CREATE TABLE "announcement_comment" (
   id SERIAL PRIMARY KEY,
-  announcement_id INTEGER NOT NULL REFERENCES announcements(id),
-  author INTEGER NOT NULL REFERENCES users(id),
+  announcement_id INTEGER NOT NULL REFERENCES announcements(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  author INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   content TEXT NOT NULL,
   post_date TIMESTAMP
 );
@@ -178,7 +208,7 @@ DROP TABLE IF EXISTS "announcement_files" CASCADE;
 CREATE TABLE "announcement_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL, 
-  file BYTEA NOT NULL,
+  file TEXT NOT NULL,
   announcement_id INTEGER NOT NULL REFERENCES announcements(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -186,7 +216,7 @@ DROP TABLE IF EXISTS "announcement_comment_files" CASCADE;
 CREATE TABLE "announcement_comment_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  file_id TEXT NOT NULL,
+  file TEXT NOT NULL,
   comment_id INTEGER NOT NULL REFERENCES announcement_comment(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 

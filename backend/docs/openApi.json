@@ -2101,15 +2101,38 @@
           }
         ],
         "requestBody": {
-          "description": "Announcement body",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PutAnnouncement"
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "example": "Some new title"
+                  },
+                  "content": {
+                    "type": "string",
+                    "example": "Some comment description"
+                  },
+                  "fileList": {
+                    "type": "array",
+                    "desription": "List of files to remove",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -2147,7 +2170,7 @@
             "name": "topicGroup",
             "in": "path",
             "description": "Name of topic Group",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -2206,15 +2229,30 @@
           }
         ],
         "requestBody": {
-          "description": "Comment body",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PostAnnouncementComment"
+                "type": "object",
+                "properties": {
+                  "author": {
+                    "type": "integer",
+                    "example": 2
+                  },
+                  "content": {
+                    "type": "string",
+                    "example": "Some comment description"
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -2245,31 +2283,52 @@
     },
     "/{topicGroup}/announcement/{announcementId}/comment/{commentId}": {
       "put": {
-        "tags": [
-          "Course Pages"
-        ],
+        "tags": [ "Course Pages" ],
         "summary": "Update announcement comment",
         "parameters": [
+          {
+            "name": "announcementId",
+            "in": "path",
+            "description": "Id of announcement",
+            "required": true,
+            "schema": { "type": "integer" }
+          },
           {
             "name": "commentId",
             "in": "path",
             "description": "Id of comment to update",
             "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "schema": { "type": "integer" }
           }
         ],
         "requestBody": {
-          "description": "Comment body",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PutAnnouncementComment"
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "example": "Some comment description"
+                  },
+                  "fileList": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -2520,15 +2579,45 @@
         ],
         "summary": "Make new post",
         "requestBody": {
-          "description": "New post",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PostForum"
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "example": 2
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "Welcome to COMP1234 2021!"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Hope you all had a fun break, this course is not going to be easy"
+                  },
+                  "related_link": {
+                    "type": "string",
+                    "example": "/content"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -3347,6 +3436,23 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "User Id liking",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -3390,6 +3496,23 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "User Id unliking",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -3842,6 +3965,48 @@
       }
     },
     "/topicGroup/{topicGroupName}": {
+      "get": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Get topic group data from name",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Topic group to get data from",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetTopicGroup" }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "TopicGroup"
+      },
       "post": {
         "tags": [
           "Topic Tree"
@@ -5267,6 +5432,81 @@
                 "topicId": {
                   "type": "integer",
                   "example": 3
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetTopicGroup": {
+        "type": "object",
+        "properties": {
+          "topicGroup": {
+            "id": {
+              "type": "integer",
+              "example": 1
+            },
+            "name": {
+              "type": "string",
+              "example": "C++ Programming"
+            },
+            "topic_code": {
+              "type": "string",
+              "example": "COMP6771"
+            },
+            "course_materials": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "course_outline.pdf"
+                  },
+                  "file": {
+                    "type": "string",
+                    "example": "_files/{topicGroup}/course_outline.pdf"
+                  }
+                }
+              }
+            },
+            "topics_list": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Loops"
+                  },
+                  "course_materials": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 0
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "loops.pdf"
+                        },
+                        "file": {
+                          "type": "string",
+                          "example": "_files/{topicGroup}/{topic}/loops.pdf"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

@@ -23,24 +23,17 @@ import {
     PopoverArrow,
     PopoverCloseButton,
     Table,
-    Thead,
     Tbody,
     Tr,
-    Th,
     Td,
     useToast,
 } from "@chakra-ui/react"
 import { GrAdd } from 'react-icons/gr'
 import { BsTrash } from 'react-icons/bs'
 
-function ManageTagsModal({ isOpen, onClose }) {
-    const [tags, setTags] = useState([])
+function ManageTagsModal({ isOpen, onClose, tags, setTags }) {
     const [tagName, setTagName] = useState('')
     const toast = useToast()
-
-    useEffect(() => {
-        fetch(`http://localhost:8000/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
-    }, [setTags])
 
     const handleDelete = (id, onClose) => {
         fetch(`http://localhost:8000/forum/tags/${id}`, { method: 'DELETE' }).then(r => {
@@ -108,15 +101,26 @@ function ManageTagsModal({ isOpen, onClose }) {
         }).then(r => {
             if (r.status === 200) {
                 e.target.reset()
+                toast({
+                    title: r.error,
+                    description: `Tag ${tagName} has been added`,
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                })  
                 fetch(`http://localhost:8000/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
             } else {
+                return r.json()
+            }
+        }).then(r => {
+            if (r && r.error) {
                 toast({
-                    title: 'Sorry, an error has occurred',
+                    title: r.error,
                     description: 'Please try again',
                     status: 'error',
                     duration: 3000,
                     isClosable: true,
-                })
+                })  
             }
         })
     }

@@ -1,0 +1,5 @@
+This is the file storage folder
+
+=> _files/announcement5/1.png
+
+Access like => <img src='/_files/announcement5/1.png' />

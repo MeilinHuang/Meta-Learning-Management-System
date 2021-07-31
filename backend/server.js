@@ -7,7 +7,8 @@ const fileUpload = require('express-fileupload');
 app.use(cors());
 app.use(express.json({limit: '50mb'}));
 app.use(fileUpload());
-
+app.use('/static', express.static('public'));
+app.use('/_files', express.static('public/_files'));
 
 /***************************************************************
                        Open API / Swagger
@@ -49,6 +50,10 @@ app.delete('/user/:userId/:topicGroupId', database.deleteAdmin);
 
 app.get('/topicGroup', async(request, response) => {
   await database.getAllTopicGroups(request, response);
+});
+
+app.get('/topicGroup/:topicGroupName', async(request, response) => {
+  await database.getTopicGroup(request, response);
 });
 
 app.get('/topicGroup/:topicGroupName/topic', async(request, response) => {
