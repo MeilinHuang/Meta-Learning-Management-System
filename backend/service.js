@@ -238,14 +238,17 @@ async function getTopicPreReqs (request, response) {
 
     var preReqsArr = [];
 
-    for (var prereq_id of resp.rows[0].prerequisites_list) {
-      let tmp = await pool.query(`SELECT * from topics WHERE id = $1`, [prereq_id]);
-      preReqsArr.push(tmp.rows[0]);
+    console.log(resp.rows[0]);
+    if (resp.rows[0].prerequisites_list !== null) {
+      for (var prereq_id of resp.rows[0].prerequisites_list) {
+        let tmp = await pool.query(`SELECT * from topics WHERE id = $1`, [prereq_id]);
+        preReqsArr.push(tmp.rows[0]);
+      }
     }
-
     resp.rows[0].prerequisites_list = preReqsArr;
     response.status(200).json(resp.rows[0]);
   } catch(e) {
+    console.log(e);
     response.status(400).send(e);
   }
 }
