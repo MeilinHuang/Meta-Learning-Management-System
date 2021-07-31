@@ -31,6 +31,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
 
     const handleSubmit = e => {
         e.preventDefault()
+        e.target.reset()
         console.log(details)
 
         if (title === '' || details.replace(/<[^>]+>/g, '') === '') {
@@ -59,7 +60,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
     }
 
     const handleUpload = e => {
-        setImages(e.target.files)
+        setImages(e.target.files[0])
         console.log(e.target.files[0])
     }
 
@@ -71,7 +72,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
                     <ModalHeader>{isForums ? 'Create new forum post' : 'Create new post'}</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                    <form id="createPost" onSubmit={handleSubmit}>
+                    <form id="createPost" onSubmit={handleSubmit} enctype="multipart/form-data">
                         <Flex flexDirection="column" mb="16px">
                             <Heading size="sm" mb="4px">Title*</Heading>
                             <Input name="postTitle" onChange={e => setTitle(e.target.value)} />

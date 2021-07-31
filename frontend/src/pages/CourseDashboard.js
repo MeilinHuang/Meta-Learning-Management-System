@@ -90,26 +90,23 @@ function CourseDashboard({ match: { params: { code }}}) {
 
     const handleAddPostSubmit = ({ title, details, date, images }) => {
         const formData = new FormData()
-
         formData.append('author', dummyAuthor)
         formData.append('uploadFile', images)
         formData.append('title', title)
         formData.append('content', details)
-        formData.append('postDate', date
-        )
-        console.log([images])
+
         fetch(`http://localhost:8000/${code}/announcement/new`, {
             method: 'POST',
             body: formData,
             headers: {
                 'Accept': '*/*',
-                'Content-Type': 'multipart/form-data'
             }
         }).then(r => {
             if (r.status === 200) {
                 fetch(`http://localhost:8000/${code}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))
             } 
             // TODO: Handle error case
+            // TODO: clear form
         })
     }
 
