@@ -2717,26 +2717,42 @@
           }
         ],
         "requestBody": {
-          "description": "Details of updated post",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PutForumPost"
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "example": "Edited description for post"
+                  },
+                  "related_link": {
+                    "type": "string",
+                    "example": "/content"
+                  },
+                  "fileDeleteList": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
             "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ForumPost"
-                }
-              }
-            }
+            "content": {}
           },
           "400": {
             "content": {
@@ -2819,15 +2835,30 @@
           }
         ],
         "requestBody": {
-          "description": "Details of post reply",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PostReply"
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "reply": {
+                    "type": "string",
+                    "example": "The final exam marks have already been released"
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -2883,15 +2914,32 @@
           }
         ],
         "requestBody": {
-          "description": "Details of updated post reply",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PutReply"
+                "type": "object",
+                "properties": {
+                  "reply": {
+                    "type": "string",
+                    "example": "The final exam marks have already been released"
+                  },
+                  "fileDeleteList": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -2988,15 +3036,30 @@
           }
         ],
         "requestBody": {
-          "description": "Details of comment body",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PostComment"
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "comment": {
+                    "type": "string",
+                    "example": "Some random comment spam"
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -3052,15 +3115,32 @@
           }
         ],
         "requestBody": {
-          "description": "Id of comment",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/PutComment"
+                "type": "object",
+                "properties": {
+                  "comment": {
+                    "type": "string",
+                    "example": "Some spam comment update"
+                  },
+                  "fileDeleteList": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
