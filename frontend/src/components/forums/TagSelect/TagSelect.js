@@ -6,6 +6,9 @@ import styles from './TagSelect.module.css'
 
 function TagSelect({ isFilter, setSelectedTags, tags }) {
     const tagsList = tags.map(({ tag_id, name}) => ({ value: tag_id, label: name }))
+    
+    // Add default tags
+    // tagsList.push({ value: '000', label: 'Announcement'})
 
     const handleSelect = selectedTags => {
         let currentTags = []

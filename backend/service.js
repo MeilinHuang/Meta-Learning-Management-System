@@ -1269,6 +1269,8 @@ async function getAnnouncements (request, response) {
       WHERE a.topic_group = $1
       GROUP BY a.id`, [topicGroupId]);
 
+    console.log(resp)
+
     for (const object of resp.rows) {
       var fileArr = [];
       var commentArr = [];
@@ -1575,6 +1577,61 @@ async function deleteAnnouncementComment (request, response) {
     response.status(400).send(e);
   }
 };
+
+// Get all announcements related search term
+async function getSearchAnnouncements (request, response) {
+  try {
+    const topicGroupName = request.params.topicGroup;
+    const announcementSearchTerm = request.params.announcementSearchTerm;
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
+
+    let resp = await pool.query(
+      `SELECT a.id, a.author, a.topic_group, a.title, a.content, a.post_date, 
+      array_agg(c.id) as comments, array_agg(af.id) as attachments
+      FROM announcements a
+      LEFT JOIN announcement_comment c ON c.announcement_id = a.id
+      LEFT JOIN announcement_files af ON af.announcement_id = a.id
+      WHERE a.topic_group = $1
+      AND (LOWER (a.title) LIKE LOWER($2)
+      OR LOWER (a.content) LIKE LOWER($2))
+      GROUP BY a.id`, [topicGroupId, `%${announcementSearchTerm}%`]);
+
+    console.log(resp)
+
+    for (const object of resp.rows) {
+      var fileArr = [];
+      var commentArr = [];
+      for (const attachment of object.attachments) {
+        if (attachment != null) { 
+          let fileQ = await pool.query(`
+          SELECT id, name, file
+          FROM announcement_files WHERE announcement_id = $1 AND id = $2
+          `, [object.id, attachment])
+          fileArr.push(fileQ.rows[0]);
+        }
+      }
+
+      if (object.comments.length) {
+        for (const comment of object.comments) {
+          let commQ = await pool.query(`
+          SELECT id, author, content, post_date
+          FROM announcement_comment WHERE announcement_id = $1 AND id = $2
+          `, [object.id, comment])
+          commentArr.push(commQ.rows[0]);
+        }
+      }
+      
+      object.attachments = fileArr;
+      object.comments = commentArr;
+    }
+
+    response.status(200).json(resp.rows);
+  } catch (e) {
+    response.sendStatus(400).send(e);
+  }
+
+}
 
 /***************************************************************
                        Gamification Functions
@@ -2345,6 +2402,7 @@ module.exports = {
   getAnnouncements,
   postAnnouncement,
   postAnnouncementComment,
+  getSearchAnnouncements,
   getQuestions,
   postQuestion,
   getLevelFromQuestion,

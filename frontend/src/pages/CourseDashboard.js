@@ -16,10 +16,9 @@ import Announcement from '../components/dashboard/Announcement/Announcement'
 import AddPostModal from '../components/forums/AddPostModal'
 
 // DUMMY VALUES
-const dummyCourse = "C++ Programming"
 const dummyAuthor = 3
 
-function CourseDashboard() {
+function CourseDashboard({ match: { params: { code }}}) {
     const [announcements, setAnnouncements] = useState([])
     const [searchTerm, setSearchTerm] = useState('')
     const buttonContents = useBreakpointValue({ base: '', md: 'Add Post' })
@@ -27,36 +26,87 @@ function CourseDashboard() {
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     useEffect(() => {
-        fetch(`http://localhost:8000/${dummyCourse}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))
-    }, [setAnnouncements])
+        fetch(`http://localhost:8000/${code}/announcement`).then(r => r.json()).then(data => {
+            const promises = []
 
-    console.log(announcements)
+            for (const post of data) {
+                promises.push(fetch(`http://localhost:8000/user/${post.author}`).then(r => r.json()))
+            }
+
+            Promise.all(promises)
+                .then(authorData => {
+                    const newPosts = []
+                    for (const i in authorData) {
+                        const withAuthor = {...data[i], author: authorData[i].user_name}
+                        newPosts.push(withAuthor)
+                    }
+                    setAnnouncements(newPosts.reverse())
+                })
+        })
+    }, [code, setAnnouncements])
 
     const handleSubmit = e => {
         e.preventDefault()
 
-        console.log(searchTerm)
+        if (searchTerm === '') {
+            fetch(`http://localhost:8000/${code}/announcement`).then(r => r.json()).then(data => {
+                const promises = []
+
+                for (const post of data) {
+                    promises.push(fetch(`http://localhost:8000/user/${post.author}`).then(r => r.json()))
+                }
+
+                Promise.all(promises)
+                    .then(authorData => {
+                        const newPosts = []
+                        for (const i in authorData) {
+                            const withAuthor = {...data[i], author: authorData[i].user_name}
+                            newPosts.push(withAuthor)
+                        }
+                        setAnnouncements(newPosts.reverse())
+                    })
+            })
+            return
+        }
+
+        fetch(`http://localhost:8000/${code}/announcement/search/${searchTerm.toLowerCase()}`).then(r => r.json()).then(data => {
+            const promises = []
+
+                for (const post of data) {
+                    promises.push(fetch(`http://localhost:8000/user/${post.author}`).then(r => r.json()))
+                }
+
+                Promise.all(promises)
+                    .then(authorData => {
+                        const newPosts = []
+                        for (const i in authorData) {
+                            const withAuthor = {...data[i], author: authorData[i].user_name}
+                            newPosts.push(withAuthor)
+                        }
+                        setAnnouncements(newPosts.reverse())
+                    })
+        })
     }
 
-    const handleAddPostSubmit = ({ title, details, date }) => {
-        fetch(`http://localhost:8000/${dummyCourse}/announcement/new`, {
+    const handleAddPostSubmit = ({ title, details, date, images }) => {
+        const formData = new FormData()
+        formData.append('author', dummyAuthor)
+        formData.append('uploadFile', images)
+        formData.append('title', title)
+        formData.append('content', details)
+
+        fetch(`http://localhost:8000/${code}/announcement/new`, {
             method: 'POST',
-            body: JSON.stringify({
-                author: dummyAuthor,
-                attachments: [],
-                title,
-                content: details,
-                postDate: date,
-            }),
+            body: formData,
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Accept': '*/*',
             }
         }).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/${dummyCourse}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))
+                fetch(`http://localhost:8000/${code}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))
             } 
             // TODO: Handle error case
+            // TODO: clear form
         })
     }
 
@@ -75,7 +125,7 @@ function CourseDashboard() {
                     </Box>
                 </Center>
             </Flex>
-            {announcements.map(announcement => <Announcement announcement={announcement} course={dummyCourse} setAnnouncements={setAnnouncements} />)}
+            {announcements.map(announcement => <Announcement announcement={announcement} course={code} setAnnouncements={setAnnouncements} />)}
         </>
     )
 }

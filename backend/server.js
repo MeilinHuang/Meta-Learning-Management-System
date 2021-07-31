@@ -219,6 +219,10 @@ app.delete('/:topicGroup/announcement/:announcementId/comment/:commentId', async
   await database.deleteAnnouncementComment(request, response);
 })
 
+app.get('/:topicGroup/announcement/search/:announcementSearchTerm', async(request, response) => {
+  await database.getSearchAnnouncements(request, response);
+});
+
 /***************************************************************
                        Gamification Functions
 ***************************************************************/

@@ -2398,6 +2398,64 @@
         }
       }
     },
+    "/{topicGroup}/announcement/search/{announcementSearchTerm}": {
+      "get": {
+        "tags": [
+          "Course Pages"
+        ],
+        "summary": "Get all announcements related to the search query",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get announcements",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "announcementSearchTerm",
+            "in": "path",
+            "description": "Search term to include all posts with the search term",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllAnnouncements"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/forum": {
       "get": {
         "tags": [

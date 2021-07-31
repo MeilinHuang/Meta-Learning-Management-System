@@ -16,11 +16,11 @@ import {
 import DraftEditor from './DraftEditor/DraftEditor'
 import TagSelect from './TagSelect/TagSelect'
 
-function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
+function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
     const [title, setTitle] = useState('')
     const [details, setDetails] = useState('')
     const [relatedLink, setRelatedLink] = useState('')
-    const [image, setImage] = useState({})
+    const [images, setImages] = useState([])
     const [tags, setTags] = useState([])
     const [selectedTags, setSelectedTags] = useState([])
     const toast = useToast()
@@ -31,6 +31,7 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
 
     const handleSubmit = e => {
         e.preventDefault()
+        e.target.reset()
         console.log(details)
 
         if (title === '' || details.replace(/<[^>]+>/g, '') === '') {
@@ -50,7 +51,7 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
             title,
             details,
             selectedTags,
-            image,
+            images,
             date,
             relatedLink,
         }
@@ -59,8 +60,8 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
     }
 
     const handleUpload = e => {
-        setImage(e.target.files[0])
-        // console.log(e.target.files[0])
+        setImages(e.target.files[0])
+        console.log(e.target.files[0])
     }
 
     return (
@@ -68,10 +69,10 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
             <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false} isCentered size="xl" p="24px">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Create new post</ModalHeader>
+                    <ModalHeader>{isForums ? 'Create new forum post' : 'Create new post'}</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                    <form id="createPost" onSubmit={handleSubmit}>
+                    <form id="createPost" onSubmit={handleSubmit} enctype="multipart/form-data">
                         <Flex flexDirection="column" mb="16px">
                             <Heading size="sm" mb="4px">Title*</Heading>
                             <Input name="postTitle" onChange={e => setTitle(e.target.value)} />
@@ -80,11 +81,11 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
                             <Heading size="sm" mb="4px">Details*</Heading>
                             <DraftEditor setDetails={setDetails}  />
                         </Flex>
-                        {/* <Flex flexDirection="column" mb="16px">
+                        <Flex flexDirection="column" mb="16px">
                             <Heading size="sm" mb="4px">Attach Images</Heading>
                             <input type="file" name="images" onChange={handleUpload} />
-                        </Flex> */}
-                        {showTags &&
+                        </Flex>
+                        {isForums &&
                             <>
                                 <Flex flexDirection="column">
                                     <Heading size="sm" mb="4px">Tags</Heading>
