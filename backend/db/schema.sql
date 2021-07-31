@@ -49,6 +49,15 @@ CREATE TABLE IF NOT EXISTS "prerequisites" (
   PRIMARY KEY (prereq, topic)
 );
 
+DROP TABLE IF EXISTS "topic_group_files" CASCADE;
+CREATE TABLE IF NOT EXISTS "topic_group_files" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  file TEXT NOT NULL,
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  due_date TIMESTAMP
+);
+
 DROP TABLE IF EXISTS "topic_files" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_files" (
   id SERIAL NOT NULL PRIMARY KEY,
@@ -56,6 +65,13 @@ CREATE TABLE IF NOT EXISTS "topic_files" (
   file TEXT NOT NULL,
   topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE ON UPDATE CASCADE,
   due_date TIMESTAMP
+);
+
+DROP TABLE IF EXISTS "topic_group_files_related_topics" CASCADE;
+CREATE TABLE IF NOT EXISTS "topic_group_files_topics" (
+  file_id INTEGER NOT NULL REFERENCES topic_group_files(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (file_id, topic_id)
 );
 
 CREATE INDEX prereq_idx ON prerequisites(prereq);
@@ -126,15 +142,15 @@ CREATE TABLE "forum_comment_files" (
 
 DROP TABLE IF EXISTS "upvotes" CASCADE;
 CREATE TABLE IF NOT EXISTS "upvotes" (
-  post_id INTEGER NOT NULL REFERENCES forum_posts(post_id),
-  user_id INTEGER NOT NULL REFERENCES users(id),
+  post_id INTEGER NOT NULL REFERENCES forum_posts(post_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY (post_id, user_id)
 );
 
 DROP TABLE IF EXISTS "post_author" CASCADE;
 CREATE TABLE IF NOT EXISTS "post_author"(
-  post_id INT NOT NULL REFERENCES forum_posts(post_id),
-  user_id INT NOT NULL REFERENCES users(id),
+  post_id INT NOT NULL REFERENCES forum_posts(post_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  user_id INT NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   author TEXT NOT NULL,
   PRIMARY KEY(post_id, user_id)
 );
@@ -171,8 +187,8 @@ CREATE TABLE IF NOT EXISTS "post_comments"(
 
 DROP TABLE IF EXISTS "post_tags" CASCADE;
 CREATE TABLE IF NOT EXISTS "post_tags"(
-  post_id INT NOT NULL REFERENCES forum_posts(post_id),
-  tag_id INT NOT NULL REFERENCES tags(tag_id),
+  post_id INT NOT NULL REFERENCES forum_posts(post_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  tag_id INT NOT NULL REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
   PRIMARY KEY(post_id, tag_id)
 );
 
