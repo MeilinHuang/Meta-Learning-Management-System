@@ -131,7 +131,7 @@ function Announcement({ announcement: { attachments, author, id, title, content,
                             </Flex>
                             <Flex>
                             <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
-                                <Popover>
+                                <Popover placement="bottom-end">
                                     {({ onClose }) => (
                                         <>
                                             <PopoverTrigger>

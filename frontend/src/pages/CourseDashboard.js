@@ -88,13 +88,7 @@ function CourseDashboard({ match: { params: { code }}}) {
         })
     }
 
-    const handleAddPostSubmit = ({ title, details, date, images }) => {
-        const formData = new FormData()
-        formData.append('author', dummyAuthor)
-        formData.append('uploadFile', images)
-        formData.append('title', title)
-        formData.append('content', details)
-
+    const handleAddPostSubmit = (formData) => {
         fetch(`http://localhost:8000/${code}/announcement/new`, {
             method: 'POST',
             body: formData,

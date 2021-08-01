@@ -38,7 +38,7 @@ function ForumPostPage({ match: { params: { code, id }}}) {
             `http://localhost:8000/forum/post/${id}`, { method: 'DELETE' }
         ).then(r => {
             if (r.status === 200) {
-                history.push('/forums')
+                history.push(`/course-page/${code}/forums`)
             } else {
                 toast({
                     title: 'Sorry, an error has occurred',
@@ -50,6 +50,8 @@ function ForumPostPage({ match: { params: { code, id }}}) {
             }
         })
     }
+
+    console.log(post)
 
     return (
         <>
@@ -63,7 +65,7 @@ function ForumPostPage({ match: { params: { code, id }}}) {
             </Breadcrumb>
             <Flex justifyContent="space-between" alignItems="baseline">
                 <Heading mt="16px">{post.title}</Heading>
-                <Popover>
+                <Popover placement="bottom-end">
                     <PopoverTrigger>
                         <Button pr="8px" leftIcon={<BsTrash />} variant="ghost" color="red" />
                     </PopoverTrigger>

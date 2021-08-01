@@ -459,6 +459,7 @@ async function getAllForumPosts (request, response) {
     }
     response.status(200).json(resp.rows);
   } catch (e) {
+    console.log(e)
     response.status(400).send(e.detail);
   }
 }
@@ -720,6 +721,7 @@ async function postForum (request, response) {
 
     response.sendStatus(200);
   } catch (e) {
+    console.log(e)
     response.status(400).send(e);
   }
 };
@@ -774,6 +776,10 @@ async function getPostById (request, response) {
         LEFT JOIN forum_reply_files file ON file.reply_id = r.reply_id
         WHERE r.reply_id = $1
         GROUP BY r.reply_id`, [replyId]);
+        
+        if (!tmp.rows[0]) {
+          continue
+        }
 
         for (const fileId of tmp.rows[0].attachments) { 
           let tmp = await pool.query(`SELECT * FROM forum_reply_files WHERE id = $1`, [fileId]);
@@ -793,6 +799,10 @@ async function getPostById (request, response) {
         LEFT JOIN forum_comment_files file ON file.comment_id = c.comment_id
         WHERE c.comment_id = $1
         GROUP BY c.comment_id`, [commentId]);
+
+        if (!tmp.rows[0]) {
+          continue
+        }
 
         for (const fileId of tmp.rows[0].attachments) {
           let tmp = await pool.query(`SELECT * FROM forum_comment_files WHERE id = $1`, [fileId]);
@@ -816,6 +826,7 @@ async function getPostById (request, response) {
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
+    console.log(e)
     response.status(400).send(e.detail);
   }
 };
@@ -1269,8 +1280,6 @@ async function getAnnouncements (request, response) {
       WHERE a.topic_group = $1
       GROUP BY a.id`, [topicGroupId]);
 
-    console.log(resp)
-
     for (const object of resp.rows) {
       var fileArr = [];
       var commentArr = [];
@@ -1368,14 +1377,14 @@ async function postAnnouncement (request, response) {
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
     const topic_group = tmpQ.rows[0].id;
-    const author = request.body.author;
+    const user_id = request.body.user_id;
     const title = request.body.title;
-    const content = request.body.content;
+    const description = request.body.description;
 
     let resp = await pool.query(
       `INSERT INTO announcements(id, author, topic_group, title, content, post_date) 
       VALUES(default, $1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING id`,
-      [author, topic_group, title, content])
+      [user_id, topic_group, title, description])
 
     if (request.files != null) {
       if (!fs.existsSync(`../frontend/public/_files/announcement${resp.rows[0].id}`)) { fs.mkdirSync(`../frontend/public/_files/announcement${resp.rows[0].id}`) }

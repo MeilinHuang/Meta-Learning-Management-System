@@ -36,8 +36,11 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned, d
             })
     }
 
-    let plainTextDesc = description.replace(/<[^>]+>/g, ' ')
-    plainTextDesc = plainTextDesc.length > 120 ? plainTextDesc.substring(0, 119) + '...' : plainTextDesc
+    let plainTextDesc
+    if (description) {
+        plainTextDesc = description.replace(/<[^>]+>/g, ' ')
+        plainTextDesc = plainTextDesc.length > 120 ? plainTextDesc.substring(0, 119) + '...' : plainTextDesc
+    }
 
     return (
         <Tr>

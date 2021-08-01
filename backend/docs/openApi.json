@@ -1985,7 +1985,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "author": {
+                  "user_id": {
                     "type": "integer",
                     "example": 3
                   },
@@ -1993,7 +1993,7 @@
                     "type": "string",
                     "example": "First announcement"
                   },
-                  "content": {
+                  "description": {
                     "type": "string",
                     "example": "Description of the first announcement"
                   },
@@ -4453,7 +4453,7 @@
       "PostAnnouncement": {
         "type": "object",
         "properties": {
-          "author": {
+          "user_id": {
             "type": "integer",
             "example": 3
           },
@@ -4461,7 +4461,7 @@
             "type": "string",
             "example": "First announcement"
           },
-          "content": {
+          "description": {
             "type": "string",
             "example": "Description of the first announcement"
           },

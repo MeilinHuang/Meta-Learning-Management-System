@@ -59,20 +59,12 @@ function ForumOverviewPage({ match: { params: { code }}}) {
         })
     }
 
-    const handleAddPostSubmit = ({ title, details, selectedTags, date, relatedLink }) => {
+    const handleAddPostSubmit = (formData) => {
         fetch(`http://localhost:8000/forum/post`, {
             method: 'POST',
-            body: JSON.stringify({
-                title,
-                user_id: dummyAuthor,
-                publishedDate: date,
-                description: details,
-                tags: selectedTags,
-                related_link: relatedLink,
-            }),
+            body: formData,
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Accept': '*/*',
             }
         }).then(r => {
             if (r.status === 200) {

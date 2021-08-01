@@ -18,7 +18,7 @@ import AuthorDetails from '../AuthorDetails'
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './PostDetails.module.css'
 
-function PostDetails({ post: { author, post_id, published_date, description, isendorsed, num_of_upvotes, upvoters }, setPost}) {
+function PostDetails({ post: { attachments, author, post_id, published_date, description, isendorsed, num_of_upvotes, upvoters }, setPost}) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState()
     const toast = useToast()
@@ -77,6 +77,10 @@ function PostDetails({ post: { author, post_id, published_date, description, ise
         })
     }
 
+    const getImage = ({ id, name, file }) => (
+        <img className={styles.attachment} key={id} alt={name} src={file} />
+    )
+
     return (
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <AuthorDetails author={author} date={published_date} />
@@ -96,6 +100,7 @@ function PostDetails({ post: { author, post_id, published_date, description, ise
                 :
                     <>
                         <Text className={styles.description} dangerouslySetInnerHTML={{ __html: details }} />
+                        {!!attachments && !!attachments.length && attachments.map(image => getImage(image))}
                         {isendorsed && (
                             <Flex alignItems="center" mt="16px">
                                 <Icon h="13px" w="13px" mr="4px" color="green" as={FaCheckCircle} />

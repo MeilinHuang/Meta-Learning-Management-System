@@ -162,7 +162,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
                         {/* show author controls if user is author */}
                         <Flex mt="8px" justifyContent="flex-end">
                             <Link onClick={editPost}>Edit</Link>
-                            <Popover>
+                            <Popover placement="bottom-end">
                                 {({ onClose }) => (
                                     <>
                                         <PopoverTrigger>

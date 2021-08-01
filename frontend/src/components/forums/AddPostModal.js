@@ -16,6 +16,8 @@ import {
 import DraftEditor from './DraftEditor/DraftEditor'
 import TagSelect from './TagSelect/TagSelect'
 
+const dummyAuthor = 2
+
 function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
     const [title, setTitle] = useState('')
     const [details, setDetails] = useState('')
@@ -47,15 +49,18 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
         const timeZoneOffset = (new Date()).getTimezoneOffset() * 60000
         const date = new Date(Date.now() - timeZoneOffset).toISOString()
 
-        const postDetails = {
-            title,
-            details,
-            selectedTags,
-            images,
-            date,
-            relatedLink,
+        const formData = new FormData()
+        formData.append('user_id', dummyAuthor)
+        formData.append('uploadFile', images)
+        formData.append('title', title)
+        formData.append('description', details)
+        formData.append('publishedDate', date)
+
+        if (selectedTags) {
+            formData.append('tags', selectedTags)
         }
-        onSubmit(postDetails)
+
+        onSubmit(formData)
         onClose()
     }
 
