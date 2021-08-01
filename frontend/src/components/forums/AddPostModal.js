@@ -61,6 +61,10 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
         }
 
         onSubmit(formData)
+
+        setTags([])
+        setImages([])
+
         onClose()
     }
 
