@@ -49,11 +49,9 @@ function generateNewQuiz() {
 
 export default function EditQuiz() {
   const [quiz, setQuiz] = useState({}); // list of dictionaries [{}, {}, ...]
-  const [dueDate, setDueDate] = useState(new Date());
   const [name, setName] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure()
   const finalRef = React.useRef()
-  const [questionsToggleState, setQuestionsToggleState] = useState({});
 
   const topics = [
     "Arrays",
@@ -206,9 +204,21 @@ export default function EditQuiz() {
     setQuiz({ ...quiz, questions: newQuestions});
   };
 
-  const expandQuestionItem = (questionIndex) => {
-    const itemsToExpand = [questionIndex];
-    onChangeQuestionItems(itemsToExpand);
+  const toggleQuestionItem = (questionIndex) => {
+    let updatedExpandedQuestions = getExpandedQuestions();
+    
+    if (updatedExpandedQuestions.includes(questionIndex))
+    {
+      // Selected question is currently expanded so we want to collapse it
+      updatedExpandedQuestions.pop(questionIndex);
+    }
+    else {
+      // Selected question is currently collapsed so we want to expand it
+      updatedExpandedQuestions.push(questionIndex);
+    }
+
+    // Update state of question items in Accordion list
+    onChangeQuestionItems(updatedExpandedQuestions);
   };
 
   const getExpandedQuestions = () => {
@@ -221,6 +231,26 @@ export default function EditQuiz() {
     });
 
     return expandedQuestions;
+  };
+
+  const expandAllQuestions = () => {
+    let newQuestions = quiz.questions?.map((qs, index) => { 
+      const obj = Object.assign({}, qs);
+      obj.is_expanded = true;
+      return obj;
+    });
+
+    setQuiz({ ...quiz, questions: newQuestions});
+  };
+
+  const collapseAllQuestions = () => {
+    let newQuestions = quiz.questions?.map((qs, index) => { 
+      const obj = Object.assign({}, qs);
+      obj.is_expanded = false;
+      return obj;
+    });
+
+    setQuiz({ ...quiz, questions: newQuestions});
   };
 
   const addQuestionToQuiz = (newQuestion) => {
@@ -244,7 +274,7 @@ export default function EditQuiz() {
   const renderQuestionLinkItem = (qs, index) => {
     return (
       <HStack key={index}>
-        <Button colorScheme="teal" variant="link" onClick={() => expandQuestionItem(+index)}>Question {index + 1}</Button>
+        <Button colorScheme="teal" variant="link" onClick={() => toggleQuestionItem(+index)}>Question {index + 1}</Button>
           <Text size="sm" color="grey">({qs.marks_awarded} {qs.marks_awarded > 1 ? "marks" : "mark"})</Text>
         {renderTag(topics[qs.related_topic_id])}
       </HStack>
@@ -257,26 +287,6 @@ export default function EditQuiz() {
         <Text fontWeight="bold" fontSize="sm" color="white">{tagText}</Text>
       </Box> 
     );
-  };
-
-  const expandAllQuestions = () => {
-    let newQuestions = quiz.questions?.map((qs, index) => { 
-      const obj = Object.assign({}, qs);
-      obj.is_expanded = true;
-      return obj;
-    });
-
-    setQuiz({ ...quiz, questions: newQuestions});
-  };
-
-  const collapseAllQuestions = () => {
-    let newQuestions = quiz.questions?.map((qs, index) => { 
-      const obj = Object.assign({}, qs);
-      obj.is_expanded = false;
-      return obj;
-    });
-
-    setQuiz({ ...quiz, questions: newQuestions});
   };
 
   const openAddQuestionModal = () => {
