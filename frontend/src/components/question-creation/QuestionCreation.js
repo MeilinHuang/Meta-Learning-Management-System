@@ -27,6 +27,7 @@ import {
           Textarea,
           VStack
         } from "@chakra-ui/react"
+import { AddIcon } from "@chakra-ui/icons"
 
 import './QuestionCreation.css'
 import "react-datepicker/dist/react-datepicker.css";
@@ -48,204 +49,6 @@ const quizzes = {
     num_questions: 3,
   },
 };
-
-// GET /quiz/:quizId
-// [Student] Used for answering a question 
-const getQuizWithId = {
-  quiz1: {
-    id: 1,
-    name: "Quiz1",
-    due_date: "2016-06-22 19:10:25-07",
-    time_given: 45,
-    num_questions: 3,
-    questions: [
-      {
-        question_bank_id: 12,
-        question_text: "Question text",
-        question_type: "mc", // sa, cb
-        marks_awarded: 3,
-        related_topic_id: 10,
-        answers: [
-          {
-            answer_text: "answer1",
-            is_correct: true,
-            explanation: ""
-          },
-          {
-            answer_text: "answer2",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer3",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer4",
-            is_correct: false,
-            explanation: ""
-          },
-        ]
-      },
-      {
-        question_bank_id: 12,
-        question_text: "Question text",
-        question_type: "mc", // sa, cb
-        marks_awarded: 3,
-        related_topic_id: 10,
-        answers: [
-          {
-            answer_text: "answer1",
-            is_correct: true,
-            explanation: ""
-          },
-          {
-            answer_text: "answer2",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer3",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer4",
-            is_correct: false,
-            explanation: ""
-          },
-        ]
-      },
-      {
-        question_bank_id: 12,
-        question_text: "Question text",
-        question_type: "mc", // sa, cb
-        marks_awarded: 3,
-        related_topic_id: 10,
-        answers: [
-          {
-            answer_text: "answer1",
-            is_correct: true,
-            explanation: ""
-          },
-          {
-            answer_text: "answer2",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer3",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer4",
-            is_correct: false,
-            explanation: ""
-          },
-        ]
-      }
-    ]
-  },
-  quiz2: {
-    id: 2,
-    name: "Quiz2",
-    due_date: "2016-06-22 19:10:25-07",
-    time_given: 45,
-    num_questions: 3,
-    questions: [
-      {
-        question_bank_id: 12,
-        question_text: "Question text",
-        question_type: "mc", // sa, cb
-        marks_awarded: 3,
-        related_topic_id: 10,
-        answers: [
-          {
-            answer_text: "answer1",
-            is_correct: true,
-            explanation: ""
-          },
-          {
-            answer_text: "answer2",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer3",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer4",
-            is_correct: false,
-            explanation: ""
-          },
-        ]
-      },
-      {
-        question_bank_id: 12,
-        question_text: "Question text",
-        question_type: "mc", // sa, cb
-        marks_awarded: 3,
-        related_topic_id: 10,
-        answers: [
-          {
-            answer_text: "answer1",
-            is_correct: true,
-            explanation: ""
-          },
-          {
-            answer_text: "answer2",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer3",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer4",
-            is_correct: false,
-            explanation: ""
-          },
-        ]
-      },
-      {
-        question_bank_id: 12,
-        question_text: "Question text",
-        question_type: "mc", // sa, cb
-        marks_awarded: 3,
-        related_topic_id: 10,
-        answers: [
-          {
-            answer_text: "answer1",
-            is_correct: true,
-            explanation: ""
-          },
-          {
-            answer_text: "answer2",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer3",
-            is_correct: false,
-            explanation: ""
-          },
-          {
-            answer_text: "answer4",
-            is_correct: false,
-            explanation: ""
-          },
-        ]
-      }
-    ]
-  },
-};
-
 
 // POST /quiz
 const sampleQuiz = {
@@ -308,13 +111,6 @@ const sampleQuiz = {
   ]
 }
 
-const topics = [
-  "Arrays",
-  "Variables",
-  "Linked lists",
-  "Functions"
-]
-
 function generateNewQuestion() {
   return {
     question_text: "",
@@ -332,22 +128,27 @@ function generateNewQuestion() {
         is_correct: false,
         explanation: ""
       },
-    ]
+    ],
+    is_expanded: false
   }
 };
 
 const API_URL = "http://localhost:8000";
 
-export default function QuestionCreation({ addQuestionToQuiz }) {
+export default function QuestionCreation({ addQuestionToQuiz, topics, isCreatingQuestion }) {
   const [questionText, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState("mc");
+  const [relatedTopicId, setRelatedTopicId] = useState("0");
   const [newQuestion, setNewQuestion] = useState({});
   const [isValidQuestion, setIsValidQuestion] = useState(true);
+  const [isNewQuestion, setIsNewQuestion] = useState(true);
 
   useEffect(() => {
     // Generate new question
     const newQuestionTemplate = generateNewQuestion();
     setNewQuestion(newQuestionTemplate);
+
+    setIsNewQuestion(isCreatingQuestion);
   }, []);
 
   const generateNewAnswer = () => {
@@ -362,13 +163,13 @@ export default function QuestionCreation({ addQuestionToQuiz }) {
     return (
       <Box>
         <Box mt="3">
-          <Text>Question text: </Text>
+          <Text fontWeight="bold" color="gray.600">Question text: </Text>
           <Textarea size="md" placeholder="Enter question" onChange={onChangeQuestionText} value={newQuestion.question_text} />
         </Box>
 
         <HStack my="2">
-          <Text>Marks awarded: </Text>
-          <NumberInput size="sm" maxW={16} min={0}>
+          <Text fontWeight="bold" color="gray.600">Marks awarded: </Text>
+          <NumberInput size="sm" maxW={16} min={0} onChange={onChangeMarksAwarded}value={newQuestion.marks_awarded}>
             <NumberInputField />
               <NumberInputStepper>
                 <NumberIncrementStepper />
@@ -378,26 +179,37 @@ export default function QuestionCreation({ addQuestionToQuiz }) {
         </HStack>
 
         <HStack my="2">
-          <Text>Related topic: </Text>
+          <Text fontWeight="bold" color="gray.600">Related topic: </Text>
           {/* TODO: Replace values with backend GET /topics */}
-          <Select defaultValue="0">
-            <option key="0" value="0">None</option>
-            {topics.map((t, i) => <option key={i} value={i}>{t}</option>)}
-          </Select>
+          <Box>
+            <Select size="sm" defaultValue="0" onChange={onChangeRelatedTopicId} value={newQuestion.related_topic_id}>
+              {topics?.map((t, i) => <option key={i} value={i}>{t}</option>)}
+            </Select>
+          </Box>
         </HStack>
 
         <HStack my="2">
-          <Text mb="1">Question type:</Text>
-          <Select defaultValue="mc" onChange={onChangeQuestionType} value={newQuestion.question_type}>
-            <option value="mc">Multiple choice</option>
-            <option value="sa">Short answer</option>
-            <option value="cb">Checkboxes</option>
-          </Select>
+          <Text mb="1" fontWeight="bold" color="gray.600">Question type:</Text>
+          <Box>
+            <Select size="sm" defaultValue="mc" onChange={onChangeQuestionType} value={newQuestion.question_type}>
+              <option value="mc">Multiple choice</option>
+              <option value="sa">Short answer</option>
+              <option value="cb">Checkboxes</option>
+            </Select>
+          </Box>
         </HStack>
 
         {renderPossibleAnswers(newQuestion)}
       </Box>
     );
+  };
+
+  const onChangeMarksAwarded = (newValue) => {
+    setNewQuestion({ ...newQuestion, marks_awarded: +newValue });
+  };
+
+  const onChangeRelatedTopicId = (e) => {
+    setNewQuestion({ ...newQuestion, related_topic_id: +e.target.value });
   };
 
   const getDefaultAnswers = () => {
@@ -552,8 +364,13 @@ export default function QuestionCreation({ addQuestionToQuiz }) {
     if (question.question_type === "mc")
     {
       return (
-        <Box>
-          <Text>Answers (select the correct answer):</Text>
+        <Box mt={5}>
+          <HStack mb={2} spacing={5}>
+            <Text fontWeight="bold" color="gray.600">Answers (select the correct answer)</Text>
+            <Button leftIcon={<AddIcon />} size="xs" colorScheme="green" variant="solid" onClick={addPossibleAnswer}>
+              Add new answer
+            </Button>
+          </HStack>
           <RadioGroup mt="1" onChange={onChangeRadioAnswer} value={getCorrectAnswers()}>
             <Stack>
               {Object.entries(question.answers).map(([i, ans]) =>
@@ -604,8 +421,8 @@ export default function QuestionCreation({ addQuestionToQuiz }) {
     {
       // Text box
       return (
-        <Box>
-          <Text>Enter a possible correct answer: </Text>
+        <Box mt={5}>
+          <Text mb={2} fontWeight="bold" color="gray.600">Enter a possible correct answer</Text>
           <Textarea onChange={onChangeShortAnswer} value={getCorrectAnswers()} />
         </Box>
       );
@@ -616,8 +433,14 @@ export default function QuestionCreation({ addQuestionToQuiz }) {
       // Loop through list of possible answers
 
       return (
-        <Box>
-          <p>Answers (select the correct answer/s): </p>
+        <Box mt={5}>
+          <HStack mb={2} spacing={5}>
+            <Text fontWeight="bold" color="gray.600">Answers (select the correct answer/s) </Text>
+            <Button leftIcon={<AddIcon />} size="xs" colorScheme="green" variant="solid" onClick={addPossibleAnswer}>
+                Add new answer
+            </Button>
+          </HStack>
+
           <CheckboxGroup mt="1" colorScheme="green" defaultValue={getCorrectAnswers()}> 
             <Stack>
               {Object.entries(question.answers).map(([i, ans]) =>
@@ -665,7 +488,7 @@ export default function QuestionCreation({ addQuestionToQuiz }) {
       );
     }
       
-    return (<Text color="gray.500">Possible answers were not fetched properly</Text>);
+    return (<Text color="gray.600">Possible answers were not fetched properly</Text>);
   };
 
   const resetQuestionFields = () => {
@@ -723,10 +546,10 @@ export default function QuestionCreation({ addQuestionToQuiz }) {
       {!isValidQuestion && printInvalidQuestionError()}
 
       <Box d="flex" justifyContent="flex-end" mt="6">
-        {newQuestion.question_type !== "sa" && <Button colorScheme="orange" variant="solid" mr="8" onClick={addPossibleAnswer}>Add new answer</Button>}
+        {/* {newQuestion.question_type !== "sa" && <Button colorScheme="orange" variant="solid" mr="8" onClick={addPossibleAnswer}>Add new answer</Button>} */}
         {/* <Button colorScheme="blue" variant="solid" mr="8" onClick={resetQuestionFields}>Reset fields</Button> */}
 
-        <Button colorScheme="teal" variant="solid" onClick={checkQuestionValidity}>Add to quiz</Button>
+        {isNewQuestion && <Button colorScheme="teal" variant="solid" onClick={checkQuestionValidity}>Add to quiz</Button>}
       </Box>
 
       {/* <p style={{ color: "red" }}>Correct answer will be: </p> */}

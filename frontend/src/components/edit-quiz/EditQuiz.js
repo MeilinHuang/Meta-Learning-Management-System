@@ -13,6 +13,7 @@ import {
   FormControl,
   Heading,
   HStack,
+  Input,
   InputGroup,
   InputLeftElement,
   InputRightElement,
@@ -28,7 +29,8 @@ import {
   Stack,
   Text,
   Textarea,
-  VStack
+  VStack,
+  useDisclosure
 } from "@chakra-ui/react"
 
 import DatePicker from "react-datepicker";
@@ -48,9 +50,17 @@ function generateNewQuiz() {
 export default function EditQuiz() {
   const [quiz, setQuiz] = useState({}); // list of dictionaries [{}, {}, ...]
   const [dueDate, setDueDate] = useState(new Date());
-  const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
-  const inputRef = React.useRef();
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const finalRef = React.useRef()
+  const [questionsToggleState, setQuestionsToggleState] = useState({});
+
+  const topics = [
+    "Arrays",
+    "Variables",
+    "Linked lists",
+    "Functions"
+  ]
 
   useEffect(() => {
     // Generate new quiz
@@ -59,17 +69,37 @@ export default function EditQuiz() {
   }, []);
 
   const onChangeDueDate = (date) => {
-    quiz.due_date = date;
+    setQuiz({ ...quiz, due_date: date });
   }
 
   const renderQuizDetails = () => {
+    const marksReducer = (accumulator, currentQuestion) => accumulator + currentQuestion.marks_awarded;
+
+    let allRelatedTopics = {};
+    let sortedRelatedTopicsList = [];
+    for (let i = 0; i < quiz.questions?.length; i++) 
+    {
+      const currentTopicId = quiz.questions[i].related_topic_id;
+      const currentTopic = topics[currentTopicId];
+      if (!(currentTopic in allRelatedTopics)) 
+      {
+        allRelatedTopics[currentTopic] = 1;
+        sortedRelatedTopicsList.push(currentTopic);
+      }
+      else {
+        allRelatedTopics[currentTopic] += 1;
+      }
+    }
+
+    sortedRelatedTopicsList.sort();
+
     return (
       <Box>       
         <Text fontWeight="bold" fontSize="2xl">Quiz Details</Text>
-        <Box display="inline-flex" my="2">
+        <HStack maxWidth="300">
           <Text fontWeight="bold">Name: </Text>
-          <Textarea placeholder="Enter quiz name" size="sm" onChange={(e) => setQuiz({ name: e.target.value })} value={quiz.name} />
-        </Box>
+          <Input placeholder="Enter quiz name" size="sm" onChange={(e) => setQuiz({ name: e.target.value })} value={quiz.name} />
+        </HStack>
 
         <HStack d="flex" my="2">
           <Text fontWeight="bold">Due date: </Text>
@@ -90,6 +120,16 @@ export default function EditQuiz() {
           <Text mb="2" fontWeight="bold">Number of questions: </Text>
           <Text>{quiz.num_questions}</Text>
         </HStack>
+
+        <HStack align>
+          <Text mb="2" fontWeight="bold">Total marks: </Text>
+          <Text>{quiz.questions?.reduce(marksReducer, 0)}</Text>
+        </HStack>
+
+        <Box maxWidth="300">
+          <Text mb="2" fontWeight="bold">Related topics: </Text>
+          {sortedRelatedTopicsList.map((topic) => <Box width="fit-content">{renderTag(topic + " (" + allRelatedTopics[topic] + ")")}</Box>)}
+        </Box>
 
         <HStack mt="5" spacing="20px" alignItems="center">
           <Button size="sm" colorScheme="red">Delete quiz</Button>
@@ -115,14 +155,14 @@ export default function EditQuiz() {
         <h2>
           <AccordionButton>
             <Box flex="1" textAlign="left">
-              Question {qsIndex + 1}
+              <Heading size="md" textAlign="left" color="gray.500">Question {qsIndex + 1}</Heading>
             </Box>
             <AccordionIcon />
           </AccordionButton>
         </h2>
         <AccordionPanel pb={4}>
           <Box>
-            <QuestionCreation />
+            <QuestionCreation addQuestionToQuiz={addQuestionToQuiz} topics={topics} isCreatingQuestion={false} />
           </Box>
         </AccordionPanel>        
       </Box>
@@ -132,21 +172,55 @@ export default function EditQuiz() {
   const renderQuestions = () => {
     return (
       <Box>
-        <HStack>
-          <Box d="flex" width="25rem">
-            <Heading>Questions</Heading>
+        <HStack> 
+          <Box d="flex">
+            <Heading width="40rem">Questions</Heading>
+            <HStack spacing="3">
+              <Button size="sm" colorScheme="green" onClick={onOpen}>New question</Button>
+              <Button size="sm" colorScheme="blue" onClick={expandAllQuestions}>Expand all</Button>
+              <Button size="sm" colorScheme="red" onClick={collapseAllQuestions}>Collapse all</Button>
+            </HStack>
           </Box>
-          <HStack spacing="5">
-            <Button size="sm" colorScheme="green" onClick={onHandleButtonClick}>New question</Button>
-            <Button size="sm" colorScheme="blue" onClick={expandAllQuestions}>Expand all</Button>
-            <Button size="sm" colorScheme="red" onClick={collapseAllQuestions}>Collapse all</Button>
-          </HStack>
         </HStack>
-        <Accordion my="3" allowToggle allowMultiple>
-          {quiz.questions?.length > 0 && quiz.questions.map((qs, index) => (<AccordionItem>{renderQuestionItem(qs, index)}</AccordionItem>))}
+        <Accordion my="3" allowToggle allowMultiple onChange={onChangeQuestionItems} index={getExpandedQuestions()}>
+          {quiz.questions?.length > 0 && quiz.questions.map((qs, index) => <AccordionItem key={index}>{renderQuestionItem(qs, index)}</AccordionItem>)}
         </Accordion>
       </Box>
     );
+  };
+
+  const onChangeQuestionItems = (expandedIndices) => {
+    let newQuestions = quiz.questions?.map((qs, index) => { 
+      const obj = Object.assign({}, qs);
+      if (expandedIndices.includes(index) && !obj.is_expanded)
+      {
+        obj.is_expanded = true;
+      }
+      else if (!expandedIndices.includes(index) && obj.is_expanded)
+      {
+        obj.is_expanded = false;
+      }
+      return obj;
+    });
+
+    setQuiz({ ...quiz, questions: newQuestions});
+  };
+
+  const expandQuestionItem = (questionIndex) => {
+    const itemsToExpand = [questionIndex];
+    onChangeQuestionItems(itemsToExpand);
+  };
+
+  const getExpandedQuestions = () => {
+    let expandedQuestions = [];
+    quiz.questions?.forEach((qs, index) => {
+      if (qs.is_expanded)
+      {
+        expandedQuestions.push(index);
+      }
+    });
+
+    return expandedQuestions;
   };
 
   const addQuestionToQuiz = (newQuestion) => {
@@ -161,18 +235,48 @@ export default function EditQuiz() {
       <Box mt="5">
         <Text mb="3">Click a question link below to jump to that question.</Text>
         <Stack flex="3" border="1px" borderColor="gray.300" p="2" borderRadius="md" minHeight="80">
-          {quiz.questions?.map((qs, index) => <Link color="teal.500" href="#">Question {index + 1}</Link>)}
+          {quiz.questions?.map((qs, index) => renderQuestionLinkItem(qs, index))}
         </Stack>
       </Box>
     );
   }
 
-  const expandAllQuestions = () => {
+  const renderQuestionLinkItem = (qs, index) => {
+    return (
+      <HStack key={index}>
+        <Button colorScheme="teal" variant="link" onClick={() => expandQuestionItem(+index)}>Question {index + 1}</Button>
+          <Text size="sm" color="grey">({qs.marks_awarded} {qs.marks_awarded > 1 ? "marks" : "mark"})</Text>
+        {renderTag(topics[qs.related_topic_id])}
+      </HStack>
+    );
+  }
 
+  const renderTag = (tagText) => {
+    return (
+      <Box size="sm" bgColor="gray.500" borderRadius="md" py={0.5} px={1}>
+        <Text fontWeight="bold" fontSize="sm" color="white">{tagText}</Text>
+      </Box> 
+    );
+  };
+
+  const expandAllQuestions = () => {
+    let newQuestions = quiz.questions?.map((qs, index) => { 
+      const obj = Object.assign({}, qs);
+      obj.is_expanded = true;
+      return obj;
+    });
+
+    setQuiz({ ...quiz, questions: newQuestions});
   };
 
   const collapseAllQuestions = () => {
+    let newQuestions = quiz.questions?.map((qs, index) => { 
+      const obj = Object.assign({}, qs);
+      obj.is_expanded = false;
+      return obj;
+    });
 
+    setQuiz({ ...quiz, questions: newQuestions});
   };
 
   const openAddQuestionModal = () => {
@@ -183,14 +287,6 @@ export default function EditQuiz() {
     );
   };
 
-  const onHandleButtonClick = (e) => {
-    setOpen(true);
-  };
-
-  const handleDialogClose = (e) => {
-    setOpen(false);
-  };
-
   const handleSubmit = (e) => {
 
   };
@@ -198,18 +294,17 @@ export default function EditQuiz() {
   const renderNewQuestionModal = () => {
     return (
       <Modal
-        // initialFocusRef={inputRef}
-        onClose={handleDialogClose}
-        isOpen={open}
+        onClose={onClose}
+        isOpen={isOpen}
         size="xl"
+        finalFocusRef={finalRef}
       >
         <ModalOverlay />
         <ModalContent as="form" onSubmit={handleSubmit}>
           <ModalHeader>Add a Question</ModalHeader>
           <ModalCloseButton />
           <ModalBody>  
-              {/* <Text my={4} fontStyle="italic" textAlign="center" fontSize="lg">or</Text> */}
-              <QuestionCreation addQuestionToQuiz={addQuestionToQuiz}/>
+              <QuestionCreation addQuestionToQuiz={addQuestionToQuiz} topics={topics} isCreatingQuestion={true}/>
           </ModalBody>
           <ModalFooter>
             {/* <Button aria-label="Close" onClick={handleDialogClose}>Close</Button>
@@ -228,22 +323,23 @@ export default function EditQuiz() {
   };
 
   return (
-    <Flex height="100" width="100" mt="10">
-      <Box flex="1" pl="5">
-        <Text fontWeight="bold" fontSize="2xl">Question List</Text>
-        {quiz.questions?.length !== 0 ? renderQuestionLinks() : <Text my="3">There are no questions in the quiz. Add a question!</Text>}
-      </Box>
-      <Divider orientation="vertical" />
-      <Box flex="2.5" px="20">
-        {renderQuestions()}
-      </Box>
-      <Divider orientation="vertical" />
-      <Box flex="1">
-        {renderQuizDetails()}
-      </Box>
-      <Box>
-        {renderNewQuestionModal()}
-      </Box>
-    </Flex>
+    <>
+      <Flex ref={finalRef} height="100" width="100" mt="10">
+        <Box flex="1" pl="5">
+          <Text fontWeight="bold" fontSize="2xl">Question List</Text>
+          {quiz.questions?.length !== 0 ? renderQuestionLinks() : <Text my="3">There are no questions in the quiz. Add a question!</Text>}
+        </Box>
+        <Divider orientation="vertical"/>
+        <Box flex="2.5" px="20">
+          {renderQuestions()}
+        </Box>
+        <Divider orientation="vertical" />
+        <Box flex="1">
+          {renderQuizDetails()}
+        </Box>
+      </Flex>
+
+      {renderNewQuestionModal()}
+    </>
   );
 }
