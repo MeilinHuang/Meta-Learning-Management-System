@@ -28,8 +28,7 @@ import TopicTreeViewResource from "./TopicTreeViewResource.js";
 
 import TopicTreeAddTopic from './TopicTreeAddTopic.js';
 
-const Links = ['Add a Topic'];
-const NavLink = ({ onClick, children }) => (
+const NavLink = ({ onClick, children, openUrl=true }) => (
     <Link
         px={2}
         py={1}
@@ -42,7 +41,7 @@ const NavLink = ({ onClick, children }) => (
                 bg: useColorModeValue('gray.300', 'gray.300'),
             }
         }
-        href={children}>
+        href={ openUrl ? children : '#'}>
         {children}
     </Link>
 );
@@ -64,7 +63,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
             "preparation": [],
             "content": [],
             "practice": [],
-            "assessment": []
+            "assessments": []
         },
         "group": "",
         "discipline": "",
@@ -159,7 +158,8 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
                         display={{ base: 'none', md: 'flex' }}>
                         {topicGroupName !== '' ? 
                         <>
-                        <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
+                        <Link px={2} py={1} color={'white'} rounded={'md'}
+                            onClick={onOpenModal}>Add a Topic</Link>
                         <Box bg='white' w={200}>
                             <FormControl id="new-topic-dependencies">
                                 <Select
@@ -214,7 +214,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
                 <Box pb={4} display={{ md: 'none' }}>
                 <Stack as={'nav'} spacing={4}>
                     { topicGroupName != '' ? (
-                        <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
+                        <NavLink key={"Add a Topic"} onClick={onOpenModal} openUrl={false}>Add a Topic</NavLink>
                     ) : <></> }
                 </Stack>
                 </Box>

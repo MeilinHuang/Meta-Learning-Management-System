@@ -28,7 +28,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
             "preparation": [],
             "content": [],
             "practice": [],
-            "assessment": []
+            "assessments": []
         },
         "group": "",
         "discipline": "",
@@ -51,14 +51,25 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
             node["title"] = topic.name;
             node["materials_strings"] = {};
             node.materials_strings["content"] = [];
+            node.materials_strings['preparation'] = [];
+            node.materials_strings['practice'] = [];
+            node.materials_strings['assessments'] = [];
             for (let course_material of topic.course_materials) {
-                node.materials_strings.content.push(course_material.name);
+                if (course_material.type === 'preparation') {
+                    node.materials_strings.preparation.push(course_material.name);
+                } else if (course_material.type === 'assessment') {
+                    node.materials_strings.assessments.push(course_material.name);
+                } else if (course_material.type === 'practice') {
+                    node.materials_strings.practice.push(course_material.name);
+                } else {
+                    node.materials_strings.content.push(course_material.name);
+                }
             }
             console.log('topic', topic);
             newJson.nodes.push(node);
             for (let prereq of topic.prereqs) {
                 newJson.links.push({
-                    'source': prereq,
+                    'source': prereq.id,
                     'target': topic.id
                 });
             }
