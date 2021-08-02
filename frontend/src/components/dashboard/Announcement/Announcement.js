@@ -141,7 +141,8 @@ function Announcement({ announcement: { attachments, author, id, title, content,
                         <Flex justifyContent="space-between">
                             <Flex>
                                 <Button pr="8px" leftIcon={<GrShare />} onClick={shareLink} />
-                                {!isAnnouncementPage && <Button ml="8px" onClick={onOpen}>Ask a question</Button>}
+                                {/* TODO: implement ask question from announcement */}
+                                {/* {!isAnnouncementPage && <Button ml="8px" onClick={onOpen}>Ask a question</Button>} */}
                             </Flex>
                             {!isAnnouncementPage && <Flex>
                                 <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
