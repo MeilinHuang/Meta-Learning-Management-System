@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import { Link as RouterLink } from 'react-router-dom'
 import {
     ButtonGroup,
     Button,
@@ -8,7 +7,6 @@ import {
     Flex,
     Heading,
     InputGroup,
-    Link,
     Popover,
     PopoverTrigger,
     PopoverContent,
@@ -122,15 +120,7 @@ function Announcement({ announcement: { attachments, author, id, title, content,
 
     return (
         <Box id={`announcement-${id}`} width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
-            {
-                isAnnouncementPage 
-                    ? 
-                        <Heading size="md">{title}</Heading> 
-                    : 
-                        <Link as={RouterLink} textDecoration="none" _hover={{ color: "blue.500" }} to={`/course-page/${course}/announcement/${id}`}>
-                            <Heading size="md">{title}</Heading>
-                        </Link>
-            }
+            <Heading size="md">{title}</Heading> 
             <Divider my="16px" />
             <AuthorDetails author={author} date={post_date} />
             {!!editorState 
