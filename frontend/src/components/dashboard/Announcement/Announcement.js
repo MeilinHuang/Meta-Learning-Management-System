@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { Link as RouterLink } from 'react-router-dom'
 import {
     ButtonGroup,
     Button,
@@ -7,6 +8,7 @@ import {
     Flex,
     Heading,
     InputGroup,
+    Link,
     Popover,
     PopoverTrigger,
     PopoverContent,
@@ -28,7 +30,7 @@ import AuthorDetails from '../../forums/AuthorDetails'
 import AddPostModal from '../../forums/AddPostModal'
 import styles from './Announcement.module.css'
 
-function Announcement({ announcement: { attachments, author, id, title, content, post_date }, course, setAnnouncements }) {
+function Announcement({ announcement: { attachments, author, id, title, content, post_date }, course, setAnnouncements, isAnnouncementPage }) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState()
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -40,7 +42,7 @@ function Announcement({ announcement: { attachments, author, id, title, content,
 
     const shareLink = () => {
         const link = window.location.origin
-        navigator.clipboard.writeText(`${link}#announcement-${id}`)
+        navigator.clipboard.writeText(`${link}/course-page/${course}/announcement/${id}`)
         toast({
             title: 'Copied link',
             status: 'success',
@@ -70,7 +72,21 @@ function Announcement({ announcement: { attachments, author, id, title, content,
                     'Content-Type': 'application/json',
                 }
             }
-        ).then(r => console.log(r)) // TODO: handle errors (maybe don't change the value in the frontend until this is okay)
+        ).then(r => {
+            if (r.status === 200) {
+                fetch(`http://localhost:8000/${course}/announcement`).then(r => r.json()).then(data => {
+                    setAnnouncements(data.reverse())
+                })
+            } else {
+                toast({
+                    title: 'Sorry, an error has occurred',
+                    description: 'Please try again',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            }
+        })
         setEditorState('')
     }
 
@@ -106,7 +122,15 @@ function Announcement({ announcement: { attachments, author, id, title, content,
 
     return (
         <Box id={`announcement-${id}`} width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
-            <Heading size="md">{title}</Heading>
+            {
+                isAnnouncementPage 
+                    ? 
+                        <Heading size="md">{title}</Heading> 
+                    : 
+                        <Link as={RouterLink} textDecoration="none" _hover={{ color: "blue.500" }} to={`/course-page/${course}/announcement/${id}`}>
+                            <Heading size="md">{title}</Heading>
+                        </Link>
+            }
             <Divider my="16px" />
             <AuthorDetails author={author} date={post_date} />
             {!!editorState 
@@ -122,15 +146,15 @@ function Announcement({ announcement: { attachments, author, id, title, content,
                 :
                     <>
                         <Text className={styles.description} dangerouslySetInnerHTML={{ __html: details }} />
-                        {!!attachments.length && attachments.map(image => getImage(image))}
+                        {!!attachments && !!attachments.length && attachments.map(image => getImage(image))}
                         <Divider my="16px" />
                         <Flex justifyContent="space-between">
                             <Flex>
                                 <Button pr="8px" leftIcon={<GrShare />} onClick={shareLink} />
-                                <Button ml="8px" onClick={onOpen}>Ask a question</Button>
+                                {!isAnnouncementPage && <Button ml="8px" onClick={onOpen}>Ask a question</Button>}
                             </Flex>
-                            <Flex>
-                            <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
+                            {!isAnnouncementPage && <Flex>
+                                <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
                                 <Popover placement="bottom-end">
                                     {({ onClose }) => (
                                         <>
@@ -154,7 +178,7 @@ function Announcement({ announcement: { attachments, author, id, title, content,
                                         </>
                                     )}
                                 </Popover>
-                            </Flex>
+                            </Flex>}
                         </Flex>
                         <AddPostModal isOpen={isOpen} onClose={onClose} onSubmit={handleAddPostSubmit} isForums />
                     </>

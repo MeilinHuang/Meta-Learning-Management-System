@@ -22,46 +22,30 @@ import {
 import Tags from '../components/forums/Tags'
 import PostDetails from '../components/forums/PostDetails/PostDetails'
 import CommentsResponses from '../components/forums/CommentsResponses/CommentsResponses'
+import Announcement from '../components/dashboard/Announcement/Announcement'
 import { BsTrash } from 'react-icons/bs'
 
-function ForumPostPage({ match: { params: { code, id }}}) {
+function CourseAnnouncementPage({ match: { params: { code, id }}}) {
     const [post, setPost] = useState({})
-    const history = useHistory()
-    const toast = useToast()
 
     useEffect(() => {
-        fetch(`http://localhost:8000/forum/post/${id}`).then(r => r.json()).then(data => setPost(data))
-    }, [id])
+        fetch(`http://localhost:8000/${code}/announcement/${id}`).then(r => r.json()).then(data => setPost(data))
+    }, [code, id])
 
-    const handleDelete = () => {
-        fetch(
-            `http://localhost:8000/forum/post/${id}`, { method: 'DELETE' }
-        ).then(r => {
-            if (r.status === 200) {
-                history.push(`/course-page/${code}/forums`)
-            } else {
-                toast({
-                    title: 'Sorry, an error has occurred',
-                    description: 'Please try again',
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                })
-            }
-        })
-    }
+    console.log(post)
 
     return (
         <>
             <Breadcrumb separator=">">
                 <BreadcrumbItem>
-                    <BreadcrumbLink as={RouterLink} to={`/course-page/${code}/forums`} fontWeight="bold">Forums</BreadcrumbLink>
+                    <BreadcrumbLink as={RouterLink} to={`/course-page/${code}`} fontWeight="bold">Announcements</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbItem isCurrentPage>
                     <BreadcrumbLink href="#">{post.title}</BreadcrumbLink>
                 </BreadcrumbItem>
             </Breadcrumb>
-            <Flex justifyContent="space-between" alignItems="baseline">
+            <Announcement announcement={post} course={code} isAnnouncementPage />
+            {/* <Flex justifyContent="space-between" alignItems="baseline">
                 <Heading mt="16px">{post.title}</Heading>
                 <Popover placement="bottom-end">
                     <PopoverTrigger>
@@ -87,9 +71,9 @@ function ForumPostPage({ match: { params: { code, id }}}) {
             <Tags tags={post.tags} />
             <PostDetails post={post} setPost={setPost} />
             <CommentsResponses posts={post.replies} post_id={id} setPost={setPost} />
-            <CommentsResponses isComments posts={post.comments} post_id={id} setPost={setPost} />
+            <CommentsResponses isComments posts={post.comments} post_id={id} setPost={setPost} /> */}
         </>
     )
 }
 
-export default ForumPostPage
+export default CourseAnnouncementPage

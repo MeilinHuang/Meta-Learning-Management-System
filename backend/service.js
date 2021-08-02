@@ -1330,7 +1330,9 @@ async function getAnnouncementById (request, response) {
     var fileArr = [];
     var commArr = [];
 
-    if (resp.rows[0].comments.length) {
+    console.log(resp.rows)
+
+    if (resp.rows[0].comments.length && resp.rows[0].comments[0] !== null) {
       for (const commId of resp.rows[0].comments) {
         let commQ = await pool.query(
         `SELECT ac.id, ac.author, ac.content, ac.post_date, array_agg(acf.id) as attachments
@@ -1354,19 +1356,22 @@ async function getAnnouncementById (request, response) {
       resp.rows[0].comments = commArr;
     }
 
-    for (const attachment of resp.rows[0].attachments) {
-      if (attachment != null) { 
-        let fileQ = await pool.query(`
-        SELECT id, name, file
-        FROM announcement_files WHERE announcement_id = $1 AND id = $2
-        `, [announcementId, attachment])
-        fileArr.push(fileQ.rows[0]);
+    if (resp.rows[0].attachments[0] !== null) {
+      for (const attachment of resp.rows[0].attachments) {
+        if (attachment != null) { 
+          let fileQ = await pool.query(`
+          SELECT id, name, file
+          FROM announcement_files WHERE announcement_id = $1 AND id = $2
+          `, [announcementId, attachment])
+          fileArr.push(fileQ.rows[0]);
+        }
       }
     }
     resp.rows[0].attachments = fileArr;
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
+    console.log(e)
     response.status(400).send(e);
   }
 };

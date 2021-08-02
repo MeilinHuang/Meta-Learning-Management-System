@@ -119,7 +119,9 @@ function CourseDashboard({ match: { params: { code }}}) {
                     </Box>
                 </Center>
             </Flex>
-            {announcements.map(announcement => <Announcement announcement={announcement} course={code} setAnnouncements={setAnnouncements} />)}
+            <Box mb="32px">
+                {announcements.map(announcement => <Announcement announcement={announcement} course={code} setAnnouncements={setAnnouncements} />)}
+            </Box>
         </>
     )
 }
