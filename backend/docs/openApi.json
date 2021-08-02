@@ -3277,6 +3277,67 @@
         }
       }
     },
+    "/forum/post/{postId}/comment/{commentId}/endorse/{isEndorsed}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Endorses or un-endorses comment associated with comment id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "Id of comment we want to endorse/un-endorse",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "isEndorsed",
+            "in": "path",
+            "description": "Set isEndorsed to true or false",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/forum/post/pin/{postId}/{isPinned}": {
       "put": {
         "tags": [
@@ -4637,6 +4698,10 @@
                 "comment": {
                   "type": "string",
                   "example": "Check the assigment spec for more info"
+                },
+                "isEndorsed": {
+                  "type": "boolean",
+                  "example": true
                 }
               }
             }
@@ -4926,6 +4991,10 @@
                       "comment": {
                         "type": "string",
                         "example": "Check the assigment spec for more info"
+                      },
+                      "isEndorsed": {
+                        "type": "boolean",
+                        "example": true
                       }
                     }
                   }

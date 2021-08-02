@@ -793,7 +793,7 @@ async function getPostById (request, response) {
         var commentFileArr = [];
 
         let tmp = await pool.query(`
-        SELECT c.comment_id, c.user_id, c.author, c.published_date, c.comment,
+        SELECT c.comment_id, c.user_id, c.author, c.published_date, c.comment, c.isEndorsed,
         array_agg(file.id) as attachments
         FROM comments c
         LEFT JOIN forum_comment_files file ON file.comment_id = c.comment_id
@@ -1024,8 +1024,8 @@ async function postComment (request, response) {
     const comment = request.body.comment;
 
     let resp = await pool.query(
-      `INSERT INTO comments(comment_id, user_id, author, published_date, comment) 
-      VALUES(default, $1, $2, CURRENT_TIMESTAMP, $3) RETURNING comment_id`,
+      `INSERT INTO comments(comment_id, user_id, author, published_date, comment, isEndorsed) 
+      VALUES(default, $1, $2, CURRENT_TIMESTAMP, $3, false) RETURNING comment_id`,
       [user_id, author, comment]);
   
     await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
@@ -1131,6 +1131,19 @@ async function deleteComment (request, response) {
     response.status(400).send(e.detail);
   }
 };
+
+// Endorses or un-endorses forum post comment
+async function putCommentEndorse (request, response) {
+  try {
+    const commentId = request.params.commentId;
+    const isEndorsed = request.params.isEndorsed;
+    await pool.query(`UPDATE comments SET isendorsed = $1 WHERE comment_id = $2`, [isEndorsed, commentId]);
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400).send(e.detail);
+  }
+}
 
 // Pins or unpins forum post
 async function putPostPin (request, response) {
@@ -2350,6 +2363,7 @@ module.exports = {
   deleteAnnouncementComment,
   deletePost,
   deleteComment,
+  putCommentEndorse,
   putComment,
   deletePostReply,
   deleteTag,
