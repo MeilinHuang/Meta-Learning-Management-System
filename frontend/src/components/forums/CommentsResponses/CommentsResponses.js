@@ -43,7 +43,7 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
         }).then(r => {
             if (r.status === 200) {
                 fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
-                    setPost(data[0])
+                    setPost(data)
                     setEditorState('') // TODO: work out how to clear editor on save
                 })
             } 

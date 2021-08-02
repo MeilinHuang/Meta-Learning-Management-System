@@ -36,10 +36,11 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned, d
             })
     }
 
-    let plainTextDesc
+    let unformattedDesc
     if (description) {
-        plainTextDesc = description.replace(/<[^>]+>/g, ' ')
-        plainTextDesc = plainTextDesc.length > 120 ? plainTextDesc.substring(0, 119) + '...' : plainTextDesc
+        unformattedDesc = description.replace(/<[^>]+>/g, ' ')
+        unformattedDesc = unformattedDesc.length > 120 ? unformattedDesc.substring(0, 119) + '...' : unformattedDesc
+        unformattedDesc = `<p>${unformattedDesc}</p>`
     }
 
     return (
@@ -55,7 +56,7 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned, d
             </Td>
             <Td width="40%" pl="0">
                 <Link as={RouterLink} color="blue.500" to={`/course-page/${code}/forums/${post_id}`}>{title}</Link>
-                <Text fontSize="13px" lineHeight="16px" mt="4px">{plainTextDesc}</Text>
+                <Text fontSize="13px" lineHeight="16px" mt="4px" dangerouslySetInnerHTML={{__html: unformattedDesc}}></Text>
                 {isendorsed && (
                     <Flex alignItems="center" mt="12px">
                         <Icon h="13px" w="13px" mr="4px" color="green" as={FaCheckCircle} />
@@ -64,8 +65,8 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned, d
                 )}
             </Td>
             <Td>{dateString}</Td>
-            <Td isNumeric>{replies.length}</Td>
-            <Td isNumeric>{comments.length}</Td>
+            <Td>{replies[0] === null ? 0 : replies.length}</Td>
+            <Td>{comments[0] === null ? 0 : comments.length}</Td>
             <Td>
                 {/* if user is in upvoters list, show filled icon */}
                 {/* TODO: handle upvote click */}
@@ -86,11 +87,12 @@ function PostTable({ isAdmin, posts: postData, code }) {
             <Thead>
                 <Tr>
                     <Th />
-                    <Th pl="0">Post</Th>
+                    {/* pl only if admin */}
+                    <Th pl="0">Post</Th> 
                     <Th>Date created</Th>
-                    <Th isNumeric>Replies</Th>
-                    <Th isNumeric>Comments</Th>
-                    <Th />
+                    <Th>Replies</Th>
+                    <Th>Comments</Th>
+                    <Th>Upvotes</Th>
                 </Tr>
             </Thead>
             <Tbody>

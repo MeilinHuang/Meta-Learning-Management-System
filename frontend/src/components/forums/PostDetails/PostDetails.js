@@ -100,7 +100,7 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
                 :
                     <>
                         <Text className={styles.description} dangerouslySetInnerHTML={{ __html: details }} />
-                        {!!attachments && !!attachments.length && attachments.map(image => getImage(image))}
+                        {!!attachments && !!attachments.length && attachments[0] !== null && attachments.map(image => getImage(image))}
                         {isendorsed && (
                             <Flex alignItems="center" mt="16px">
                                 <Icon h="13px" w="13px" mr="4px" color="green" as={FaCheckCircle} />

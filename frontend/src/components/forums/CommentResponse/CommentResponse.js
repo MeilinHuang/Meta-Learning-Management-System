@@ -105,7 +105,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
             ).then(r => {
                 if (r.status === 200) {
                     fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
-                        setPost(data[0])
+                        setPost(data)
                         onClose()
                     })
                 } else {
@@ -124,7 +124,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
             ).then(r => {
                 if (r.status === 200) {
                     fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
-                        setPost(data[0])
+                        setPost(data)
                         onClose()
                     })
                 } else {
