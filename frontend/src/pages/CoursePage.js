@@ -1,11 +1,11 @@
 import React, { useState } from "react"
 import Sidebar from "../components/Sidebar.js"
 import WidgetsBar from "../components/WidgetsBar.js"
-import AnnouncementPage from "../pages/AnnouncementPage.js"
 import CourseContentPage from "../pages/CourseContentPage.js"
 import CourseDashboard from "../pages/CourseDashboard.js"
 import ForumOverviewPage from "../pages/ForumOverviewPage.js"
 import ForumPostPage from '../pages/ForumPostPage'
+import CourseAnnouncementPage from '../pages/CourseAnnouncementPage'
 import {
     Switch,
     Route,
@@ -53,15 +53,15 @@ function CoursePage() {
                     <WidgetsBar page="course"></WidgetsBar>
                 </Box>
             </Box>
-            <Flex marginLeft={[0, 0, 200, 100]} marginRight={[0, 0, 0, 100]}>
+            <Flex marginLeft={[0, 0, 200, 200]} marginRight={[0, 0, 0, 200]}>
                 <Container marginTop={[70, 70, 50]} mx={{ base: "0", md: "24px"}} maxWidth="100%">
                     <Switch>
                         {/* Add your page as a Route here */}
-                        <Route exact path="/course-page/:code/announcement/:id" component={AnnouncementPage} />
                         <Route exact path="/course-page/:code/forums" component={ForumOverviewPage} />
                         <Route exact path="/course-page/:code/content"><CourseContentPage /></Route>
                         <Route exact path="/course-page/:code/forums/:id" component={ForumPostPage} />
-                        <Route path="/" component={CourseDashboard} />
+                        <Route exact path="/course-page/:code/announcement/:id" component={CourseAnnouncementPage} />
+                        <Route path="/course-page/:code" component={CourseDashboard} />
                     </Switch>
                 </Container>
                 

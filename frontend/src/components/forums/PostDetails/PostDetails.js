@@ -4,18 +4,21 @@ import {
     Box,
     Divider,
     Flex,
+    Icon,
     InputGroup,
     Text,
     useToast,
 } from "@chakra-ui/react"
 import { GrEdit, GrShare } from 'react-icons/gr'
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai"
+import { FaRegCheckCircle, FaCheckCircle } from 'react-icons/fa'
+import { TiArrowUpOutline, TiArrowUpThick } from 'react-icons/ti'
 import { ContentState, convertFromHTML } from 'draft-js'
 import AuthorDetails from '../AuthorDetails'
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './PostDetails.module.css'
 
-function PostDetails({ post: { author, post_id, published_date, description }}) {
+function PostDetails({ post: { attachments, author, post_id, published_date, description, isendorsed, num_of_upvotes, upvoters }, setPost}) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState()
     const toast = useToast()
@@ -43,7 +46,6 @@ function PostDetails({ post: { author, post_id, published_date, description }}) 
 
     const handleSubmit = e => {
         e.preventDefault()
-        console.log(post_id)
         fetch(
             `http://localhost:8000/forum/post/${post_id}`,
             {
@@ -56,9 +58,28 @@ function PostDetails({ post: { author, post_id, published_date, description }}) 
                     'Content-Type': 'application/json',
                 }
             }
-        ).then(r => console.log(r)) // TODO: handle errors (maybe don't change the value in the frontend until this is okay)
+        ).then(r => {
+            if (r.status === 200) {
+                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
+            }
+        }) // TODO: handle errors
         setEditorState('')
     }
+
+    const handleEndorse = () => {
+        fetch(
+            `http://localhost:8000/forum/post/endorse/${post_id}/${!isendorsed}`, { method: 'PUT' }
+        ).then(r => {
+            if (r.status === 200) {
+                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
+            }
+            // TODO: handle errors
+        })
+    }
+
+    const getImage = ({ id, name, file }) => (
+        <img className={styles.attachment} key={id} alt={name} src={file} />
+    )
 
     return (
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
@@ -79,10 +100,21 @@ function PostDetails({ post: { author, post_id, published_date, description }}) 
                 :
                     <>
                         <Text className={styles.description} dangerouslySetInnerHTML={{ __html: details }} />
+                        {!!attachments && !!attachments.length && attachments.map(image => getImage(image))}
+                        {isendorsed && (
+                            <Flex alignItems="center" mt="16px">
+                                <Icon h="13px" w="13px" mr="4px" color="green" as={FaCheckCircle} />
+                                <Text fontSize="13px" color="green" fontWeight="bold">This post is endorsed by staff</Text>
+                            </Flex>
+                        )}
                         <Divider my="16px" />
                         <Flex justifyContent="space-between">
                             <Flex>
-                                <Button pr="8px" leftIcon={<GrShare />} onClick={shareLink} />
+                                <Button leftIcon={<TiArrowUpOutline />}>{num_of_upvotes}</Button>
+                                <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} /> {/* ONLY SHOW IF USER IS STAFF */}
+                                <Button pr="8px" leftIcon={<GrShare />} onClick={shareLink} ml="8px" />
+                            </Flex>
+                            <Flex>
                                 <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
                             </Flex>
                         </Flex>

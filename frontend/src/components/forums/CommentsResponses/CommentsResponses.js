@@ -52,7 +52,7 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
     }
 
     return (
-        <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
+        <Box width={{ base: '100%', lg: '80%' }} mt="24px" mb={isComments ? '32px' : ''} mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md" mb="12px">{isComments ? 'Comments' : 'Responses'}</Heading>
             {posts && posts[0] !== null && posts.map(post => (
                 post !== null && <CommentResponse {...post} post_id={post_id} setPost={setPost} />

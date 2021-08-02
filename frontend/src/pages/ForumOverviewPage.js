@@ -21,7 +21,7 @@ import { StoreContext } from '../utils/store'
 const dummyAuthor = 3
 
 
-function ForumOverviewPage() {
+function ForumOverviewPage({ match: { params: { code }}}) {
     const context = useContext(StoreContext)
     const {
         posts: [posts, setPosts],
@@ -57,23 +57,14 @@ function ForumOverviewPage() {
             setPosts(data)
             setShowPinned(false)
         })
-        console.log(searchTerm)
     }
 
-    const handleAddPostSubmit = ({ title, details, selectedTags, date, relatedLink }) => {
+    const handleAddPostSubmit = (formData) => {
         fetch(`http://localhost:8000/forum/post`, {
             method: 'POST',
-            body: JSON.stringify({
-                title,
-                user_id: dummyAuthor,
-                publishedDate: date,
-                description: details,
-                tags: selectedTags,
-                related_link: relatedLink,
-            }),
+            body: formData,
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Accept': '*/*',
             }
         }).then(r => {
             if (r.status === 200) {
@@ -88,7 +79,7 @@ function ForumOverviewPage() {
             <Flex justify="center">
                 <Center width={{ base: '100%', lg: '80%' }}>
                     <Button onClick={onOpen} leftIcon={buttonIcon} pr={{ base: '8px', md: '16px' }}>{buttonContents}</Button>
-                    <AddPostModal isOpen={isOpen} onClose={onClose} showTags onSubmit={handleAddPostSubmit} />
+                    <AddPostModal isOpen={isOpen} onClose={onClose} isForums onSubmit={handleAddPostSubmit} />
                     <Box as="form" onSubmit={handleSubmit} width="100%" ml={{ base: '16px', md: '24px'}}>
                         <InputGroup variant="outline">
                             <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
@@ -98,7 +89,7 @@ function ForumOverviewPage() {
                 </Center>
             </Flex>
             <Filter />
-            <PostTableContainer posts={posts} pinnedPosts={pinnedPosts} showPinned={showPinned} />
+            <PostTableContainer posts={posts} pinnedPosts={pinnedPosts} showPinned={showPinned} code={code} />
         </>
     )
 }
