@@ -113,7 +113,8 @@ CREATE TABLE IF NOT EXISTS "comments" (
   user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   author TEXT NOT NULL,
   published_date TIMESTAMP,
-  comment TEXT
+  comment TEXT,
+  isEndorsed BOOLEAN NOT NULL
 );
 
 DROP TABLE IF EXISTS "forum_post_files" CASCADE;

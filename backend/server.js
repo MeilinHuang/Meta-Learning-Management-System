@@ -150,6 +150,10 @@ app.delete('/forum/post/:postId/comment/:commentId', async(request, response) =>
   await database.deleteComment(request, response);
 });
 
+app.put('/forum/post/:postId/comment/:commentId/endorse/:isEndorsed', async(request, response) => {
+  await database.putCommentEndorse(request, response);
+});
+
 app.put('/forum/post/pin/:postId/:isPinned', async(request, response) => {
   await database.putPostPin(request, response);
 });

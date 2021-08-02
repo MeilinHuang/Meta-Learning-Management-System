@@ -71,9 +71,9 @@ INSERT INTO post_replies(post_id, reply_id) VALUES(1, 2);
 INSERT INTO post_replies(post_id, reply_id) VALUES(2, 3);
 
 -- Create Comments
-INSERT INTO comments(comment_id, user_id, author, published_date, comment) VALUES(default, 3, 'Tutory Tutor', current_timestamp, 'Extra tips');
-INSERT INTO comments(comment_id, user_id, author, published_date, comment) VALUES(default, 2, 'John Smith', current_timestamp, 'Thank you for the post');
-INSERT INTO comments(comment_id, user_id, author, published_date, comment) VALUES(default, 1, 'David Nguyen', current_timestamp, 'Never mind i figured it out');
+INSERT INTO comments(comment_id, user_id, author, published_date, comment, isEndorsed) VALUES(default, 3, 'Tutory Tutor', current_timestamp, 'Extra tips', true);
+INSERT INTO comments(comment_id, user_id, author, published_date, comment, isEndorsed) VALUES(default, 2, 'John Smith', current_timestamp, 'Thank you for the post', false);
+INSERT INTO comments(comment_id, user_id, author, published_date, comment, isEndorsed) VALUES(default, 1, 'David Nguyen', current_timestamp, 'Never mind i figured it out', false);
 
 -- Link Comments
 INSERT INTO post_comments(post_id, comment_id) VALUES(1, 1);
