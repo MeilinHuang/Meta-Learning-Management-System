@@ -28,7 +28,8 @@ function WidgetsBar({page}) {
                             </Portal>
                         </Menu>
                 </Flex>
-                {   page==="course"&&
+                {   
+                    page==="course"&&
                     <Container>
                         <Text size="sm">Course Progress</Text>
                         <Divider color="black" opacity="1"></Divider>
@@ -37,7 +38,7 @@ function WidgetsBar({page}) {
                         </Box>
                     </Container>
                 }
-                <Container padding={0} width="100%" marginTop={3} marginBottom={10}>
+                <Container padding={0} width="100%" marginTop={3} marginBottom={10} height={250} userSelect="none">
                     <Calendar></Calendar>
                 </Container>
                 <Container>
