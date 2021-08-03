@@ -4,6 +4,7 @@ import {
     Box,
     Flex,
     Heading,
+    Input,
     InputGroup,
 } from "@chakra-ui/react"
 import { AiOutlineSend } from 'react-icons/ai'
@@ -15,6 +16,7 @@ const dummyAuthor = 1
 
 function CommentsResponses({ isComments, posts, post_id, setPost }) {
     const [ editorState, setEditorState ] = useState('')
+    const [ showEditor, setShowEditor ] = useState(false)
     const [details, setDetails] = useState('')
 
     const handleSubmit = e => {
@@ -45,13 +47,12 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
                 fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
                     setPost(data)
                     setEditorState('') // TODO: work out how to clear editor on save
+                    setShowEditor(false)
                 })
             } 
             // TODO: Handle error case
         })
     }
-
-    console.log(posts)
 
     return (
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mb={isComments ? '32px' : ''} mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
@@ -62,7 +63,13 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
             <form id={`create${isComments ? 'Comment' : 'Response'}`} onSubmit={handleSubmit}>
                 <Flex>
                     <InputGroup variant="filled" mr="8px">
-                        <DraftEditor content={editorState} setDetails={setDetails} className={styles.editor} />
+                        {
+                            showEditor
+                                ?
+                                    <DraftEditor content={editorState} setDetails={setDetails} className={styles.editor} showEditor={showEditor} />
+                                :
+                                    <Input variant="outline" onClick={() => setShowEditor(true)} />
+                        }
                     </InputGroup>
                     <Button pr="8px" leftIcon={<AiOutlineSend />} form={`create${isComments ? 'Comment' : 'Response'}`} type="submit" />
                 </Flex>
