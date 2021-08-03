@@ -99,7 +99,7 @@ function TopicModal({topicGroup, topicName}) {
     const { isOpen, onOpen, onClose } = useDisclosure()
     return (
         <Box>
-            <Flex key={topicGroup + "-topic-" + topicName } justifyContent="flex-start" padding={5} cursor="pointer" _hover={{bg:"gray.100", fontWeight:"medium"}} onClick={onOpen}>
+            <Flex justifyContent="flex-start" padding={5} cursor="pointer" _hover={{bg:"gray.100", fontWeight:"medium"}} onClick={onOpen}>
                 <Flex width="100%">
                     <Text>
                         {topicName}
@@ -200,7 +200,7 @@ export default function TopicTreeList() {
                                         {
                                             e.topics_list.map(topic => {
                                                 return (
-                                                    <TopicModal topicGroup={e.name} topicName={topic.name}></TopicModal>
+                                                    <TopicModal key={e.name + "-topic-" + topic.name } topicGroup={e.name} topicName={topic.name}></TopicModal>
                                                 )
                                             })
                                         }
