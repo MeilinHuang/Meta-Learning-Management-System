@@ -103,7 +103,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
         let responseJson = await response.json();
         let prereqList = [];
         for (let prereq of responseJson.prerequisites_list) {
-            prereqList.push(prereq.name);
+            prereqList.push({'name': prereq.name, 'id': prereq.id});
         }
         setListPrereqs(prereqList);
         console.log('selectedNode', value);
@@ -135,7 +135,6 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
     }
 
     function isChecked() {
-        console.log('checked', tempView == 'Graph View');
         return tempView == "Graph View";
     }
   
@@ -151,16 +150,16 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
                 onClick={isOpen ? onClose : onOpen}
                 />
                 <HStack spacing={8} alignItems={'center'}>
-                    <Box color='white' fontSize={'1.2rem'} >Meta LMS</Box>
+                    <Box color='white' fontSize={'1.2rem'} >Meta LMS  &nbsp;| &nbsp;<b>Topic Tree</b></Box>
                     <HStack
                         as={'nav'}
                         spacing={4}
                         display={{ base: 'none', md: 'flex' }}>
                         {topicGroupName !== '' ? 
                         <>
-                        <Link px={2} py={1} color={'white'} rounded={'md'}
+                        <Link mt={1} px={2} py={1} color={'white'} rounded={'md'}
                             onClick={onOpenModal}>Add a Topic</Link>
-                        <Box bg='white' w={200}>
+                        <Box bg='white'  w={200}>
                             <FormControl id="new-topic-dependencies">
                                 <Select
                                     name="searchTopic"

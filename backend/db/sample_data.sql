@@ -56,10 +56,20 @@ INSERT INTO tags(tag_id, name) VALUES(default, 'Introduction');
 INSERT INTO tags(tag_id, name) VALUES(default, 'New');
 INSERT INTO tags(tag_id, name) VALUES(default, 'Ass1');
 
+-- Create Topic Tags
+INSERT INTO tags(tag_id, name) VALUES(default, 'Memory');
+INSERT INTO tags(tag_id, name) VALUES(default, 'For loops');
+INSERT INTO tags(tag_id, name) VALUES(default, 'Lists');
+
 -- Link tags
 INSERT INTO post_tags(post_id, tag_id) VALUES(1, 1);
 INSERT INTO post_tags(post_id, tag_id) VALUES(1, 2);
 INSERT INTO post_tags(post_id, tag_id) VALUES(2, 3);
+
+-- Link topic tags
+INSERT INTO topic_tags(topic_id, tag_id) VALUES(2, 4);
+INSERT INTO topic_tags(topic_id, tag_id) VALUES(1, 5);
+INSERT INTO topic_tags(topic_id, tag_id) VALUES(3, 6);
 
 -- Create Replies
 INSERT INTO replies(reply_id, user_id, author, published_date, reply) VALUES(default, 3, 'Tutory Tutor', current_timestamp, 'Glad to be in this course');

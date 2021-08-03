@@ -193,6 +193,13 @@ CREATE TABLE IF NOT EXISTS "post_tags"(
   PRIMARY KEY(post_id, tag_id)
 );
 
+DROP TABLE IF EXISTS "topic_tags" CASCADE;
+CREATE TABLE IF NOT EXISTS "topic_tags"(
+  topic_id INT NOT NULL REFERENCES topics(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  tag_id INT NOT NULL REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  PRIMARY KEY(topic_id, tag_id)
+);
+
 -- Course Pages
 DROP TABLE IF EXISTS "user_content_progress" CASCADE;
 CREATE TABLE "user_content_progress" (

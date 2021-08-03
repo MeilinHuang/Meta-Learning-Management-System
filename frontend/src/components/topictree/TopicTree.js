@@ -93,7 +93,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
         for (let i = 0; i < data.nodes.length; i++) {
             for (let j = 0; j < linksArray.length; j++) {
                 if (data.nodes[i].id === linksArray[j]) {
-                    prereqs.push(data.nodes[i].title);
+                    prereqs.push({'name': data.nodes[i].title, 'id': data.nodes[i].id});
                     break;
                 }
             }
