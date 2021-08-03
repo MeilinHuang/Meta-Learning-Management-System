@@ -1,12 +1,37 @@
 import React, { useEffect, useState } from "react"
-import { useToast, Spinner, Heading, Text, Button, Box, Accordion, AccordionItem, AccordionButton, AccordionPanel, Stack, Checkbox, Center, AccordionIcon, Flex, Divider, useBreakpointValue } from "@chakra-ui/react"
+import { 
+    useToast, 
+    Spinner, 
+    Heading, 
+    Text, 
+    Button, 
+    Box, 
+    Accordion, 
+    AccordionItem, 
+    AccordionButton, 
+    AccordionPanel, 
+    Stack, 
+    Checkbox, 
+    Center, 
+    AccordionIcon, 
+    Flex, 
+    Divider, 
+    useBreakpointValue, 
+    InputGroup,
+    InputLeftElement,
+    Input, 
+} from "@chakra-ui/react"
+import { GrTree } from "react-icons/gr"
+import { SearchIcon } from "@chakra-ui/icons"
 import {get_topics_url} from "../Constants.js"
 import { useHistory } from 'react-router-dom'
 
 function CourseContentPage() {
-    const buttonSize = useBreakpointValue({ base: 'xs', sm: 'sm', md: 'md' });
     const [data, setData] = useState(null)
+    const [display, setDisplay] = useState([])
     const [files, setFiles] = useState([])
+    const treeButton = useBreakpointValue({base: <GrTree/>, md: "TOPIC TREE"})
+
     const download = useToast()
     let history = useHistory()
     let course = history.location.pathname.split("/").filter(e => e !== "")[1]
@@ -14,7 +39,8 @@ function CourseContentPage() {
         fetch(get_topics_url(course)).then(e => {
             return e.json()
         }).then(e => {
-            setData(e)
+            setData(e.topics_list)
+            setDisplay(e.topics_list)
         })
     }, [])
     
@@ -27,18 +53,35 @@ function CourseContentPage() {
     )
     if (data != null) {
         pageView =  (
-            <Box marginInline={[0, 0, 0, 100]}>
+            <Box marginInline={[0, 0, 0, 30, 100]}>
                 <Box marginBottom={10}>
                     <Flex alignItems="center">
-                        <Heading flexGrow={1}size="lg">Course Content</Heading>
+                        <InputGroup variant="filled">
+                            <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
+                            <Input placeholder="Search" onChange={e => {
+                                console.log(data)
+                                const value = e.target.value.toLowerCase()
+                                let tmpArray = data.filter(e => {
+                                    if (e.name.toLowerCase().indexOf(value) !== -1) {
+                                        return true
+                                    }
+                                    for (let content of e.course_materials) {
+                                        if (content.name.toLowerCase().indexOf(value) !== -1) {
+                                            return true
+                                        }
+                                    }
+                                    return false
+                                })
+                                setDisplay(tmpArray)
+                            }}></Input>
+                        </InputGroup>
                         {/* TODO ONLY FOR ADMIN TO EDIT TOPIC TREE*/}
-                        <Button color="white" bg="blue.400" size={buttonSize} onClick={() => history.push("/topictree")}>TOPIC TREE</Button>
+                        <Button marginLeft={5} onClick={() => history.push("/topictree")}>{treeButton}</Button>
                     </Flex>
-                    <Divider></Divider>
                 </Box>
                 <Center flexDirection="column">
-                    <Accordion width="100%" allowMultiple>
-                        { data.topics_list.map(e => {
+                    <Accordion width="100%" allowMultiple defaultIndex={[...Array(data.length).keys()]}>
+                        { display.map(e => {
                             return (
                                 <AccordionItem key={"section " + e.name}>
                                     <h2>
@@ -77,7 +120,7 @@ function CourseContentPage() {
                                                                             }
                                                                         }
                                                                     }}></Checkbox>
-                                                                    <Text marginLeft={10}>{e.name}</Text>
+                                                                    <Text marginLeft={10} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">{e.name}</Text>
                                                                 </Flex>
                                                             </Box>
                                                         )
@@ -91,7 +134,7 @@ function CourseContentPage() {
                         }) }
                     </Accordion>
                     {/*TODO actually download files after file system is implemented in backend */}
-                    <Button marginTop={5} alignSelf="flex-end" color="white" bg="blue.400" size={buttonSize} onClick={e =>{
+                    <Button marginTop={5} alignSelf="flex-end" onClick={e =>{
                         if (files.length > 0) {
                             return (
                                 download({
