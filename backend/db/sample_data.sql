@@ -19,10 +19,11 @@ INSERT INTO topics(id, topic_group_id, name) values(default, 2, 'Schemas');
 INSERT INTO topics(id, topic_group_id, name) values(default, 2, 'ER-Diagrams');
 
 -- Add Topic Files
-INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'while_loops.pdf', 'while_loops_path', 1, NULL);
-INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'for_loops.pdf', 'for_loops_path', 1, NULL);
-INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'pointers1.pdf', 'pointers1_path', 2, NULL);
-INSERT INTO topic_files(id, name, file, topic_id, due_date) values(default, 'dynamic_arrays.pdf', 'dynamic_arrays_path', 3, NULL);
+INSERT INTO topic_files(id, name, file, type, topic_id, due_date) values(default, 'while_loops.pdf', 'while_loops_path', 'content', 1, NULL);
+INSERT INTO topic_files(id, name, file, type, topic_id, due_date) values(default, 'for_loops.pdf', 'for_loops_path', 'content', 1, NULL);
+INSERT INTO topic_files(id, name, file, type, topic_id, due_date) values(default, 'pointers1.pdf', 'pointers1_path', 'content', 2, NULL);
+INSERT INTO topic_files(id, name, file, type, topic_id, due_date) values(default, 'dynamic_arrays.pdf', 'dynamic_arrays_path', 'content', 3, NULL);
+INSERT INTO topic_files(id, name, file, type, topic_id, due_date) values(default, 'ass1.pdf', 'dynamic_arrays_path', 'assessment', 3, NULL);
 
 -- Add prerequisites
 INSERT INTO prerequisites(prereq, topic) values(3, 1);
@@ -55,10 +56,20 @@ INSERT INTO tags(tag_id, name) VALUES(default, 'Introduction');
 INSERT INTO tags(tag_id, name) VALUES(default, 'New');
 INSERT INTO tags(tag_id, name) VALUES(default, 'Ass1');
 
+-- Create Topic Tags
+INSERT INTO tags(tag_id, name) VALUES(default, 'Memory');
+INSERT INTO tags(tag_id, name) VALUES(default, 'For loops');
+INSERT INTO tags(tag_id, name) VALUES(default, 'Lists');
+
 -- Link tags
 INSERT INTO post_tags(post_id, tag_id) VALUES(1, 1);
 INSERT INTO post_tags(post_id, tag_id) VALUES(1, 2);
 INSERT INTO post_tags(post_id, tag_id) VALUES(2, 3);
+
+-- Link topic tags
+INSERT INTO topic_tags(topic_id, tag_id) VALUES(2, 4);
+INSERT INTO topic_tags(topic_id, tag_id) VALUES(1, 5);
+INSERT INTO topic_tags(topic_id, tag_id) VALUES(3, 6);
 
 -- Create Replies
 INSERT INTO replies(reply_id, user_id, author, published_date, reply) VALUES(default, 3, 'Tutory Tutor', current_timestamp, 'Glad to be in this course');

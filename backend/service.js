@@ -314,6 +314,8 @@ async function postPreReq (request, response) {
 async function deletePreReq (request, response) {
   const preReqId = parseInt(request.preReqId);
   const topicId = parseInt(request.topicId);
+  console.log('preReqId', preReqId);
+  console.log('topicId', topicId);
 
   let resp = await pool.query(
     'DELETE FROM prerequisites WHERE prereq = $1 AND topic = $2', [preReqId, topicId]);

@@ -28,8 +28,7 @@ import TopicTreeViewResource from "./TopicTreeViewResource.js";
 
 import TopicTreeAddTopic from './TopicTreeAddTopic.js';
 
-const Links = ['Add a Topic'];
-const NavLink = ({ onClick, children }) => (
+const NavLink = ({ onClick, children, openUrl=true }) => (
     <Link
         px={2}
         py={1}
@@ -42,7 +41,7 @@ const NavLink = ({ onClick, children }) => (
                 bg: useColorModeValue('gray.300', 'gray.300'),
             }
         }
-        href={children}>
+        href={ openUrl ? children : '#'}>
         {children}
     </Link>
 );
@@ -64,7 +63,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
             "preparation": [],
             "content": [],
             "practice": [],
-            "assessment": []
+            "assessments": []
         },
         "group": "",
         "discipline": "",
@@ -104,7 +103,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
         let responseJson = await response.json();
         let prereqList = [];
         for (let prereq of responseJson.prerequisites_list) {
-            prereqList.push(prereq.name);
+            prereqList.push({'name': prereq.name, 'id': prereq.id});
         }
         setListPrereqs(prereqList);
         console.log('selectedNode', value);
@@ -136,7 +135,6 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
     }
 
     function isChecked() {
-        console.log('checked', tempView == 'Graph View');
         return tempView == "Graph View";
     }
   
@@ -152,15 +150,16 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
                 onClick={isOpen ? onClose : onOpen}
                 />
                 <HStack spacing={8} alignItems={'center'}>
-                    <Box color='white' fontSize={'1.2rem'} >Meta LMS</Box>
+                    <Box color='white' fontSize={'1.2rem'} >Meta LMS  &nbsp;| &nbsp;<b>Topic Tree</b></Box>
                     <HStack
                         as={'nav'}
                         spacing={4}
                         display={{ base: 'none', md: 'flex' }}>
                         {topicGroupName !== '' ? 
                         <>
-                        <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
-                        <Box bg='white' w={200}>
+                        <Link mt={1} px={2} py={1} color={'white'} rounded={'md'}
+                            onClick={onOpenModal}>Add a Topic</Link>
+                        <Box bg='white'  w={200}>
                             <FormControl id="new-topic-dependencies">
                                 <Select
                                     name="searchTopic"
@@ -214,7 +213,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
                 <Box pb={4} display={{ md: 'none' }}>
                 <Stack as={'nav'} spacing={4}>
                     { topicGroupName != '' ? (
-                        <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
+                        <NavLink key={"Add a Topic"} onClick={onOpenModal} openUrl={false}>Add a Topic</NavLink>
                     ) : <></> }
                 </Stack>
                 </Box>
