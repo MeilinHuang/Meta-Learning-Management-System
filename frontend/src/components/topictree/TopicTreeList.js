@@ -14,7 +14,6 @@ import {
     AccordionPanel,
     AccordionIcon,
     Stack,
-    Divider,
     Modal,
     ModalOverlay,
     ModalContent,
@@ -128,8 +127,6 @@ export default function TopicTreeList() {
     const [data, setData] = useState([]);
     const [display, setDisplay] = useState([])
     const [view, setView] = useState("List View");
-    const [ form, setForm ] = useState({"topic_group": null, "topic": null})
-    const toast = useToast()
 
     useEffect(async function () {
         fetch(topic_group_url)
@@ -170,7 +167,7 @@ export default function TopicTreeList() {
                             }}></Input>
                         </InputGroup>
                         <Box marginLeft={5}>
-                        <FormModal buttonText="ADD TOPIC" modalName="Topic Group"></FormModal>
+                        <FormModal buttonText="ADD GROUP" modalName="Topic Group"></FormModal>
                         </Box>
                     </Flex>
                 </Flex>

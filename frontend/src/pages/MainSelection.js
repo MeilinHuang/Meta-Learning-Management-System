@@ -18,7 +18,7 @@ function MainSelection() {
                     <Heading letterSpacing="wider">Welcome John!</Heading>
                     <Box>
                         <Text fontSize="large" fontWeight="medium">You have 3 assignments due</Text>
-                        <Text fontSize="large" fontWeight="medium">The next assignment due is COMP1234 Assignment 1</Text>
+                        <Text fontSize="large" fontWeight="medium">The next assignment due is COMP1234 Assignment 1 on 22nd September</Text>
                     </Box>
                 </VStack>
             </Flex>
