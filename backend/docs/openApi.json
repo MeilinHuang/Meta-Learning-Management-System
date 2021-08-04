@@ -4266,15 +4266,34 @@
           }
         ],
         "requestBody": {
-          "description": "New Topic Group",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/TopicGroup"
+                "type": "object",
+                "properties": {
+                  "topic_code": {
+                    "type": "string",
+                    "example": "COMP5721"
+                  },
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -4364,6 +4383,80 @@
             "name": "topicName",
             "in": "path",
             "description": "Name of new topic",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Deletes topic",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic",
             "required": true,
             "schema": {
               "type": "string"

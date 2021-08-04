@@ -3,6 +3,7 @@ const { json } = require('express');
 const pool = require('./db/database');
 var fs = require('fs');
 const e = require('express');
+const { type } = require('os');
 
 // TODO : ADD AUTH AND JWTOKEN
 
@@ -76,8 +77,7 @@ const deleteAdmin = (request, response) => {
 
 async function getAllTopicGroups(request, response) {
   void (request);
-  try {
-    let resp = await pool.query(
+  let resp = await pool.query(
     `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
     array_agg(DISTINCT user_admin.admin_id) as admin_list,
     array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
@@ -96,7 +96,25 @@ async function getAllTopicGroups(request, response) {
       var announcementArr = [];
 
       for (const topicId of object.topics_list) {
-        let tmp = await pool.query(`SELECT * FROM topics WHERE id = $1`, [topicId]);
+        let tmp = await pool.query(`
+        SELECT t.id, t.topic_group_id, t.name,
+        array_agg(DISTINCT tf.id) as course_materials
+        FROM topics t 
+        LEFT JOIN topic_files tf ON tf.topic_id = t.id
+        WHERE t.id = $1
+        GROUP BY t.id`, [topicId]);
+
+        if (tmp.rows[0]) {
+          if (tmp.rows[0].course_materials[0] !== null) {
+            var topicFilesArr = [];
+            for (const fileId of tmp.rows[0].course_materials) {
+              let fileReq = await pool.query(`SELECT * FROM topic_files WHERE id = $1`, [fileId]);
+              topicFilesArr.push(fileReq.rows[0]);
+            }
+            tmp.rows[0].course_materials = topicFilesArr;
+          }
+        }
+        
         topicArr.push(tmp.rows[0]);
       };
   
@@ -121,6 +139,8 @@ async function getAllTopicGroups(request, response) {
       object.admin_list = adminArr;
     }
     response.status(200).json(resp.rows);
+  try {
+    
   } catch (e) {
     response.status(400).send(e);
   }
@@ -135,7 +155,7 @@ async function getTopicGroup (request, response) {
 
     let resp = await pool.query(
       `SELECT tp_group.id, tp_group.name, tp_group.topic_code, 
-      array_agg(DISTINCT user_admin.admin_id) as admin_list,
+      array_agg(DISTINCT user_admin.admin_id) as admin_list, array_agg(DISTINCT tgf.id) as attachments,
       array_agg(DISTINCT topics.id) as topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
       array_agg(DISTINCT announcements.id) as announcements_list
       FROM topic_group tp_group 
@@ -143,14 +163,21 @@ async function getTopicGroup (request, response) {
       FULL OUTER JOIN topics ON topics.topic_group_id = tp_group.id
       LEFT JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
       LEFT JOIN announcements ON topics.topic_group_id = announcements.topic_group
+      LEFT JOIN topic_group_files tgf ON tgf.topic_group_id = tp_group.id
       WHERE tp_group.id = $1
       GROUP BY tp_group.id`, [topicGroupId]);
 
     var adminArr = [];
+    var fileArr = [];
     var topicArr = [];
     var tutArr = [];
     var announcementArr = [];
     var preReqsArr = [];
+
+    for (const fileId of resp.rows[0].attachments) {
+      let tmp = await pool.query(`SELECT * FROM topic_group_files WHERE id = $1`, [fileId]);
+      fileArr.push(tmp.rows[0]);
+    }
 
     for (const tutorialId of resp.rows[0].tutorial_list) {
       let tmp = await pool.query(`SELECT * FROM tutorials WHERE id = $1`, [tutorialId]);
@@ -201,6 +228,7 @@ async function getTopicGroup (request, response) {
       }
     };
 
+    resp.rows[0].attachments = fileArr;
     resp.rows[0].topics_list = topicArr;
     resp.rows[0].tutorial_list = tutArr;
     resp.rows[0].announcements_list = announcementArr;
@@ -294,7 +322,6 @@ async function getTopicPreReqs (request, response) {
     resp.rows[0].prerequisites_list = preReqsArr;
     response.status(200).json(resp.rows[0]);
   } catch(e) {
-    console.log(e);
     response.status(400).send(e);
   }
 }
@@ -304,8 +331,8 @@ async function postPreReq (request, response) {
   const preReqId = parseInt(request.preReqId);
   const topicId = parseInt(request.topicId);
 
-  let resp = await pool.query(
-    'INSERT INTO prerequisites(prereq, topic) VALUES($1, $2)', [preReqId, topicId]);
+  await pool.query(
+  'INSERT INTO prerequisites(prereq, topic) VALUES($1, $2)', [preReqId, topicId]);
 
   response.status(200).send(`Pre-requisite added with ID: ${preReqId}`)
 }
@@ -314,41 +341,81 @@ async function postPreReq (request, response) {
 async function deletePreReq (request, response) {
   const preReqId = parseInt(request.preReqId);
   const topicId = parseInt(request.topicId);
-  console.log('preReqId', preReqId);
-  console.log('topicId', topicId);
 
-  let resp = await pool.query(
-    'DELETE FROM prerequisites WHERE prereq = $1 AND topic = $2', [preReqId, topicId]);
+  await pool.query(
+  'DELETE FROM prerequisites WHERE prereq = $1 AND topic = $2', [preReqId, topicId]);
 
-  response.status(200).send(
-    `Pre-requisite deleted with Topic ID: ${topicId} and Pre-Req ID : ${preReqId}`)
-
+  response.status(200).json({successs: true});
 }
 
 // Create topic group
 async function postTopicGroup (request, response) {
-  const topicGroupName = request.params.topicGroupName;
-  const topic_code = request.body.topic_code;
-  const course_outline = request.body.course_outline;
+  try {
+    const topicGroupName = request.params.topicGroupName;
+    const topic_code = request.body.topic_code;
+    const course_outline = request.body.course_outline;
+    const fileTypeList = request.body.uploadedFileTypes.split(",");
 
-  let resp = await pool.query(
-    'INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, $1, $2, $3)',
-    [topicGroupName, topic_code, course_outline]);
+    let resp = await pool.query(
+      'INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, $1, $2, $3) RETURNING id',
+      [topicGroupName, topic_code, course_outline]);
 
-  response.status(200).send(`Topic Group created with name: ${topicGroupName}`)
+    if (request.files != null) {
+      if (!fs.existsSync(`../frontend/public/_files/topicGroup${resp.rows[0].id}`)) { fs.mkdirSync(`../frontend/public/_files/topicGroup${resp.rows[0].id}`) }
+      if (request.files.uploadFile.length > 1) {
+        if (fileTypeList.length > request.files.uploadFile.length) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        var typeCounter = 0;
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO topic_group_files(id, name, file, type, topic_group_id)
+          VALUES(default, $1, $2, $3, $4)`, [file.name, (`/_files/topicGroup${resp.rows[0].id}/${file.name}`), 
+          fileTypeList[typeCounter], resp.rows[0].id]);
+          fs.writeFile(`../frontend/public/_files/topicGroup${resp.rows[0].id}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          typeCounter+=1;
+        }
+      } else {
+        if (fileTypeList.length > 1) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        await pool.query(`INSERT INTO topic_group_files(id, name, file, type, topic_group_id)
+        VALUES(default, $1, $2, $3, $4)`, [request.files.uploadFile.name, 
+        (`/_files/topicGroup${resp.rows[0].id}/${request.files.uploadFile.name}`), fileTypeList[0], resp.rows[0].id]);
+        fs.writeFile(`../frontend/public/_files/topicGroup${resp.rows[0].id}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
+
+    response.sendStatus(200);
+  } catch (e) {
+    response.status(400).send(e)
+  }
 } 
 
 // Delete a topic group
 async function deleteTopicGroup (request, response) {
-  const topicGroupName = request.params.topicGroupName;
+  try { 
+    const topicGroupName = request.params.topicGroupName;
 
-  let resp = await pool.query(
-    'DELETE FROM topic_group WHERE LOWER(name) = LOWER($1)',
+    let checkExist = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (!checkExist.rows.length) throw (`Failed: Topic group {${topicGroupName}} doesn't exist in database`);
+
+    await pool.query('DELETE FROM topic_group WHERE LOWER(name) = LOWER($1)',
     [topicGroupName]);
 
-  response.status(200).send(`Topic Group deleted with name: ${topicGroupName}`)
+    if (fs.existsSync(`../frontend/public/_files/topicGroup${checkExist.rows[0].id}`)) { 
+      fs.rmdir(`../frontend/public/_files/topicGroup${checkExist.rows[0].id}`, { recursive: true }, (err) => {
+        if (err) { throw err; }
+      }); 
+    }
+
+    response.status(200).json({success: true, deleted: topicGroupName});
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
 }
 
+// Delete topic
 async function deleteTopic(request, response) {
   const topicGroupName = request.params.topicGroupName;
   const topicName = request.params.topicName;
@@ -357,44 +424,85 @@ async function deleteTopic(request, response) {
     response.status(400).json({error: "Could not find topic group"});
     return;
   }
+
   const topicGroupId = idResp.rows[0].id;
   let tmp = await pool.query(
-    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+    `SELECT id FROM topics WHERE LOWER(name) = LOWER($1) AND topic_group_id = $2`
   , [topicName, topicGroupId]);
   if (tmp.rows.length == 0) {
     response.status(400).json({error: "Could not find topic in database"});
     return;
   }
-  let topicId = tmp.rows[0].id;
+
+  if (fs.existsSync(`../frontend/public/_files/topicGroup${idResp.rows[0].id}/topic${tmp.rows[0].id}`)) { 
+    fs.rmdir(`../frontend/public/_files/topicGroup${idResp.rows[0].id}/topic${tmp.rows[0].id}`, { recursive: true }, (err) => {
+      if (err) { throw err; }
+    }); 
+  }
+
+  const topicId = tmp.rows[0].id;
   await pool.query(`DELETE FROM prerequisites WHERE topic = $1 or prereq = $1`, [topicId]);
   await pool.query(`DELETE FROM topics WHERE id = $1`, [topicId]);
   response.status(200).json({ success: true, topicId: topicId});
 }
 
 async function postTopic (request, response) {
-  const topicGroupName = request.params.topicGroupName;
-  const topicName = request.params.topicName;
-  const idResp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
-  if (idResp.rows.length == 0) {
-    response.status(400).json({error: "Could not find topic group"});
-    return;
-  }
-  const topicGroupId = idResp.rows[0].id;
+  try {
+    const topicGroupName = request.params.topicGroupName;
+    const topicName = request.params.topicName;
+    const idResp = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (idResp.rows.length == 0) throw ("Could not find topic group");
+    const topicGroupId = idResp.rows[0].id;
+    const fileTypeList = request.body.uploadedFileTypes.split(",");
 
-  let resp = await pool.query(
-    'INSERT INTO topics(id, topic_group_id, name) values(default, $1, $2)',
-    [topicGroupId, topicName]);
-  
-  let tmp = await pool.query(
-    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
-  , [topicName, topicGroupId]);
-  if (tmp.rows.length == 0) {
-    response.status(400).json({error: "Could not find newly created topic in database"});
-    return;
-  }
-  let topicId = tmp.rows[0];
+    let resp = await pool.query(
+      'INSERT INTO topics(id, topic_group_id, name) values(default, $1, $2) RETURNING id',
+      [topicGroupId, topicName]);
+    const topicId = resp.rows[0].id;
+    
+    /* let tmp = await pool.query(
+      `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+    , [topicName, topicGroupId]);
+    if (tmp.rows.length == 0) throw ("Could not find newly created topic in database");
+    let topicId = tmp.rows[0]; */
 
-  response.status(200).json(topicId);
+    // Checks if directory exists for topic group and topic and makes it
+    if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}`)) {
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}`); 
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`); 
+    } else if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`)) {
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`); 
+    }
+
+    if (request.files != null) {
+      if (request.files.uploadFile.length > 1) {
+        if (fileTypeList.length > request.files.uploadFile.length) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        var typeCounter = 0;
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO topic_files(id, name, file, type, topic_id)
+          VALUES(default, $1, $2, $3, $4)`, [file.name, (`/_files/topicGroup${topicGroupId}/topic${topicId}/${file.name}`), 
+          fileTypeList[typeCounter], topicId]);
+          fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          typeCounter+=1;
+        }
+      } else {
+        if (fileTypeList.length > 1) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        await pool.query(`INSERT INTO topic_files(id, name, file, type, topic_id)
+        VALUES(default, $1, $2, $3, $4)`, [request.files.uploadFile.name, 
+        (`/_files/topicGroup${topicGroupId}/topic${topicId}/${request.files.uploadFile.name}`), fileTypeList[0], topicId]);
+        fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
+
+    response.status(200).json(topicId);
+  } catch (e) {
+    response.status(400).send(e);
+  }
 }
 
 /***************************************************************

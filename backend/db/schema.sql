@@ -16,8 +16,7 @@ DROP TABLE IF EXISTS "topic_group" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_group" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  topic_code TEXT NOT NULL UNIQUE,
-  course_outline TEXT
+  topic_code TEXT NOT NULL UNIQUE
 );
 
 DROP TABLE IF EXISTS "user_admin" CASCADE;
@@ -29,8 +28,8 @@ CREATE TABLE IF NOT EXISTS "user_admin" (
 
 DROP TABLE IF EXISTS "user_enrolled" CASCADE;
 CREATE TABLE IF NOT EXISTS "user_enrolled" (
-  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
-  user_id INTEGER NOT NULL REFERENCES users(id),
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   PRIMARY KEY(user_id, topic_group_id)
 );
 
@@ -38,7 +37,7 @@ CREATE TABLE IF NOT EXISTS "user_enrolled" (
 DROP TABLE IF EXISTS "topics" CASCADE;
 CREATE TABLE IF NOT EXISTS "topics" (
   id SERIAL NOT NULL PRIMARY KEY,
-  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
   name TEXT NOT NULL
 );
 
@@ -54,8 +53,8 @@ CREATE TABLE IF NOT EXISTS "topic_group_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   file TEXT NOT NULL,
-  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  due_date TIMESTAMP
+  type TEXT NOT NULL,
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 DROP TABLE IF EXISTS "topic_files" CASCADE;
@@ -66,13 +65,6 @@ CREATE TABLE IF NOT EXISTS "topic_files" (
   type TEXT NOT NULL,
   topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE ON UPDATE CASCADE,
   due_date TIMESTAMP
-);
-
-DROP TABLE IF EXISTS "topic_group_files_related_topics" CASCADE;
-CREATE TABLE IF NOT EXISTS "topic_group_files_topics" (
-  file_id INTEGER NOT NULL REFERENCES topic_group_files(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY (file_id, topic_id)
 );
 
 CREATE INDEX prereq_idx ON prerequisites(prereq);
@@ -213,8 +205,8 @@ CREATE TABLE "user_content_progress" (
 DROP TABLE IF EXISTS "announcements" CASCADE;
 CREATE TABLE IF NOT EXISTS "announcements" (
   id SERIAL PRIMARY KEY,
-  author INTEGER NOT NULL REFERENCES users(id),
-  topic_group INTEGER NOT NULL REFERENCES topic_group(id),
+  author INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  topic_group INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
   title TEXT NOT NULL,
   content TEXT NOT NULL,
   post_date TIMESTAMP
