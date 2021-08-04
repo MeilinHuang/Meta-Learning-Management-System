@@ -60,6 +60,10 @@ app.get('/topicGroup/:topicGroupName/topic', async(request, response) => {
   await database.getTopics(request, response);
 });
 
+app.get('/topicGroup/:topicGroupName/topic/:topicName/topic', async(request, response) => {
+  await database.getTopicFile(request, response);
+})
+
 app.get('/topicGroup/:topicGroupName/topic/:topicName/prerequisite', async(request, response) => {
   await database.getTopicPreReqs(request, response);
 });

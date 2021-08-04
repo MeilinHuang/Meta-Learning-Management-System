@@ -4024,6 +4024,58 @@
         }
       }
     },
+    "/topicGroup/{topicGroupName}/topic/{topicName}/topic": {
+      "get": {
+        "tags": [
+          "Topic Tree"
+        ],
+        "summary": "Get list of files associated with topic",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group we want topics for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic we want files for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/topicGroup/{topicGroupName}/topic/{topicName}/prerequisite": {
       "get": {
         "tags": [

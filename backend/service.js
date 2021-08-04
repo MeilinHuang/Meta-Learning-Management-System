@@ -505,6 +505,28 @@ async function postTopic (request, response) {
   }
 }
 
+// Get topic files
+async function getTopicFile (request, response) {
+  try {
+    const topicGroupName = request.params.topicGroupName;
+    const topicName = request.params.topicName;
+
+    // Checks topicgroup and topic validity
+    let tgResp = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (!tgResp.rows.length) throw (`Failed: Topic group {${topicGroupName}} does not exist.`);
+
+    let tnResp = await pool.query(`SELECT id FROM topics WHERE LOWER(name) = LOWER($1) AND topics.topic_group_id = $2`, 
+    [topicName, tgResp.rows[0].id]);
+    if (!tnResp.rows.length) throw (`Failed: Topic {${topicName}} does not exist.`);
+
+    let resp = await pool.query(`SELECT * FROM topic_files WHERE topic_id = $1`, [tnResp.rows[0].id]);
+
+    response.status(200).json(resp.rows);
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
+}
+
 /***************************************************************
                        Forum Functions
 ***************************************************************/
@@ -2564,5 +2586,6 @@ module.exports = {
   postLevel,
   postQuizQuestion,
   getTopicGroup,
-  getTag
+  getTag,
+  getTopicFile
 };
