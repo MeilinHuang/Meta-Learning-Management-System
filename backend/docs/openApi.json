@@ -3471,6 +3471,49 @@
       }
     },
     "/forum/tags/{tagId}": {
+      "get": {
+        "tags": [ "Forums" ],
+        "summary": "Get tag from id",
+        "parameters": [
+          {
+            "name": "tagId",
+            "in": "path",
+            "description": "Tag id",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForumTag"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "Forums"

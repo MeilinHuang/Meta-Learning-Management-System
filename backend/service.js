@@ -1175,6 +1175,17 @@ async function getAllTags (request, response) {
   }
 };
 
+async function getTag (request, response) {
+  try {
+    const tagId = request.params.tagId;
+    let resp = await pool.query(`SELECT * FROM tags WHERE tag_id = $1`, [tagId]);
+    if (!resp.rows.length) throw ("Tag id not found");
+    response.status(200).json(resp.rows[0]);
+  } catch (e) {
+    response.status(400).send(e);
+  }
+}
+
 // Posts tag
 async function postTag (request, response) {
   try {
@@ -2444,5 +2455,6 @@ module.exports = {
   deleteLevel,
   postLevel,
   postQuizQuestion,
-  getTopicGroup
+  getTopicGroup,
+  getTag
 };

@@ -158,6 +158,10 @@ app.put('/forum/post/pin/:postId/:isPinned', async(request, response) => {
   await database.putPostPin(request, response);
 });
 
+app.get('/forum/tags/:tagId', async(request, response) => {
+  await database.getTag(request, response);
+});
+
 app.put('/forum/tags/:tagId', async(request, response) => {
   await database.putTag(request, response);
 });
