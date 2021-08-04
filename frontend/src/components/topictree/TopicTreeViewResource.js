@@ -7,6 +7,7 @@ import {
     ModalFooter,
     ModalBody,
     ModalCloseButton,
+    CloseButton,
     Button,
     FormControl,
     FormLabel,
@@ -32,6 +33,7 @@ import { delete_topic_url, delete_prereqs } from "../../Constants";
 export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, topicGroupName}) {
   const [tempPrereqs, setTempPrereqs] = useState([]);
   const [hasDeleted, setHasDelete] = useState(false);
+  const [showAddPrereqBox, setShowAddPrereqBox] = useState(false);
   useEffect(() => {
     setTempPrereqs(prereqs);
   }, [prereqs])
@@ -78,6 +80,14 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     }
   }
 
+  const showAddPrereq = () => {
+    setShowAddPrereqBox(true);
+  }
+
+  const hideAddPrereq = () => {
+    setShowAddPrereqBox(false);
+  }
+
   const typesOfFiles = ["Practice", "Content", "Preparation", "Assessments"];
   return (
     <>
@@ -102,9 +112,15 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                       </Tr>
                     );
                   })}
+                  {showAddPrereqBox ?
+                  <Tr>
+                    <Td><Input placeholder="New prerequisite name" /></Td>
+                    <Td><Flex flexDirection="row" w="8rem" alignItems="center" justifyContent="space-between"><Button colorScheme="green">Done</Button><CloseButton onClick={hideAddPrereq}/></Flex></Td>
+                  </Tr>
+                  : <></>}
                 </Tbody>
               </Table>
-              <Button mb={5} colorScheme="blue">Add prerequisite</Button>
+              <Button mb={5} colorScheme="blue" onClick={showAddPrereq}>Add prerequisite</Button>
             </Box>
             {typesOfFiles.map((typeOfFile) => {
               return (
