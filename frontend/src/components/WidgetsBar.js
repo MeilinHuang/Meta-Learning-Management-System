@@ -1,5 +1,5 @@
 import React from "react"
-import { Box, Container, Text, Divider, Stack, Skeleton, Avatar, Flex, Menu, MenuButton, Portal, MenuList, MenuItem } from "@chakra-ui/react"
+import { Box, Container, Text, Divider, Skeleton, Avatar, Flex, Menu, MenuButton, Portal, MenuList, MenuItem } from "@chakra-ui/react"
 import Calendar from './Calendar.js'
 //import Calendar from 'react-calendar'
 //import "./widgetBar.css"
@@ -28,9 +28,13 @@ function WidgetsBar({page}) {
                             </Portal>
                         </Menu>
                 </Flex>
+                <Container padding={0} width="100%" marginTop={3} marginBottom={10} height={200} userSelect="none">
+                    <Calendar></Calendar>
+                </Container>
+
                 {   
                     page==="course"&&
-                    <Container>
+                    <Container marginBottom={10}>
                         <Text size="sm">Course Progress</Text>
                         <Divider color="black" opacity="1"></Divider>
                         <Box bg="blue.100" marginTop={5} borderRadius={10} width="100%" height="100%">
@@ -38,9 +42,7 @@ function WidgetsBar({page}) {
                         </Box>
                     </Container>
                 }
-                <Container padding={0} width="100%" marginTop={3} marginBottom={10} height={250} userSelect="none">
-                    <Calendar></Calendar>
-                </Container>
+
                 <Container>
                     <Text size="sm">Due Dates</Text>
                     <Divider color="black" opacity="1"></Divider>

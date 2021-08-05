@@ -43,6 +43,8 @@ function Calendar() {
 
     useEffect(() => {
         setRows(getMonth(month))
+        //remove dependency array warning, probably should fix this
+        // eslint-disable-next-line
     }, [month])
 
     return (

@@ -44,15 +44,15 @@ function CourseContentPage() {
         })
     }, [])
     
-    let counter = 0
+    const categories = ["Preparation", "Content", "Practice", "Assessments"]
 
+    let counter = 0
     let pageView = (
         <Center alignContent="center">
             <Spinner size="xl"/>
         </Center>
     )
     if (data != null) {
-        console.log(data)
         pageView =  (
             <Box marginInline={[0, 0, 0, 30, 100]}>
                 <Box marginBottom={10}>
@@ -80,53 +80,80 @@ function CourseContentPage() {
                     </Flex>
                 </Box>
                 <Center flexDirection="column">
-                    <Accordion width="100%" allowMultiple defaultIndex={[...Array(data.length).keys()]}>
+                    <Accordion width="100%" allowMultiple>
                         { display.map(e => {
                             return (
                                 <AccordionItem key={"section " + e.name}>
                                     <h2>
                                         <AccordionButton>
-                                            <Box flex="1" textAlign="left">
+                                            <Flex flexGrow={1} textAlign="left">
                                                 <Heading size={["sm", "md"]}>
                                                     {e.name}
                                                 </Heading>
-                                            </Box>
+                                            </Flex>
                                             <AccordionIcon></AccordionIcon>
                                         </AccordionButton>
                                     </h2>
                                     {   
-                                        e.course_materials.length > 0 &&
                                         <AccordionPanel>
-                                            <Stack spacing={5} divider={<Divider></Divider>} paddingTop={3}>
+                                            
+                                                <Accordion width="100%" allowMultiple>
+                                                    {
+                                                        categories.map(category => {
+                                                            return (
+                                                                <AccordionItem key={e.name + "-" + category}>
+                                                                    <AccordionButton paddingRight={0} paddingLeft={5}>
+                                                                        <Text flexGrow={1} textAlign="left">
+                                                                            {category}
+                                                                        </Text>
+                                                                        <AccordionIcon></AccordionIcon>
+                                                                    </AccordionButton>
+                                                                    <AccordionPanel>
+                                                                        <Stack spacing={5} divider={<Divider></Divider>} paddingTop={3}>
+                                                                        { 
+                                                                            e.course_materials.map(mat => {
+                                                                                if (category.toLowerCase().indexOf(mat.type) != -1) {
+                                                                                    return (
+                                                                                        <Box key={mat + "-" + e.name}>
+                                                                                            <Flex>
+                                                                                                <Checkbox onChange={box => {
+                                                                                                    let checked = box.target.checked
+                                                                                                    let old = files
+                                                                                                    if (checked) {
+                                                                                                        old.push(mat.name)
+                                                                                                        setFiles(old)
+                                                                                                    }
+                                                                                                    else {
+                                                                                                        const index = old.indexOf(mat.name)
+                                                                                                        if (index > -1) {
+                                                                                                            old.splice(index, 1)
+                                                                                                            setFiles(old)
+                                                                                                        }
+                                                                                                    }
+                                                                                                }}></Checkbox>
+                                                                                                <Text marginLeft={10} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">{mat.name}</Text>
+                                                                                            </Flex>
+                                                                                        </Box>
+                                                                                    )
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                        </Stack>
+                                                                    </AccordionPanel>
+                                                                </AccordionItem>
+                                                            )
+                                                        })
+                                                    }
+                                                </Accordion>
                                                 {/*TODO redirect to view content after click*/}
-                                                {
+                                                {/*
                                                     e.course_materials.map(e => {
                                                         counter += 1
                                                         return (
-                                                            <Box key={e.name +  counter}>
-                                                                <Flex>
-                                                                    <Checkbox onChange={box => {
-                                                                        let checked = box.target.checked
-                                                                        let old = files
-                                                                        if (checked) {
-                                                                            old.push(e.name)
-                                                                            setFiles(old)
-                                                                        }
-                                                                        else {
-                                                                            const index = old.indexOf(e.name)
-                                                                            if (index > -1) {
-                                                                                old.splice(index, 1)
-                                                                                setFiles(old)
-                                                                            }
-                                                                        }
-                                                                    }}></Checkbox>
-                                                                    <Text marginLeft={10} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">{e.name}</Text>
-                                                                </Flex>
-                                                            </Box>
+                                                            
                                                         )
                                                     })
-                                                }
-                                            </Stack>
+                                                */}
                                         </AccordionPanel>
                                     }
                                 </AccordionItem>
