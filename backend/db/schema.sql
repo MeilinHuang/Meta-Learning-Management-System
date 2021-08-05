@@ -343,14 +343,48 @@ CREATE TABLE "tutorials" (
   tutor_id INTEGER NOT NULL REFERENCES users(id),
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
   tutorial_code TEXT NOT NULL,
-  timeslot TEXT,
+  timeslot TIMESTAMP NOT NULL,
   curr_capacity INTEGER NOT NULL,
   max_capacity INTEGER NOT NULL
+);
+
+DROP TABLE IF EXISTS "lectures" CASCADE;
+CREATE TABLE "lectures" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  lecturer_id INTEGER NOT NULL REFERENCES users(id),
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  lecture_code TEXT NOT NULL,
+  timeslot TIMESTAMP NOT NULL,
+  curr_capacity INTEGER NOT NULL,
+  max_capacity INTEGER NOT NULL
+);
+
+DROP TABLE IF EXISTS "lecture_files" CASCADE;
+CREATE TABLE "lecture_files" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  file TEXT NOT NULL,
+  lecture_id INTEGER NOT NULL REFERENCES lectures(id) ON DELETE CASCADE ON UPDATE CASCADE,
+);
+
+DROP TABLE IF EXISTS "tutorial_files" CASCADE;
+CREATE TABLE "tutorial_files" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  file TEXT NOT NULL,
+  tutorial_id INTEGER NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE ON UPDATE CASCADE,
+);
+
+DROP TABLE IF EXISTS "enrolled_lectures" CASCADE;
+CREATE TABLE "enrolled_lectures" (
+  lecture_id INTEGER NOT NULL REFERENCES lectures(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (tutorial_id, student_id)
 );
 
 DROP TABLE IF EXISTS "enrolled_tutorials" CASCADE;
 CREATE TABLE "enrolled_tutorials" (
   tutorial_id INTEGER NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  student_id INTEGER NOT NULL REFERENCES users(id),
+  student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY (tutorial_id, student_id)
 );

@@ -4373,6 +4373,88 @@
         },
         "x-codegen-request-body-name": "TopicGroup"
       },
+      "put": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Update topic group details",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Some new topic group name"
+                  },
+                  "topic_code": {
+                    "type": "string",
+                    "example": "Some new topic code"
+                  },
+                  "fileDeleteList": {
+                    "type": "array",
+                    "desription": "(File ID) List of files to remove",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "announcementBody"
+      },
       "delete": {
         "tags": [
           "Topic Tree"
@@ -4491,6 +4573,93 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Update topic details",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Some new topic group name"
+                  },
+                  "fileDeleteList": {
+                    "type": "array",
+                    "desription": "(File ID) List of files to remove",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "announcementBody"
       },
       "delete": {
         "tags": [ "Topic Tree" ],
