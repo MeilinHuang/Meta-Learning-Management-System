@@ -1,7 +1,7 @@
 const express = require("express");
 var cors = require('cors');
 const app = express();
-const database =  require('./service.js');
+const database = require('./service.js');
 const fileUpload = require('express-fileupload');
 
 app.use(cors());
@@ -82,8 +82,8 @@ app.post('/topicGroup/:topicGroupName', async(request, response) => {
   await database.postTopicGroup(request, response);
 });
 
-app.delete('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
-  await database.deleteTopic(request, response);
+app.put('/topicGroup/:topicGroupName', async(request, response) => {
+  await database.putTopicGroup(request, response);
 });
 
 app.delete('/topicGroup/:topicGroupName', async(request, response) => {
@@ -93,6 +93,14 @@ app.delete('/topicGroup/:topicGroupName', async(request, response) => {
 app.post('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
   await database.postTopic(request, response);
 })
+
+app.put('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
+  await database.putTopic(request, response);
+})
+
+app.delete('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
+  await database.deleteTopic(request, response);
+});
 
 /***************************************************************
                        Forum Functions

@@ -7,8 +7,8 @@ INSERT INTO users(id, name, zid) values(default, 'Tutory Tutorer', 'z5921738');
 INSERT INTO users(id, name, zid) values(default, 'Lecturey Lecturer', 'z5928712');
 
 -- Create Topic Groups
-INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, 'C++ Programming', 'COMP6771', 'Course_Outline.pdf');
-INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, 'Database Systems', 'COMP3331', 'Course_Outline.pdf');
+INSERT INTO topic_group(id, name, topic_code) values(default, 'C++ Programming', 'COMP6771');
+INSERT INTO topic_group(id, name, topic_code) values(default, 'Database Systems', 'COMP3331');
 
 -- Create Topics
 INSERT INTO topics(id, topic_group_id, name) values(default, 1, 'Loops');
