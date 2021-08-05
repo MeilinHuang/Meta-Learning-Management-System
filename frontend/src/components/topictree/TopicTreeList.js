@@ -190,11 +190,12 @@ export default function TopicTreeList() {
                                                 // would remove the need to fetch everytime
                                                 return (
                                                     <Flex key={e.name + " " + topic.name} justifyContent="flex-start" padding={5} cursor="pointer" _hover={{bg:"gray.100", fontWeight:"medium"}} onClick={() => {
+                                                        console.log(topic.course_materials[0])
                                                         fetch(get_prereqs(e.name, topic.name)).then(x => x.json()).then(x => {
-                                                            let matList = []
+                                                            let matList = {"preparation": [], "content": [], "practice": [], "assessment": []}
                                                             topic.course_materials.map(mat => {
                                                                 if (mat !== null) {
-                                                                    matList.push(mat.name)
+                                                                    matList[mat.type].push(mat.name)
                                                                 }
                                                             })
                                                             let tmp = {
@@ -203,10 +204,10 @@ export default function TopicTreeList() {
                                                                 "prerequisite_strings": [],
                                                                 "description": "",
                                                                 "materials_strings": {
-                                                                    "preparation": [],
-                                                                    "content": matList,
-                                                                    "practice": [],
-                                                                    "assessments": []
+                                                                    "preparation": matList.preparation,
+                                                                    "content": matList.content,
+                                                                    "practice": matList.practice,
+                                                                    "assessments": matList.assessment
                                                                 },
                                                                 "group": "",
                                                                 "discipline": "",

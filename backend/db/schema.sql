@@ -16,7 +16,8 @@ DROP TABLE IF EXISTS "topic_group" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_group" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  topic_code TEXT NOT NULL UNIQUE
+  topic_code TEXT NOT NULL UNIQUE,
+  course_outline TEXT
 );
 
 DROP TABLE IF EXISTS "user_admin" CASCADE;

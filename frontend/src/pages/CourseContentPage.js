@@ -52,6 +52,7 @@ function CourseContentPage() {
         </Center>
     )
     if (data != null) {
+        console.log(data)
         pageView =  (
             <Box marginInline={[0, 0, 0, 30, 100]}>
                 <Box marginBottom={10}>
@@ -59,7 +60,6 @@ function CourseContentPage() {
                         <InputGroup variant="filled">
                             <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
                             <Input placeholder="Search" onChange={e => {
-                                console.log(data)
                                 const value = e.target.value.toLowerCase()
                                 let tmpArray = data.filter(e => {
                                     if (e.name.toLowerCase().indexOf(value) !== -1) {
