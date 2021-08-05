@@ -31,18 +31,6 @@ function WidgetsBar({page}) {
                 <Container padding={0} width="100%" marginTop={3} marginBottom={10} height={200} userSelect="none">
                     <Calendar></Calendar>
                 </Container>
-
-                {   
-                    page==="course"&&
-                    <Container marginBottom={10}>
-                        <Text size="sm">Course Progress</Text>
-                        <Divider color="black" opacity="1"></Divider>
-                        <Box bg="blue.100" marginTop={5} borderRadius={10} width="100%" height="100%">
-                            <Box bg="blue.500" width="50%" height="100%" borderRadius="10px 0px 0px 10px" textAlign="center" color="blue.500">.</Box>
-                        </Box>
-                    </Container>
-                }
-
                 <Container>
                     <Text size="sm">Due Dates</Text>
                     <Divider color="black" opacity="1"></Divider>
@@ -50,6 +38,16 @@ function WidgetsBar({page}) {
                     <Skeleton width="100%" marginTop={5} height={5}></Skeleton>
                     <Skeleton width="100%" marginTop={5} height={5}></Skeleton>
                 </Container>
+                {   
+                    page==="course"&&
+                    <Container marginTop={10}>
+                        <Text size="sm">Course Progress</Text>
+                        <Divider color="black" opacity="1"></Divider>
+                        <Box bg="blue.100" marginTop={5} borderRadius={10} width="100%" height="100%">
+                            <Box bg="blue.500" width="50%" height="100%" borderRadius="10px 0px 0px 10px" textAlign="center" color="blue.500">.</Box>
+                        </Box>
+                    </Container>
+                }
             </Flex>   
         </Box>
     )

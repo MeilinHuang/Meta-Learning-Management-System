@@ -54,7 +54,7 @@ function CourseContentPage() {
     )
     if (data != null) {
         pageView =  (
-            <Box marginInline={[0, 0, 0, 30, 100]}>
+            <Box marginInline={[0, 0, 0, 30, 100]} marginBottom={50}>
                 <Box marginBottom={10}>
                     <Flex alignItems="center">
                         <InputGroup variant="filled">
