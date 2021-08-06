@@ -30,12 +30,12 @@ function CourseDashboard() {
         fetch(`http://localhost:8000/${dummyCourse}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))
     }, [setAnnouncements])
 
-    console.log(announcements)
+    
 
     const handleSubmit = e => {
         e.preventDefault()
 
-        console.log(searchTerm)
+        
     }
 
     const handleAddPostSubmit = ({ title, details, date }) => {

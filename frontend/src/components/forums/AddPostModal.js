@@ -31,7 +31,7 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
 
     const handleSubmit = e => {
         e.preventDefault()
-        console.log(details)
+        
 
         if (title === '' || details.replace(/<[^>]+>/g, '') === '') {
             toast({
@@ -60,7 +60,7 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
 
     const handleUpload = e => {
         setImage(e.target.files[0])
-        // console.log(e.target.files[0])
+        // 
     }
 
     return (

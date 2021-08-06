@@ -57,7 +57,7 @@ function ForumOverviewPage() {
             setPosts(data)
             setShowPinned(false)
         })
-        console.log(searchTerm)
+        
     }
 
     const handleAddPostSubmit = ({ title, details, selectedTags, date, relatedLink }) => {

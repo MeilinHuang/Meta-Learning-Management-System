@@ -43,7 +43,7 @@ function PostDetails({ post: { author, post_id, published_date, description }}) 
 
     const handleSubmit = e => {
         e.preventDefault()
-        console.log(post_id)
+        
         fetch(
             `http://localhost:8000/forum/post/${post_id}`,
             {

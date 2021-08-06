@@ -70,7 +70,7 @@ function PostTable({ isAdmin, posts: postData }) {
     const orderedPosts = [...postData].reverse()
     const context = useContext(StoreContext)
     const { posts: [, setPosts], pinnedPosts: [, setPinnedPosts], showPinned: [, setShowPinned] } = context;
-    console.log(orderedPosts)
+    
 
     return (
         <Table variant="simple">
