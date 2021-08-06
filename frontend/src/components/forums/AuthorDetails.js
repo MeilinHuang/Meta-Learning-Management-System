@@ -6,7 +6,6 @@ import {
 } from "@chakra-ui/react"
 
 function AuthorDetails({ author, date }) {
-    
     const dateString = new Date(date).toLocaleString('en-AU')
 
     return (

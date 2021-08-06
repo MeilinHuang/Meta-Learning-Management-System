@@ -1985,7 +1985,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "author": {
+                  "user_id": {
                     "type": "integer",
                     "example": 3
                   },
@@ -1993,7 +1993,7 @@
                     "type": "string",
                     "example": "First announcement"
                   },
-                  "content": {
+                  "description": {
                     "type": "string",
                     "example": "Description of the first announcement"
                   },
@@ -2376,6 +2376,64 @@
           "200": {
             "description": "OK",
             "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroup}/announcement/search/{announcementSearchTerm}": {
+      "get": {
+        "tags": [
+          "Course Pages"
+        ],
+        "summary": "Get all announcements related to the search query",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get announcements",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "announcementSearchTerm",
+            "in": "path",
+            "description": "Search term to include all posts with the search term",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllAnnouncements"
+                }
+              }
+            }
           },
           "400": {
             "content": {
@@ -3219,6 +3277,67 @@
         }
       }
     },
+    "/forum/post/{postId}/comment/{commentId}/endorse/{isEndorsed}": {
+      "put": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Endorses or un-endorses comment associated with comment id",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Id of post",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "Id of comment we want to endorse/un-endorse",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "isEndorsed",
+            "in": "path",
+            "description": "Set isEndorsed to true or false",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/forum/post/pin/{postId}/{isPinned}": {
       "put": {
         "tags": [
@@ -3352,6 +3471,49 @@
       }
     },
     "/forum/tags/{tagId}": {
+      "get": {
+        "tags": [ "Forums" ],
+        "summary": "Get tag from id",
+        "parameters": [
+          {
+            "name": "tagId",
+            "in": "path",
+            "description": "Tag id",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForumTag"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "Forums"
@@ -3862,6 +4024,58 @@
         }
       }
     },
+    "/topicGroup/{topicGroupName}/topic/{topicName}/topic": {
+      "get": {
+        "tags": [
+          "Topic Tree"
+        ],
+        "summary": "Get list of files associated with topic",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group we want topics for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic we want files for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/topicGroup/{topicGroupName}/topic/{topicName}/prerequisite": {
       "get": {
         "tags": [
@@ -4104,15 +4318,34 @@
           }
         ],
         "requestBody": {
-          "description": "New Topic Group",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/TopicGroup"
+                "type": "object",
+                "properties": {
+                  "topic_code": {
+                    "type": "string",
+                    "example": "COMP5721"
+                  },
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -4139,6 +4372,88 @@
           }
         },
         "x-codegen-request-body-name": "TopicGroup"
+      },
+      "put": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Update topic group details",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Some new topic group name"
+                  },
+                  "topic_code": {
+                    "type": "string",
+                    "example": "Some new topic code"
+                  },
+                  "fileDeleteList": {
+                    "type": "array",
+                    "desription": "(File ID) List of files to remove",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "announcementBody"
       },
       "delete": {
         "tags": [
@@ -4202,6 +4517,167 @@
             "name": "topicName",
             "in": "path",
             "description": "Name of new topic",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Update topic details",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Some new topic group name"
+                  },
+                  "fileDeleteList": {
+                    "type": "array",
+                    "desription": "(File ID) List of files to remove",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "announcementBody"
+      },
+      "delete": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Deletes topic",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic",
             "required": true,
             "schema": {
               "type": "string"
@@ -4395,7 +4871,7 @@
       "PostAnnouncement": {
         "type": "object",
         "properties": {
-          "author": {
+          "user_id": {
             "type": "integer",
             "example": 3
           },
@@ -4403,7 +4879,7 @@
             "type": "string",
             "example": "First announcement"
           },
-          "content": {
+          "description": {
             "type": "string",
             "example": "Description of the first announcement"
           },
@@ -4579,6 +5055,10 @@
                 "comment": {
                   "type": "string",
                   "example": "Check the assigment spec for more info"
+                },
+                "isEndorsed": {
+                  "type": "boolean",
+                  "example": true
                 }
               }
             }
@@ -4868,6 +5348,10 @@
                       "comment": {
                         "type": "string",
                         "example": "Check the assigment spec for more info"
+                      },
+                      "isEndorsed": {
+                        "type": "boolean",
+                        "example": true
                       }
                     }
                   }

@@ -1,10 +1,12 @@
+//const { json } = require('express');
+//const e = require('express');
+//const { type } = require('os');
 
-const { json } = require('express');
 const pool = require('./db/database');
 var fs = require('fs');
-const e = require('express');
 
-// TODO : ADD AUTH AND JWTOKEN
+// API
+const lecturesTutorialsApi = require('./api/lecturesTutorials');
 
 /***************************************************************
                        User Functions
@@ -76,8 +78,7 @@ const deleteAdmin = (request, response) => {
 
 async function getAllTopicGroups(request, response) {
   void (request);
-  try {
-    let resp = await pool.query(
+  let resp = await pool.query(
     `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
     array_agg(DISTINCT user_admin.admin_id) as admin_list,
     array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
@@ -96,7 +97,25 @@ async function getAllTopicGroups(request, response) {
       var announcementArr = [];
 
       for (const topicId of object.topics_list) {
-        let tmp = await pool.query(`SELECT * FROM topics WHERE id = $1`, [topicId]);
+        let tmp = await pool.query(`
+        SELECT t.id, t.topic_group_id, t.name,
+        array_agg(DISTINCT tf.id) as course_materials
+        FROM topics t 
+        LEFT JOIN topic_files tf ON tf.topic_id = t.id
+        WHERE t.id = $1
+        GROUP BY t.id`, [topicId]);
+
+        if (tmp.rows[0]) {
+          if (tmp.rows[0].course_materials[0] !== null) {
+            var topicFilesArr = [];
+            for (const fileId of tmp.rows[0].course_materials) {
+              let fileReq = await pool.query(`SELECT * FROM topic_files WHERE id = $1`, [fileId]);
+              topicFilesArr.push(fileReq.rows[0]);
+            }
+            tmp.rows[0].course_materials = topicFilesArr;
+          }
+        }
+        
         topicArr.push(tmp.rows[0]);
       };
   
@@ -121,6 +140,8 @@ async function getAllTopicGroups(request, response) {
       object.admin_list = adminArr;
     }
     response.status(200).json(resp.rows);
+  try {
+    
   } catch (e) {
     response.status(400).send(e);
   }
@@ -135,7 +156,7 @@ async function getTopicGroup (request, response) {
 
     let resp = await pool.query(
       `SELECT tp_group.id, tp_group.name, tp_group.topic_code, 
-      array_agg(DISTINCT user_admin.admin_id) as admin_list,
+      array_agg(DISTINCT user_admin.admin_id) as admin_list, array_agg(DISTINCT tgf.id) as attachments,
       array_agg(DISTINCT topics.id) as topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
       array_agg(DISTINCT announcements.id) as announcements_list
       FROM topic_group tp_group 
@@ -143,14 +164,21 @@ async function getTopicGroup (request, response) {
       FULL OUTER JOIN topics ON topics.topic_group_id = tp_group.id
       LEFT JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
       LEFT JOIN announcements ON topics.topic_group_id = announcements.topic_group
+      LEFT JOIN topic_group_files tgf ON tgf.topic_group_id = tp_group.id
       WHERE tp_group.id = $1
       GROUP BY tp_group.id`, [topicGroupId]);
 
     var adminArr = [];
+    var fileArr = [];
     var topicArr = [];
     var tutArr = [];
     var announcementArr = [];
     var preReqsArr = [];
+
+    for (const fileId of resp.rows[0].attachments) {
+      let tmp = await pool.query(`SELECT * FROM topic_group_files WHERE id = $1`, [fileId]);
+      fileArr.push(tmp.rows[0]);
+    }
 
     for (const tutorialId of resp.rows[0].tutorial_list) {
       let tmp = await pool.query(`SELECT * FROM tutorials WHERE id = $1`, [tutorialId]);
@@ -201,6 +229,7 @@ async function getTopicGroup (request, response) {
       }
     };
 
+    resp.rows[0].attachments = fileArr;
     resp.rows[0].topics_list = topicArr;
     resp.rows[0].tutorial_list = tutArr;
     resp.rows[0].announcements_list = announcementArr;
@@ -294,7 +323,6 @@ async function getTopicPreReqs (request, response) {
     resp.rows[0].prerequisites_list = preReqsArr;
     response.status(200).json(resp.rows[0]);
   } catch(e) {
-    console.log(e);
     response.status(400).send(e);
   }
 }
@@ -304,8 +332,8 @@ async function postPreReq (request, response) {
   const preReqId = parseInt(request.preReqId);
   const topicId = parseInt(request.topicId);
 
-  let resp = await pool.query(
-    'INSERT INTO prerequisites(prereq, topic) VALUES($1, $2)', [preReqId, topicId]);
+  await pool.query(
+  'INSERT INTO prerequisites(prereq, topic) VALUES($1, $2)', [preReqId, topicId]);
 
   response.status(200).send(`Pre-requisite added with ID: ${preReqId}`)
 }
@@ -314,41 +342,138 @@ async function postPreReq (request, response) {
 async function deletePreReq (request, response) {
   const preReqId = parseInt(request.preReqId);
   const topicId = parseInt(request.topicId);
-  console.log('preReqId', preReqId);
-  console.log('topicId', topicId);
 
-  let resp = await pool.query(
-    'DELETE FROM prerequisites WHERE prereq = $1 AND topic = $2', [preReqId, topicId]);
+  await pool.query(
+  'DELETE FROM prerequisites WHERE prereq = $1 AND topic = $2', [preReqId, topicId]);
 
-  response.status(200).send(
-    `Pre-requisite deleted with Topic ID: ${topicId} and Pre-Req ID : ${preReqId}`)
-
+  response.status(200).json({successs: true});
 }
 
 // Create topic group
 async function postTopicGroup (request, response) {
-  const topicGroupName = request.params.topicGroupName;
-  const topic_code = request.body.topic_code;
-  const course_outline = request.body.course_outline;
+  try {
+    const topicGroupName = request.params.topicGroupName;
+    const topic_code = request.body.topic_code;
+    const fileTypeList = request.body.uploadedFileTypes.split(",");
 
-  let resp = await pool.query(
-    'INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, $1, $2, $3)',
-    [topicGroupName, topic_code, course_outline]);
+    let resp = await pool.query(
+      'INSERT INTO topic_group(id, name, topic_code) values(default, $1, $2) RETURNING id',
+      [topicGroupName, topic_code]);
 
-  response.status(200).send(`Topic Group created with name: ${topicGroupName}`)
+    if (request.files != null) {
+      if (!fs.existsSync(`../frontend/public/_files/topicGroup${resp.rows[0].id}`)) { fs.mkdirSync(`../frontend/public/_files/topicGroup${resp.rows[0].id}`) }
+      if (request.files.uploadFile.length > 1) {
+        if (fileTypeList.length > request.files.uploadFile.length) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        var typeCounter = 0;
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO topic_group_files(id, name, file, type, topic_group_id)
+          VALUES(default, $1, $2, $3, $4)`, [file.name, (`/_files/topicGroup${resp.rows[0].id}/${file.name}`), 
+          fileTypeList[typeCounter], resp.rows[0].id]);
+          fs.writeFile(`../frontend/public/_files/topicGroup${resp.rows[0].id}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          typeCounter+=1;
+        }
+      } else {
+        if (fileTypeList.length > 1) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        await pool.query(`INSERT INTO topic_group_files(id, name, file, type, topic_group_id)
+        VALUES(default, $1, $2, $3, $4)`, [request.files.uploadFile.name, 
+        (`/_files/topicGroup${resp.rows[0].id}/${request.files.uploadFile.name}`), fileTypeList[0], resp.rows[0].id]);
+        fs.writeFile(`../frontend/public/_files/topicGroup${resp.rows[0].id}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
+
+    response.sendStatus(200);
+  } catch (e) {
+    response.status(400).send(e)
+  }
 } 
+
+// Update topic group details
+async function putTopicGroup (request, response) {
+  try {
+    const newName = request.body.name;
+    const newTopicCode = request.body.topic_code;
+    const topicGroupName = request.params.topicGroupName;
+
+    let tgReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (!tgReq.rows.length) throw (`Failed: topic group {${topicGroupName}} does not exist`);
+
+    const topicGroupId = tgReq.rows[0].id;
+    const fileTypeList = request.body.uploadedFileTypes.split(",");
+
+    await pool.query(`UPDATE topic_group SET name = $1, topic_code = $2
+    WHERE id = $3`, [newName, newTopicCode, topicGroupId]);
+
+    if (request.body.fileDeleteList) {
+      const fileDeleteList = request.body.fileDeleteList.split(",");
+      if (fileDeleteList.length) {  // Deletes files specified in delete list
+        for (const fileId of fileDeleteList) {
+          let tmpQ = await pool.query(`DELETE FROM topic_group_files WHERE id = $1 RETURNING file`, [fileId]);
+          fs.unlinkSync("../frontend/public"+tmpQ.rows[0].file);
+        }
+      }
+    }
+
+    if (request.files != null) {
+      if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}`)) { fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}`) }
+      if (request.files.uploadFile.length > 1) {
+        if (fileTypeList.length > request.files.uploadFile.length) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        var typeCounter = 0;
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO topic_group_files(id, name, file, type, topic_group_id)
+          VALUES(default, $1, $2, $3, $4)`, [file.name, (`/_files/topicGroup${topicGroupId}/${file.name}`), 
+          fileTypeList[typeCounter], topicGroupId]);
+          fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          typeCounter+=1;
+        }
+      } else {
+        if (fileTypeList.length > 1) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        await pool.query(`INSERT INTO topic_group_files(id, name, file, type, topic_group_id)
+        VALUES(default, $1, $2, $3, $4)`, [request.files.uploadFile.name, 
+        (`/_files/topicGroup${topicGroupId}/${request.files.uploadFile.name}`), fileTypeList[0], topicGroupId]);
+        fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
+
+    response.status(200).json({success: true});
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
+}
 
 // Delete a topic group
 async function deleteTopicGroup (request, response) {
-  const topicGroupName = request.params.topicGroupName;
+  try { 
+    const topicGroupName = request.params.topicGroupName;
 
-  let resp = await pool.query(
-    'DELETE FROM topic_group WHERE LOWER(name) = LOWER($1)',
+    let checkExist = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (!checkExist.rows.length) throw (`Failed: Topic group {${topicGroupName}} doesn't exist in database`);
+
+    await pool.query('DELETE FROM topic_group WHERE LOWER(name) = LOWER($1)',
     [topicGroupName]);
 
-  response.status(200).send(`Topic Group deleted with name: ${topicGroupName}`)
+    if (fs.existsSync(`../frontend/public/_files/topicGroup${checkExist.rows[0].id}`)) { 
+      fs.rmdir(`../frontend/public/_files/topicGroup${checkExist.rows[0].id}`, { recursive: true }, (err) => {
+        if (err) { throw err; }
+      }); 
+    }
+
+    response.status(200).json({success: true, deleted: topicGroupName});
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
 }
 
+// Delete topic
 async function deleteTopic(request, response) {
   const topicGroupName = request.params.topicGroupName;
   const topicName = request.params.topicName;
@@ -357,44 +482,175 @@ async function deleteTopic(request, response) {
     response.status(400).json({error: "Could not find topic group"});
     return;
   }
+
   const topicGroupId = idResp.rows[0].id;
   let tmp = await pool.query(
-    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+    `SELECT id FROM topics WHERE LOWER(name) = LOWER($1) AND topic_group_id = $2`
   , [topicName, topicGroupId]);
   if (tmp.rows.length == 0) {
     response.status(400).json({error: "Could not find topic in database"});
     return;
   }
-  let topicId = tmp.rows[0].id;
+
+  if (fs.existsSync(`../frontend/public/_files/topicGroup${idResp.rows[0].id}/topic${tmp.rows[0].id}`)) { 
+    fs.rmdir(`../frontend/public/_files/topicGroup${idResp.rows[0].id}/topic${tmp.rows[0].id}`, { recursive: true }, (err) => {
+      if (err) { throw err; }
+    }); 
+  }
+
+  const topicId = tmp.rows[0].id;
   await pool.query(`DELETE FROM prerequisites WHERE topic = $1 or prereq = $1`, [topicId]);
   await pool.query(`DELETE FROM topics WHERE id = $1`, [topicId]);
   response.status(200).json({ success: true, topicId: topicId});
 }
 
+// Update topic details
+async function putTopic (request, response) {
+  try {
+    const topicName = request.params.topicName;
+    const newName = request.body.name;
+    const topicGroupName = request.params.topicGroupName;
+
+    let tgReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (!tgReq.rows.length) throw (`Failed: topic group {${topicGroupName}} does not exist`);
+
+    let tReq = await pool.query(`SELECT id FROM topics WHERE LOWER(name) = LOWER($1)`, [topicName]);
+    if (!tReq.rows.length) throw (`Failed: topic {${topicName}} does not exist`);
+
+    const topicGroupId = tgReq.rows[0].id;
+    const topicId = tReq.rows[0].id;
+    const fileTypeList = request.body.uploadedFileTypes.split(",");
+
+    await pool.query(`UPDATE topics SET name = $1 WHERE id = $2`, [newName, topicId]);
+
+    if (request.body.fileDeleteList) {
+      const fileDeleteList = request.body.fileDeleteList.split(",");
+      if (fileDeleteList.length) {  // Deletes files specified in delete list
+        for (const fileId of fileDeleteList) {
+          let tmpQ = await pool.query(`DELETE FROM topic_files WHERE id = $1 RETURNING file`, [fileId]);
+          fs.unlinkSync("../frontend/public"+tmpQ.rows[0].file);
+        }
+      }
+    }
+
+    // Checks if directory exists for topic group and topic and makes it
+    if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}`)) {
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}`); 
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`); 
+    } else if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`)) {
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`); 
+    }
+
+    if (request.files != null) {
+      if (request.files.uploadFile.length > 1) {
+        if (fileTypeList.length > request.files.uploadFile.length) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        var typeCounter = 0;
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO topic_files(id, name, file, type, topic_id)
+          VALUES(default, $1, $2, $3, $4)`, [file.name, (`/_files/topicGroup${topicGroupId}/topic${topicId}/${file.name}`), 
+          fileTypeList[typeCounter], topicId]);
+          fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          typeCounter+=1;
+        }
+      } else {
+        if (fileTypeList.length > 1) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        await pool.query(`INSERT INTO topic_files(id, name, file, type, topic_id)
+        VALUES(default, $1, $2, $3, $4)`, [request.files.uploadFile.name, 
+        (`/_files/topicGroup${topicGroupId}/topic${topicId}/${request.files.uploadFile.name}`), fileTypeList[0], topicId]);
+        fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
+
+    response.status(200).json({success: true, topic: topicId});
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
+}
+
 async function postTopic (request, response) {
-  const topicGroupName = request.params.topicGroupName;
-  const topicName = request.params.topicName;
-  const idResp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
-  if (idResp.rows.length == 0) {
-    response.status(400).json({error: "Could not find topic group"});
-    return;
-  }
-  const topicGroupId = idResp.rows[0].id;
+  try {
+    const topicGroupName = request.params.topicGroupName;
+    const topicName = request.params.topicName;
+    const idResp = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (idResp.rows.length == 0) throw ("Could not find topic group");
+    const topicGroupId = idResp.rows[0].id;
+    const fileTypeList = request.body.uploadedFileTypes.split(",");
 
-  let resp = await pool.query(
-    'INSERT INTO topics(id, topic_group_id, name) values(default, $1, $2)',
-    [topicGroupId, topicName]);
-  
-  let tmp = await pool.query(
-    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
-  , [topicName, topicGroupId]);
-  if (tmp.rows.length == 0) {
-    response.status(400).json({error: "Could not find newly created topic in database"});
-    return;
-  }
-  let topicId = tmp.rows[0];
+    let resp = await pool.query(
+      'INSERT INTO topics(id, topic_group_id, name) values(default, $1, $2) RETURNING id',
+      [topicGroupId, topicName]);
+    const topicId = resp.rows[0].id;
+    
+    /* let tmp = await pool.query(
+      `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+    , [topicName, topicGroupId]);
+    if (tmp.rows.length == 0) throw ("Could not find newly created topic in database");
+    let topicId = tmp.rows[0]; */
 
-  response.status(200).json(topicId);
+    // Checks if directory exists for topic group and topic and makes it
+    if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}`)) {
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}`); 
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`); 
+    } else if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`)) {
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`); 
+    }
+
+    if (request.files != null) {
+      if (request.files.uploadFile.length > 1) {
+        if (fileTypeList.length > request.files.uploadFile.length) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        var typeCounter = 0;
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO topic_files(id, name, file, type, topic_id)
+          VALUES(default, $1, $2, $3, $4)`, [file.name, (`/_files/topicGroup${topicGroupId}/topic${topicId}/${file.name}`), 
+          fileTypeList[typeCounter], topicId]);
+          fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          typeCounter+=1;
+        }
+      } else {
+        if (fileTypeList.length > 1) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        await pool.query(`INSERT INTO topic_files(id, name, file, type, topic_id)
+        VALUES(default, $1, $2, $3, $4)`, [request.files.uploadFile.name, 
+        (`/_files/topicGroup${topicGroupId}/topic${topicId}/${request.files.uploadFile.name}`), fileTypeList[0], topicId]);
+        fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
+
+    response.status(200).json({success: true, topic: topicId});
+  } catch (e) {
+    response.status(400).send(e);
+  }
+}
+
+// Get topic files
+async function getTopicFile (request, response) {
+  try {
+    const topicGroupName = request.params.topicGroupName;
+    const topicName = request.params.topicName;
+
+    // Checks topicgroup and topic validity
+    let tgResp = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (!tgResp.rows.length) throw (`Failed: Topic group {${topicGroupName}} does not exist.`);
+
+    let tnResp = await pool.query(`SELECT id FROM topics WHERE LOWER(name) = LOWER($1) AND topics.topic_group_id = $2`, 
+    [topicName, tgResp.rows[0].id]);
+    if (!tnResp.rows.length) throw (`Failed: Topic {${topicName}} does not exist.`);
+
+    let resp = await pool.query(`SELECT * FROM topic_files WHERE topic_id = $1`, [tnResp.rows[0].id]);
+
+    response.status(200).json(resp.rows);
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
 }
 
 /***************************************************************
@@ -461,6 +717,7 @@ async function getAllForumPosts (request, response) {
     }
     response.status(200).json(resp.rows);
   } catch (e) {
+    console.log(e)
     response.status(400).send(e.detail);
   }
 }
@@ -722,6 +979,7 @@ async function postForum (request, response) {
 
     response.sendStatus(200);
   } catch (e) {
+    console.log(e)
     response.status(400).send(e);
   }
 };
@@ -776,6 +1034,10 @@ async function getPostById (request, response) {
         LEFT JOIN forum_reply_files file ON file.reply_id = r.reply_id
         WHERE r.reply_id = $1
         GROUP BY r.reply_id`, [replyId]);
+        
+        if (!tmp.rows[0]) {
+          continue
+        }
 
         for (const fileId of tmp.rows[0].attachments) { 
           let tmp = await pool.query(`SELECT * FROM forum_reply_files WHERE id = $1`, [fileId]);
@@ -789,12 +1051,16 @@ async function getPostById (request, response) {
         var commentFileArr = [];
 
         let tmp = await pool.query(`
-        SELECT c.comment_id, c.user_id, c.author, c.published_date, c.comment,
+        SELECT c.comment_id, c.user_id, c.author, c.published_date, c.comment, c.isEndorsed,
         array_agg(file.id) as attachments
         FROM comments c
         LEFT JOIN forum_comment_files file ON file.comment_id = c.comment_id
         WHERE c.comment_id = $1
         GROUP BY c.comment_id`, [commentId]);
+
+        if (!tmp.rows[0]) {
+          continue
+        }
 
         for (const fileId of tmp.rows[0].attachments) {
           let tmp = await pool.query(`SELECT * FROM forum_comment_files WHERE id = $1`, [fileId]);
@@ -818,6 +1084,7 @@ async function getPostById (request, response) {
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
+    console.log(e)
     response.status(400).send(e.detail);
   }
 };
@@ -1015,8 +1282,8 @@ async function postComment (request, response) {
     const comment = request.body.comment;
 
     let resp = await pool.query(
-      `INSERT INTO comments(comment_id, user_id, author, published_date, comment) 
-      VALUES(default, $1, $2, CURRENT_TIMESTAMP, $3) RETURNING comment_id`,
+      `INSERT INTO comments(comment_id, user_id, author, published_date, comment, isEndorsed) 
+      VALUES(default, $1, $2, CURRENT_TIMESTAMP, $3, false) RETURNING comment_id`,
       [user_id, author, comment]);
   
     await pool.query(`INSERT INTO post_comments(post_id, comment_id) 
@@ -1123,6 +1390,19 @@ async function deleteComment (request, response) {
   }
 };
 
+// Endorses or un-endorses forum post comment
+async function putCommentEndorse (request, response) {
+  try {
+    const commentId = request.params.commentId;
+    const isEndorsed = request.params.isEndorsed;
+    await pool.query(`UPDATE comments SET isendorsed = $1 WHERE comment_id = $2`, [isEndorsed, commentId]);
+
+    response.sendStatus(200);
+  } catch(e) {
+    response.status(400).send(e.detail);
+  }
+}
+
 // Pins or unpins forum post
 async function putPostPin (request, response) {
   try {
@@ -1150,6 +1430,17 @@ async function getAllTags (request, response) {
     response.send(e);
   }
 };
+
+async function getTag (request, response) {
+  try {
+    const tagId = request.params.tagId;
+    let resp = await pool.query(`SELECT * FROM tags WHERE tag_id = $1`, [tagId]);
+    if (!resp.rows.length) throw ("Tag id not found");
+    response.status(200).json(resp.rows[0]);
+  } catch (e) {
+    response.status(400).send(e);
+  }
+}
 
 // Posts tag
 async function postTag (request, response) {
@@ -1321,7 +1612,9 @@ async function getAnnouncementById (request, response) {
     var fileArr = [];
     var commArr = [];
 
-    if (resp.rows[0].comments.length) {
+    console.log(resp.rows)
+
+    if (resp.rows[0].comments.length && resp.rows[0].comments[0] !== null) {
       for (const commId of resp.rows[0].comments) {
         let commQ = await pool.query(
         `SELECT ac.id, ac.author, ac.content, ac.post_date, array_agg(acf.id) as attachments
@@ -1345,19 +1638,22 @@ async function getAnnouncementById (request, response) {
       resp.rows[0].comments = commArr;
     }
 
-    for (const attachment of resp.rows[0].attachments) {
-      if (attachment != null) { 
-        let fileQ = await pool.query(`
-        SELECT id, name, file
-        FROM announcement_files WHERE announcement_id = $1 AND id = $2
-        `, [announcementId, attachment])
-        fileArr.push(fileQ.rows[0]);
+    if (resp.rows[0].attachments[0] !== null) {
+      for (const attachment of resp.rows[0].attachments) {
+        if (attachment != null) { 
+          let fileQ = await pool.query(`
+          SELECT id, name, file
+          FROM announcement_files WHERE announcement_id = $1 AND id = $2
+          `, [announcementId, attachment])
+          fileArr.push(fileQ.rows[0]);
+        }
       }
     }
     resp.rows[0].attachments = fileArr;
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
+    console.log(e)
     response.status(400).send(e);
   }
 };
@@ -1368,14 +1664,14 @@ async function postAnnouncement (request, response) {
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
     const topic_group = tmpQ.rows[0].id;
-    const author = request.body.author;
+    const user_id = request.body.user_id;
     const title = request.body.title;
-    const content = request.body.content;
+    const description = request.body.description;
 
     let resp = await pool.query(
       `INSERT INTO announcements(id, author, topic_group, title, content, post_date) 
       VALUES(default, $1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING id`,
-      [author, topic_group, title, content])
+      [user_id, topic_group, title, description])
 
     if (request.files != null) {
       if (!fs.existsSync(`../frontend/public/_files/announcement${resp.rows[0].id}`)) { fs.mkdirSync(`../frontend/public/_files/announcement${resp.rows[0].id}`) }
@@ -1405,7 +1701,8 @@ async function postAnnouncement (request, response) {
 
 // Update announcement by id
 async function putAnnouncement (request, response) {
-  const announcementId = request.params.announcementId;
+  try {
+    const announcementId = request.params.announcementId;
     const title = request.body.title;
     const content = request.body.content;
 
@@ -1443,8 +1740,6 @@ async function putAnnouncement (request, response) {
     }
     
     response.sendStatus(200);
-  try {
-    
   } catch (e) {
     response.status(400).send(e);
   }
@@ -1577,6 +1872,61 @@ async function deleteAnnouncementComment (request, response) {
     response.status(400).send(e);
   }
 };
+
+// Get all announcements related search term
+async function getSearchAnnouncements (request, response) {
+  try {
+    const topicGroupName = request.params.topicGroup;
+    const announcementSearchTerm = request.params.announcementSearchTerm;
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
+
+    let resp = await pool.query(
+      `SELECT a.id, a.author, a.topic_group, a.title, a.content, a.post_date, 
+      array_agg(c.id) as comments, array_agg(af.id) as attachments
+      FROM announcements a
+      LEFT JOIN announcement_comment c ON c.announcement_id = a.id
+      LEFT JOIN announcement_files af ON af.announcement_id = a.id
+      WHERE a.topic_group = $1
+      AND (LOWER (a.title) LIKE LOWER($2)
+      OR LOWER (a.content) LIKE LOWER($2))
+      GROUP BY a.id`, [topicGroupId, `%${announcementSearchTerm}%`]);
+
+    console.log(resp)
+
+    for (const object of resp.rows) {
+      var fileArr = [];
+      var commentArr = [];
+      for (const attachment of object.attachments) {
+        if (attachment != null) { 
+          let fileQ = await pool.query(`
+          SELECT id, name, file
+          FROM announcement_files WHERE announcement_id = $1 AND id = $2
+          `, [object.id, attachment])
+          fileArr.push(fileQ.rows[0]);
+        }
+      }
+
+      if (object.comments.length) {
+        for (const comment of object.comments) {
+          let commQ = await pool.query(`
+          SELECT id, author, content, post_date
+          FROM announcement_comment WHERE announcement_id = $1 AND id = $2
+          `, [object.id, comment])
+          commentArr.push(commQ.rows[0]);
+        }
+      }
+      
+      object.attachments = fileArr;
+      object.comments = commentArr;
+    }
+
+    response.status(200).json(resp.rows);
+  } catch (e) {
+    response.sendStatus(400).send(e);
+  }
+
+}
 
 /***************************************************************
                        Gamification Functions
@@ -2286,6 +2636,7 @@ module.exports = {
   deleteAnnouncementComment,
   deletePost,
   deleteComment,
+  putCommentEndorse,
   putComment,
   deletePostReply,
   deleteTag,
@@ -2347,6 +2698,7 @@ module.exports = {
   getAnnouncements,
   postAnnouncement,
   postAnnouncementComment,
+  getSearchAnnouncements,
   getQuestions,
   postQuestion,
   getLevelFromQuestion,
@@ -2358,5 +2710,10 @@ module.exports = {
   deleteLevel,
   postLevel,
   postQuizQuestion,
-  getTopicGroup
+  getTopicGroup,
+  getTag,
+  getTopicFile,
+  putTopicGroup,
+  putTopic,
+  lecturesTutorialsApi
 };

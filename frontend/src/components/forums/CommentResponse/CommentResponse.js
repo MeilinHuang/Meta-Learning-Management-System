@@ -4,6 +4,7 @@ import {
     ButtonGroup,
     Divider,
     Flex,
+    Icon,
     InputGroup,
     Link,
     Popover,
@@ -20,13 +21,17 @@ import {
 import AuthorDetails from '../AuthorDetails'
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai"
 import { ContentState, convertFromHTML } from 'draft-js'
+import { FaRegCheckCircle, FaCheckCircle } from 'react-icons/fa'
+import { BsTrash } from 'react-icons/bs'
+import { GrEdit } from 'react-icons/gr'
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './CommentResponse.module.css'
 
-function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id, setPost }) {
+function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id, setPost, isendorsed }) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState('')
     const toast = useToast()
+    console.log(isendorsed)
 
     useEffect(() => {
         setDetails(comment || reply)
@@ -105,7 +110,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
             ).then(r => {
                 if (r.status === 200) {
                     fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
-                        setPost(data[0])
+                        setPost(data)
                         onClose()
                     })
                 } else {
@@ -124,7 +129,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
             ).then(r => {
                 if (r.status === 200) {
                     fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
-                        setPost(data[0])
+                        setPost(data)
                         onClose()
                     })
                 } else {
@@ -138,6 +143,17 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
                 }
             })
         }
+    }
+
+    const handleEndorse = () => {
+        fetch(
+            `http://localhost:8000/forum/post/${post_id}/comment/${comment_id}/endorse/${!isendorsed}`, { method: 'PUT' }
+        ).then(r => {
+            if (r.status === 200) {
+                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
+            }
+            // TODO: handle errors
+        })
     }
 
     return (
@@ -159,32 +175,41 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
                 :
                     <>
                         <Text className={styles.description} dangerouslySetInnerHTML={{ __html: details }} />
-                        {/* show author controls if user is author */}
-                        <Flex mt="8px" justifyContent="flex-end">
-                            <Link onClick={editPost}>Edit</Link>
-                            <Popover>
-                                {({ onClose }) => (
-                                    <>
-                                        <PopoverTrigger>
-                                            <Link color="red" ml="8px">Delete</Link>
-                                        </PopoverTrigger>
-                                        <PopoverContent>
-                                            <PopoverHeader fontWeight="semibold">Confirmation</PopoverHeader>
-                                            <PopoverArrow />
-                                            <PopoverCloseButton />
-                                            <PopoverBody>
-                                                Are you sure you want to delete this post?
-                                            </PopoverBody>
-                                            <PopoverFooter d="flex" justifyContent="flex-end">
-                                                <ButtonGroup size="sm">
-                                                <Button variant="outline">Cancel</Button>
-                                                <Button colorScheme="red" onClick={() => handleDelete(onClose)}>Delete</Button>
-                                                </ButtonGroup>
-                                            </PopoverFooter>
-                                        </PopoverContent>
-                                    </>
-                                )}
-                            </Popover>
+                        <Flex justifyContent={isendorsed ? "space-between" : 'flex-end'}>
+                            {isendorsed && (
+                                <Flex alignItems="center" mt="16px">
+                                    <Icon h="13px" w="13px" mr="4px" color="green" as={FaCheckCircle} />
+                                    <Text fontSize="13px" color="green" fontWeight="bold">This comment is endorsed by staff</Text>
+                                </Flex>
+                            )}
+                            {/* show author controls if user is author */}
+                            <Flex mt="8px" justifyContent="flex-end">
+                                {!!comment_id && <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} />}
+                                <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
+                                <Popover placement="bottom-end">
+                                    {({ onClose }) => (
+                                        <>
+                                            <PopoverTrigger>
+                                                <Button pr="8px" leftIcon={<BsTrash />} ml="8px" color="red" />
+                                            </PopoverTrigger>
+                                            <PopoverContent>
+                                                <PopoverHeader fontWeight="semibold">Confirmation</PopoverHeader>
+                                                <PopoverArrow />
+                                                <PopoverCloseButton />
+                                                <PopoverBody>
+                                                    Are you sure you want to delete this post?
+                                                </PopoverBody>
+                                                <PopoverFooter d="flex" justifyContent="flex-end">
+                                                    <ButtonGroup size="sm">
+                                                    <Button variant="outline">Cancel</Button>
+                                                    <Button colorScheme="red" onClick={() => handleDelete(onClose)}>Delete</Button>
+                                                    </ButtonGroup>
+                                                </PopoverFooter>
+                                            </PopoverContent>
+                                        </>
+                                    )}
+                                </Popover>
+                            </Flex>
                         </Flex>
                     </>
             }

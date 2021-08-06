@@ -1,7 +1,7 @@
 const express = require("express");
 var cors = require('cors');
 const app = express();
-const database =  require('./service.js');
+const database = require('./service.js');
 const fileUpload = require('express-fileupload');
 
 app.use(cors());
@@ -60,6 +60,10 @@ app.get('/topicGroup/:topicGroupName/topic', async(request, response) => {
   await database.getTopics(request, response);
 });
 
+app.get('/topicGroup/:topicGroupName/topic/:topicName/topic', async(request, response) => {
+  await database.getTopicFile(request, response);
+})
+
 app.get('/topicGroup/:topicGroupName/topic/:topicName/prerequisite', async(request, response) => {
   await database.getTopicPreReqs(request, response);
 });
@@ -78,8 +82,8 @@ app.post('/topicGroup/:topicGroupName', async(request, response) => {
   await database.postTopicGroup(request, response);
 });
 
-app.delete('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
-  await database.deleteTopic(request, response);
+app.put('/topicGroup/:topicGroupName', async(request, response) => {
+  await database.putTopicGroup(request, response);
 });
 
 app.delete('/topicGroup/:topicGroupName', async(request, response) => {
@@ -89,6 +93,14 @@ app.delete('/topicGroup/:topicGroupName', async(request, response) => {
 app.post('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
   await database.postTopic(request, response);
 })
+
+app.put('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
+  await database.putTopic(request, response);
+})
+
+app.delete('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
+  await database.deleteTopic(request, response);
+});
 
 /***************************************************************
                        Forum Functions
@@ -150,8 +162,16 @@ app.delete('/forum/post/:postId/comment/:commentId', async(request, response) =>
   await database.deleteComment(request, response);
 });
 
+app.put('/forum/post/:postId/comment/:commentId/endorse/:isEndorsed', async(request, response) => {
+  await database.putCommentEndorse(request, response);
+});
+
 app.put('/forum/post/pin/:postId/:isPinned', async(request, response) => {
   await database.putPostPin(request, response);
+});
+
+app.get('/forum/tags/:tagId', async(request, response) => {
+  await database.getTag(request, response);
 });
 
 app.put('/forum/tags/:tagId', async(request, response) => {
@@ -218,6 +238,10 @@ app.put('/:topicGroup/announcement/:announcementId/comment/:commentId', async(re
 app.delete('/:topicGroup/announcement/:announcementId/comment/:commentId', async(request, response) => {
   await database.deleteAnnouncementComment(request, response);
 })
+
+app.get('/:topicGroup/announcement/search/:announcementSearchTerm', async(request, response) => {
+  await database.getSearchAnnouncements(request, response);
+});
 
 /***************************************************************
                        Gamification Functions

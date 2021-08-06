@@ -43,7 +43,7 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
         }).then(r => {
             if (r.status === 200) {
                 fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
-                    setPost(data[0])
+                    setPost(data)
                     setEditorState('') // TODO: work out how to clear editor on save
                 })
             } 
@@ -51,8 +51,10 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
         })
     }
 
+    console.log(posts)
+
     return (
-        <Box width={{ base: '100%', lg: '80%' }} mt="24px" mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
+        <Box width={{ base: '100%', lg: '80%' }} mt="24px" mb={isComments ? '32px' : ''} mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md" mb="12px">{isComments ? 'Comments' : 'Responses'}</Heading>
             {posts && posts[0] !== null && posts.map(post => (
                 post !== null && <CommentResponse {...post} post_id={post_id} setPost={setPost} />

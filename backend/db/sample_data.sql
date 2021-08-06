@@ -7,8 +7,8 @@ INSERT INTO users(id, name, zid) values(default, 'Tutory Tutorer', 'z5921738');
 INSERT INTO users(id, name, zid) values(default, 'Lecturey Lecturer', 'z5928712');
 
 -- Create Topic Groups
-INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, 'C++ Programming', 'COMP6771', 'Course_Outline.pdf');
-INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, 'Database Systems', 'COMP3331', 'Course_Outline.pdf');
+INSERT INTO topic_group(id, name, topic_code) values(default, 'C++ Programming', 'COMP6771');
+INSERT INTO topic_group(id, name, topic_code) values(default, 'Database Systems', 'COMP3331');
 
 -- Create Topics
 INSERT INTO topics(id, topic_group_id, name) values(default, 1, 'Loops');
@@ -82,9 +82,9 @@ INSERT INTO post_replies(post_id, reply_id) VALUES(1, 2);
 INSERT INTO post_replies(post_id, reply_id) VALUES(2, 3);
 
 -- Create Comments
-INSERT INTO comments(comment_id, user_id, author, published_date, comment) VALUES(default, 3, 'Tutory Tutor', current_timestamp, 'Extra tips');
-INSERT INTO comments(comment_id, user_id, author, published_date, comment) VALUES(default, 2, 'John Smith', current_timestamp, 'Thank you for the post');
-INSERT INTO comments(comment_id, user_id, author, published_date, comment) VALUES(default, 1, 'David Nguyen', current_timestamp, 'Never mind i figured it out');
+INSERT INTO comments(comment_id, user_id, author, published_date, comment, isEndorsed) VALUES(default, 3, 'Tutory Tutor', current_timestamp, 'Extra tips', true);
+INSERT INTO comments(comment_id, user_id, author, published_date, comment, isEndorsed) VALUES(default, 2, 'John Smith', current_timestamp, 'Thank you for the post', false);
+INSERT INTO comments(comment_id, user_id, author, published_date, comment, isEndorsed) VALUES(default, 1, 'David Nguyen', current_timestamp, 'Never mind i figured it out', false);
 
 -- Link Comments
 INSERT INTO post_comments(post_id, comment_id) VALUES(1, 1);
