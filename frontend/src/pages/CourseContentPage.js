@@ -48,38 +48,15 @@ function CourseContentPage() {
 
     let counter = 0
     let pageView = (
+
         <Center alignContent="center">
             <Spinner size="xl"/>
         </Center>
     )
     if (data != null) {
         pageView =  (
-            <Box marginInline={[0, 0, 0, 30, 100]} marginBottom={50}>
-                <Box marginBottom={10}>
-                    <Flex alignItems="center">
-                        <InputGroup variant="filled">
-                            <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
-                            <Input placeholder="Search" onChange={e => {
-                                const value = e.target.value.toLowerCase()
-                                let tmpArray = data.filter(e => {
-                                    if (e.name.toLowerCase().indexOf(value) !== -1) {
-                                        return true
-                                    }
-                                    for (let content of e.course_materials) {
-                                        if (content.name.toLowerCase().indexOf(value) !== -1) {
-                                            return true
-                                        }
-                                    }
-                                    return false
-                                })
-                                setDisplay(tmpArray)
-                            }}></Input>
-                        </InputGroup>
-                        {/* TODO ONLY FOR ADMIN TO EDIT TOPIC TREE*/}
-                        <Button marginLeft={5} onClick={() => history.push("/topictree")}>{treeButton}</Button>
-                    </Flex>
-                </Box>
-                <Center flexDirection="column">
+            <Flex justify="center" marginBottom={10}>
+                <Flex flexDirection="column" width="80%">
                     <Accordion width="100%" allowMultiple>
                         { display.map(e => {
                             return (
@@ -185,11 +162,39 @@ function CourseContentPage() {
                             )
                         }
                     }}>DOWNLOAD</Button>
-                </Center>
-            </Box>
+                </Flex>
+            </Flex>
         )
     }
-    return pageView
+    return (
+        <>
+            <Flex justify="center" marginBottom={10}>
+                <Flex alignItems="center" width="80%">
+                    {/* TODO ONLY FOR ADMIN TO EDIT TOPIC TREE*/}
+                    <Button onClick={() => history.push("/topictree")}>{treeButton}</Button>
+                    <InputGroup marginLeft={5}>
+                        <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
+                        <Input placeholder="Search" onChange={e => {
+                            const value = e.target.value.toLowerCase()
+                            let tmpArray = data.filter(e => {
+                                if (e.name.toLowerCase().indexOf(value) !== -1) {
+                                    return true
+                                }
+                                for (let content of e.course_materials) {
+                                    if (content.name.toLowerCase().indexOf(value) !== -1) {
+                                        return true
+                                    }
+                                }
+                                return false
+                            })
+                            setDisplay(tmpArray)
+                        }}></Input>
+                    </InputGroup>
+                </Flex>
+            </Flex>
+            {pageView}
+        </>
+    )
 }
 
 export default CourseContentPage
