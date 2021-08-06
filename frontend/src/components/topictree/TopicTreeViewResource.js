@@ -7,6 +7,7 @@ import {
     ModalFooter,
     ModalBody,
     ModalCloseButton,
+    CloseButton,
     Button,
     FormControl,
     FormLabel,
@@ -26,15 +27,22 @@ import {
     UnorderedList,
     ListItem
 } from "@chakra-ui/react";
-import { delete_topic_url, delete_prereqs } from "../../Constants";
+import Select from "./ChakraReactSelect.js";
+import { delete_topic_url, delete_prereqs, add_prereqs } from "../../Constants";
 
 
-export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, topicGroupName}) {
+export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, topicGroupName, nodes}) {
   const [tempPrereqs, setTempPrereqs] = useState([]);
   const [hasDeleted, setHasDelete] = useState(false);
+  const [showAddPrereqBox, setShowAddPrereqBox] = useState(false);
+  const [notPrereqs, setNotPrereqs] = useState([]);
   useEffect(() => {
     setTempPrereqs(prereqs);
-  }, [prereqs])
+  }, [prereqs]);
+
+  useEffect(() => {
+    setNotPrereqs(nodes);
+  }, [nodes]);
 
   const deleteTopic = async () => {
     await fetch(delete_topic_url(topicGroupName, data.title), {
@@ -43,7 +51,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
           'Content-Type': 'application/json'
       }
     });
-    console.log('deleting topic', data);
+    
     window.location.reload();
   };
 
@@ -51,11 +59,11 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     // Delete from array
     let copyPrereqs = JSON.parse(JSON.stringify(tempPrereqs));
     const index = tempPrereqs.indexOf(prereqToDelete);
-    console.log('index', index);
+    
     if (index > -1) {
       copyPrereqs.splice(index, 1);
     }
-    console.log('copyPrereqs', copyPrereqs);
+    
     setTempPrereqs(copyPrereqs);
     setHasDelete(true);
     await fetch(delete_prereqs(topicGroupName, data.title), {
@@ -78,7 +86,57 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     }
   }
 
-  const typesOfFiles = ["Practice", "Content", "Preparation", "Assessments"];
+  const showAddPrereq = () => {
+    setShowAddPrereqBox(true);
+  }
+
+  const hideAddPrereq = () => {
+    setShowAddPrereqBox(false);
+  }
+
+  const addPrereq = async(newPrereq, action) => {
+    console.log('newPrereqId', newPrereq);
+
+    // Add to prereqs
+    let copyPrereqs = JSON.parse(JSON.stringify(tempPrereqs));
+    copyPrereqs.push({
+      'name': newPrereq.label,
+      'id': newPrereq.value
+    });
+    
+    setTempPrereqs(copyPrereqs);
+
+    // delete from non prereqs
+    let copyNonPrereqs = JSON.parse(JSON.stringify(notPrereqs));
+    console.log('copyNonPrereqs', copyNonPrereqs);
+    const index = nodes.indexOf(newPrereq);
+    if (copyNonPrereqs.length > 1) {
+      if (index > -1) {
+        copyNonPrereqs.splice(index, 1);
+      }
+    } else {
+      copyNonPrereqs = [];
+    }
+
+    
+    setNotPrereqs(copyNonPrereqs);
+
+    setHasDelete(true); // reload when modal is closed so graph is updated
+    setShowAddPrereqBox(false);
+    
+    fetch(add_prereqs(topicGroupName, data.title), {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        'preReqId': newPrereq.value,
+        'topicId': data.id
+      }),
+    })
+  }
+
+  const typesOfFiles = ["Content", "Practice", "Preparation", "Assessments"];
   return (
     <>
     
@@ -92,19 +150,34 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
             <Box>
               <Heading as="h5" size="sm">Prerequisites</Heading>
               <Table variant="simple" mb={8}>
+              
                 <Tbody>
-                  {tempPrereqs.length == 0 ? <>No prerequisites here!</> : <></>}
+                  
                   {tempPrereqs.map((prereq) => {
                     return (
-                      <Tr>
+                      <Tr key={prereq.name}>
                         <Td>{prereq.name}</Td>
                         <Td><Button colorScheme="red" onClick={() => {deletePrerequisite(prereq)}}>Delete</Button></Td>
                       </Tr>
                     );
                   })}
+                  {showAddPrereqBox ?
+                  <Tr>
+                    <Td><Select
+                                name="prereqs"
+                                options={notPrereqs}
+                                placeholder="Select a topic..."
+                                closeMenuOnSelect={false}
+                                size="sm"
+                                onChange={addPrereq}
+                            /></Td>
+                    <Td><Flex flexDirection="row" w="8rem" alignItems="center" justifyContent="space-between"><Button colorScheme="green">Done</Button><CloseButton onClick={hideAddPrereq}/></Flex></Td>
+                  </Tr>
+                  : <></>}
                 </Tbody>
               </Table>
-              <Button mb={5} colorScheme="blue">Add prerequisite</Button>
+              {tempPrereqs.length == 0 ? <h6>No prerequisites here!</h6> : <></>}
+              <Button mb={5} colorScheme="blue" onClick={showAddPrereq}>Add prerequisite</Button>
             </Box>
             {typesOfFiles.map((typeOfFile) => {
               return (
@@ -118,10 +191,10 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {data.materials_strings[typeOfFile.toLowerCase()].length == 0 ? <>No files here!</> : <></>}
+                  
                   {data.materials_strings[typeOfFile.toLowerCase()].map((file_string) => {
                     return (
-                      <Tr>
+                      <Tr key={file_string}>
                         <Td>{file_string}</Td>
                         <Td><Button colorScheme="green" mr={3}>Download file</Button></Td>
                       </Tr>
@@ -129,6 +202,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                   })}
                 </Tbody>
               </Table>
+              {data.materials_strings[typeOfFile.toLowerCase()].length == 0 ? <h6>No files here!</h6> : <></>}
               <Button colorScheme="blue" mt={3}>Upload file</Button>
               </Box>
             )})}

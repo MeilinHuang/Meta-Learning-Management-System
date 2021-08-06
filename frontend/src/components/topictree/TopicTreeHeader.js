@@ -54,6 +54,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
     const [tempView, setTempView] = useState(view);
     const [topics, setTopics] = useState([]);
     const [listPrereqs, setListPrereqs] = useState([]);
+    const [notListPrereqs, setNotListPrereqs] = useState([]);
     const [selectedNode, setSelectedNode] = useState({
         "id": 0,
         "title": "",
@@ -86,6 +87,8 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
         for (let topic of jsonData.topics_list) {
             topic['value'] = topic.name;
             topic['label'] = topic.name;
+            topic['id'] = topic.id;
+            topic['name'] = topic.name;
             tempTopics.push(topic);
         }
 
@@ -93,9 +96,12 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
     };
 
     const onChangeSearch = async (value, action) => {
-        console.log('setting selected topic', value);
+        
         value['materials_strings'] = {};
         value.materials_strings['content'] = [];
+        value.materials_strings['practice'] = [];
+        value.materials_strings['preparation'] = [];
+        value.materials_strings['assessments'] = [];
         value['title'] = value.name;
         setSelectedNode(value);
 
@@ -105,14 +111,31 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
         for (let prereq of responseJson.prerequisites_list) {
             prereqList.push({'name': prereq.name, 'id': prereq.id});
         }
+
         setListPrereqs(prereqList);
-        console.log('selectedNode', value);
-        console.log('prereqs', prereqList);
+        let notPrereqs = [];
+        for (let topic of topics) {
+            let found = false;
+            for (let prereq of prereqList) {
+                if (topic.id === prereq.id) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found && topic.id !== value.id) {
+                notPrereqs.push({'value': topic.id, 'label': topic.name});
+            }
+        }
+        setNotListPrereqs(notPrereqs);
+
+        console.log('notPrereqs', notPrereqs);
+        console.log('prereqList', prereqList);
+        
         onOpenViewModal();
     }
 
     useEffect(() => {
-        console.log('topicGroupName', topicGroupName !== '');
+        
         if (topicGroupName !== '') {
             fetch(get_topics_url(topicGroupName))
             .then(response => response.json())
@@ -124,7 +147,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
     }, []);
 
     function setView() {
-        console.log('tempView', tempView);
+        
         if (tempView == 'Graph View') {
             setTempView('List View');
             history.push('/topictreelist');
@@ -220,7 +243,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
             ) : null}
             </Box>
             <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} topicGroupName={topicGroupName} />
-            <TopicTreeViewResource data={selectedNode} isOpen={isOpenViewModal} onClose={onCloseViewModal} prereqs={listPrereqs} topicGroupName={topicGroupName} />
+            <TopicTreeViewResource data={selectedNode} isOpen={isOpenViewModal} onClose={onCloseViewModal} prereqs={listPrereqs} topicGroupName={topicGroupName} nodes={notListPrereqs} />
         </div>
     );
   }

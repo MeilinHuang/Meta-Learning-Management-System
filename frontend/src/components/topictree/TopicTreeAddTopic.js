@@ -41,12 +41,12 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
     };
 
     const onChangePrerequisites = (value, action) => {
-        console.log('value', value);
+        
         setSelectedTopics(value);
     }
 
     const onChangeNewName = (value) => {
-        console.log('value', value.target.value);
+        
         setNewTopicName(value.target.value);
     }
 
@@ -70,14 +70,9 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
             setAlertTitle(responseJson.error);
             return;
         }
-        console.log(responseJson);
-
         let groupId = responseJson.id;
         for (let prereq of selectedTopics) {
-            console.log('Sending prereqs with body', {
-                "preReqId": prereq.id,
-                "topicId": groupId
-            });
+
             response = await fetch(post_new_prereq(topicGroupName, newTopicName), {
                 method: 'POST',
                 headers: {
