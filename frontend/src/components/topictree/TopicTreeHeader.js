@@ -1,4 +1,5 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
+import { useHistory } from 'react-router-dom'
 import {
     Box,
     Flex,
@@ -18,14 +19,16 @@ import {
     FormControl,
     FormLabel,
     Switch,
-    Divider
+    Divider,
   } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, CloseIcon, AddIcon, SearchIcon } from '@chakra-ui/icons';
 import Select from "./ChakraReactSelect.js";
+import { get_topics_url, get_prereqs} from "../../Constants.js";
+import TopicTreeViewResource from "./TopicTreeViewResource.js";
+
 import TopicTreeAddTopic from './TopicTreeAddTopic.js';
 
-const Links = ['Add a Topic'];
-const NavLink = ({ onClick, children }) => (
+const NavLink = ({ onClick, children, openUrl=true }) => (
     <Link
         px={2}
         py={1}
@@ -38,15 +41,40 @@ const NavLink = ({ onClick, children }) => (
                 bg: useColorModeValue('gray.300', 'gray.300'),
             }
         }
-        href={children}>
+        href={ openUrl ? children : '#'}>
         {children}
     </Link>
 );
 
 
   
-export default function TopicTreeHeader({id, view, setView}) {
+export default function TopicTreeHeader({id, topicGroupName='', view}) {
+    const history = useHistory();
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [tempView, setTempView] = useState(view);
+    const [topics, setTopics] = useState([]);
+    const [listPrereqs, setListPrereqs] = useState([]);
+    const [notListPrereqs, setNotListPrereqs] = useState([]);
+    const [selectedNode, setSelectedNode] = useState({
+        "id": 0,
+        "title": "",
+        "prerequisite_strings": [],
+        "description": "",
+        "materials_strings": {
+            "preparation": [],
+            "content": [],
+            "practice": [],
+            "assessments": []
+        },
+        "group": "",
+        "discipline": "",
+        "creator": ""
+    });
+    const { 
+        isOpen: isOpenViewModal, 
+        onOpen: onOpenViewModal, 
+        onClose: onCloseViewModal 
+    } = useDisclosure();
 
     const { 
         isOpen:isOpenModal, 
@@ -54,14 +82,84 @@ export default function TopicTreeHeader({id, view, setView}) {
         onClose: onCloseModal 
     } = useDisclosure();
 
-    var colourOptions = [
-        { value: "blue", label: "Blue", color: "#0052CC" },
-        { value: "purple", label: "Purple", color: "#5243AA" },
-        { value: "red", label: "Red", color: "#FF5630" },
-        { value: "orange", label: "Orange", color: "#FF8B00" },
-        { value: "yellow", label: "Yellow", color: "#FFC400" },
-        { value: "green", label: "Green", color: "#36B37E" }
-    ];
+    const convertToList = (jsonData) => {
+        let tempTopics = [];
+        for (let topic of jsonData.topics_list) {
+            topic['value'] = topic.name;
+            topic['label'] = topic.name;
+            topic['id'] = topic.id;
+            topic['name'] = topic.name;
+            tempTopics.push(topic);
+        }
+
+        return tempTopics;
+    };
+
+    const onChangeSearch = async (value, action) => {
+        
+        value['materials_strings'] = {};
+        value.materials_strings['content'] = [];
+        value.materials_strings['practice'] = [];
+        value.materials_strings['preparation'] = [];
+        value.materials_strings['assessments'] = [];
+        value['title'] = value.name;
+        setSelectedNode(value);
+
+        let response = await fetch(get_prereqs(topicGroupName, value.name));
+        let responseJson = await response.json();
+        let prereqList = [];
+        for (let prereq of responseJson.prerequisites_list) {
+            prereqList.push({'name': prereq.name, 'id': prereq.id});
+        }
+
+        setListPrereqs(prereqList);
+        let notPrereqs = [];
+        for (let topic of topics) {
+            let found = false;
+            for (let prereq of prereqList) {
+                if (topic.id === prereq.id) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found && topic.id !== value.id) {
+                notPrereqs.push({'value': topic.id, 'label': topic.name});
+            }
+        }
+        setNotListPrereqs(notPrereqs);
+
+        console.log('notPrereqs', notPrereqs);
+        console.log('prereqList', prereqList);
+        
+        onOpenViewModal();
+    }
+
+    useEffect(() => {
+        
+        if (topicGroupName !== '') {
+            fetch(get_topics_url(topicGroupName))
+            .then(response => response.json())
+            .then(function (data) {
+                setTopics(convertToList(data));
+            });
+        }
+
+    }, []);
+
+    function setView() {
+        
+        if (tempView == 'Graph View') {
+            setTempView('List View');
+            history.push('/topictreelist');
+        } else {
+            setTempView('Graph View');
+            history.push('/topictree');
+        }
+    }
+
+    function isChecked() {
+        return tempView == "Graph View";
+    }
   
     return (
         <div id={id}>
@@ -75,30 +173,30 @@ export default function TopicTreeHeader({id, view, setView}) {
                 onClick={isOpen ? onClose : onOpen}
                 />
                 <HStack spacing={8} alignItems={'center'}>
-                    <Box color='white' fontSize={'1.2rem'} >Meta LMS</Box>
+                    <Box color='white' fontSize={'1.2rem'} >Meta LMS  &nbsp;| &nbsp;<b>Topic Tree</b></Box>
                     <HStack
                         as={'nav'}
                         spacing={4}
                         display={{ base: 'none', md: 'flex' }}>
-                        
-                        <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
-                        <Box bg='white' w={200}>
+                        {topicGroupName !== '' ? 
+                        <>
+                        <Link mt={1} px={2} py={1} color={'white'} rounded={'md'}
+                            onClick={onOpenModal}>Add a Topic</Link>
+                        <Box bg='white'  w={200}>
                             <FormControl id="new-topic-dependencies">
                                 <Select
                                     name="searchTopic"
-                                    options={colourOptions}
+                                    options={topics}
                                     placeholder="Search a topic"
                                     closeMenuOnSelect={true}
                                     size="sm"
                                     w={5000}
-                                    onKeyDown={(key) => {
-                                        if (key.code == "Enter") {
-                                            
-                                        }
-                                    }}
+                                    onChange={onChangeSearch}
                                 />
                             </FormControl>
                         </Box>
+                        </> : <></>
+                        }
                     </HStack>
                 </HStack>
                 <Flex alignItems={'center'} height="100%">
@@ -106,7 +204,8 @@ export default function TopicTreeHeader({id, view, setView}) {
                         <FormLabel htmlFor="topic-tree-view" color="white">
                             {view}
                         </FormLabel>
-                        <Switch id="topic-tree-view" onChange={e => { if (e.target.checked) { setView("Graph View")} else setView("List View")}} defaultChecked/>
+                        <Switch id="topic-tree-view" onChange={e => { if (e.target.checked) { setView("Graph View")} else setView("List View")}} 
+                            isChecked={isChecked()}/>
                     </FormControl>
                     <Divider orientation="vertical"></Divider>
                     <Menu>
@@ -136,12 +235,15 @@ export default function TopicTreeHeader({id, view, setView}) {
             {isOpen ? (
                 <Box pb={4} display={{ md: 'none' }}>
                 <Stack as={'nav'} spacing={4}>
-                    <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
+                    { topicGroupName != '' ? (
+                        <NavLink key={"Add a Topic"} onClick={onOpenModal} openUrl={false}>Add a Topic</NavLink>
+                    ) : <></> }
                 </Stack>
                 </Box>
             ) : null}
             </Box>
-            <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} />
+            <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} topicGroupName={topicGroupName} />
+            <TopicTreeViewResource data={selectedNode} isOpen={isOpenViewModal} onClose={onCloseViewModal} prereqs={listPrereqs} topicGroupName={topicGroupName} nodes={notListPrereqs} />
         </div>
     );
   }

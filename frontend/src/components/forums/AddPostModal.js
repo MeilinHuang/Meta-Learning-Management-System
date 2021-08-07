@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
     Button,
     Flex,
@@ -11,33 +11,68 @@ import {
     ModalHeader,
     ModalBody,
     ModalCloseButton,
+    useToast,
 } from "@chakra-ui/react"
 import DraftEditor from './DraftEditor/DraftEditor'
 import TagSelect from './TagSelect/TagSelect'
 
-function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
+const dummyAuthor = 2
+
+function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
     const [title, setTitle] = useState('')
     const [details, setDetails] = useState('')
-    const [image, setImage] = useState({})
+    const [relatedLink, setRelatedLink] = useState('')
+    const [images, setImages] = useState([])
     const [tags, setTags] = useState([])
+    const [selectedTags, setSelectedTags] = useState([])
+    const toast = useToast()
+
+    useEffect(() => {
+        fetch(`http://localhost:8000/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
+    }, [])
 
     const handleSubmit = e => {
         e.preventDefault()
-        const date = new Date(Date.now()).toISOString()
+        e.target.reset()
+        console.log(details)
 
-        const postDetails = {
-            title,
-            details,
-            tags,
-            image,
-            date,
+        if (title === '' || details.replace(/<[^>]+>/g, '') === '') {
+            toast({
+                title: 'Required fields missing',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            })
+            return
         }
-        onSubmit(postDetails)
+
+        const timeZoneOffset = (new Date()).getTimezoneOffset() * 60000
+        const date = new Date(Date.now() - timeZoneOffset).toISOString()
+
+        const formData = new FormData()
+        formData.append('user_id', dummyAuthor)
+        formData.append('uploadFile', images)
+        formData.append('title', title)
+        formData.append('description', details)
+        formData.append('publishedDate', date)
+
+        if (selectedTags) {
+            const tags = []
+            selectedTags.map(({ tag_id }) => tags.push(tag_id))
+            formData.append('tags', tags)
+        }
+
+        onSubmit(formData)
+
+        setTags([])
+        setImages([])
+
+        onClose()
     }
 
     const handleUpload = e => {
-        setImage(e.target.files[0])
-        // console.log(e.target.files[0])
+        setImages(e.target.files[0])
+        console.log(e.target.files[0])
     }
 
     return (
@@ -45,30 +80,38 @@ function AddPostModal({ isOpen, onClose, showTags, onSubmit }) {
             <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false} isCentered size="xl" p="24px">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Create new post</ModalHeader>
+                    <ModalHeader>{isForums ? 'Create new forum post' : 'Create new post'}</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                    <form id="createPost" onSubmit={handleSubmit}>
+                    <form id="createPost" onSubmit={handleSubmit} enctype="multipart/form-data">
                         <Flex flexDirection="column" mb="16px">
-                            <Heading size="sm" mb="4px">Title</Heading>
+                            <Heading size="sm" mb="4px">Title*</Heading>
                             <Input name="postTitle" onChange={e => setTitle(e.target.value)} />
                         </Flex>
                         <Flex flexDirection="column">
-                            <Heading size="sm" mb="4px">Details</Heading>
+                            <Heading size="sm" mb="4px">Details*</Heading>
                             <DraftEditor setDetails={setDetails}  />
                         </Flex>
-                        {/* <Flex flexDirection="column" mb="16px">
+                        <Flex flexDirection="column" mb="16px">
                             <Heading size="sm" mb="4px">Attach Images</Heading>
                             <input type="file" name="images" onChange={handleUpload} />
-                        </Flex> */}
-                        {showTags && <Flex flexDirection="column">
-                            <Heading size="sm" mb="4px">Tags</Heading>
-                            <TagSelect setTags={setTags} />
-                        </Flex>}
+                        </Flex>
+                        {isForums &&
+                            <>
+                                <Flex flexDirection="column">
+                                    <Heading size="sm" mb="4px">Tags</Heading>
+                                    <TagSelect setSelectedTags={setSelectedTags} tags={tags} />
+                                </Flex>
+                                <Flex flexDirection="column" mt="16px">
+                                    <Heading size="sm" mb="4px">Related Link</Heading>
+                                    <Input name="postRelatedLink" onChange={e => setRelatedLink(e.target.value)} />
+                                </Flex>
+                            </>
+                        }
                     </form>
                     </ModalBody>
                     <ModalFooter>
-                        <Button type="submit" form="createPost" onClick={onClose}>Save</Button>
+                        <Button type="submit" form="createPost">Save</Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

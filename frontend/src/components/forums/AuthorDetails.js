@@ -11,7 +11,7 @@ function AuthorDetails({ author, date }) {
     return (
         <Flex alignItems={{ base: 'unset', md: 'center' }} justifyContent="space-between" flexDirection={{ base: 'column', md: 'row' }} mb="8px">
             <Heading size="sm">{author}</Heading>
-            <Text>{dateString}</Text>
+            <Text fontSize="13px">{dateString}</Text>
         </Flex>
     )
 }

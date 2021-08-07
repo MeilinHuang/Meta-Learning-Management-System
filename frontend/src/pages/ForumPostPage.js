@@ -24,13 +24,13 @@ import PostDetails from '../components/forums/PostDetails/PostDetails'
 import CommentsResponses from '../components/forums/CommentsResponses/CommentsResponses'
 import { BsTrash } from 'react-icons/bs'
 
-function ForumPostPage({ match: { params: { id }}}) {
+function ForumPostPage({ match: { params: { code, id }}}) {
     const [post, setPost] = useState({})
     const history = useHistory()
     const toast = useToast()
 
     useEffect(() => {
-        fetch(`http://localhost:8000/forum/post/${id}`).then(r => r.json()).then(data => setPost(data[0]))
+        fetch(`http://localhost:8000/forum/post/${id}`).then(r => r.json()).then(data => setPost(data))
     }, [id])
 
     const handleDelete = () => {
@@ -38,7 +38,7 @@ function ForumPostPage({ match: { params: { id }}}) {
             `http://localhost:8000/forum/post/${id}`, { method: 'DELETE' }
         ).then(r => {
             if (r.status === 200) {
-                history.push('/forums')
+                history.push(`/course-page/${code}/forums`)
             } else {
                 toast({
                     title: 'Sorry, an error has occurred',
@@ -55,7 +55,7 @@ function ForumPostPage({ match: { params: { id }}}) {
         <>
             <Breadcrumb separator=">">
                 <BreadcrumbItem>
-                    <BreadcrumbLink as={RouterLink} to="/forums" fontWeight="bold">Forums</BreadcrumbLink>
+                    <BreadcrumbLink as={RouterLink} to={`/course-page/${code}/forums`} fontWeight="bold">Forums</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbItem isCurrentPage>
                     <BreadcrumbLink href="#">{post.title}</BreadcrumbLink>
@@ -63,7 +63,7 @@ function ForumPostPage({ match: { params: { id }}}) {
             </Breadcrumb>
             <Flex justifyContent="space-between" alignItems="baseline">
                 <Heading mt="16px">{post.title}</Heading>
-                <Popover>
+                <Popover placement="bottom-end">
                     <PopoverTrigger>
                         <Button pr="8px" leftIcon={<BsTrash />} variant="ghost" color="red" />
                     </PopoverTrigger>
@@ -85,7 +85,7 @@ function ForumPostPage({ match: { params: { id }}}) {
             </Flex>
             <Divider />
             <Tags tags={post.tags} />
-            <PostDetails post={post} />
+            <PostDetails post={post} setPost={setPost} />
             <CommentsResponses posts={post.replies} post_id={id} setPost={setPost} />
             <CommentsResponses isComments posts={post.comments} post_id={id} setPost={setPost} />
         </>

@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import './TopicTree.css';
 import TopicTreeHeader from "./TopicTreeHeader.js"
-import { Spinner } from '@chakra-ui/spinner';
 import { Button, Text, Heading, Box, Input, Flex, InputGroup, InputLeftElement, Stack, Divider } from '@chakra-ui/react';
 import { SearchIcon, ArrowRightIcon } from '@chakra-ui/icons'
 import TopicTreeViewResource from "./TopicTreeViewResource.js"
@@ -16,14 +15,11 @@ function zoomed() {
     g.attr("transform", d3.event.transform);
 }
 
-export default function TopicTree() {
-
-    const [view, setView] = useState("Graph View")
-
+export default function TopicTree({ match: { params: { topicGroup }}}) {
     const ref = useRef();
-    const dataset = [100, 200, 300, 400, 500];
     const [data, setData] = useState([]);
     const [listPrereqs, setListPrereqs] = useState([]);
+    const [notListPrereqs, setNotListPrereqs] = useState([]);
     const [selectedNode, setSelectedNode] = useState({
         "id": 0,
         "title": "",
@@ -33,39 +29,12 @@ export default function TopicTree() {
             "preparation": [],
             "content": [],
             "practice": [],
-            "assessment": []
+            "assessments": []
         },
         "group": "",
         "discipline": "",
         "creator": ""
     });
-    const links = [
-        {
-            name: 'Home',
-            url: '/',
-        },
-        {
-            name: 'Course Outline',
-            url: '/course-outline',
-        },
-        {
-            name: 'Content',
-            url: '/content',
-        },
-        {
-            name: 'Forums',
-            url: '/forums',
-        },
-        {
-            name: 'Support',
-            url: '/support',
-        },
-        {
-            name: 'Topic Tree',
-            url: '/topictree'
-        }
-    ];
-    const [isOpen, setOpen] = useState(false);
     const { 
         isOpen: isOpenModal, 
         onOpen: onOpenModal, 
@@ -83,50 +52,70 @@ export default function TopicTree() {
             node["title"] = topic.name;
             node["materials_strings"] = {};
             node.materials_strings["content"] = [];
+            node.materials_strings['preparation'] = [];
+            node.materials_strings['practice'] = [];
+            node.materials_strings['assessments'] = [];
             for (let course_material of topic.course_materials) {
-                node.materials_strings.content.push(course_material.name);
+                if (course_material.type === 'preparation') {
+                    node.materials_strings.preparation.push(course_material.name);
+                } else if (course_material.type === 'assessment') {
+                    node.materials_strings.assessments.push(course_material.name);
+                } else if (course_material.type === 'practice') {
+                    node.materials_strings.practice.push(course_material.name);
+                } else {
+                    node.materials_strings.content.push(course_material.name);
+                }
             }
-            console.log('topic', topic);
+            
             newJson.nodes.push(node);
             for (let prereq of topic.prereqs) {
                 newJson.links.push({
-                    'source': prereq,
+                    'source': prereq.id,
                     'target': topic.id
                 });
             }
         }
-        console.log('newJson', newJson);
+        
         return newJson;
     }
 
 
     const getListOfPrerequisites = (id, data) => {
-        console.log('id', id);
-        console.log('data', data);
+        
+        
         let linksArray = [];
         for (let i = 0; i < data.links.length; i++) {
             if (data.links[i].target.id === id) {
                 linksArray.push(data.links[i].source.id);
             }
         }
-        console.log(linksArray);
+        
         let prereqs = [];
+        let nodes = [];
+        console.log('data', data.nodes);
         for (let i = 0; i < data.nodes.length; i++) {
+            let found = false;
             for (let j = 0; j < linksArray.length; j++) {
                 if (data.nodes[i].id === linksArray[j]) {
-                    prereqs.push(data.nodes[i].title);
+                    prereqs.push({'name': data.nodes[i].title, 'id': data.nodes[i].id});
+                    found = true;
                     break;
                 }
             }
+            if (!found && data.nodes[i].id !== undefined && data.nodes[i].title !== undefined && data.nodes[i].id !== id) {
+                nodes.push({'value': data.nodes[i].id.toString(), 'label': data.nodes[i].title});
+            }
         }
-        console.log('prereqs', prereqs);
+        console.log('nodes', nodes);
         setListPrereqs(prereqs);
+        setNotListPrereqs(nodes);
+        onOpenModal();
     }
 
     useEffect(() => {
 
         
-        console.log('running');
+        
         let size = 500;
 
         let width = window.innerWidth;
@@ -154,12 +143,12 @@ export default function TopicTree() {
         })
 
         // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
-        fetch(get_topics_url('C++ Programming'))
+        fetch(get_topics_url(topicGroup))
         .then((res) => {
             return res.json();
         })
         .then((res) => {
-            console.log('old json', res);
+            
             return treeStructure(res);
         })
         .then( function(data) {
@@ -170,7 +159,7 @@ export default function TopicTree() {
                     preprocessedData[node.id.toString()] = node;
                 }
             }
-            console.log('data');
+            
             // arrow heads
             svg.append("svg:defs").selectAll("marker")
                 .data(["end"])
@@ -208,16 +197,16 @@ export default function TopicTree() {
                 .enter().append("g")
                 .on("click", function() {
                     let topicName = d3.select(this).text();
-                    console.log("node clicked", d3.select(this).text());
+                    
                     let nodeData = data.nodes.filter(function (dataValue) {
-                        console.log(dataValue);
+                        
                         return dataValue.title === topicName;
                     });
-                    console.log('nodeData', nodeData);
+                    
 
                     setSelectedNode(nodeData[0]);
                     getListOfPrerequisites(nodeData[0].id, data);
-                    onOpenModal();
+
 
 
                 });
@@ -247,7 +236,7 @@ export default function TopicTree() {
                 });
             });
             
-            console.log('linkNodes', linkNodes);
+            
             simulation
                 .nodes(data.nodes.concat(linkNodes))
                 .on("tick", ticked);
@@ -289,78 +278,14 @@ export default function TopicTree() {
                 d.fy = null;
             }
         });
-    }, [view]);
+    }, []);
 
-    let pageView = null
-    if (view === "Graph View") {
-        pageView = (
-            <div>
-                <TopicTreeHeader id="topic-tree-header" view={view} setView={setView}></TopicTreeHeader>
-                <div id="graph" ref={ref} />
-                <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} />
-            </div>
-        )
-    }
-    else {
-        if (data != null) {
-            //Data is a list of topic groups
-            pageView = (
-            <div>
-                <TopicTreeHeader id="topic-tree-header" view={view} setView={setView}></TopicTreeHeader>
-                <Box paddingInline={[5, 15, 30]} paddingBlock={10}>
-                    <Flex flexDirection={["column", "column", "row"]}>
-                        <Heading>Topic Groups</Heading>
-                        <InputGroup variant="filled" marginLeft={["0", "0", "20%"]} width={["80%", "70%", "30%"]} alignSelf="center">
-                            <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
-                            <Input placeholder="Search"></Input>
-                        </InputGroup>
-                    </Flex>
-                    <Stack spacing={5} divider={<Divider></Divider>} marginTop={10}>
-                        {data.map(e => {
-                            let num_topics = e.topics_list.length + " topics"
-                            if (e.topics_list.length == 1) {
-                                num_topics.substring(0, num_topics.length - 1)
-                            }
-                            //TODO add links to topics when user clicks on topic group
-                            // also direct to course page if user clicks on visit course page button
-                            // could also show prerequesite topic groups
-                            return (
-                                <Flex key={"topic-group-" + e.id} padding={5} justifyContent="auto">
-                                    <Button as={Flex} bg="white" cursor="pointer" flexGrow={1}>
-                                        <ArrowRightIcon color="blue.500" alignSelf="center" display={["none", "block"]} marginRight={10}></ArrowRightIcon>
-                                        <Flex flexDirection={["column", "column", "row"]}>
-                                            <Box width={[200]}>
-                                                <Heading fontSize="lg">
-                                                    {e.name}
-                                                </Heading>
-                                            </Box>
-                                            <Box>
-                                                <Text>
-                                                    {e.topic_code}
-                                                </Text>
-                                            </Box>
-                                        </Flex>
-                                        <Box marginLeft={10} fontSize="sm" display={["none", "none", "block"]}>
-                                            <Text>
-                                                {num_topics}
-                                            </Text>
-                                        </Box>
-                                        <Box flexGrow={1}></Box>
-                                    </Button>
-                                    <Button bg="blue.500" color="white">Course Page</Button>
-                                </Flex>
-                            )
-                        })}
-                    </Stack>
-                </Box>
-                
-            </div>
-            )
-        }
-        else {
-            pageView = <Spinner></Spinner>
-        }
-    }
-
-    return pageView
+    return (
+        <div>
+            <TopicTreeHeader id="topic-tree-header" topicGroupName={topicGroup} view={"Graph View"}></TopicTreeHeader>
+            <div id="graph" ref={ref} />
+            <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} topicGroupName={topicGroup} nodes={notListPrereqs} />
+        </div>
+    );
+    
 }
