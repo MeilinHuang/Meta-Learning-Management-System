@@ -48,7 +48,7 @@ function MainSelection() {
                                                 history.push("/course-page/" + course.name)
                                             }}>
                                                 <Flex flexDirection={["row"]}>
-                                                    <Text letterSpacing="wide" fontWeight={200} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" width={[200, 150, 200]}>{course.name}</Text>
+                                                    <Text letterSpacing="wide" fontWeight={200} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" width={[150, 150, 200]}>{course.name}</Text>
                                                     <Text letterSpacing="wider" fontWeight={200}>{course.topic_code}</Text>
                                                 </Flex>
                                             </Flex>
