@@ -56,7 +56,7 @@ function CourseContentPage() {
     if (data != null) {
         pageView =  (
             <Flex justify="center" marginBottom={10}>
-                <Flex flexDirection="column" width="80%">
+                <Flex flexDirection="column" width={["100%", "100%", "80%"]}>
                     <Accordion width="100%" allowMultiple>
                         { display.map(e => {
                             return (
@@ -169,7 +169,7 @@ function CourseContentPage() {
     return (
         <>
             <Flex justify="center" marginBottom={10}>
-                <Flex alignItems="center" width="80%">
+                <Flex alignItems="center" width={["100%", "100%", "80%"]}>
                     {/* TODO ONLY FOR ADMIN TO EDIT TOPIC TREE*/}
                     <Button onClick={() => history.push("/topictree")}>{treeButton}</Button>
                     <InputGroup marginLeft={5}>
