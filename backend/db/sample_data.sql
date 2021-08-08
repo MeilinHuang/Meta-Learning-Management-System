@@ -29,10 +29,6 @@ INSERT INTO topic_files(id, name, file, type, topic_id, due_date) values(default
 INSERT INTO prerequisites(prereq, topic) values(3, 1);
 INSERT INTO prerequisites(prereq, topic) values(2, 1);
 
--- Create Tutorials
-INSERT INTO tutorials(id, tutor_id, topic_group_id, tutorial_code, timeslot, curr_capacity, max_capacity) values(default, 3, 1, 'M18A1', '10:00-12:00', 0, 20);
-INSERT INTO tutorials(id, tutor_id, topic_group_id, tutorial_code, timeslot, curr_capacity, max_capacity) values(default, 3, 1, 'W18A1', '10:00-12:00', 0, 20);
-
 -- Create Admins
 INSERT INTO user_admin(admin_id, topic_group_id) values(3, 1);
 
@@ -166,6 +162,32 @@ INSERT INTO quiz_student_answer(student_id, quiz_id, question_id, answer_selecte
 VALUES(3, 2, 2, 1);
 
 -- Create poll
-INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll A', current_timestamp, current_timestamp, false, 'Poll type A');
-INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll B', current_timestamp, current_timestamp, false, 'Poll type B');
-INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) VALUES(default, 'Poll C', current_timestamp, current_timestamp, false, 'Poll type C');
+INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) 
+VALUES(default, 'Poll A', current_timestamp, current_timestamp, false, 'Poll type A');
+INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) 
+VALUES(default, 'Poll B', current_timestamp, current_timestamp, false, 'Poll type B');
+INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) 
+VALUES(default, 'Poll C', current_timestamp, current_timestamp, false, 'Poll type C');
+
+-- Weeks
+INSERT INTO weeks(id, num) VALUES(default, 1);
+INSERT INTO weeks(id, num) VALUES(default, 2);
+INSERT INTO weeks(id, num) VALUES(default, 3);
+
+-- Create NonEnrol-Lectures
+INSERT INTO lectures(id, lecturer_id, topic_group_id, topic_reference, week, start_time, end_time)
+VALUES(default, 4, 1, 1, 1, '10:00', '11:00');
+
+-- Lecture files
+INSERT INTO lecture_files(id, name, file, type, lecture_id) 
+VALUES(default, 'lecture1-slides.pdf', '/_files/lecture1/lecture1-slides.pdf', 'lecture', 1);
+
+-- Create NonEnrol-Tutorials
+INSERT INTO tutorials(id, tutor_id, topic_group_id, week, start_time, end_time, topic_reference) 
+VALUES(default, 3, 1, 1, '12:00', '13:00', 1);
+INSERT INTO tutorials(id, tutor_id, topic_group_id, week, start_time, end_time, topic_reference) 
+VALUES(default, 3, 1, 1, '15:00', '16:00', 1);
+
+-- Tutorial files
+INSERT INTO tutorial_files(id, name, file, type, tutorial_id) 
+VALUES(default, 'tutorial1-slides.pdf', '/_files/tutorial1/lecture1-slides.pdf', 'tutorial', 1);
