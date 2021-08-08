@@ -5,9 +5,6 @@
 const pool = require('./db/database');
 var fs = require('fs');
 
-// API
-const lecturesTutorialsApi = require('./api/lecturesTutorials');
-
 /***************************************************************
                        User Functions
 ***************************************************************/
@@ -79,7 +76,7 @@ const deleteAdmin = (request, response) => {
 async function getAllTopicGroups(request, response) {
   void (request);
   let resp = await pool.query(
-    `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
+    `SELECT tp_group.id, tp_group.name, tp_group.topic_code,
     array_agg(DISTINCT user_admin.admin_id) as admin_list,
     array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
     array_agg(DISTINCT announcements.id) as announcements_list
@@ -1929,274 +1926,6 @@ async function getSearchAnnouncements (request, response) {
 }
 
 /***************************************************************
-                       Gamification Functions
-***************************************************************/
-
-async function getQuestions (request, response) {
-  void (request);
-  try {
-    let resp = await pool.query(
-      `SELECT * from gamification_question`)
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Create new gamification question
-async function postQuestion (request, response) {
-  const title = request.body.title;
-  const questionType = request.body.questionType;
-  const potentialAnswer = request.body.potentialAnswers;
-  const correctAnswer = request.body.correctAnswer;
-  const timeStampQuery = await pool.query(`SELECT current_timestamp`);
-  const availableFrom = timeStampQuery.rows[0].current_timestamp;
-  const numberOfAnswers = request.body.numberOfAnswers;
-  const mediaLink = request.body.mediaLink;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  let resp = await pool.query(
-    `INSERT INTO gamification_question(id, title, questiontype, potentialAnswers, 
-     correctAnswer, availableFrom, numberOfAnswers, mediaLink, estimatedTimeRequired)
-     VALUES(default, $1, $2, $3, $4, $5, $6, $7, $8)`, [title, questionType, potentialAnswer, correctAnswer,
-    availableFrom, numberOfAnswers, mediaLink, estimatedTime]);
-
-  response.status(200).send("Post gamification question success");
-  try {
-    
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get level data from question
-async function getLevelFromQuestion (request, response) {
-  const questionId = request.params.questionId;
-  try {
-    let resp = await pool.query(
-      `SELECT * from levels 
-      JOIN levels_questions ON question_id = $1 AND level_id = levels.id;`, [questionId])
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Edit existing question data
-async function putQuestion (request, response) {
-  const questionId = request.params.questionId;
-  const title = request.body.title;
-  const questionType = request.body.questionType;
-  const potentialAnswer = request.body.potentialAnswers;
-  const correctAnswer = request.body.correctAnswer;
-  const availableFrom = request.body.availableFrom;
-  const numberOfAnswers = request.body.numberOfAnswers;
-  const mediaLink = request.body.mediaLink;
-  const estimatedTime = request.body.estimatedTimeRequired;
-  
-  try {
-    let resp = await pool.query(
-      `UPDATE gamification_question SET title = $1, 
-      questionType = $2, potentialAnswers = $3, correctAnswer = $4, 
-      availableFrom = $5, numberOfAnswers = $6, mediaLink = $7, estimatedTimeRequired = $8
-      WHERE id = $9`,
-      [title, questionType, potentialAnswer, correctAnswer,
-      availableFrom, numberOfAnswers, mediaLink, estimatedTime, questionId]);
-    response.status(200).send("Gamification Question Update Success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Delete question from id
-async function deleteQuestion (request, response) {
-  const questionId = request.params.questionId;
-  
-  try {
-    let resp = await pool.query(
-      `DELETE FROM gamification_question WHERE id = $1`,
-      [questionId]);
-    response.status(200).send("Gamification Question Delete Success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get all gamification levels
-async function getAllLevels (request, response) {
-  void (request);
-  try {
-    let resp = await pool.query(
-      `SELECT * from levels`)
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get all gamification levels
-async function getLevelById (request, response) {
-  const levelId = request.params.levelId;
-  try {
-    let resp = await pool.query(
-      `SELECT * from levels WHERE id = $1`, [levelId]);
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-}
-
-// Edit existing level data
-async function putLevel (request, response) {
-  const levelId = request.params.levelId;
-  const title = request.body.title;
-  const topicGroupId = request.body.topicGroupId;
-  const levelType = request.body.levelType;
-  const availableFrom = request.body.availableFrom;
-  const questionNumbers = request.body.questionNumbers;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  try {
-    let resp = await pool.query(
-      `UPDATE levels SET title = $1, topic_group_id = $2, typeoflevel = $3, 
-      availableFrom = $4, numberofquestions = $5, estimatedTimeRequired = $6
-      WHERE id = $7`, [title, topicGroupId, levelType, availableFrom, 
-      questionNumbers, estimatedTime, levelId]);
-    response.status(200).send("Update level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Delete level from id
-async function deleteLevel (request, response) {
-  const levelId = request.params.levelId;
-  try {
-    let resp = await pool.query(
-      `DELETE from levels WHERE id = $1`, [levelId]);
-    response.status(200).send("Delete level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Create new level 
-async function postLevel (request, response) {
-  const title = request.body.title;
-  const topicGroupId = request.body.topicGroupId;
-  const levelType = request.body.levelType;
-  const availableFrom = request.body.availableFrom;
-  const questionNumbers = request.body.questionNumbers;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  try {
-    let resp = await pool.query(
-      `INSERT INTO levels(id, title, topic_group_id, typeOfLevel, 
-        availableFrom, numberOfQuestions, estimatedTimeRequired) 
-      VALUES(default, $1, $2, $3, $4, $5, $6) RETURNING id`,
-      [title, topicGroupId, levelType, availableFrom, questionNumbers, estimatedTime]);
-
-    let insertLink = await pool.query(`INSERT INTO topic_group_levels(topic_group_id, levelsid) 
-    VALUES($1, $2)`, [topicGroupId, resp.rows[0].id]);
-    response.status(200).send("Post level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get all questions linked to level 
-async function getLevelQuestions (request, response) {
-  const levelName = request.params.level;
-
-  try {
-    let resp = await pool.query(
-      `SELECT array_agg(q.id) as questions_list
-      FROM gamification_question q
-      JOIN levels_questions lq ON lq.question_id = q.id
-      JOIN levels l ON l.title = $1 AND lq.level_id = l.id`,
-      [levelName]);
-
-      var finalQuery = resp.rows;
-
-      for (var object of finalQuery) { // Loop through list of topic groups
-        var questionsArr = [];
-  
-        for (const questionId of object.questions_list) {
-          let tmp = await pool.query(`SELECT * FROM gamification_question WHERE id = $1`, [questionId]);
-          questionsArr.push(tmp.rows[0]);
-        };
-  
-        object.questions_list = questionsArr;
-      }
-
-    response.status(200).json(finalQuery[0]);
-
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Remove level from topic group
-async function removeTGLevel (request, response) {
-  const topicGroupName = request.params.topicGroup;
-  const tgQuery = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
-  const tgId = tgQuery.rows[0].id;
-  const level = request.params.level;
-
-  try {
-    let resp = await pool.query(
-      `DELETE FROM levels 
-      WHERE levels.title = $1 AND levels.id IN 
-      (SELECT levelsid from topic_group_levels WHERE topic_group_id = $2);`,
-      [level, tgId]);
-
-    response.status(200).send("Removed level from topic group");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Post new level for topic group
-async function postTGLevel (request, response) {
-  const title = request.body.title;
-  const topicGroupId = request.params.topicGroupId;
-  const levelType = request.body.levelType;
-  const availableFrom = request.body.availableFrom;
-  const questionNumbers = request.body.questionNumbers;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  try {
-    let resp = await pool.query(
-      `INSERT INTO levels(id, title, topic_group_id, typeOfLevel, 
-        availableFrom, numberOfQuestions, estimatedTimeRequired) 
-      VALUES(default, $1, $2, $3, $4, $5, $6) RETURNING id`,
-      [title, topicGroupId, levelType, availableFrom, questionNumbers, estimatedTime]);
-
-    let insertLink = await pool.query(`INSERT INTO topic_group_levels(topic_group_id, levelsid) 
-    VALUES($1, $2)`, [topicGroupId, resp.rows[0].id]);
-
-    response.status(200).send("Post topic group level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get list of levels for topic group
-async function getTGLevels (request, response) {
-  const topicGroupId = request.params.topicGroupId;
-  try {
-    let resp = await pool.query(
-      `SELECT l.id, l.title, l.topic_group_id, l.typeOfLevel, 
-      l.availableFrom, l.numberOfquestions, l.estimatedTimeRequired
-      FROM levels l 
-      JOIN topic_group_levels tgl ON tgl.levelsid = l.id AND tgl.topic_group_id = $1`, [topicGroupId])
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-/***************************************************************
                        Assessment Functions
 ***************************************************************/
 
@@ -2662,10 +2391,6 @@ module.exports = {
   putQuizById,
   getQuizQuestions,
   postQuiz,
-  getTGLevels,
-  postTGLevel,
-  removeTGLevel,
-  getLevelQuestions,
   getUser,
   postAdmin,
   deleteUser,
@@ -2699,21 +2424,10 @@ module.exports = {
   postAnnouncement,
   postAnnouncementComment,
   getSearchAnnouncements,
-  getQuestions,
-  postQuestion,
-  getLevelFromQuestion,
-  putQuestion,
-  deleteQuestion,
-  getAllLevels,
-  getLevelById,
-  putLevel,
-  deleteLevel,
-  postLevel,
   postQuizQuestion,
   getTopicGroup,
   getTag,
   getTopicFile,
   putTopicGroup,
   putTopic,
-  lecturesTutorialsApi
 };
