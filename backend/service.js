@@ -254,8 +254,9 @@ async function getTopics (request, response) {
 
     for (var object of resp.rows) { 
       var topicArr = [];
-      var preReqsArr = [];
+
       for (const topic_id of object.topics_list) {
+        let preReqsArr = [];
         let tmp = await pool.query(
           `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(DISTINCT topic_files.id) as course_materials, 
           array_agg(DISTINCT prerequisites.prereq) as prereqs
