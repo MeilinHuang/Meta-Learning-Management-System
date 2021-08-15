@@ -9,6 +9,7 @@ import {
     Divider,
     Flex,
     Heading,
+    Icon,
     Popover,
     PopoverTrigger,
     PopoverContent,
@@ -17,12 +18,17 @@ import {
     PopoverFooter,
     PopoverArrow,
     PopoverCloseButton,
+    Tooltip,
     useToast,
 } from "@chakra-ui/react"
 import Tags from '../components/forums/Tags'
 import PostDetails from '../components/forums/PostDetails/PostDetails'
 import CommentsResponses from '../components/forums/CommentsResponses/CommentsResponses'
 import { BsTrash } from 'react-icons/bs'
+import { FaCheckCircle } from 'react-icons/fa'
+
+
+const dummyUser = 3
 
 function ForumPostPage({ match: { params: { code, id }}}) {
     const [post, setPost] = useState({})
@@ -64,8 +70,25 @@ function ForumPostPage({ match: { params: { code, id }}}) {
                 </BreadcrumbItem>
             </Breadcrumb>
             <Flex justifyContent="space-between" alignItems="baseline">
-                <Heading mt="16px">{post.title}</Heading>
-                <Popover placement="bottom-end">
+            <Flex alignItems="center" mt="16px">
+                <Heading>{post.title}</Heading>
+                {post.isendorsed && (
+                    <Tooltip
+                        label="This post is endorsed by staff"
+                        hasArrow
+                        placement="bottom"
+                        ml="12px"
+                        w="90px"
+                        textAlign="center"
+                        fontSize="12px"
+                    >
+                        <span>
+                            <Icon h="16px" w="16px" ml="12px" color="green" as={FaCheckCircle} />
+                        </span>
+                    </Tooltip>
+                )}
+                </Flex>
+                {post.user_id === dummyUser && <Popover placement="bottom-end">
                     <PopoverTrigger>
                         <Button pr="8px" leftIcon={<BsTrash />} variant="ghost" color="red" />
                     </PopoverTrigger>
@@ -83,7 +106,7 @@ function ForumPostPage({ match: { params: { code, id }}}) {
                             </ButtonGroup>
                         </PopoverFooter>
                     </PopoverContent>
-                </Popover>
+                </Popover>}
             </Flex>
             <Divider />
             <Tags tags={post.tags} />

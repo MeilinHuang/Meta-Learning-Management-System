@@ -18,7 +18,9 @@ import AuthorDetails from '../AuthorDetails'
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './PostDetails.module.css'
 
-function PostDetails({ post: { attachments, author, post_id, published_date, description, isendorsed, num_of_upvotes, upvoters }, setPost}) {
+const dummyUser = 3
+
+function PostDetails({ post: { attachments, author, post_id, published_date, description, isendorsed, num_of_upvotes, upvoters, user_id }, setPost}) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState()
     const toast = useToast()
@@ -101,22 +103,19 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
                     <>
                         <Text className={styles.description} dangerouslySetInnerHTML={{ __html: details }} />
                         {!!attachments && !!attachments.length && attachments[0] !== null && attachments.map(image => getImage(image))}
-                        {isendorsed && (
-                            <Flex alignItems="center" mt="16px">
-                                <Icon h="13px" w="13px" mr="4px" color="green" as={FaCheckCircle} />
-                                <Text fontSize="13px" color="green" fontWeight="bold">This post is endorsed by staff</Text>
-                            </Flex>
-                        )}
                         <Divider my="16px" />
                         <Flex justifyContent="space-between">
                             <Flex>
                                 <Button leftIcon={<TiArrowUpOutline />}>{num_of_upvotes}</Button>
-                                <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} /> {/* ONLY SHOW IF USER IS STAFF */}
+                                {/* ONLY SHOW IF USER IS STAFF */}
+                                <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} /> 
                                 <Button pr="8px" leftIcon={<GrShare />} onClick={shareLink} ml="8px" />
                             </Flex>
-                            <Flex>
-                                <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
-                            </Flex>
+                            {user_id === dummyUser && (
+                                <Flex>
+                                    <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
+                                </Flex>
+                            )}
                         </Flex>
                     </>
             }

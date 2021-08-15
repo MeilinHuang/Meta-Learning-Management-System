@@ -27,7 +27,9 @@ import { GrEdit } from 'react-icons/gr'
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './CommentResponse.module.css'
 
-function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id, setPost, isendorsed }) {
+const dummyUser = 3
+
+function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id, setPost, isendorsed, user_id }) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState('')
     const toast = useToast()
@@ -185,30 +187,34 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
                             {/* show author controls if user is author */}
                             <Flex mt="8px" justifyContent="flex-end">
                                 {!!comment_id && <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} />}
-                                <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
-                                <Popover placement="bottom-end">
-                                    {({ onClose }) => (
-                                        <>
-                                            <PopoverTrigger>
-                                                <Button pr="8px" leftIcon={<BsTrash />} ml="8px" color="red" />
-                                            </PopoverTrigger>
-                                            <PopoverContent>
-                                                <PopoverHeader fontWeight="semibold">Confirmation</PopoverHeader>
-                                                <PopoverArrow />
-                                                <PopoverCloseButton />
-                                                <PopoverBody>
-                                                    Are you sure you want to delete this post?
-                                                </PopoverBody>
-                                                <PopoverFooter d="flex" justifyContent="flex-end">
-                                                    <ButtonGroup size="sm">
-                                                    <Button variant="outline">Cancel</Button>
-                                                    <Button colorScheme="red" onClick={() => handleDelete(onClose)}>Delete</Button>
-                                                    </ButtonGroup>
-                                                </PopoverFooter>
-                                            </PopoverContent>
-                                        </>
-                                    )}
-                                </Popover>
+                                {user_id === dummyUser && (
+                                    <>
+                                        <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
+                                        <Popover placement="bottom-end">
+                                            {({ onClose }) => (
+                                                <>
+                                                    <PopoverTrigger>
+                                                        <Button pr="8px" leftIcon={<BsTrash />} ml="8px" color="red" />
+                                                    </PopoverTrigger>
+                                                    <PopoverContent>
+                                                        <PopoverHeader fontWeight="semibold">Confirmation</PopoverHeader>
+                                                        <PopoverArrow />
+                                                        <PopoverCloseButton />
+                                                        <PopoverBody>
+                                                            Are you sure you want to delete this post?
+                                                        </PopoverBody>
+                                                        <PopoverFooter d="flex" justifyContent="flex-end">
+                                                            <ButtonGroup size="sm">
+                                                            <Button variant="outline">Cancel</Button>
+                                                            <Button colorScheme="red" onClick={() => handleDelete(onClose)}>Delete</Button>
+                                                            </ButtonGroup>
+                                                        </PopoverFooter>
+                                                    </PopoverContent>
+                                                </>
+                                            )}
+                                        </Popover>
+                                    </>
+                                )}
                             </Flex>
                         </Flex>
                     </>

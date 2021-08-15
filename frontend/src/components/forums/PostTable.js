@@ -13,6 +13,7 @@ import {
     Tr,
     Th,
     Td,
+    Tooltip,
 } from "@chakra-ui/react"
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri'
 import { TiArrowUpOutline, TiArrowUpThick } from 'react-icons/ti'
@@ -55,14 +56,25 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned, d
                 />
             </Td>
             <Td width="40%" pl="0">
-                <Link as={RouterLink} color="blue.500" to={`/course-page/${code}/forums/${post_id}`}>{title}</Link>
+                <Flex alignItems="center">
+                    <Link as={RouterLink} color="blue.500" to={`/course-page/${code}/forums/${post_id}`}>{title}</Link>
+                    {isendorsed && (
+                        <Tooltip
+                            label="This post is endorsed by staff"
+                            hasArrow
+                            placement="bottom"
+                            ml="8px"
+                            w="90px"
+                            textAlign="center"
+                            fontSize="12px"
+                        >
+                            <span>
+                                <Icon h="13px" w="13px" ml="8px" color="green" as={FaCheckCircle} />
+                            </span>
+                        </Tooltip>
+                    )}
+                </Flex>
                 <Text fontSize="13px" lineHeight="16px" mt="4px" dangerouslySetInnerHTML={{__html: unformattedDesc}}></Text>
-                {isendorsed && (
-                    <Flex alignItems="center" mt="12px">
-                        <Icon h="13px" w="13px" mr="4px" color="green" as={FaCheckCircle} />
-                        <Text fontSize="13px" color="green" fontWeight="bold">This post is endorsed by staff</Text>
-                    </Flex>
-                )}
             </Td>
             <Td>{dateString}</Td>
             <Td>{replies[0] === null ? 0 : replies.length}</Td>
