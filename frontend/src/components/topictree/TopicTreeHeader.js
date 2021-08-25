@@ -93,9 +93,12 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
             topic['name'] = topic.name;
             tempTopics.push(topic);
             tempActualTopics.push(topic);
-            for (let tag of topic.tags) {
-                tempTopics.push({'value': topic.name, 'label': tag.name, 'id': topic.id, 'name': topic.name});
+            if (topic.tags !== undefined) {
+                for (let tag of topic.tags) {
+                    tempTopics.push({'value': topic.name, 'label': tag.name, 'id': topic.id, 'name': topic.name});
+                }
             }
+
         }
         
         
