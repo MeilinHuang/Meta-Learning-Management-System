@@ -100,7 +100,24 @@ function CourseDashboard({ match: { params: { code }}}) {
             }
         }).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/${code}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))
+                fetch(`http://localhost:8000/${code}/announcement`).then(r => r.json()).then(data => {
+                    const promises = []
+        
+                    for (const post of data) {
+                        promises.push(fetch(`http://localhost:8000/user/${post.author}`).then(r => r.json()))
+                    }
+        
+                    Promise.all(promises)
+                        .then(authorData => {
+                            const newPosts = []
+                            for (const i in authorData) {
+                                const withAuthor = {...data[i], author: authorData[i].user_name}
+                                newPosts.push(withAuthor)
+                            }
+                            setAnnouncements(newPosts.reverse())
+                            setLoading(false)
+                        })
+                })
             } 
             // TODO: Handle error case
             // TODO: clear form
