@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS "user_admin" (
 
 DROP TABLE IF EXISTS "user_enrolled" CASCADE;
 CREATE TABLE IF NOT EXISTS "user_enrolled" (
-  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
-  user_id INTEGER NOT NULL REFERENCES users(id),
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   PRIMARY KEY(user_id, topic_group_id)
 );
 
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS "user_enrolled" (
 DROP TABLE IF EXISTS "topics" CASCADE;
 CREATE TABLE IF NOT EXISTS "topics" (
   id SERIAL NOT NULL PRIMARY KEY,
-  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
   name TEXT NOT NULL
 );
 
@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS "topic_group_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   file TEXT NOT NULL,
-  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  due_date TIMESTAMP
+  type TEXT NOT NULL,
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 DROP TABLE IF EXISTS "topic_files" CASCADE;
@@ -63,15 +63,9 @@ CREATE TABLE IF NOT EXISTS "topic_files" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   file TEXT NOT NULL,
+  type TEXT NOT NULL,
   topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE ON UPDATE CASCADE,
   due_date TIMESTAMP
-);
-
-DROP TABLE IF EXISTS "topic_group_files_related_topics" CASCADE;
-CREATE TABLE IF NOT EXISTS "topic_group_files_topics" (
-  file_id INTEGER NOT NULL REFERENCES topic_group_files(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY (file_id, topic_id)
 );
 
 CREATE INDEX prereq_idx ON prerequisites(prereq);
@@ -113,7 +107,8 @@ CREATE TABLE IF NOT EXISTS "comments" (
   user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   author TEXT NOT NULL,
   published_date TIMESTAMP,
-  comment TEXT
+  comment TEXT,
+  isEndorsed BOOLEAN NOT NULL
 );
 
 DROP TABLE IF EXISTS "forum_post_files" CASCADE;
@@ -192,6 +187,13 @@ CREATE TABLE IF NOT EXISTS "post_tags"(
   PRIMARY KEY(post_id, tag_id)
 );
 
+DROP TABLE IF EXISTS "topic_tags" CASCADE;
+CREATE TABLE IF NOT EXISTS "topic_tags"(
+  topic_id INT NOT NULL REFERENCES topics(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  tag_id INT NOT NULL REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  PRIMARY KEY(topic_id, tag_id)
+);
+
 -- Course Pages
 DROP TABLE IF EXISTS "user_content_progress" CASCADE;
 CREATE TABLE "user_content_progress" (
@@ -204,8 +206,8 @@ CREATE TABLE "user_content_progress" (
 DROP TABLE IF EXISTS "announcements" CASCADE;
 CREATE TABLE IF NOT EXISTS "announcements" (
   id SERIAL PRIMARY KEY,
-  author INTEGER NOT NULL REFERENCES users(id),
-  topic_group INTEGER NOT NULL REFERENCES topic_group(id),
+  author INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  topic_group INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
   title TEXT NOT NULL,
   content TEXT NOT NULL,
   post_date TIMESTAMP
@@ -235,45 +237,6 @@ CREATE TABLE "announcement_comment_files" (
   file TEXT NOT NULL,
   comment_id INTEGER NOT NULL REFERENCES announcement_comment(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
-
-/* -- Gamification
-DROP TABLE IF EXISTS "levels" CASCADE;
-CREATE TABLE "levels" (
-  id SERIAL PRIMARY KEY,
-  title TEXT NOT NULL,
-  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
-  typeOfLevel TEXT NOT NULL,
-  availableFrom TIMESTAMP,
-  numberOfQuestions INTEGER NOT NULL,
-  estimatedTimeRequired INTEGER NOT NULL
-);
-
-DROP TABLE IF EXISTS "gamification_question" CASCADE;
-CREATE TABLE "gamification_question" (
-  id SERIAL PRIMARY KEY,
-  title TEXT NOT NULL,
-  questionType TEXT NOT NULL,
-  potentialAnswers TEXT NOT NULL,
-  correctAnswer TEXT NOT NULL,
-  availableFrom TIMESTAMP,
-  numberOfAnswers INTEGER NOT NULL,
-  mediaLink TEXT,
-  estimatedTimeRequired INTEGER NOT NULL
-);
-
-DROP TABLE IF EXISTS "levels_questions" CASCADE;
-CREATE TABLE "levels_questions" (
-  Level_ID INTEGER REFERENCES Levels(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  Question_ID INTEGER REFERENCES gamification_question(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY(Level_ID, Question_ID)
-);
-
-DROP TABLE IF EXISTS "topic_group_levels" CASCADE;
-CREATE TABLE "topic_group_levels" (
-  Topic_Group_ID INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  LevelsId INTEGER NOT NULL REFERENCES levels(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY (topic_group_id, LevelsId)
-); */
 
 -- Assessment 
 DROP TABLE IF EXISTS "quiz" CASCADE;
@@ -335,20 +298,89 @@ CREATE TABLE "quiz_poll" (
 );
 
 -- Lectures and Tutorials
+DROP TABLE IF EXISTS "weeks" CASCADE;
+CREATE TABLE "weeks" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  num INTEGER NOT NULL
+);
+
 DROP TABLE IF EXISTS "tutorials" CASCADE;
 CREATE TABLE "tutorials" (
   id SERIAL NOT NULL PRIMARY KEY,
-  tutor_id INTEGER NOT NULL REFERENCES users(id),
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  tutorial_code TEXT NOT NULL,
-  timeslot TEXT,
-  curr_capacity INTEGER NOT NULL,
-  max_capacity INTEGER NOT NULL
+  week INTEGER,
+  tutor_id INTEGER NOT NULL REFERENCES users(id),
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  topic_reference INTEGER REFERENCES topics(id),
+  tutorial_video TEXT
+);
+
+DROP TABLE IF EXISTS "lectures" CASCADE;
+CREATE TABLE "lectures" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  lecturer_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  week INTEGER,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  topic_reference INTEGER REFERENCES topics(id),
+  lecture_video TEXT
+);
+
+DROP TABLE IF EXISTS "lecture_files" CASCADE;
+CREATE TABLE "lecture_files" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  file TEXT NOT NULL,
+  type TEXT,
+  lecture_id INTEGER NOT NULL REFERENCES lectures(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DROP TABLE IF EXISTS "tutorial_files" CASCADE;
+CREATE TABLE "tutorial_files" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  file TEXT NOT NULL,
+  type TEXT,
+  tutorial_id INTEGER NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DROP TABLE IF EXISTS "enrolled_lectures" CASCADE;
+CREATE TABLE "enrolled_lectures" (
+  lecture_id INTEGER NOT NULL REFERENCES lectures(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (lecture_id, student_id)
 );
 
 DROP TABLE IF EXISTS "enrolled_tutorials" CASCADE;
 CREATE TABLE "enrolled_tutorials" (
   tutorial_id INTEGER NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  student_id INTEGER NOT NULL REFERENCES users(id),
+  student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY (tutorial_id, student_id)
+);
+
+-- Enrol types
+DROP TABLE IF EXISTS "enrol_tutorials" CASCADE;
+CREATE TABLE "enrol_tutorials" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  tutorial_code TEXT NOT NULL,
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  tutor_id INTEGER NOT NULL REFERENCES users(id),
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  curr_capacity INTEGER NOT NULL,
+  max_capacity INTEGER NOT NULL
+);
+
+DROP TABLE IF EXISTS "enrol_lectures" CASCADE;
+CREATE TABLE "enrol_lectures" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  lecture_code TEXT NOT NULL,
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  lecturer_id INTEGER NOT NULL REFERENCES users(id),
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  curr_capacity INTEGER NOT NULL,
+  max_capacity INTEGER NOT NULL
 );

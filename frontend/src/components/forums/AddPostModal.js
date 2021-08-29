@@ -57,7 +57,9 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
         formData.append('publishedDate', date)
 
         if (selectedTags) {
-            formData.append('tags', selectedTags)
+            const tags = []
+            selectedTags.map(({ tag_id }) => tags.push(tag_id))
+            formData.append('tags', tags)
         }
 
         onSubmit(formData)

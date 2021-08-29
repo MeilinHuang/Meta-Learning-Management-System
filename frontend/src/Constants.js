@@ -22,6 +22,14 @@ export function get_prereqs(topicGroupName, newTopicName) {
     return backend_url + "topicGroup/" + topicGroupName + "/topic/" + newTopicName + "/prerequisite";
 }
 
+export function delete_prereqs(topicGroupName, newTopicName) {
+    return backend_url + "topicGroup/" + topicGroupName + "/topic/" + newTopicName + "/prerequisite";
+}
+
+export function add_prereqs(topicGroupName, topicName) {
+    return backend_url + "topicGroup/" + topicGroupName + "/topic/" + topicName + "/prerequisite";
+}
+
 export function get_topic_group(topicGroupName) {
     return backend_url + "topicGroup/" + topicGroupName;
 }

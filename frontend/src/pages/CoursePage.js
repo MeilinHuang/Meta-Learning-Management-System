@@ -58,7 +58,7 @@ function CoursePage() {
                     <Switch>
                         {/* Add your page as a Route here */}
                         <Route exact path="/course-page/:code/forums" component={ForumOverviewPage} />
-                        <Route exact path="/course-page/:code/content"><CourseContentPage /></Route>
+                        <Route exact path="/course-page/:code/content" component={CourseContentPage}></Route>
                         <Route exact path="/course-page/:code/forums/:id" component={ForumPostPage} />
                         <Route exact path="/course-page/:code/announcement/:id" component={CourseAnnouncementPage} />
                         <Route path="/course-page/:code" component={CourseDashboard} />

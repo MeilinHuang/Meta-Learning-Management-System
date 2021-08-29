@@ -12,8 +12,8 @@ function TagSelect({ isFilter, setSelectedTags, tags }) {
 
     const handleSelect = selectedTags => {
         let currentTags = []
-        selectedTags.forEach(({ value }) => {
-            currentTags.push(value)
+        selectedTags.forEach(({ value, label }) => {
+            currentTags.push({tag_id: value, name: label})
         })
         setSelectedTags(currentTags)
     }

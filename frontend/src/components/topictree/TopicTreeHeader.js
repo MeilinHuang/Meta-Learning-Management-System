@@ -28,8 +28,7 @@ import TopicTreeViewResource from "./TopicTreeViewResource.js";
 
 import TopicTreeAddTopic from './TopicTreeAddTopic.js';
 
-const Links = ['Add a Topic'];
-const NavLink = ({ onClick, children }) => (
+const NavLink = ({ onClick, children, openUrl=true }) => (
     <Link
         px={2}
         py={1}
@@ -42,7 +41,7 @@ const NavLink = ({ onClick, children }) => (
                 bg: useColorModeValue('gray.300', 'gray.300'),
             }
         }
-        href={children}>
+        href={ openUrl ? children : '#'}>
         {children}
     </Link>
 );
@@ -54,7 +53,9 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [tempView, setTempView] = useState(view);
     const [topics, setTopics] = useState([]);
+    const [actualTopics, setActualTopics] = useState([]);
     const [listPrereqs, setListPrereqs] = useState([]);
+    const [notListPrereqs, setNotListPrereqs] = useState([]);
     const [selectedNode, setSelectedNode] = useState({
         "id": 0,
         "title": "",
@@ -64,7 +65,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
             "preparation": [],
             "content": [],
             "practice": [],
-            "assessment": []
+            "assessments": []
         },
         "group": "",
         "discipline": "",
@@ -84,19 +85,34 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
 
     const convertToList = (jsonData) => {
         let tempTopics = [];
+        let tempActualTopics = [];
         for (let topic of jsonData.topics_list) {
             topic['value'] = topic.name;
             topic['label'] = topic.name;
+            topic['id'] = topic.id;
+            topic['name'] = topic.name;
             tempTopics.push(topic);
-        }
+            tempActualTopics.push(topic);
+            if (topic.tags !== undefined) {
+                for (let tag of topic.tags) {
+                    tempTopics.push({'value': topic.name, 'label': tag.name, 'id': topic.id, 'name': topic.name});
+                }
+            }
 
+        }
+        
+        
+        setActualTopics(tempActualTopics);
         return tempTopics;
     };
 
     const onChangeSearch = async (value, action) => {
-        console.log('setting selected topic', value);
+        
         value['materials_strings'] = {};
         value.materials_strings['content'] = [];
+        value.materials_strings['practice'] = [];
+        value.materials_strings['preparation'] = [];
+        value.materials_strings['assessments'] = [];
         value['title'] = value.name;
         setSelectedNode(value);
 
@@ -104,16 +120,33 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
         let responseJson = await response.json();
         let prereqList = [];
         for (let prereq of responseJson.prerequisites_list) {
-            prereqList.push(prereq.name);
+            prereqList.push({'name': prereq.name, 'id': prereq.id});
         }
+
         setListPrereqs(prereqList);
-        console.log('selectedNode', value);
-        console.log('prereqs', prereqList);
+        let notPrereqs = [];
+        for (let topic of actualTopics) {
+            let found = false;
+            for (let prereq of prereqList) {
+                if (topic.id === prereq.id) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found && topic.id !== value.id) {
+                notPrereqs.push({'value': topic.id, 'label': topic.name});
+            }
+        }
+        setNotListPrereqs(notPrereqs);
+
+        console.log('notPrereqs', notPrereqs);
+        console.log('prereqList', prereqList);
+        
         onOpenViewModal();
     }
 
     useEffect(() => {
-        console.log('topicGroupName', topicGroupName !== '');
+        
         if (topicGroupName !== '') {
             fetch(get_topics_url(topicGroupName))
             .then(response => response.json())
@@ -125,7 +158,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
     }, []);
 
     function setView() {
-        console.log('tempView', tempView);
+        
         if (tempView == 'Graph View') {
             setTempView('List View');
             history.push('/topictreelist');
@@ -136,7 +169,6 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
     }
 
     function isChecked() {
-        console.log('checked', tempView == 'Graph View');
         return tempView == "Graph View";
     }
   
@@ -152,15 +184,16 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
                 onClick={isOpen ? onClose : onOpen}
                 />
                 <HStack spacing={8} alignItems={'center'}>
-                    <Box color='white' fontSize={'1.2rem'} >Meta LMS</Box>
+                    <Box color='white' fontSize={'1.2rem'} >Meta LMS  &nbsp;| &nbsp;<b>Topic Tree</b></Box>
                     <HStack
                         as={'nav'}
                         spacing={4}
                         display={{ base: 'none', md: 'flex' }}>
                         {topicGroupName !== '' ? 
                         <>
-                        <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
-                        <Box bg='white' w={200}>
+                        <Link mt={1} px={2} py={1} color={'white'} rounded={'md'}
+                            onClick={onOpenModal}>Add a Topic</Link>
+                        <Box bg='white'  w={200}>
                             <FormControl id="new-topic-dependencies">
                                 <Select
                                     name="searchTopic"
@@ -214,14 +247,14 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
                 <Box pb={4} display={{ md: 'none' }}>
                 <Stack as={'nav'} spacing={4}>
                     { topicGroupName != '' ? (
-                        <NavLink key={"Add a Topic"} onClick={onOpenModal}>Add a Topic</NavLink>
+                        <NavLink key={"Add a Topic"} onClick={onOpenModal} openUrl={false}>Add a Topic</NavLink>
                     ) : <></> }
                 </Stack>
                 </Box>
             ) : null}
             </Box>
             <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} topicGroupName={topicGroupName} />
-            <TopicTreeViewResource data={selectedNode} isOpen={isOpenViewModal} onClose={onCloseViewModal} prereqs={listPrereqs} topicGroupName={topicGroupName} />
+            <TopicTreeViewResource data={selectedNode} isOpen={isOpenViewModal} onClose={onCloseViewModal} prereqs={listPrereqs} topicGroupName={topicGroupName} nodes={notListPrereqs} />
         </div>
     );
   }
