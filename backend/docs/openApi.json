@@ -36,10 +36,6 @@
       "description": "API for Course Pages feature"
     },
     {
-      "name": "Gamification",
-      "description": "API for Gamification feature"
-    },
-    {
       "name": "Assessment",
       "description": "API for Assessment feature"
     },
@@ -1150,511 +1146,6 @@
           "200": {
             "description": "OK",
             "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/questions": {
-      "get": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Get all gamification questions",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetAllQuestions"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/questions/new": {
-      "post": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Create new question",
-        "requestBody": {
-          "description": "New question body",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Question"
-              }
-            }
-          },
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "questionBody"
-      }
-    },
-    "/questions/{questionId}": {
-      "get": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Get all level data from question id",
-        "parameters": [
-          {
-            "name": "questionId",
-            "in": "path",
-            "description": "Id of question to get level data from",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Level"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Edit existing question data",
-        "parameters": [
-          {
-            "name": "questionId",
-            "in": "path",
-            "description": "Id of question to edit",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Details of updated question",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Question"
-              }
-            }
-          },
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "editQuestion"
-      },
-      "delete": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Delete question from question id",
-        "parameters": [
-          {
-            "name": "questionId",
-            "in": "path",
-            "description": "Id of question to delete",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/levels": {
-      "get": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Get all gamification levels",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetAllLevels"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/levels/{levelId}": {
-      "get": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Get level data for specified level id",
-        "parameters": [
-          {
-            "name": "levelId",
-            "in": "path",
-            "description": "Id of level we want data for",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Level"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Edit existing level data",
-        "parameters": [
-          {
-            "name": "levelId",
-            "in": "path",
-            "description": "Id of level",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Details of updated level",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PutLevel"
-              }
-            }
-          },
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Level"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "editLevel"
-      },
-      "delete": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Delete level from level id",
-        "parameters": [
-          {
-            "name": "levelId",
-            "in": "path",
-            "description": "Id of level we want to delete",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/levels/new": {
-      "post": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Create new level",
-        "requestBody": {
-          "description": "New level body",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostLevel"
-              }
-            }
-          },
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "levelBody"
-      }
-    },
-    "/{level}/questions": {
-      "get": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Get all questions linked to level",
-        "parameters": [
-          {
-            "name": "level",
-            "in": "path",
-            "description": "Name of level to get questions for",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetAllQuestions"
-                }
-              }
-            }
           },
           "400": {
             "content": {
@@ -3471,6 +2962,49 @@
       }
     },
     "/forum/tags/{tagId}": {
+      "get": {
+        "tags": [ "Forums" ],
+        "summary": "Get tag from id",
+        "parameters": [
+          {
+            "name": "tagId",
+            "in": "path",
+            "description": "Tag id",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForumTag"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "Forums"
@@ -3738,162 +3272,6 @@
         }
       }
     },
-    "/{topicGroup}/remove-level/{level}": {
-      "delete": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Delete level from topic group",
-        "parameters": [
-          {
-            "name": "topicGroup",
-            "in": "path",
-            "description": "name of topic group",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "level",
-            "in": "path",
-            "description": "Name of level we want to remove from topic group",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/topicGroup/{topicGroupId}/newLevel": {
-      "post": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Create a new level for topic group",
-        "parameters": [
-          {
-            "name": "topicGroupId",
-            "in": "path",
-            "description": "Id of topic group we want to add new level to",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "New level body",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Level"
-              }
-            }
-          },
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "levelBody"
-      }
-    },
-    "/topicGroup/{topicGroupId}/levels": {
-      "get": {
-        "tags": [
-          "Gamification"
-        ],
-        "summary": "Get a list of levels for provided topic group",
-        "parameters": [
-          {
-            "name": "topicGroupId",
-            "in": "path",
-            "description": "Id of topic group",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetAllLevels"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/topicGroup": {
       "get": {
         "tags": [
@@ -3959,6 +3337,58 @@
                 }
               }
             }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{topicGroupName}/topic/{topicName}/topic": {
+      "get": {
+        "tags": [
+          "Topic Tree"
+        ],
+        "summary": "Get list of files associated with topic",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group we want topics for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic we want files for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
           },
           "400": {
             "content": {
@@ -4223,15 +3653,34 @@
           }
         ],
         "requestBody": {
-          "description": "New Topic Group",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/TopicGroup"
+                "type": "object",
+                "properties": {
+                  "topic_code": {
+                    "type": "string",
+                    "example": "COMP5721"
+                  },
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
-          },
-          "required": false
+          }
         },
         "responses": {
           "200": {
@@ -4258,6 +3707,88 @@
           }
         },
         "x-codegen-request-body-name": "TopicGroup"
+      },
+      "put": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Update topic group details",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Some new topic group name"
+                  },
+                  "topic_code": {
+                    "type": "string",
+                    "example": "Some new topic code"
+                  },
+                  "fileDeleteList": {
+                    "type": "array",
+                    "desription": "(File ID) List of files to remove",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "announcementBody"
       },
       "delete": {
         "tags": [
@@ -4327,6 +3858,32 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -4351,6 +3908,803 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Update topic details",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Some new topic group name"
+                  },
+                  "fileDeleteList": {
+                    "type": "array",
+                    "desription": "(File ID) List of files to remove",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
+                  "uploadFile": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "uploadedFileTypes": {
+                    "description": "(uploadFile[1].type = uploadFileTypes[1])",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "course_outline"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "announcementBody"
+      },
+      "delete": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Deletes topic",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicName",
+            "in": "path",
+            "description": "Name of topic",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/file/{targetId}": {
+      "post": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Upload lecture or tutorial file",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "query",
+            "description": "Target type",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["lecture", "tutorial"]
+            }
+          },
+          {
+            "name": "targetId",
+            "in": "path",
+            "description": "Target id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uploadFile": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "announcementBody"
+      },
+      "delete": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Delete file from lecture or tutorial",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "query",
+            "description": "Target type",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["lecture", "tutorial"]
+            }
+          },
+          {
+            "name": "targetId",
+            "in": "path",
+            "description": "Id of file to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroupName}": {
+      "get": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Gets list of weeks",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "required": false,
+            "in": "path",
+            "description": "Topic group to get lectures for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetWeeks" }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroupName}/lectures": {
+      "get": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Gets list of lectures for specified topic group",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "required": true,
+            "in": "path",
+            "description": "Topic group to get lectures for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetLectures" }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroupName}/lecture/{lectureId}": {
+      "get": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Get lecture by id",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lectureId",
+            "required": true,
+            "in": "path",
+            "description": "Id of lecture",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Update lecture details",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lectureId",
+            "required": true,
+            "in": "path",
+            "description": "Id of lecture",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostLecture"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "lectureBody"
+      },
+      "delete": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Delete lecture",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lectureId",
+            "required": true,
+            "in": "path",
+            "description": "Id of lecture",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "lectureBody"
+      }
+    },
+    "/{topicGroupName}/lecture": {
+      "post": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Create new lecture",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostLecture"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "lectureBody"
+      }
+    },
+    "/{topicGroupName}/tutorials": {
+      "get": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Gets list of tutorials for specified topic group",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "required": true,
+            "in": "path",
+            "description": "Topic group to get tutorials for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetTutorials" }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroupName}/tutorial/{tutorialId}": {
+      "get": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Get tutorial by id",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tutorialId",
+            "required": true,
+            "in": "path",
+            "description": "Id of tutorial",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Update tutorial details",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tutorialId",
+            "required": true,
+            "in": "path",
+            "description": "Id of tutorial",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostTutorial"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "lectureBody"
+      },
+      "delete": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Delete tutorial",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tutorialId",
+            "required": true,
+            "in": "path",
+            "description": "Id of tutorial",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroupName}/tutorial": {
+      "post": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Create new tutorial",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostTutorial"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "tutorialBody"
       }
     }
   },
@@ -4377,6 +4731,199 @@
           }
         },
         "description": "Forbidden"
+      },
+      "PostTutorial": {
+        "type": "object",
+        "properties": {
+          "week": {
+            "type": "integer",
+            "example": 1
+          },
+          "tutorId": {
+            "type": "integer",
+            "example": 4
+          },
+          "startTime": {
+            "type": "time",
+            "example": "05:00"
+          },
+          "endTime": {
+            "type": "time",
+            "example": "06:00"
+          },
+          "topicReference": {
+            "type": "string",
+            "example": "Arrays"
+          },
+          "tutorialVideo": {
+            "type": "string",
+            "example": "www.youtube.com/tutorial2"
+          }
+        }
+      },
+      "GetTutorials": {
+        "type": "object",
+        "properties": {
+        "tutorials": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "topic_group_id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "week": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "tutorId": {
+                  "type": "integer",
+                  "example": 3
+                },
+                "startTime": {
+                  "type": "time",
+                  "example": "10:00"
+                },
+                "endTime": {
+                  "type": "time",
+                  "example": "11:00"
+                },
+                "topicReference": {
+                  "type": "string",
+                  "example": "Arrays"
+                },
+                "tutorialVideo": {
+                  "type": "string",
+                  "example": "www.youtube.com"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetWeeks": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "num": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "PostLecture": {
+        "type": "object",
+        "properties": {
+          "lecturerId": {
+            "type": "integer",
+            "example": 4
+          },
+          "week": {
+            "type": "integer",
+            "example": 1
+          },
+          "startTime": {
+            "type": "time",
+            "example": "10:00"
+          },
+          "endTime": {
+            "type": "time",
+            "example": "11:00"
+          },
+          "topicReference": {
+            "type": "string",
+            "example": "Loops"
+          },
+          "lectureVideo": {
+            "type": "string",
+            "example": "www.youtube.com"
+          }
+        }
+      },
+      "GetLectures": {
+        "type": "object",
+        "properties": {
+          "lectures": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "topic_group_id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "lecture_code": {
+                  "type": "string",
+                  "example": "L12A"
+                },
+                "topic_reference": {
+                  "type": "string",
+                  "example": "Loops"
+                },
+                "lecturer_id": {
+                  "type": "integer",
+                  "example": 4
+                },
+                "timeslot": {
+                  "type": "timestamp",
+                  "example": "2021-08-08 22:52:35.388924"
+                },
+                "curr_capacity": {
+                  "type": "integer",
+                  "example": 0
+                },
+                "max_capacity": {
+                  "type": "integer",
+                  "example": 120
+                },
+                "lecture_video": {
+                  "type": "string",
+                  "example": "www.youtube.com"
+                },
+                "lecture_files": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "lecture1-slides.pdf"
+                      },
+                      "file": {
+                        "type": "string",
+                        "example": "/_files/lecture1/lecture1-slides.pdf"
+                      },
+                      "type": {
+                        "type": "string",
+                        "example": "lecture"
+                      },
+                      "lecture_id": {
+                        "type": "integer",
+                        "example": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       "Poll": {
         "type": "object",
@@ -4485,29 +5032,6 @@
                 }
               }
             }
-          }
-        }
-      },
-      "PostLevel": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "example": "Level"
-          },
-          "topicGroupId": {
-            "type": "integer"
-          },
-          "levelType": {
-            "type": "string"
-          },
-          "questionNumbers": {
-            "type": "integer",
-            "example": 3
-          },
-          "estimatedTimeRequired": {
-            "type": "integer",
-            "example": 15
           }
         }
       },

@@ -1,10 +1,9 @@
+//const { json } = require('express');
+//const e = require('express');
+//const { type } = require('os');
 
-const { json } = require('express');
 const pool = require('./db/database');
 var fs = require('fs');
-const e = require('express');
-
-// TODO : ADD AUTH AND JWTOKEN
 
 /***************************************************************
                        User Functions
@@ -76,9 +75,8 @@ const deleteAdmin = (request, response) => {
 
 async function getAllTopicGroups(request, response) {
   void (request);
-  try {
-    let resp = await pool.query(
-    `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
+  let resp = await pool.query(
+    `SELECT tp_group.id, tp_group.name, tp_group.topic_code,
     array_agg(DISTINCT user_admin.admin_id) as admin_list,
     array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
     array_agg(DISTINCT announcements.id) as announcements_list
@@ -96,7 +94,25 @@ async function getAllTopicGroups(request, response) {
       var announcementArr = [];
 
       for (const topicId of object.topics_list) {
-        let tmp = await pool.query(`SELECT * FROM topics WHERE id = $1`, [topicId]);
+        let tmp = await pool.query(`
+        SELECT t.id, t.topic_group_id, t.name,
+        array_agg(DISTINCT tf.id) as course_materials
+        FROM topics t 
+        LEFT JOIN topic_files tf ON tf.topic_id = t.id
+        WHERE t.id = $1
+        GROUP BY t.id`, [topicId]);
+
+        if (tmp.rows[0]) {
+          if (tmp.rows[0].course_materials[0] !== null) {
+            var topicFilesArr = [];
+            for (const fileId of tmp.rows[0].course_materials) {
+              let fileReq = await pool.query(`SELECT * FROM topic_files WHERE id = $1`, [fileId]);
+              topicFilesArr.push(fileReq.rows[0]);
+            }
+            tmp.rows[0].course_materials = topicFilesArr;
+          }
+        }
+        
         topicArr.push(tmp.rows[0]);
       };
   
@@ -121,6 +137,8 @@ async function getAllTopicGroups(request, response) {
       object.admin_list = adminArr;
     }
     response.status(200).json(resp.rows);
+  try {
+    
   } catch (e) {
     response.status(400).send(e);
   }
@@ -135,7 +153,7 @@ async function getTopicGroup (request, response) {
 
     let resp = await pool.query(
       `SELECT tp_group.id, tp_group.name, tp_group.topic_code, 
-      array_agg(DISTINCT user_admin.admin_id) as admin_list,
+      array_agg(DISTINCT user_admin.admin_id) as admin_list, array_agg(DISTINCT tgf.id) as attachments,
       array_agg(DISTINCT topics.id) as topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
       array_agg(DISTINCT announcements.id) as announcements_list
       FROM topic_group tp_group 
@@ -143,14 +161,21 @@ async function getTopicGroup (request, response) {
       FULL OUTER JOIN topics ON topics.topic_group_id = tp_group.id
       LEFT JOIN tutorials ON topics.topic_group_id = tutorials.topic_group_id
       LEFT JOIN announcements ON topics.topic_group_id = announcements.topic_group
+      LEFT JOIN topic_group_files tgf ON tgf.topic_group_id = tp_group.id
       WHERE tp_group.id = $1
       GROUP BY tp_group.id`, [topicGroupId]);
 
     var adminArr = [];
+    var fileArr = [];
     var topicArr = [];
     var tutArr = [];
     var announcementArr = [];
     var preReqsArr = [];
+
+    for (const fileId of resp.rows[0].attachments) {
+      let tmp = await pool.query(`SELECT * FROM topic_group_files WHERE id = $1`, [fileId]);
+      fileArr.push(tmp.rows[0]);
+    }
 
     for (const tutorialId of resp.rows[0].tutorial_list) {
       let tmp = await pool.query(`SELECT * FROM tutorials WHERE id = $1`, [tutorialId]);
@@ -201,6 +226,7 @@ async function getTopicGroup (request, response) {
       }
     };
 
+    resp.rows[0].attachments = fileArr;
     resp.rows[0].topics_list = topicArr;
     resp.rows[0].tutorial_list = tutArr;
     resp.rows[0].announcements_list = announcementArr;
@@ -294,7 +320,6 @@ async function getTopicPreReqs (request, response) {
     resp.rows[0].prerequisites_list = preReqsArr;
     response.status(200).json(resp.rows[0]);
   } catch(e) {
-    console.log(e);
     response.status(400).send(e);
   }
 }
@@ -304,8 +329,8 @@ async function postPreReq (request, response) {
   const preReqId = parseInt(request.preReqId);
   const topicId = parseInt(request.topicId);
 
-  let resp = await pool.query(
-    'INSERT INTO prerequisites(prereq, topic) VALUES($1, $2)', [preReqId, topicId]);
+  await pool.query(
+  'INSERT INTO prerequisites(prereq, topic) VALUES($1, $2)', [preReqId, topicId]);
 
   response.status(200).send(`Pre-requisite added with ID: ${preReqId}`)
 }
@@ -315,38 +340,137 @@ async function deletePreReq (request, response) {
   const preReqId = parseInt(request.preReqId);
   const topicId = parseInt(request.topicId);
 
-  let resp = await pool.query(
-    'DELETE FROM prerequisites WHERE prereq = $1 AND topic = $2', [preReqId, topicId]);
+  await pool.query(
+  'DELETE FROM prerequisites WHERE prereq = $1 AND topic = $2', [preReqId, topicId]);
 
-  response.status(200).send(
-    `Pre-requisite deleted with Topic ID: ${topicId} and Pre-Req ID : ${preReqId}`)
-
+  response.status(200).json({successs: true});
 }
 
 // Create topic group
 async function postTopicGroup (request, response) {
-  const topicGroupName = request.params.topicGroupName;
-  const topic_code = request.body.topic_code;
-  const course_outline = request.body.course_outline;
+  try {
+    const topicGroupName = request.params.topicGroupName;
+    const topic_code = request.body.topic_code;
+    const fileTypeList = request.body.uploadedFileTypes.split(",");
 
-  let resp = await pool.query(
-    'INSERT INTO topic_group(id, name, topic_code, course_outline) values(default, $1, $2, $3)',
-    [topicGroupName, topic_code, course_outline]);
+    let resp = await pool.query(
+      'INSERT INTO topic_group(id, name, topic_code) values(default, $1, $2) RETURNING id',
+      [topicGroupName, topic_code]);
 
-  response.status(200).send(`Topic Group created with name: ${topicGroupName}`)
+    if (request.files != null) {
+      if (!fs.existsSync(`../frontend/public/_files/topicGroup${resp.rows[0].id}`)) { fs.mkdirSync(`../frontend/public/_files/topicGroup${resp.rows[0].id}`) }
+      if (request.files.uploadFile.length > 1) {
+        if (fileTypeList.length > request.files.uploadFile.length) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        var typeCounter = 0;
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO topic_group_files(id, name, file, type, topic_group_id)
+          VALUES(default, $1, $2, $3, $4)`, [file.name, (`/_files/topicGroup${resp.rows[0].id}/${file.name}`), 
+          fileTypeList[typeCounter], resp.rows[0].id]);
+          fs.writeFile(`../frontend/public/_files/topicGroup${resp.rows[0].id}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          typeCounter+=1;
+        }
+      } else {
+        if (fileTypeList.length > 1) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        await pool.query(`INSERT INTO topic_group_files(id, name, file, type, topic_group_id)
+        VALUES(default, $1, $2, $3, $4)`, [request.files.uploadFile.name, 
+        (`/_files/topicGroup${resp.rows[0].id}/${request.files.uploadFile.name}`), fileTypeList[0], resp.rows[0].id]);
+        fs.writeFile(`../frontend/public/_files/topicGroup${resp.rows[0].id}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
+
+    response.sendStatus(200);
+  } catch (e) {
+    response.status(400).send(e)
+  }
 } 
+
+// Update topic group details
+async function putTopicGroup (request, response) {
+  try {
+    const newName = request.body.name;
+    const newTopicCode = request.body.topic_code;
+    const topicGroupName = request.params.topicGroupName;
+
+    let tgReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (!tgReq.rows.length) throw (`Failed: topic group {${topicGroupName}} does not exist`);
+
+    const topicGroupId = tgReq.rows[0].id;
+    const fileTypeList = request.body.uploadedFileTypes.split(",");
+
+    await pool.query(`UPDATE topic_group SET name = $1, topic_code = $2
+    WHERE id = $3`, [newName, newTopicCode, topicGroupId]);
+
+    if (request.body.fileDeleteList) {
+      const fileDeleteList = request.body.fileDeleteList.split(",");
+      if (fileDeleteList.length) {  // Deletes files specified in delete list
+        for (const fileId of fileDeleteList) {
+          let tmpQ = await pool.query(`DELETE FROM topic_group_files WHERE id = $1 RETURNING file`, [fileId]);
+          fs.unlinkSync("../frontend/public"+tmpQ.rows[0].file);
+        }
+      }
+    }
+
+    if (request.files != null) {
+      if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}`)) { fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}`) }
+      if (request.files.uploadFile.length > 1) {
+        if (fileTypeList.length > request.files.uploadFile.length) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        var typeCounter = 0;
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO topic_group_files(id, name, file, type, topic_group_id)
+          VALUES(default, $1, $2, $3, $4)`, [file.name, (`/_files/topicGroup${topicGroupId}/${file.name}`), 
+          fileTypeList[typeCounter], topicGroupId]);
+          fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          typeCounter+=1;
+        }
+      } else {
+        if (fileTypeList.length > 1) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        await pool.query(`INSERT INTO topic_group_files(id, name, file, type, topic_group_id)
+        VALUES(default, $1, $2, $3, $4)`, [request.files.uploadFile.name, 
+        (`/_files/topicGroup${topicGroupId}/${request.files.uploadFile.name}`), fileTypeList[0], topicGroupId]);
+        fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
+
+    response.status(200).json({success: true});
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
+}
 
 // Delete a topic group
 async function deleteTopicGroup (request, response) {
-  const topicGroupName = request.params.topicGroupName;
+  try { 
+    const topicGroupName = request.params.topicGroupName;
 
-  let resp = await pool.query(
-    'DELETE FROM topic_group WHERE LOWER(name) = LOWER($1)',
+    let checkExist = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (!checkExist.rows.length) throw (`Failed: Topic group {${topicGroupName}} doesn't exist in database`);
+
+    await pool.query('DELETE FROM topic_group WHERE LOWER(name) = LOWER($1)',
     [topicGroupName]);
 
-  response.status(200).send(`Topic Group deleted with name: ${topicGroupName}`)
+    if (fs.existsSync(`../frontend/public/_files/topicGroup${checkExist.rows[0].id}`)) { 
+      fs.rmdir(`../frontend/public/_files/topicGroup${checkExist.rows[0].id}`, { recursive: true }, (err) => {
+        if (err) { throw err; }
+      }); 
+    }
+
+    response.status(200).json({success: true, deleted: topicGroupName});
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
 }
 
+// Delete topic
 async function deleteTopic(request, response) {
   const topicGroupName = request.params.topicGroupName;
   const topicName = request.params.topicName;
@@ -355,44 +479,175 @@ async function deleteTopic(request, response) {
     response.status(400).json({error: "Could not find topic group"});
     return;
   }
+
   const topicGroupId = idResp.rows[0].id;
   let tmp = await pool.query(
-    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+    `SELECT id FROM topics WHERE LOWER(name) = LOWER($1) AND topic_group_id = $2`
   , [topicName, topicGroupId]);
   if (tmp.rows.length == 0) {
     response.status(400).json({error: "Could not find topic in database"});
     return;
   }
-  let topicId = tmp.rows[0].id;
+
+  if (fs.existsSync(`../frontend/public/_files/topicGroup${idResp.rows[0].id}/topic${tmp.rows[0].id}`)) { 
+    fs.rmdir(`../frontend/public/_files/topicGroup${idResp.rows[0].id}/topic${tmp.rows[0].id}`, { recursive: true }, (err) => {
+      if (err) { throw err; }
+    }); 
+  }
+
+  const topicId = tmp.rows[0].id;
   await pool.query(`DELETE FROM prerequisites WHERE topic = $1 or prereq = $1`, [topicId]);
   await pool.query(`DELETE FROM topics WHERE id = $1`, [topicId]);
   response.status(200).json({ success: true, topicId: topicId});
 }
 
+// Update topic details
+async function putTopic (request, response) {
+  try {
+    const topicName = request.params.topicName;
+    const newName = request.body.name;
+    const topicGroupName = request.params.topicGroupName;
+
+    let tgReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (!tgReq.rows.length) throw (`Failed: topic group {${topicGroupName}} does not exist`);
+
+    let tReq = await pool.query(`SELECT id FROM topics WHERE LOWER(name) = LOWER($1)`, [topicName]);
+    if (!tReq.rows.length) throw (`Failed: topic {${topicName}} does not exist`);
+
+    const topicGroupId = tgReq.rows[0].id;
+    const topicId = tReq.rows[0].id;
+    const fileTypeList = request.body.uploadedFileTypes.split(",");
+
+    await pool.query(`UPDATE topics SET name = $1 WHERE id = $2`, [newName, topicId]);
+
+    if (request.body.fileDeleteList) {
+      const fileDeleteList = request.body.fileDeleteList.split(",");
+      if (fileDeleteList.length) {  // Deletes files specified in delete list
+        for (const fileId of fileDeleteList) {
+          let tmpQ = await pool.query(`DELETE FROM topic_files WHERE id = $1 RETURNING file`, [fileId]);
+          fs.unlinkSync("../frontend/public"+tmpQ.rows[0].file);
+        }
+      }
+    }
+
+    // Checks if directory exists for topic group and topic and makes it
+    if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}`)) {
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}`); 
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`); 
+    } else if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`)) {
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`); 
+    }
+
+    if (request.files != null) {
+      if (request.files.uploadFile.length > 1) {
+        if (fileTypeList.length > request.files.uploadFile.length) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        var typeCounter = 0;
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO topic_files(id, name, file, type, topic_id)
+          VALUES(default, $1, $2, $3, $4)`, [file.name, (`/_files/topicGroup${topicGroupId}/topic${topicId}/${file.name}`), 
+          fileTypeList[typeCounter], topicId]);
+          fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          typeCounter+=1;
+        }
+      } else {
+        if (fileTypeList.length > 1) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        await pool.query(`INSERT INTO topic_files(id, name, file, type, topic_id)
+        VALUES(default, $1, $2, $3, $4)`, [request.files.uploadFile.name, 
+        (`/_files/topicGroup${topicGroupId}/topic${topicId}/${request.files.uploadFile.name}`), fileTypeList[0], topicId]);
+        fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
+
+    response.status(200).json({success: true, topic: topicId});
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
+}
+
 async function postTopic (request, response) {
-  const topicGroupName = request.params.topicGroupName;
-  const topicName = request.params.topicName;
-  const idResp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
-  if (idResp.rows.length == 0) {
-    response.status(400).json({error: "Could not find topic group"});
-    return;
-  }
-  const topicGroupId = idResp.rows[0].id;
+  try {
+    const topicGroupName = request.params.topicGroupName;
+    const topicName = request.params.topicName;
+    const idResp = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (idResp.rows.length == 0) throw ("Could not find topic group");
+    const topicGroupId = idResp.rows[0].id;
+    const fileTypeList = request.body.uploadedFileTypes.split(",");
 
-  let resp = await pool.query(
-    'INSERT INTO topics(id, topic_group_id, name) values(default, $1, $2)',
-    [topicGroupId, topicName]);
-  
-  let tmp = await pool.query(
-    `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
-  , [topicName, topicGroupId]);
-  if (tmp.rows.length == 0) {
-    response.status(400).json({error: "Could not find newly created topic in database"});
-    return;
-  }
-  let topicId = tmp.rows[0];
+    let resp = await pool.query(
+      'INSERT INTO topics(id, topic_group_id, name) values(default, $1, $2) RETURNING id',
+      [topicGroupId, topicName]);
+    const topicId = resp.rows[0].id;
+    
+    /* let tmp = await pool.query(
+      `SELECT id FROM topics WHERE name = $1 AND topic_group_id = $2`
+    , [topicName, topicGroupId]);
+    if (tmp.rows.length == 0) throw ("Could not find newly created topic in database");
+    let topicId = tmp.rows[0]; */
 
-  response.status(200).json(topicId);
+    // Checks if directory exists for topic group and topic and makes it
+    if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}`)) {
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}`); 
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`); 
+    } else if (!fs.existsSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`)) {
+      fs.mkdirSync(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`); 
+    }
+
+    if (request.files != null) {
+      if (request.files.uploadFile.length > 1) {
+        if (fileTypeList.length > request.files.uploadFile.length) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        var typeCounter = 0;
+        for (const file of request.files.uploadFile) {
+          await pool.query(`INSERT INTO topic_files(id, name, file, type, topic_id)
+          VALUES(default, $1, $2, $3, $4)`, [file.name, (`/_files/topicGroup${topicGroupId}/topic${topicId}/${file.name}`), 
+          fileTypeList[typeCounter], topicId]);
+          fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}/${file.name}`, file.name, "binary", function (err) { if (err) throw err; });
+          typeCounter+=1;
+        }
+      } else {
+        if (fileTypeList.length > 1) throw ("Uploaded file type list longer than uploaded files");
+        else if (fileTypeList.length < 0) throw ("Uploaded file type list shorter than uploaded files");
+        await pool.query(`INSERT INTO topic_files(id, name, file, type, topic_id)
+        VALUES(default, $1, $2, $3, $4)`, [request.files.uploadFile.name, 
+        (`/_files/topicGroup${topicGroupId}/topic${topicId}/${request.files.uploadFile.name}`), fileTypeList[0], topicId]);
+        fs.writeFile(`../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}/${request.files.uploadFile.name}`, 
+        request.files.uploadFile.data, "binary", function (err) {
+          if (err) throw err;
+        });
+      }
+    }
+
+    response.status(200).json({success: true, topic: topicId});
+  } catch (e) {
+    response.status(400).send(e);
+  }
+}
+
+// Get topic files
+async function getTopicFile (request, response) {
+  try {
+    const topicGroupName = request.params.topicGroupName;
+    const topicName = request.params.topicName;
+
+    // Checks topicgroup and topic validity
+    let tgResp = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if (!tgResp.rows.length) throw (`Failed: Topic group {${topicGroupName}} does not exist.`);
+
+    let tnResp = await pool.query(`SELECT id FROM topics WHERE LOWER(name) = LOWER($1) AND topics.topic_group_id = $2`, 
+    [topicName, tgResp.rows[0].id]);
+    if (!tnResp.rows.length) throw (`Failed: Topic {${topicName}} does not exist.`);
+
+    let resp = await pool.query(`SELECT * FROM topic_files WHERE topic_id = $1`, [tnResp.rows[0].id]);
+
+    response.status(200).json(resp.rows);
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
 }
 
 /***************************************************************
@@ -1173,6 +1428,17 @@ async function getAllTags (request, response) {
   }
 };
 
+async function getTag (request, response) {
+  try {
+    const tagId = request.params.tagId;
+    let resp = await pool.query(`SELECT * FROM tags WHERE tag_id = $1`, [tagId]);
+    if (!resp.rows.length) throw ("Tag id not found");
+    response.status(200).json(resp.rows[0]);
+  } catch (e) {
+    response.status(400).send(e);
+  }
+}
+
 // Posts tag
 async function postTag (request, response) {
   try {
@@ -1432,7 +1698,8 @@ async function postAnnouncement (request, response) {
 
 // Update announcement by id
 async function putAnnouncement (request, response) {
-  const announcementId = request.params.announcementId;
+  try {
+    const announcementId = request.params.announcementId;
     const title = request.body.title;
     const content = request.body.content;
 
@@ -1470,8 +1737,6 @@ async function putAnnouncement (request, response) {
     }
     
     response.sendStatus(200);
-  try {
-    
   } catch (e) {
     response.status(400).send(e);
   }
@@ -1659,274 +1924,6 @@ async function getSearchAnnouncements (request, response) {
   }
 
 }
-
-/***************************************************************
-                       Gamification Functions
-***************************************************************/
-
-async function getQuestions (request, response) {
-  void (request);
-  try {
-    let resp = await pool.query(
-      `SELECT * from gamification_question`)
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Create new gamification question
-async function postQuestion (request, response) {
-  const title = request.body.title;
-  const questionType = request.body.questionType;
-  const potentialAnswer = request.body.potentialAnswers;
-  const correctAnswer = request.body.correctAnswer;
-  const timeStampQuery = await pool.query(`SELECT current_timestamp`);
-  const availableFrom = timeStampQuery.rows[0].current_timestamp;
-  const numberOfAnswers = request.body.numberOfAnswers;
-  const mediaLink = request.body.mediaLink;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  let resp = await pool.query(
-    `INSERT INTO gamification_question(id, title, questiontype, potentialAnswers, 
-     correctAnswer, availableFrom, numberOfAnswers, mediaLink, estimatedTimeRequired)
-     VALUES(default, $1, $2, $3, $4, $5, $6, $7, $8)`, [title, questionType, potentialAnswer, correctAnswer,
-    availableFrom, numberOfAnswers, mediaLink, estimatedTime]);
-
-  response.status(200).send("Post gamification question success");
-  try {
-    
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get level data from question
-async function getLevelFromQuestion (request, response) {
-  const questionId = request.params.questionId;
-  try {
-    let resp = await pool.query(
-      `SELECT * from levels 
-      JOIN levels_questions ON question_id = $1 AND level_id = levels.id;`, [questionId])
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Edit existing question data
-async function putQuestion (request, response) {
-  const questionId = request.params.questionId;
-  const title = request.body.title;
-  const questionType = request.body.questionType;
-  const potentialAnswer = request.body.potentialAnswers;
-  const correctAnswer = request.body.correctAnswer;
-  const availableFrom = request.body.availableFrom;
-  const numberOfAnswers = request.body.numberOfAnswers;
-  const mediaLink = request.body.mediaLink;
-  const estimatedTime = request.body.estimatedTimeRequired;
-  
-  try {
-    let resp = await pool.query(
-      `UPDATE gamification_question SET title = $1, 
-      questionType = $2, potentialAnswers = $3, correctAnswer = $4, 
-      availableFrom = $5, numberOfAnswers = $6, mediaLink = $7, estimatedTimeRequired = $8
-      WHERE id = $9`,
-      [title, questionType, potentialAnswer, correctAnswer,
-      availableFrom, numberOfAnswers, mediaLink, estimatedTime, questionId]);
-    response.status(200).send("Gamification Question Update Success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Delete question from id
-async function deleteQuestion (request, response) {
-  const questionId = request.params.questionId;
-  
-  try {
-    let resp = await pool.query(
-      `DELETE FROM gamification_question WHERE id = $1`,
-      [questionId]);
-    response.status(200).send("Gamification Question Delete Success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get all gamification levels
-async function getAllLevels (request, response) {
-  void (request);
-  try {
-    let resp = await pool.query(
-      `SELECT * from levels`)
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get all gamification levels
-async function getLevelById (request, response) {
-  const levelId = request.params.levelId;
-  try {
-    let resp = await pool.query(
-      `SELECT * from levels WHERE id = $1`, [levelId]);
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-}
-
-// Edit existing level data
-async function putLevel (request, response) {
-  const levelId = request.params.levelId;
-  const title = request.body.title;
-  const topicGroupId = request.body.topicGroupId;
-  const levelType = request.body.levelType;
-  const availableFrom = request.body.availableFrom;
-  const questionNumbers = request.body.questionNumbers;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  try {
-    let resp = await pool.query(
-      `UPDATE levels SET title = $1, topic_group_id = $2, typeoflevel = $3, 
-      availableFrom = $4, numberofquestions = $5, estimatedTimeRequired = $6
-      WHERE id = $7`, [title, topicGroupId, levelType, availableFrom, 
-      questionNumbers, estimatedTime, levelId]);
-    response.status(200).send("Update level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Delete level from id
-async function deleteLevel (request, response) {
-  const levelId = request.params.levelId;
-  try {
-    let resp = await pool.query(
-      `DELETE from levels WHERE id = $1`, [levelId]);
-    response.status(200).send("Delete level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Create new level 
-async function postLevel (request, response) {
-  const title = request.body.title;
-  const topicGroupId = request.body.topicGroupId;
-  const levelType = request.body.levelType;
-  const availableFrom = request.body.availableFrom;
-  const questionNumbers = request.body.questionNumbers;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  try {
-    let resp = await pool.query(
-      `INSERT INTO levels(id, title, topic_group_id, typeOfLevel, 
-        availableFrom, numberOfQuestions, estimatedTimeRequired) 
-      VALUES(default, $1, $2, $3, $4, $5, $6) RETURNING id`,
-      [title, topicGroupId, levelType, availableFrom, questionNumbers, estimatedTime]);
-
-    let insertLink = await pool.query(`INSERT INTO topic_group_levels(topic_group_id, levelsid) 
-    VALUES($1, $2)`, [topicGroupId, resp.rows[0].id]);
-    response.status(200).send("Post level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get all questions linked to level 
-async function getLevelQuestions (request, response) {
-  const levelName = request.params.level;
-
-  try {
-    let resp = await pool.query(
-      `SELECT array_agg(q.id) as questions_list
-      FROM gamification_question q
-      JOIN levels_questions lq ON lq.question_id = q.id
-      JOIN levels l ON l.title = $1 AND lq.level_id = l.id`,
-      [levelName]);
-
-      var finalQuery = resp.rows;
-
-      for (var object of finalQuery) { // Loop through list of topic groups
-        var questionsArr = [];
-  
-        for (const questionId of object.questions_list) {
-          let tmp = await pool.query(`SELECT * FROM gamification_question WHERE id = $1`, [questionId]);
-          questionsArr.push(tmp.rows[0]);
-        };
-  
-        object.questions_list = questionsArr;
-      }
-
-    response.status(200).json(finalQuery[0]);
-
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Remove level from topic group
-async function removeTGLevel (request, response) {
-  const topicGroupName = request.params.topicGroup;
-  const tgQuery = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
-  const tgId = tgQuery.rows[0].id;
-  const level = request.params.level;
-
-  try {
-    let resp = await pool.query(
-      `DELETE FROM levels 
-      WHERE levels.title = $1 AND levels.id IN 
-      (SELECT levelsid from topic_group_levels WHERE topic_group_id = $2);`,
-      [level, tgId]);
-
-    response.status(200).send("Removed level from topic group");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Post new level for topic group
-async function postTGLevel (request, response) {
-  const title = request.body.title;
-  const topicGroupId = request.params.topicGroupId;
-  const levelType = request.body.levelType;
-  const availableFrom = request.body.availableFrom;
-  const questionNumbers = request.body.questionNumbers;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  try {
-    let resp = await pool.query(
-      `INSERT INTO levels(id, title, topic_group_id, typeOfLevel, 
-        availableFrom, numberOfQuestions, estimatedTimeRequired) 
-      VALUES(default, $1, $2, $3, $4, $5, $6) RETURNING id`,
-      [title, topicGroupId, levelType, availableFrom, questionNumbers, estimatedTime]);
-
-    let insertLink = await pool.query(`INSERT INTO topic_group_levels(topic_group_id, levelsid) 
-    VALUES($1, $2)`, [topicGroupId, resp.rows[0].id]);
-
-    response.status(200).send("Post topic group level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get list of levels for topic group
-async function getTGLevels (request, response) {
-  const topicGroupId = request.params.topicGroupId;
-  try {
-    let resp = await pool.query(
-      `SELECT l.id, l.title, l.topic_group_id, l.typeOfLevel, 
-      l.availableFrom, l.numberOfquestions, l.estimatedTimeRequired
-      FROM levels l 
-      JOIN topic_group_levels tgl ON tgl.levelsid = l.id AND tgl.topic_group_id = $1`, [topicGroupId])
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
 
 /***************************************************************
                        Assessment Functions
@@ -2394,10 +2391,6 @@ module.exports = {
   putQuizById,
   getQuizQuestions,
   postQuiz,
-  getTGLevels,
-  postTGLevel,
-  removeTGLevel,
-  getLevelQuestions,
   getUser,
   postAdmin,
   deleteUser,
@@ -2431,16 +2424,10 @@ module.exports = {
   postAnnouncement,
   postAnnouncementComment,
   getSearchAnnouncements,
-  getQuestions,
-  postQuestion,
-  getLevelFromQuestion,
-  putQuestion,
-  deleteQuestion,
-  getAllLevels,
-  getLevelById,
-  putLevel,
-  deleteLevel,
-  postLevel,
   postQuizQuestion,
-  getTopicGroup
+  getTopicGroup,
+  getTag,
+  getTopicFile,
+  putTopicGroup,
+  putTopic,
 };

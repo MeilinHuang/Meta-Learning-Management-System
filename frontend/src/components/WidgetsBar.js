@@ -1,11 +1,14 @@
 import React from "react"
-import { Box, Container, Text, Divider, Stack, Skeleton, Avatar, Flex, Menu, MenuButton, Portal, MenuList, MenuItem } from "@chakra-ui/react"
-import { ChevronDownIcon } from "@chakra-ui/icons"
+import { Box, Container, Text, Divider, Skeleton, Avatar, Flex, Menu, MenuButton, Portal, MenuList, MenuItem } from "@chakra-ui/react"
+import Calendar from './Calendar.js'
+//import Calendar from 'react-calendar'
+//import "./widgetBar.css"
+//import 'react-calendar/dist/Calendar.css';
 
 function WidgetsBar({page}) {
     return (
-        <Box display={["none", "none", "none", "block"]} minWidth={200} width={200} borderLeftWidth={1} height="100vh">
-            <Stack spacing={10}>
+        <Box display={["none", "none", "none", "block"]} width={200} borderLeftWidth={1} height="100vh">
+            <Flex flexDirection="column">
                 <Flex alignItems="center" justifyContent="center" marginTop={3}>
                     <Menu isLazy>
                             <MenuButton _hover={{textDecoration: "underline"}}>
@@ -25,19 +28,8 @@ function WidgetsBar({page}) {
                             </Portal>
                         </Menu>
                 </Flex>
-                {   page==="course"&&
-                    <Container>
-                        <Text size="sm">Course Progress</Text>
-                        <Divider color="black" opacity="1"></Divider>
-                        <Box bg="blue.100" marginTop={5} borderRadius={10} width="100%" height="100%">
-                            <Box bg="blue.500" width="50%" height="100%" borderRadius="10px 0px 0px 10px" textAlign="center" color="blue.500">.</Box>
-                        </Box>
-                    </Container>
-                }
-                <Container>
-                    <Text size="sm">Calendar</Text>
-                    <Divider color="black" opacity="1"></Divider>
-                    <Skeleton width="100%" marginTop={5} height={150}></Skeleton>
+                <Container padding={0} width="100%" marginTop={3} marginBottom={10} height={200} userSelect="none">
+                    <Calendar></Calendar>
                 </Container>
                 <Container>
                     <Text size="sm">Due Dates</Text>
@@ -46,7 +38,17 @@ function WidgetsBar({page}) {
                     <Skeleton width="100%" marginTop={5} height={5}></Skeleton>
                     <Skeleton width="100%" marginTop={5} height={5}></Skeleton>
                 </Container>
-            </Stack>   
+                {   
+                    page==="course"&&
+                    <Container marginTop={10}>
+                        <Text size="sm">Course Progress</Text>
+                        <Divider color="black" opacity="1"></Divider>
+                        <Box bg="blue.100" marginTop={5} borderRadius={10} width="100%" height="100%">
+                            <Box bg="blue.500" width="50%" height="100%" borderRadius="10px 0px 0px 10px" textAlign="center" color="blue.500">.</Box>
+                        </Box>
+                    </Container>
+                }
+            </Flex>   
         </Box>
     )
 }

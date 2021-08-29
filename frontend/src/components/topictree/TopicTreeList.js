@@ -14,7 +14,6 @@ import {
     AccordionPanel,
     AccordionIcon,
     Stack,
-    Divider,
     Modal,
     ModalOverlay,
     ModalContent,
@@ -26,7 +25,8 @@ import {
     useToast
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
-import { topic_group_url, post_new_topic_url, get_topic_group } from '../../Constants.js';
+import TopicTreeViewResource from "./TopicTreeViewResource.js"
+import { topic_group_url, post_new_topic_url, get_prereqs } from '../../Constants.js';
 import { Spinner } from '@chakra-ui/spinner';
 import TopicTreeHeader from "./TopicTreeHeader.js";
 
@@ -95,41 +95,27 @@ function FormModal({buttonText, modalName, topicGroup}) {
     )
 }
 
-function TopicModal({topicGroup, topicName}) {
-    const { isOpen, onOpen, onClose } = useDisclosure()
-    return (
-        <Box>
-            <Flex justifyContent="flex-start" padding={5} cursor="pointer" _hover={{bg:"gray.100", fontWeight:"medium"}} onClick={onOpen}>
-                <Flex width="100%">
-                    <Text>
-                        {topicName}
-                    </Text>
-                </Flex>
-            </Flex>
-            <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay/>
-                <ModalContent>
-                    <ModalHeader>{topicGroup}</ModalHeader>
-                    <ModalCloseButton/>
-                    <ModalBody>
-                        <Text fontWeight="medium">{topicName}</Text>
-                        Honestly I dont know what to put here so :D
-                    </ModalBody>
-                    <ModalFooter>
-
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
-        </Box>
-    )
-}
-
 export default function TopicTreeList() {
     const [data, setData] = useState([]);
     const [display, setDisplay] = useState([])
     const [view, setView] = useState("List View");
-    const [ form, setForm ] = useState({"topic_group": null, "topic": null})
-    const toast = useToast()
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const [listPrereqs, setListPrereqs] = useState([]);
+    const [selectedNode, setSelectedNode] = useState({
+        "id": 0,
+        "title": "",
+        "prerequisite_strings": [],
+        "description": "",
+        "materials_strings": {
+            "preparation": [],
+            "content": [],
+            "practice": [],
+            "assessments": []
+        },
+        "group": "",
+        "discipline": "",
+        "creator": ""
+    });
 
     useEffect(async function () {
         fetch(topic_group_url)
@@ -170,7 +156,7 @@ export default function TopicTreeList() {
                             }}></Input>
                         </InputGroup>
                         <Box marginLeft={5}>
-                        <FormModal buttonText="ADD TOPIC" modalName="Topic Group"></FormModal>
+                        <FormModal buttonText="ADD GROUP" modalName="Topic Group"></FormModal>
                         </Box>
                     </Flex>
                 </Flex>
@@ -199,8 +185,45 @@ export default function TopicTreeList() {
                                         <Stack>
                                         {
                                             e.topics_list.map(topic => {
+                                                //TODO FILL IN GROUP, DESCRIPTION, DISCIPLINE, CREATOR
+                                                // maybe topic group data should contain data of prerequisites?
+                                                // would remove the need to fetch everytime
                                                 return (
-                                                    <TopicModal key={e.name + "-topic-" + topic.name } topicGroup={e.name} topicName={topic.name}></TopicModal>
+                                                    <Flex key={e.name + " " + topic.name} justifyContent="flex-start" padding={5} cursor="pointer" _hover={{bg:"gray.100", fontWeight:"medium"}} onClick={() => {
+                                                        console.log(topic.course_materials[0])
+                                                        fetch(get_prereqs(e.name, topic.name)).then(x => x.json()).then(x => {
+                                                            let matList = {"preparation": [], "content": [], "practice": [], "assessment": []}
+                                                            topic.course_materials.map(mat => {
+                                                                if (mat !== null) {
+                                                                    matList[mat.type].push(mat.name)
+                                                                }
+                                                            })
+                                                            let tmp = {
+                                                                "id": topic.id,
+                                                                "title": topic.name,
+                                                                "prerequisite_strings": [],
+                                                                "description": "",
+                                                                "materials_strings": {
+                                                                    "preparation": matList.preparation,
+                                                                    "content": matList.content,
+                                                                    "practice": matList.practice,
+                                                                    "assessments": matList.assessment
+                                                                },
+                                                                "group": "",
+                                                                "discipline": "",
+                                                                "creator": ""
+                                                            }
+                                                            setListPrereqs(x.prerequisites_list)
+                                                            setSelectedNode(tmp)
+                                                            onOpen()
+                                                        })
+                                                    }}>
+                                                        <Flex width="100%">
+                                                            <Text>
+                                                                {topic.name}
+                                                            </Text>
+                                                        </Flex>
+                                                    </Flex>
                                                 )
                                             })
                                         }
@@ -215,7 +238,8 @@ export default function TopicTreeList() {
                         })}
                     </Accordion>
                 </Flex>
-            </Flex>      
+            </Flex> 
+            <TopicTreeViewResource data={selectedNode} isOpen={isOpen} onClose={onClose} prereqs={listPrereqs} />     
         </Box>
         )
     }
