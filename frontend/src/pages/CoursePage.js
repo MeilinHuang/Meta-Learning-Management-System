@@ -5,6 +5,7 @@ import CourseContentPage from "../pages/CourseContentPage.js"
 import CourseDashboard from "../pages/CourseDashboard.js"
 import ForumOverviewPage from "../pages/ForumOverviewPage.js"
 import ForumPostPage from '../pages/ForumPostPage'
+import CourseAnnouncementPage from '../pages/CourseAnnouncementPage'
 import {
     Switch,
     Route,
@@ -57,8 +58,9 @@ function CoursePage() {
                     <Switch>
                         {/* Add your page as a Route here */}
                         <Route exact path="/course-page/:code/forums" component={ForumOverviewPage} />
-                        <Route exact path="/course-page/:code/content"><CourseContentPage /></Route>
+                        <Route exact path="/course-page/:code/content" component={CourseContentPage}></Route>
                         <Route exact path="/course-page/:code/forums/:id" component={ForumPostPage} />
+                        <Route exact path="/course-page/:code/announcement/:id" component={CourseAnnouncementPage} />
                         <Route path="/course-page/:code" component={CourseDashboard} />
                     </Switch>
                 </Container>

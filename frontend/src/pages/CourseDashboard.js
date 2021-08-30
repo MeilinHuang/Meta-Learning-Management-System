@@ -7,6 +7,7 @@ import {
     Input,
     InputGroup,
     InputLeftElement,
+    Spinner,
     useBreakpointValue,
     useDisclosure,
 } from "@chakra-ui/react"
@@ -21,6 +22,7 @@ const dummyAuthor = 3
 function CourseDashboard({ match: { params: { code }}}) {
     const [announcements, setAnnouncements] = useState([])
     const [searchTerm, setSearchTerm] = useState('')
+    const [loading, setLoading] = useState(true)
     const buttonContents = useBreakpointValue({ base: '', md: 'Add Post' })
     const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null })
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -41,6 +43,7 @@ function CourseDashboard({ match: { params: { code }}}) {
                         newPosts.push(withAuthor)
                     }
                     setAnnouncements(newPosts.reverse())
+                    setLoading(false)
                 })
         })
     }, [code, setAnnouncements])
@@ -119,7 +122,14 @@ function CourseDashboard({ match: { params: { code }}}) {
                     </Box>
                 </Center>
             </Flex>
-            {announcements.map(announcement => <Announcement announcement={announcement} course={code} setAnnouncements={setAnnouncements} />)}
+            <Box mb="32px">
+                {loading && 
+                    <Flex mt="16px" justifyContent="center">
+                        <Spinner />
+                    </Flex>
+                }
+                {announcements.map(announcement => <Announcement announcement={announcement} course={code} setAnnouncements={setAnnouncements} />)}
+            </Box>
         </>
     )
 }

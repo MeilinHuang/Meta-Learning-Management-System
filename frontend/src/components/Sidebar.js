@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react"
+import React, { useState} from "react"
 import { useHistory } from 'react-router-dom'
 import { Stack, Text, Box, Flex, Drawer, DrawerOverlay, DrawerCloseButton, DrawerContent, Select, Avatar, DrawerHeader, Menu, MenuButton, Portal, MenuList, MenuItem} from "@chakra-ui/react"
 import { ChevronDownIcon, ArrowBackIcon, HamburgerIcon } from '@chakra-ui/icons'
@@ -37,37 +37,38 @@ function SidebarContent({history, links}) {
 function Sidebar({links, isOpen, setOpen, variant, page}) {
     const history = useHistory()
     const [code, setCode] = useState("")
-    //MAYBE STORE IN LOCAL STORAGE INSTEAD OF FETCHING EVERYTIME
-    const course = history.location.pathname.split("/").filter(e => e !== "")[1]
-    fetch(get_topic_group(course)).then(e => e.json()).then(e => setCode(e.topic_code))
 
     let title = (
-        <Menu isLazy placement="right">
-            <MenuButton>
-                <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
-                    <Box marginLeft={1} padding={4} fontSize="larger">
-                        <Text fontWeight="medium" letterSpacing="wider">{code}</Text>
-                        <Text fontSize="medium" letterSpacing="wider">{course}</Text>
-                    </Box>
-                </Flex>
-            </MenuButton>
-            <Portal>
-                <MenuList zIndex={100} placement="right">
-                    {
-                        ["Course 1", "Course 2"].map(e => <MenuItem key={"course-menu-" + e}>{e}</MenuItem>)
-                    }
-                </MenuList>
-            </Portal>
-        </Menu>
-
+        <Flex flexDirection="column" bg="blue.500" color="white" height={90} textAlign="left" justifyContent="center">
+            <Box marginLeft={1} padding={4} fontSize="x-large">
+                <Text fontWeight="medium" letterSpacing="wider">MetaLMS</Text>
+            </Box>
+        </Flex>
     )
-    if (page === "main") {
+
+    if (page === "course") {
+        //MAYBE STORE IN LOCAL STORAGE INSTEAD OF FETCHING EVERYTIME
+        const course = history.location.pathname.split("/").filter(e => e !== "")[1]
+        fetch(get_topic_group(course)).then(e => e.json()).then(e => setCode(e.topic_code))
+
         title = (
-            <Flex flexDirection="column" bg="blue.500" color="white" height={90} textAlign="left" justifyContent="center">
-                <Box marginLeft={1} padding={4} fontSize="x-large">
-                    <Text fontWeight="medium" letterSpacing="wider">MetaLMS</Text>
-                </Box>
-            </Flex>
+            <Menu isLazy placement="right">
+                <MenuButton>
+                    <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
+                        <Box marginLeft={1} padding={4} fontSize="larger">
+                            <Text fontWeight="medium" letterSpacing="wider">{code}</Text>
+                            <Text fontSize="medium" letterSpacing="wider">{course}</Text>
+                        </Box>
+                    </Flex>
+                </MenuButton>
+                <Portal>
+                    <MenuList zIndex={100} placement="right">
+                        {
+                            ["Course 1", "Course 2"].map(e => <MenuItem key={"course-menu-" + e}>{e}</MenuItem>)
+                        }
+                    </MenuList>
+                </Portal>
+            </Menu>
         )
     }
 

@@ -27,7 +27,7 @@ export default function TopicGroupList() {
         fetch(topic_group_url)
         .then(response => response.json())
         .then(function (response) {
-            console.log('response', response);
+            
             setData(response);
         });
     }, []);
