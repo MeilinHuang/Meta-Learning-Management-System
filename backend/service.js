@@ -300,6 +300,7 @@ async function getTopics (request, response) {
         };
 
         object.topics_list = topicArr;
+        object.name = topicGroupName.name;
 
       }
       result.push(resp.rows[0]);
