@@ -7,17 +7,15 @@ import {
   AccordionPanel,
   Box,
   Button,
-  Container,
+  Checkbox,
   Divider,
   Flex,
-  FormControl,
   Heading,
   HStack,
   Input,
   InputGroup,
   InputLeftElement,
   InputRightElement,
-  Link,
   Modal,
   ModalBody,
   ModalContent,
@@ -25,13 +23,15 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Spacer,
   Stack,
   Text,
-  Textarea,
   VStack,
   useDisclosure
 } from "@chakra-ui/react"
+
+import {
+  SearchIcon,
+} from "@chakra-ui/icons"
 
 import DatePicker from "react-datepicker";
 import QuestionCreation from '../question-creation/QuestionCreation';
@@ -49,9 +49,11 @@ function generateNewQuiz() {
 
 export default function EditQuiz() {
   const [quiz, setQuiz] = useState({}); // list of dictionaries [{}, {}, ...]
-  const [name, setName] = useState("");
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const finalRef = React.useRef()
+  const [questionBank, setQuestionBank] = useState([]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const finalRef = React.useRef();
+  const [selectingCreateOrImportQuestion, setSelectingCreateOrImportQuestion] = useState(false);
+  const [isImportingQuestion, setIsImportingQuestion] = useState(false);
 
   const topics = [
     "Arrays",
@@ -65,6 +67,10 @@ export default function EditQuiz() {
     const newQuizTemplate = generateNewQuiz();
     setQuiz(newQuizTemplate);
   }, []);
+
+  const getQuestionBank = () => {
+    // TODO: Get from database when connecting with backend
+  };
 
   const onChangeDueDate = (date) => {
     setQuiz({ ...quiz, due_date: date });
@@ -174,7 +180,7 @@ export default function EditQuiz() {
           <Box d="flex">
             <Heading width="40rem">Questions</Heading>
             <HStack spacing="3">
-              <Button size="sm" colorScheme="green" onClick={onOpen}>New question</Button>
+              <Button size="sm" colorScheme="green" onClick={onClickNewQuestion}>New question</Button>
               <Button size="sm" colorScheme="blue" onClick={expandAllQuestions}>Expand all</Button>
               <Button size="sm" colorScheme="red" onClick={collapseAllQuestions}>Collapse all</Button>
             </HStack>
@@ -185,6 +191,11 @@ export default function EditQuiz() {
         </Accordion>
       </Box>
     );
+  };
+
+  const onClickNewQuestion = () => {
+    onOpen();
+    setSelectingCreateOrImportQuestion(true);
   };
 
   const onChangeQuestionItems = (expandedIndices) => {
@@ -254,8 +265,7 @@ export default function EditQuiz() {
   };
 
   const addQuestionToQuiz = (newQuestion) => {
-
-    // TODO: Add question to quiz (pass data)
+    // Update questions in quiz
     const updatedQuestions = quiz.questions.concat([newQuestion])
     setQuiz({ ...quiz, num_questions: quiz.num_questions + 1, questions: updatedQuestions});
   };
@@ -301,20 +311,48 @@ export default function EditQuiz() {
 
   };
 
+  const addQuestionToQuestionBank = (question) => {
+    // TODO: Make POST request to add question to question bank
+
+    // Remove this later once above TODO is complete
+    const newQuestionBank = questionBank.concat([question]);
+    setQuestionBank(newQuestionBank);
+  };
+
   const renderNewQuestionModal = () => {
+    const creatingNewQuestion = (!selectingCreateOrImportQuestion && !isImportingQuestion);
+    const importingNewQuestion = (!selectingCreateOrImportQuestion && isImportingQuestion);
+
+    let modalHeaderText = "";
+    
+    if (selectingCreateOrImportQuestion)
+    {
+      modalHeaderText = "Create or import a question";
+    } 
+    else if (creatingNewQuestion)
+    {
+      modalHeaderText = "Create a question";
+    }
+    else if (importingNewQuestion)
+    {
+      modalHeaderText = "Import a question";
+    }
+
     return (
       <Modal
-        onClose={onClose}
+        onClose={handleOnClose}
         isOpen={isOpen}
         size="xl"
         finalFocusRef={finalRef}
       >
         <ModalOverlay />
         <ModalContent as="form" onSubmit={handleSubmit}>
-          <ModalHeader>Add a Question</ModalHeader>
+          <ModalHeader>{modalHeaderText}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>  
-              <QuestionCreation addQuestionToQuiz={addQuestionToQuiz} topics={topics} isCreatingQuestion={true}/>
+              { selectingCreateOrImportQuestion && renderCreateOrImportBox()}
+              { creatingNewQuestion && <QuestionCreation addQuestionToQuiz={addQuestionToQuiz} topics={topics} isCreatingQuestion={true} addToQuestionBank={addQuestionToQuestionBank}/> }
+              { importingNewQuestion && renderImportQuestionScreen()}
           </ModalBody>
           <ModalFooter>
             {/* <Button aria-label="Close" onClick={handleDialogClose}>Close</Button>
@@ -332,6 +370,77 @@ export default function EditQuiz() {
     );
   };
 
+  const handleOnClose = () => {
+    onClose();
+    setSelectingCreateOrImportQuestion(false);
+    setIsImportingQuestion(false);
+  };
+
+  const renderCreateOrImportBox = () => {
+    return (
+      <VStack>
+        <Button colorScheme="green" onClick={onClickCreateNewQuestion}>Create a new question</Button>
+        <Heading size="md" color="gray.600">or</Heading>
+        <Button colorScheme="orange" onClick={onClickImportQuestion}>Import from Question Bank</Button>
+      </VStack>
+    );
+  };
+
+  const renderImportQuestionScreen = () => {
+    return (
+      <Box>
+        <Stack spacing={4}>
+          <InputGroup>
+            <Input placeholder="Enter amount" />
+            <InputRightElement>
+              <SearchIcon color="gray.800"/>
+                
+            </InputRightElement>
+          </InputGroup>
+        </Stack>
+
+        <VStack spacing={10} px={9} mt={3}>
+        { questionBank.map(qs => {
+            return (
+              <InputGroup>
+                <InputLeftElement>
+                  <Checkbox mr={3} />
+                  <Text>{qs.question_text}</Text>
+                </InputLeftElement>
+                <InputRightElement>
+                  <Text>{renderTag(topics[qs.related_topic_id])}</Text>
+                </InputRightElement>
+              </InputGroup>
+            );
+        })}
+        </VStack>
+      </Box>
+    );
+  };
+
+  const renderQuestionFromQuestionBank = (qs) => {
+    return (
+      <InputGroup>
+        <InputLeftElement>
+          <Text>{qs.question_text}</Text>
+        </InputLeftElement>
+        <InputRightElement>
+          <Text>{renderTag(topics[qs.related_topic_id])}</Text>
+        </InputRightElement>
+      </InputGroup>
+    );
+  };
+
+  const onClickCreateNewQuestion = () => {
+    setSelectingCreateOrImportQuestion(false);
+    setIsImportingQuestion(false);
+  };
+
+  const onClickImportQuestion = () => {
+    setSelectingCreateOrImportQuestion(false);
+    setIsImportingQuestion(true);
+  };
+
   return (
     <>
       <Flex ref={finalRef} height="100" width="100" mt="10">
@@ -339,11 +448,11 @@ export default function EditQuiz() {
           <Text fontWeight="bold" fontSize="2xl">Question List</Text>
           {quiz.questions?.length !== 0 ? renderQuestionLinks() : <Text my="3">There are no questions in the quiz. Add a question!</Text>}
         </Box>
-        <Divider orientation="vertical"/>
+        <Box flex="0.1" borderLeft="1px" borderColor="gray.400" height="890px" />
         <Box flex="2.5" px="20">
           {renderQuestions()}
         </Box>
-        <Divider orientation="vertical" />
+        <Box flex="0.1" borderLeft="1px" borderColor="gray.400" height="890px" />
         <Box flex="1">
           {renderQuizDetails()}
         </Box>

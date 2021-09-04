@@ -27,7 +27,7 @@ import {
           Textarea,
           VStack
         } from "@chakra-ui/react"
-import { AddIcon } from "@chakra-ui/icons"
+import { AddIcon, QuestionOutlineIcon } from "@chakra-ui/icons"
 
 import './QuestionCreation.css'
 import "react-datepicker/dist/react-datepicker.css";
@@ -129,13 +129,14 @@ function generateNewQuestion() {
         explanation: ""
       },
     ],
-    is_expanded: false
+    is_expanded: false,
+    add_to_question_bank: false,
   }
 };
 
 const API_URL = "http://localhost:8000";
 
-export default function QuestionCreation({ addQuestionToQuiz, topics, isCreatingQuestion }) {
+export default function QuestionCreation({ addQuestionToQuiz, topics, isCreatingQuestion, addToQuestionBank }) {
   const [questionText, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState("mc");
   const [relatedTopicId, setRelatedTopicId] = useState("0");
@@ -200,8 +201,17 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
         </HStack>
 
         {renderPossibleAnswers(newQuestion)}
+
+        <HStack spacing={3} mt={5}>
+          <Checkbox onChange={onChangeAddToQuestionBank}>Add to Question Bank</Checkbox>
+          <QuestionOutlineIcon color="blue"/>
+        </HStack>
       </Box>
     );
+  };
+
+  const onChangeAddToQuestionBank = (e) => {
+    setNewQuestion({ ...newQuestion, add_to_question_bank: e.target.checked});
   };
 
   const onChangeMarksAwarded = (newValue) => {
@@ -535,6 +545,12 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
     }
 
     setIsValidQuestion(true);
+
+    if (newQuestion.add_to_question_bank)
+    {
+        // Add question to question bank
+        addToQuestionBank(newQuestion);
+    }
 
     addQuestionToQuiz(newQuestion);
   }
