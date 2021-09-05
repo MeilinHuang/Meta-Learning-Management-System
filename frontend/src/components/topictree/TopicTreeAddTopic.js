@@ -31,7 +31,7 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
 
     const convertToList = (jsonData) => {
         let tempTopics = [];
-        for (let topic of jsonData.topics_list) {
+        for (let topic of jsonData.result[0].topics_list) {
             topic['value'] = topic.name;
             topic['label'] = topic.name;
             tempTopics.push(topic);

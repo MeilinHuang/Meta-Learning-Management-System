@@ -7,9 +7,12 @@ import { SearchIcon, ArrowRightIcon } from '@chakra-ui/icons'
 import TopicTreeViewResource from "./TopicTreeViewResource.js"
 import { useDisclosure } from '@chakra-ui/hooks';
 import { backend_url, get_topics_url, get_topic_groups } from '../../Constants.js';
+import { set } from 'draft-js/lib/DefaultDraftBlockRenderMap';
 
 var g;
-var svg
+var svg;
+var expand = {};
+var circles, link, node, lables, simulation, tempNodes, linkNodes, tempLinks;
 
 function zoomed() {
     g.attr("transform", d3.event.transform);
@@ -42,40 +45,47 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
     } = useDisclosure();
 
     const treeStructure = (jsonData) => {
-        console.log('jsondata', jsonData);
+        
+        expand = {};
+
         let newJson = {
             "nodes": [{}],
             "links": []
         };
-        for (let topic of jsonData.topics_list) {
-            let node = {};
-            node["id"] = topic.id;
-            node["title"] = topic.name;
-            node["materials_strings"] = {};
-            node.materials_strings["content"] = [];
-            node.materials_strings['preparation'] = [];
-            node.materials_strings['practice'] = [];
-            node.materials_strings['assessments'] = [];
-            for (let course_material of topic.course_materials) {
-                if (course_material.type === 'preparation') {
-                    node.materials_strings.preparation.push(course_material.name);
-                } else if (course_material.type === 'assessment') {
-                    node.materials_strings.assessments.push(course_material.name);
-                } else if (course_material.type === 'practice') {
-                    node.materials_strings.practice.push(course_material.name);
-                } else {
-                    node.materials_strings.content.push(course_material.name);
+        for (let topicGroup of jsonData) {
+            expand[topicGroup.name] = false;
+            for (let topic of topicGroup.topics_list) {
+                let node = {};
+                node["id"] = topic.id;
+                node["title"] = topic.name;
+                node["group"] = topicGroup.name;
+                node["materials_strings"] = {};
+                node.materials_strings["content"] = [];
+                node.materials_strings['preparation'] = [];
+                node.materials_strings['practice'] = [];
+                node.materials_strings['assessments'] = [];
+                for (let course_material of topic.course_materials) {
+                    if (course_material.type === 'preparation') {
+                        node.materials_strings.preparation.push(course_material.name);
+                    } else if (course_material.type === 'assessment') {
+                        node.materials_strings.assessments.push(course_material.name);
+                    } else if (course_material.type === 'practice') {
+                        node.materials_strings.practice.push(course_material.name);
+                    } else {
+                        node.materials_strings.content.push(course_material.name);
+                    }
+                }
+                
+                newJson.nodes.push(node);
+                for (let prereq of topic.prereqs) {
+                    newJson.links.push({
+                        'source': prereq.id,
+                        'target': topic.id
+                    });
                 }
             }
-            
-            newJson.nodes.push(node);
-            for (let prereq of topic.prereqs) {
-                newJson.links.push({
-                    'source': prereq.id,
-                    'target': topic.id
-                });
-            }
         }
+        
         
         return newJson;
     }
@@ -93,7 +103,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
         
         let prereqs = [];
         let nodes = [];
-        console.log('data', data.nodes);
+        
         for (let i = 0; i < data.nodes.length; i++) {
             let found = false;
             for (let j = 0; j < linksArray.length; j++) {
@@ -107,10 +117,152 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
                 nodes.push({'value': data.nodes[i].id.toString(), 'label': data.nodes[i].title});
             }
         }
-        console.log('nodes', nodes);
+        
         setListPrereqs(prereqs);
         setNotListPrereqs(nodes);
         onOpenModal();
+    }
+
+    function init(data) {
+        let preprocessedData = {};
+        // make it easier to access instead of having to traverse data.nodes each time
+        for (let node of data.nodes) {
+            if (node.hasOwnProperty('id')) {
+                preprocessedData[node.id.toString()] = node;
+            }
+        }
+        
+        tempNodes = [];
+        let seenGroups = {};
+        let nodeDict = {};
+        let i = 76754;
+        for (let node of data.nodes) {
+            if (expand[node.group] == false) {
+                if (!seenGroups.hasOwnProperty(node.group)) {
+                    seenGroups[node.group] = i;
+                    tempNodes.push({
+                        'id': i,
+                        'name': node.group,
+                        'title': node.group,
+                        'type': 'group'
+                    });
+                }
+            } else {
+                node.type = 'topic';
+                tempNodes.push(node)
+            }
+            nodeDict[node.id] = node;
+            i += 1;
+        }
+        
+
+        tempLinks = [];
+        let linkDict = {};
+        for (let link of data.links) {
+            let linkToAppend = {};
+            
+            if (expand[nodeDict[link.source].group] == false) {
+                linkToAppend['source'] = seenGroups[nodeDict[link.source].group];
+                
+            } else {
+                linkToAppend['source'] = link.source;
+            }
+
+            if (expand[nodeDict[link.target].group] == false) {
+                linkToAppend['target'] = seenGroups[nodeDict[link.target].group];
+            } else {
+                linkToAppend['target'] = link.target;
+            }
+            let linkStr = linkToAppend['source'] + ',' + linkToAppend['target'];
+            if (!linkDict.hasOwnProperty(linkStr) && linkToAppend['source'] != linkToAppend['target']) {
+                linkDict[linkStr] = true;
+                tempLinks.push(JSON.parse(JSON.stringify(linkToAppend)));
+            }   
+        }
+        
+        // arrow heads
+        svg.append("svg:defs").selectAll("marker")
+            .data(["end"])
+            .enter().append("svg:marker")
+            .attr("id", String)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 43) // whereabouts it is on the line - TODO adjust this dependon if we are talking about distance of hull or topic nodes
+            .attr("refY", 0)
+            .attr("markerWidth", 10)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5");
+
+        // Initialize the links
+        link = g.append('g')
+            .attr('class', 'links')
+            .selectAll('path')
+            .data(tempLinks)
+            .enter()
+            .append('path')
+            .attr('class', function (d) { return 'link'; })
+            .attr("marker-end", (d) => { return "url(#end)" })
+            .style("fill", 'none')
+            .style("stroke", "#666")
+            .style("stroke-width", "1.5px")
+            .style("opacity", 0.8);
+            
+        
+        // Initialize the nodes
+        node = g
+            .attr("class", "nodes")
+            .selectAll("g")
+            .data(tempNodes)
+            .enter().append("g")
+            .on("click", function() {
+                let topicName = d3.select(this).text();
+                
+                let nodeData = tempNodes.filter(function (dataValue) {
+                    
+                    return dataValue.title === topicName;
+                });
+                
+
+                setSelectedNode(nodeData[0]);
+                getListOfPrerequisites(nodeData[0].id, data);
+
+
+
+            });
+        let radius = 30;
+        circles = node.append("circle")
+        .attr("r", function (r) {
+            return r.type == 'group' ? radius * 2 : radius;
+        })
+        .attr("fill", function(r) {
+            console.log(r);
+            if (r.type == 'group') {
+                return '#68b559';
+            }
+            return '#ADD8E6';
+        })
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended))
+            
+        lables = node.append("text")
+            .attr('text-anchor', 'middle')
+            .attr('alignment-baseline', 'middle')
+            .style("font-size", "8px")
+            .append('tspan')
+            .text(function(d) {
+              return d.title;
+            })
+        
+        linkNodes = [];
+        tempLinks.forEach(function(link) {
+            linkNodes.push({
+                source: preprocessedData[link.source],
+                target: preprocessedData[link.target]
+            });
+        });
     }
 
     useEffect(() => {
@@ -130,7 +282,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
                         .attr("height", height)
                         .call(zoom);
         g = svg.append("g")
-        var simulation = d3.forceSimulation()
+        simulation = d3.forceSimulation()
             .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(400))
             .force("charge", d3.forceManyBody().strength(-70))
             .force("center", d3.forceCenter(width / 2, height / 2));
@@ -142,99 +294,17 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
         })
         .then((res) => {
             
-            return treeStructure(res);
+            return treeStructure(res.result);
         })
         .then( function(data) {
-            let preprocessedData = {};
-            // make it easier to access instead of having to traverse data.nodes each time
-            for (let node of data.nodes) {
-                if (node.hasOwnProperty('id')) {
-                    preprocessedData[node.id.toString()] = node;
-                }
-            }
-            
-            // arrow heads
-            svg.append("svg:defs").selectAll("marker")
-                .data(["end"])
-                .enter().append("svg:marker")
-                .attr("id", String)
-                .attr("viewBox", "0 -5 10 10")
-                .attr("refX", 43) // whereabouts it is on the line - TODO adjust this dependon if we are talking about distance of hull or topic nodes
-                .attr("refY", 0)
-                .attr("markerWidth", 10)
-                .attr("markerHeight", 6)
-                .attr("orient", "auto")
-                .append("svg:path")
-                .attr("d", "M0,-5L10,0L0,5");
-
-            // Initialize the links
-            var link = g.append('g')
-                .attr('class', 'links')
-                .selectAll('path')
-                .data(data.links)
-                .enter()
-                .append('path')
-                .attr('class', function (d) { return 'link'; })
-                .attr("marker-end", (d) => { return "url(#end)" })
-                .style("fill", 'none')
-                .style("stroke", "#666")
-                .style("stroke-width", "1.5px")
-                .style("opacity", 0.8);
-                
-            
-            // Initialize the nodes
-            var node = g
-                .attr("class", "nodes")
-                .selectAll("g")
-                .data(data.nodes)
-                .enter().append("g")
-                .on("click", function() {
-                    let topicName = d3.select(this).text();
-                    
-                    let nodeData = data.nodes.filter(function (dataValue) {
-                        
-                        return dataValue.title === topicName;
-                    });
-                    
-
-                    setSelectedNode(nodeData[0]);
-                    getListOfPrerequisites(nodeData[0].id, data);
-
-
-
-                });
-            let radius = 30;
-            var circles = node.append("circle")
-            .attr("r", radius)
-            .attr("fill",'#ADD8E6')
-            .call(d3.drag()
-                .on("start", dragstarted)
-                .on("drag", dragged)
-                .on("end", dragended))
-                
-            var lables = node.append("text")
-                .attr('text-anchor', 'middle')
-                .attr('alignment-baseline', 'middle')
-                .style("font-size", "8px")
-                .append('tspan')
-                .text(function(d) {
-                  return d.title;
-                })
-            
-            var linkNodes = [];
-            data.links.forEach(function(link) {
-                linkNodes.push({
-                    source: preprocessedData[link.source],
-                    target: preprocessedData[link.target]
-                });
-            });
+            init(data);
             
             
             simulation
-                .nodes(data.nodes.concat(linkNodes))
+                .nodes(tempNodes.concat(linkNodes))
                 .on("tick", ticked);
             simulation.force("link")
-                .links(data.links.concat(linkNodes));
+                .links(tempLinks.concat(linkNodes));
 
     
             // This function is run at each iteration of the force algorithm, updating the nodes position.
@@ -254,24 +324,27 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
                     
             }
 
-            function dragstarted(d) {
-                if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
-            }
-              
-            function dragged(d) {
-                d.fx = d3.event.x;
-                d.fy = d3.event.y;
-            }
-              
-            function dragended(d) {
-                if (!d3.event.active) simulation.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
-            }
+
         });
+        
     }, []);
+
+    function dragstarted(d) {
+        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+    }
+      
+    function dragged(d) {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+    }
+      
+    function dragended(d) {
+        if (!d3.event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+    }
 
     return (
         <div>
