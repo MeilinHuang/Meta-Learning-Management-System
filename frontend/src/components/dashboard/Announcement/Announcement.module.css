@@ -1,0 +1,26 @@
+.description blockquote,
+.description li {
+    margin-left: 32px;
+}
+
+.description blockquote {
+    padding-left: 12px;
+    border-left: 5px solid #ccc;
+}
+
+.description ol,
+.description ul,
+.description blockquote {
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.description code {
+    background-color: #eee;
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.attachment {
+    margin-top: 16px;
+}

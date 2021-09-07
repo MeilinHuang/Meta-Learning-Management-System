@@ -23,8 +23,7 @@ import { FaQuestion } from "react-icons/fa";
 import { BsQuestion } from "react-icons/bs";
 import { select } from 'd3';
 
-export default function QuizUsage()
-{
+export default function QuizUsage() {
   const [quizId, setQuizId] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [studentSubmission, setStudentSubmission] = useState({});
@@ -83,22 +82,45 @@ export default function QuizUsage()
     // Store questions locally for quiz
     setQuestions(receivedQuestions);
 
+    console.log("Received questions:");
+    console.log(receivedQuestions);
+
+    const newSubmission = {
+      quiz_id: 1,
+      answers: []
+    };
+
+    receivedQuestions.forEach(qs => {
+      const answerObj = {
+        question_id: qs.question_id,
+        student_answers: []
+      };
+
+      newSubmission.answers.push(answerObj);
+    })
+
+    setStudentSubmission(newSubmission);
+
     // Create new answer submission
     // TODO: GET studentSubmission from db (if editing the submission, else create new one)
-    const newSubmissionObj = generateNewAnswerSubmission();
-    setStudentSubmission(newSubmissionObj);
+    // const newSubmissionObj = generateNewAnswerSubmission();
+    // setStudentSubmission(newSubmissionObj);
   }, []);
 
   const generateNewAnswerSubmission = () => {
+    // TODO REMOVE: Calling this in useEffect does not work
     const newSubmission = {
       quiz_id: 1,
-      answers:[]
+      answers: []
     };
-  
-    questions.forEach (qs => {
+
+    console.log("QUESTIONS: ");
+    console.log(questions);
+
+    questions.forEach(qs => {
       const answerObj = {
         question_id: qs.question_id,
-        student_answers: ["1"]
+        student_answers: []
       };
 
       newSubmission.answers.push(answerObj);
@@ -131,13 +153,13 @@ export default function QuizUsage()
         {q.question_type === "cb" && renderCheckboxAnswers(q)}
 
         <Stack direction="row" spacing={10} mt={10} justifyContent="flex-end">
-          {currQuestionNo !== 0 && 
-          <Button colorScheme="orange" variant="solid" onClick={onClickPreviousQuestion}>
+          {currQuestionNo !== 0 &&
+            <Button colorScheme="orange" variant="solid" onClick={onClickPreviousQuestion}>
               Previous question
           </Button>}
-          
-          {currQuestionNo !== questions.length-1 && 
-          <Button colorScheme="green" onClick={onClickNextQuestion}>
+
+          {currQuestionNo !== questions.length - 1 &&
+            <Button colorScheme="green" onClick={onClickNextQuestion}>
               Next question
           </Button>}
         </Stack>
@@ -163,15 +185,13 @@ export default function QuizUsage()
   };
 
   const onChangeMultipleChoice = (e) => {
-
-    // setSelectedAnswers([e]);
     const updatedAnswers = studentSubmission.answers.map(ansObj => (ansObj.question_id === questions[currQuestionNo].question_id) ? { ...ansObj, student_answers: [e] } : ansObj);
     setStudentSubmission({ ...studentSubmission, answers: updatedAnswers });
   };
 
   const renderShortAnswerAnswers = (q) => {
     const studentAnswer = getStudentAnswerToCurrentQuestion();
-    const displayedAnswer = studentAnswer.length > 0 ? studentAnswer[0] : ""; 
+    const displayedAnswer = studentAnswer.length > 0 ? studentAnswer[0] : "";
 
     return (
       <Box my={5}>
@@ -182,7 +202,6 @@ export default function QuizUsage()
   };
 
   const onChangeShortAnswer = (e) => {
-    // setSelectedAnswers([e.target.value]);
     const updatedAnswers = studentSubmission.answers.map(ansObj => (ansObj.question_id === questions[currQuestionNo].question_id) ? { ...ansObj, student_answers: [e.target.value] } : ansObj);
     setStudentSubmission({ ...studentSubmission, answers: updatedAnswers });
   };
@@ -202,37 +221,41 @@ export default function QuizUsage()
   };
 
   const onChangeCheckboxAnswer = (idx) => (e) => {
+    // TODO(Fix): Does not work - answer not being updated - crashes before it can happen
     let updatedAnswersForQuestion = [];
 
     const foundAnswer = studentSubmission?.answers?.find(ansObj => ansObj.question_id === questions[currQuestionNo].question_id);
-    if (foundAnswer && foundAnswer.student_answers.length > 0)
-    {
+    console.log("#### CB Found answer");
+    console.log(foundAnswer);
+    if (foundAnswer && foundAnswer.student_answers.length > 0) {
       foundAnswer.student_answers.forEach(ans => {
         updatedAnswersForQuestion.push(ans);
       });
     }
 
     const newAnswer = idx.toString();
-    const isAlreadySelected = selectedAnswers.includes(newAnswer);
+    const isAlreadySelected = updatedAnswersForQuestion.includes(newAnswer);
 
-    if (e.target.checked && !isAlreadySelected)
-    {
+    if (e.target.checked && !isAlreadySelected) {
       // Add in new selected answer
       // newSelectedAnswers = selectedAnswers.concat([newAnswer]);
       updatedAnswersForQuestion = updatedAnswersForQuestion.concat([newAnswer]);
 
-      const updatedAnswers = studentSubmission.answers.map(ansObj => (ansObj.question_id === questions[currQuestionNo].question_id) ? { ...ansObj, student_answers: updatedAnswers } : ansObj);
+      const updatedAnswers = studentSubmission.answers.map(ansObj => (ansObj.question_id === questions[currQuestionNo].question_id) ? { ...ansObj, student_answers: updatedAnswersForQuestion } : ansObj);
       setStudentSubmission({ ...studentSubmission, answers: updatedAnswers });
+      console.log("CB Updated Answer: ");
+      console.log(updatedAnswers);
     }
-    else if (!e.target.checked && isAlreadySelected)
-    {
+    else if (!e.target.checked && isAlreadySelected) {
       // Remove unselected answer
       // newSelectedAnswers = [...selectedAnswers];
       //  newSelectedAnswers.pop(newAnswer);
       updatedAnswersForQuestion.pop(newAnswer);
 
-      const updatedAnswers = studentSubmission.answers.map(ansObj => (ansObj.question_id === questions[currQuestionNo].question_id) ? { ...ansObj, student_answers: updatedAnswers } : ansObj);
+      const updatedAnswers = studentSubmission.answers.map(ansObj => (ansObj.question_id === questions[currQuestionNo].question_id) ? { ...ansObj, student_answers: updatedAnswersForQuestion } : ansObj);
       setStudentSubmission({ ...studentSubmission, answers: updatedAnswers });
+      console.log("CB Updated Answer: ");
+      console.log(updatedAnswers);
     }
 
     // console.log(newSelectedAnswers);
@@ -249,15 +272,14 @@ export default function QuizUsage()
     let studentAnswers = [];
     console.log("Current q_id: " + questions[currQuestionNo]?.question_id);
     console.log(studentSubmission.answers);
-    const foundAnswer = studentSubmission?.answers?.find(ansObj => ansObj.question_id === questions[currQuestionNo].question_id);
-    console.log("ANSWER FOUND!");
+    const foundAnswer = studentSubmission?.answers?.find(ansObj => +ansObj.question_id === +questions[currQuestionNo].question_id);
+    console.log("ANSWER: ");
     console.log(foundAnswer);
-    if (foundAnswer && foundAnswer.student_answers.length > 0)
-    {
+    if (foundAnswer && foundAnswer.student_answers.length > 0) {
       console.log("valid found answer");
-      studentAnswers = [ ...foundAnswer.student_answers ];
+      studentAnswers = [...foundAnswer.student_answers];
     }
-    
+
 
     return studentAnswers;
   };
@@ -267,8 +289,7 @@ export default function QuizUsage()
     // updateAnswerToCurrentQuestion();
 
     // Update current question number
-    if ((currQuestionNo - 1) < 0)
-    {
+    if ((currQuestionNo - 1) < 0) {
       setCurrQuestionNo(0);
     }
     else {
@@ -285,8 +306,7 @@ export default function QuizUsage()
     // updateAnswerToCurrentQuestion();
 
     // Update current question number
-    if ((currQuestionNo + 1) >= questions.length)
-    {
+    if ((currQuestionNo + 1) >= questions.length) {
       setCurrQuestionNo(questions.length - 1);
     }
     else {
@@ -318,18 +338,30 @@ export default function QuizUsage()
     );
   };
 
+  const printStudentSubmissionAnswers = () => {
+    console.log("---- Student submission ------");
+    console.log(studentSubmission);
+    console.log("--------------");
+
+    return (
+      <Box>
+
+      </Box>
+    );
+  };
+
   return (
     <Flex mt="10">
       <Box flex="0.7" pt={10} px={10}>
         <Heading size="md">Quiz progression</Heading>
         <Text mt={3}>The icons below represent the answer status to the questions. </Text>
         <Text>
-          Those in blue with a question mark indicates the question hasn't been attempted yet and those 
+          Those in blue with a question mark indicates the question hasn't been attempted yet and those
           in green with a tick indicate attempted questions.
         </Text>
         {/* TODO: Uncomment this when able to figure out render questions status box */}
         <Stack direction="row" mt={5} h="40%" p={4} border="1px" borderRadius="md" borderColor="gray.400">
-          {questions.map((qs, index) => <Box key={index}>{renderQuestionStatusBox(qs, index+1)}</Box>)}
+          {questions.map((qs, index) => <Box key={index}>{renderQuestionStatusBox(qs, index + 1)}</Box>)}
           {/* <Box>{renderQuestionStatusBox(questions[0], 1)}</Box>
           <Box>{renderQuestionStatusBox(questions[0], 2)}</Box>
           <Box>{renderQuestionStatusBox(questions[0], 3)}</Box> */}
@@ -341,11 +373,12 @@ export default function QuizUsage()
       </Box>
       <Box flex="0.1" borderLeft="1px" borderColor="gray.400" height="890px" />
       <Box flex="3">
-        {questions.length > 0 && renderQuestion(questions[currQuestionNo], currQuestionNo+1)}
+        {questions.length > 0 && renderQuestion(questions[currQuestionNo], currQuestionNo + 1)}
         {/* {getStudentAnswerToCurrentQuestion()?.map(a => <Text key={a}>{a}</Text>)} */}
       </Box>
+      {printStudentSubmissionAnswers()}
     </Flex>
-    
+
   );
 }
 

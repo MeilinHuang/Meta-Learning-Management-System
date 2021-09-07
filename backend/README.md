@@ -1,9 +1,7 @@
 # Notes 
 
-* put /forum/tags == get /forum/tags (There's a swagger io bug that wont let me use get) 
-Other than that returns desired list of tags <br />
-
-* No implementation for file system as of yet <br />
+* put /forum/tags == get all tags (swagger bug)
+* Files are encoded in base64 
 
 ## To start:
 
@@ -19,14 +17,12 @@ password: metalms
 Start SQL Shell (psql) and import data
 
 ```
-\i schema.sql
-\i sample_data.sql
+\i ..\schema.sql
+\i ..\sample_data.sql
 ```
 
 ## Bugs / Requests 
 
-* Add any bugs or requests for data etc to: <br />
-```
-/docs/bugs.txt
-/docs/requests.txt
-```
+For bugs and requests:
+
+* PM me on Slack (David)

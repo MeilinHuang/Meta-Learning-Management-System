@@ -1,20 +1,31 @@
 const express = require("express");
+var cors = require('cors');
 const app = express();
-const database =  require('./service.js');
+const fileUpload = require('express-fileupload');
 
-// Body parsing
-app.use(express.json());
+app.use(cors());
+app.use(express.json({limit: '50mb'}));
+app.use(fileUpload());
+app.use('/static', express.static('public'));
+app.use('/_files', express.static('public/_files'));
 
 /***************************************************************
-                       Swagger API
+                       Open API / Swagger
 ***************************************************************/
 
-const swaggerUi = require('swagger-ui-express'),
-swaggerDocument = require('./swagger.json');
+const swaggerUi = require('swagger-ui-express');
+const openApiDocument = require('./docs/openApi');
 
 // Redirect to swagger
 app.get('/', (req, res) => res.redirect('/docs'));
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
+
+/***************************************************************
+                       API Routes
+***************************************************************/
+
+const database = require('./service.js');
+const lectureTutorial = require('./api/lecturesTutorials');
 
 /***************************************************************
                        Auth Functions
@@ -42,13 +53,22 @@ app.delete('/user/:userId/:topicGroupId', database.deleteAdmin);
                        Topic Group Functions
 ***************************************************************/
 
+
 app.get('/topicGroup', async(request, response) => {
   await database.getAllTopicGroups(request, response);
+});
+
+app.get('/topicGroup/:topicGroupName', async(request, response) => {
+  await database.getTopicGroup(request, response);
 });
 
 app.get('/topicGroup/:topicGroupName/topic', async(request, response) => {
   await database.getTopics(request, response);
 });
+
+app.get('/topicGroup/:topicGroupName/topic/:topicName/topic', async(request, response) => {
+  await database.getTopicFile(request, response);
+})
 
 app.get('/topicGroup/:topicGroupName/topic/:topicName/prerequisite', async(request, response) => {
   await database.getTopicPreReqs(request, response);
@@ -68,6 +88,10 @@ app.post('/topicGroup/:topicGroupName', async(request, response) => {
   await database.postTopicGroup(request, response);
 });
 
+app.put('/topicGroup/:topicGroupName', async(request, response) => {
+  await database.putTopicGroup(request, response);
+});
+
 app.delete('/topicGroup/:topicGroupName', async(request, response) => {
   await database.deleteTopicGroup(request, response);
 });
@@ -75,6 +99,14 @@ app.delete('/topicGroup/:topicGroupName', async(request, response) => {
 app.post('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
   await database.postTopic(request, response);
 })
+
+app.put('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
+  await database.putTopic(request, response);
+})
+
+app.delete('/topicGroup/:topicGroupName/topic/:topicName', async(request, response) => {
+  await database.deleteTopic(request, response);
+});
 
 /***************************************************************
                        Forum Functions
@@ -108,6 +140,10 @@ app.put('/forum/post/:postId', async(request, response) => {
   await database.putPost(request, response);
 });
 
+app.delete('/forum/post/:postId', async(request, response) => {
+  await database.deletePost(request, response);
+});
+
 app.put('/forum/post/:postId/reply/:replyId', async(request, response) => {
   await database.putPostReply(request, response);
 });
@@ -116,12 +152,36 @@ app.post('/forum/post/:postId/reply', async(request, response) => {
   await database.postReply(request, response);
 });
 
+app.delete('/forum/post/:postId/reply/:replyId', async(request, response) => {
+  await database.deletePostReply(request, response);
+});
+
 app.post('/forum/post/:postId/comment', async(request, response) => {
   await database.postComment(request, response);
 });
 
+app.put('/forum/post/:postId/comment/:commentId', async(request, response) => {
+  await database.putComment(request, response);
+});
+
+app.delete('/forum/post/:postId/comment/:commentId', async(request, response) => {
+  await database.deleteComment(request, response);
+});
+
+app.put('/forum/post/:postId/comment/:commentId/endorse/:isEndorsed', async(request, response) => {
+  await database.putCommentEndorse(request, response);
+});
+
 app.put('/forum/post/pin/:postId/:isPinned', async(request, response) => {
   await database.putPostPin(request, response);
+});
+
+app.get('/forum/tags/:tagId', async(request, response) => {
+  await database.getTag(request, response);
+});
+
+app.put('/forum/tags/:tagId', async(request, response) => {
+  await database.putTag(request, response);
 });
 
 app.put('/forum/tags', async(request, response) => {
@@ -131,6 +191,23 @@ app.put('/forum/tags', async(request, response) => {
 app.post('/forum/tags', async(request, response) => {
   await database.postTag(request, response);
 });
+
+app.delete('/forum/tags/:tagId', async(request, response) => {
+  await database.deleteTag(request, response);
+});
+
+app.put('/forum/post/endorse/:postId/:isEndorsed', async(request, response) => {
+  await database.putPostEndorse(request, response);
+});
+
+app.put('/forum/post/like/:postId', async(request, response) => {
+  await database.putPostLike(request, response);
+});
+
+app.put('/forum/post/unlike/:postId', async(request, response) => {
+  await database.putPostUnlike(request, response);
+});
+
 
 /***************************************************************
                        Course Pages Functions
@@ -144,9 +221,33 @@ app.post('/:topicGroup/announcement/new', async(request, response) => {
   await database.postAnnouncement(request, response);
 })
 
-app.post('/:topicGroup/announcement/comment', async(request, response) => {
+app.get('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.getAnnouncementById(request, response);
+})
+
+app.put('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.putAnnouncement(request, response);
+})
+
+app.delete('/:topicGroup/announcement/:announcementId', async(request, response) => {
+  await database.deleteAnnouncement(request, response);
+})
+
+app.post('/:topicGroup/announcement/:announcementId/comment', async(request, response) => {
   await database.postAnnouncementComment(request, response);
 })
+
+app.put('/:topicGroup/announcement/:announcementId/comment/:commentId', async(request, response) => {
+  await database.putAnnouncementComment(request, response);
+})
+
+app.delete('/:topicGroup/announcement/:announcementId/comment/:commentId', async(request, response) => {
+  await database.deleteAnnouncementComment(request, response);
+})
+
+app.get('/:topicGroup/announcement/search/:announcementSearchTerm', async(request, response) => {
+  await database.getSearchAnnouncements(request, response);
+});
 
 /***************************************************************
                        Gamification Functions
@@ -210,7 +311,7 @@ app.get('/topicGroup/:topicGroupId/levels', async(request, response) => {
 })
 
 /***************************************************************
-                       Assessnebt Functions
+                       Assessment Functions
 ***************************************************************/
 
 app.post('/quiz', async(request, response) => {
@@ -307,6 +408,62 @@ app.put('/quiz/:quizId/question/:questionId/answer/:quizQuestionAnswerId', async
 
 app.get('/quiz/results/question/:questionId/answerCount', async(request, response) => {
   await database.getStudentAnswerCount(request, response);
+})
+
+/***************************************************************
+                       Lecture and Tutorial Functions
+***************************************************************/
+
+app.post('/file/:targetId', async(request, response) => {
+  await lectureTutorial.postLectureTutorialFile(request, response);
+})
+
+app.delete('/file/:targetId', async(request, response) => {
+  await lectureTutorial.deleteLectureTutorialFile(request, response);
+})
+
+app.get('/:topicGroupName', async(request, response) => {
+  await lectureTutorial.getWeeks(request, response);
+})
+
+app.get('/:topicGroupName/lectures', async (request, response) => {
+  await lectureTutorial.getAllLectures(request, response);
+})
+
+app.get('/:topicGroupName/lecture/:lectureId', async (request, response) => {
+  await lectureTutorial.getLectureById(request, response);
+})
+
+app.put('/:topicGroupName/lecture/:lectureId', async (request, response) => {
+  await lectureTutorial.putLecture(request, response);
+})
+
+app.delete('/:topicGroupName/lecture/:lectureId', async (request, response) => {
+  await lectureTutorial.deleteLecture(request, response);
+})
+
+app.post('/:topicGroupName/lecture', async (request, response) => {
+  await lectureTutorial.postLecture(request, response);
+})
+
+app.get('/:topicGroupName/tutorials', async (request, response) => {
+  await lectureTutorial.getAllTutorials(request, response);
+})
+
+app.get('/:topicGroupName/tutorial/:tutorialId', async (request, response) => {
+  await lectureTutorial.getTutorialById(request, response);
+})
+
+app.put('/:topicGroupName/tutorial/:tutorialId', async (request, response) => {
+  await lectureTutorial.putTutorial(request, response);
+})
+
+app.delete('/:topicGroupName/tutorial/:tutorialId', async (request, response) => {
+  await lectureTutorial.deleteTutorial(request, response);
+})
+
+app.post('/:topicGroupName/tutorial', async (request, response) => {
+  await lectureTutorial.postTutorial(request, response);
 })
 
 app.listen(8000, () => {
