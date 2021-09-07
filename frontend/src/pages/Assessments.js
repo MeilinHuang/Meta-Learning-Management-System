@@ -39,9 +39,9 @@ export default function Assessments() {
   return (
     <div>
       {/* <EditQuiz /> */}
-      {/* <QuizCreation /> */}
+      <QuizCreation />
       {/* <QuestionCreation /> */}
-      <QuizUsage />
+      {/* <QuizUsage /> */}
     </div>
   );
 

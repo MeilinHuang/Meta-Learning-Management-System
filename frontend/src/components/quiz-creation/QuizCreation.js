@@ -57,19 +57,19 @@ export default function QuizCreation() {
       >
         <ModalOverlay />
         <ModalContent as="form" onSubmit={handleSubmit}>
-          <ModalHeader>Add a Question</ModalHeader>
+          <ModalHeader>Create a Quiz</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl >
               <FormControl>
                 <FormLabel htmlFor="name">
-                  Give your quiz a name
+                  Quiz name
                 </FormLabel>
                 <Input autoComplete="off" ref={inputRef} id="name" name="name" value={name} onChange={handleNameChange} />
               </FormControl>
-              
+
               {/* <Text my={4} fontStyle="italic" textAlign="center" fontSize="lg">or</Text> */}
-             
+
             </FormControl>
           </ModalBody>
           <ModalFooter>
