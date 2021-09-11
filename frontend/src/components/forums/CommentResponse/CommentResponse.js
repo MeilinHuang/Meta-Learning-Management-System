@@ -159,7 +159,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
 
     return (
         <>
-            <AuthorDetails author={author} date={published_date} />
+            <AuthorDetails author={author} date={published_date} isEndorsed={isendorsed} />
             {!!editorState
                 ?
                     <form id="editPost" onSubmit={handleSubmit}>
@@ -176,45 +176,37 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
                 :
                     <>
                         <Text className={styles.description} dangerouslySetInnerHTML={{ __html: details }} />
-                        <Flex justifyContent={isendorsed ? "space-between" : 'flex-end'}>
-                            {isendorsed && (
-                                <Flex alignItems="center" mt="16px">
-                                    <Icon h="13px" w="13px" mr="4px" color="green" as={FaCheckCircle} />
-                                    <Text fontSize="13px" color="green" fontWeight="bold">This comment is endorsed by staff</Text>
-                                </Flex>
+                        {/* show author controls if user is author */}
+                        <Flex mt="8px" justifyContent="flex-end">
+                            {!!comment_id && <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} />}
+                            {user_id === dummyUser && (
+                                <>
+                                    <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
+                                    <Popover placement="bottom-end">
+                                        {({ onClose }) => (
+                                            <>
+                                                <PopoverTrigger>
+                                                    <Button pr="8px" leftIcon={<BsTrash />} ml="8px" color="red" />
+                                                </PopoverTrigger>
+                                                <PopoverContent>
+                                                    <PopoverHeader fontWeight="semibold">Confirmation</PopoverHeader>
+                                                    <PopoverArrow />
+                                                    <PopoverCloseButton />
+                                                    <PopoverBody>
+                                                        Are you sure you want to delete this post?
+                                                    </PopoverBody>
+                                                    <PopoverFooter d="flex" justifyContent="flex-end">
+                                                        <ButtonGroup size="sm">
+                                                        <Button variant="outline">Cancel</Button>
+                                                        <Button colorScheme="red" onClick={() => handleDelete(onClose)}>Delete</Button>
+                                                        </ButtonGroup>
+                                                    </PopoverFooter>
+                                                </PopoverContent>
+                                            </>
+                                        )}
+                                    </Popover>
+                                </>
                             )}
-                            {/* show author controls if user is author */}
-                            <Flex mt="8px" justifyContent="flex-end">
-                                {!!comment_id && <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} />}
-                                {user_id === dummyUser && (
-                                    <>
-                                        <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
-                                        <Popover placement="bottom-end">
-                                            {({ onClose }) => (
-                                                <>
-                                                    <PopoverTrigger>
-                                                        <Button pr="8px" leftIcon={<BsTrash />} ml="8px" color="red" />
-                                                    </PopoverTrigger>
-                                                    <PopoverContent>
-                                                        <PopoverHeader fontWeight="semibold">Confirmation</PopoverHeader>
-                                                        <PopoverArrow />
-                                                        <PopoverCloseButton />
-                                                        <PopoverBody>
-                                                            Are you sure you want to delete this post?
-                                                        </PopoverBody>
-                                                        <PopoverFooter d="flex" justifyContent="flex-end">
-                                                            <ButtonGroup size="sm">
-                                                            <Button variant="outline">Cancel</Button>
-                                                            <Button colorScheme="red" onClick={() => handleDelete(onClose)}>Delete</Button>
-                                                            </ButtonGroup>
-                                                        </PopoverFooter>
-                                                    </PopoverContent>
-                                                </>
-                                            )}
-                                        </Popover>
-                                    </>
-                                )}
-                            </Flex>
                         </Flex>
                     </>
             }
