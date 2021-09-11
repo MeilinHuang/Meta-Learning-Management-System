@@ -655,11 +655,13 @@ async function getTopicFile (request, response) {
 ***************************************************************/
 
 async function getAllForumPosts (request, response) {
-  void (request);
   try {
+    const topicGroupName = request.params.topicGroup
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.topic_group,
       array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
       array_agg(DISTINCT comments.comment_id) as comments
@@ -672,7 +674,8 @@ async function getAllForumPosts (request, response) {
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
       LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
       LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
-      GROUP BY fp.post_id`);
+      WHERE fp.topic_group = $1
+      GROUP BY fp.post_id`, [topicGroupId]);
 
     for (var object of resp.rows) {
       var tagsArr = [];
@@ -712,6 +715,7 @@ async function getAllForumPosts (request, response) {
       object.comments = commentsArr;
       object.attachments = fileArr;
     }
+    console.log(resp.rows)
     response.status(200).json(resp.rows);
   } catch (e) {
     console.log(e)
@@ -721,8 +725,10 @@ async function getAllForumPosts (request, response) {
 
 // Get all pinned forum posts
 async function getAllPinnedPosts (request, response) {
-  void (request);
   try {
+    const topicGroupName = request.params.topicGroup
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
       fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
@@ -739,7 +745,8 @@ async function getAllPinnedPosts (request, response) {
       LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
       LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       WHERE fp.ispinned = TRUE
-      GROUP BY fp.post_id`);
+      AND fp.topic_group = $1
+      GROUP BY fp.post_id`, [topicGroupId]);
 
       for (var object of resp.rows) {
         var tagsArr = [];
@@ -789,6 +796,9 @@ async function getAllPinnedPosts (request, response) {
 // Get all posts related search term
 async function getSearchPosts (request, response) {
   try {
+    const topicGroupName = request.params.topicGroup
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
     const forumSearchTerm = request.params.forumSearchTerm;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
@@ -807,7 +817,8 @@ async function getSearchPosts (request, response) {
       LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       WHERE LOWER (fp.title) LIKE LOWER($1)
       OR LOWER (fp.description) LIKE LOWER($1)
-      GROUP BY fp.post_id`, [`%${forumSearchTerm}%`]);
+      AND fp.topic_group = $2
+      GROUP BY fp.post_id`, [`%${forumSearchTerm}%`, topicGroupId]);
 
     for (var object of resp.rows) {
       var tagsArr = [];
@@ -857,6 +868,9 @@ async function getSearchPosts (request, response) {
 // Get all posts related tag term
 async function getFilterPosts (request, response) {
   try {
+    const topicGroupName = request.params.topicGroup
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
     const forumFilterTerm = request.params.forumFilterTerm;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
@@ -874,7 +888,8 @@ async function getFilterPosts (request, response) {
       LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
       LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       WHERE LOWER(t.name) LIKE LOWER($1)
-      GROUP BY fp.post_id`, [`%${forumFilterTerm}%`]);
+      AND fp.topic_group = $2
+      GROUP BY fp.post_id`, [`%${forumFilterTerm}%`, topicGroupId]);
 
       for (var object of resp.rows) {
         var tagsArr = [];
@@ -934,13 +949,17 @@ async function postForum (request, response) {
     const publishedDate = request.body.publishedDate;
     const description = request.body.description;
     const related_link = request.body.related_link;
+
+    const topicGroupName = request.params.topicGroup
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
   
     let resp = await pool.query(
       `INSERT INTO forum_posts(post_id, title, user_id, 
-        author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
-        values(default, $1, $2, $3, $4, $5, false, $6, 0, false) 
+        author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group) 
+        values(default, $1, $2, $3, $4, $5, false, $6, 0, false, $7) 
         RETURNING post_id`,
-      [title, user_id, author, publishedDate, description, related_link]);
+      [title, user_id, author, publishedDate, description, related_link, topicGroupId]);
   
     if (request.body.tags) {
       const tags = request.body.tags.split(",");

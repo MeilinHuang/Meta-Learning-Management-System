@@ -29,11 +29,10 @@ import styles from './CommentResponse.module.css'
 
 const dummyUser = 3
 
-function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id, setPost, isendorsed, user_id }) {
+function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id, setPost, isendorsed, user_id, code }) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState('')
     const toast = useToast()
-    console.log(isendorsed)
 
     useEffect(() => {
         setDetails(comment || reply)
@@ -51,7 +50,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
 
         if (isComments) {
             fetch(
-                `http://localhost:8000/forum/post/${post_id}/comment/${comment_id}`,
+                `http://localhost:8000/${code}/forum/post/${post_id}/comment/${comment_id}`,
                 {
                     method: 'PUT',
                     body: JSON.stringify({
@@ -77,7 +76,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
             })
         } else {
             fetch(
-                `http://localhost:8000/forum/post/${post_id}/reply/${reply_id}`,
+                `http://localhost:8000/${code}/forum/post/${post_id}/reply/${reply_id}`,
                 {
                     method: 'PUT',
                     body: JSON.stringify({
@@ -108,10 +107,10 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
         const isComments = !!comment && !reply
         if (isComments) {
             fetch(
-                `http://localhost:8000/forum/post/${post_id}/comment/${comment_id}`, { method: 'DELETE' }
+                `http://localhost:8000/${code}/forum/post/${post_id}/comment/${comment_id}`, { method: 'DELETE' }
             ).then(r => {
                 if (r.status === 200) {
-                    fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
+                    fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => {
                         setPost(data)
                         onClose()
                     })
@@ -127,10 +126,10 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
             })
         } else {
             fetch(
-                `http://localhost:8000/forum/post/${post_id}/reply/${reply_id}`, { method: 'DELETE' }
+                `http://localhost:8000/${code}/forum/post/${post_id}/reply/${reply_id}`, { method: 'DELETE' }
             ).then(r => {
                 if (r.status === 200) {
-                    fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
+                    fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => {
                         setPost(data)
                         onClose()
                     })
@@ -149,10 +148,10 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
 
     const handleEndorse = () => {
         fetch(
-            `http://localhost:8000/forum/post/${post_id}/comment/${comment_id}/endorse/${!isendorsed}`, { method: 'PUT' }
+            `http://localhost:8000/${code}/forum/post/${post_id}/comment/${comment_id}/endorse/${!isendorsed}`, { method: 'PUT' }
         ).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
+                fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
             }
             // TODO: handle errors
         })

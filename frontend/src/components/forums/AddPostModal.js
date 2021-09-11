@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import {
     Button,
     Flex,
@@ -18,7 +18,7 @@ import TagSelect from './TagSelect/TagSelect'
 
 const dummyAuthor = 2
 
-function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
+function AddPostModal({ isOpen, onClose, isForums, onSubmit, code }) {
     const [title, setTitle] = useState('')
     const [details, setDetails] = useState('')
     const [relatedLink, setRelatedLink] = useState('')
@@ -28,8 +28,10 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
     const toast = useToast()
 
     useEffect(() => {
-        fetch(`http://localhost:8000/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
-    }, [])
+        if (isForums) {
+            fetch(`http://localhost:8000/${code}/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
+        }
+    }, [code, isForums])
 
     const handleSubmit = e => {
         e.preventDefault()

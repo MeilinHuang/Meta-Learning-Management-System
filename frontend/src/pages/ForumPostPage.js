@@ -36,12 +36,12 @@ function ForumPostPage({ match: { params: { code, id }}}) {
     const toast = useToast()
 
     useEffect(() => {
-        fetch(`http://localhost:8000/forum/post/${id}`).then(r => r.json()).then(data => setPost(data))
+        fetch(`http://localhost:8000/${code}/forum/post/${id}`).then(r => r.json()).then(data => setPost(data))
     }, [id])
 
     const handleDelete = () => {
         fetch(
-            `http://localhost:8000/forum/post/${id}`, { method: 'DELETE' }
+            `http://localhost:8000/${code}/forum/post/${id}`, { method: 'DELETE' }
         ).then(r => {
             if (r.status === 200) {
                 history.push(`/course-page/${code}/forums`)
@@ -110,9 +110,9 @@ function ForumPostPage({ match: { params: { code, id }}}) {
             </Flex>
             <Divider />
             <Tags tags={post.tags} />
-            <PostDetails post={post} setPost={setPost} />
-            <CommentsResponses posts={post.replies} post_id={id} setPost={setPost} />
-            <CommentsResponses isComments posts={post.comments} post_id={id} setPost={setPost} />
+            <PostDetails post={post} setPost={setPost} code={code} />
+            <CommentsResponses posts={post.replies} post_id={id} setPost={setPost} code={code} />
+            <CommentsResponses isComments posts={post.comments} post_id={id} setPost={setPost} code={code} />
         </>
     )
 }

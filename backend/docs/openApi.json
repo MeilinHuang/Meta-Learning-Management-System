@@ -1947,12 +1947,23 @@
         }
       }
     },
-    "/forum": {
+    "/{topicGroup}/forum": {
       "get": {
         "tags": [
           "Forums"
         ],
         "summary": "Get all forum posts",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1985,12 +1996,23 @@
         }
       }
     },
-    "/forum/pinned": {
+    "/{topicGroup}/forum/pinned": {
       "get": {
         "tags": [
           "Forums"
         ],
         "summary": "Get all pinned forum posts",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2023,7 +2045,7 @@
         }
       }
     },
-    "/forum/search/{forumSearchTerm}": {
+    "/{topicGroup}/forum/search/{forumSearchTerm}": {
       "get": {
         "tags": [
           "Forums"
@@ -2038,51 +2060,11 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetAllForumPosts"
-                }
-              }
-            }
           },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/forum/{forumFilterTerm}": {
-      "get": {
-        "tags": [
-          "Forums"
-        ],
-        "summary": "Get all forum posts related to the filter term",
-        "parameters": [
           {
-            "name": "forumFilterTerm",
+            "name": "topicGroup",
             "in": "path",
-            "description": "Filter term to include all posts with the filter term",
+            "description": "Name of topic group to get forum post for",
             "required": true,
             "schema": {
               "type": "string"
@@ -2121,12 +2103,81 @@
         }
       }
     },
-    "/forum/post": {
+    "/{topicGroup}/forum/{forumFilterTerm}": {
+      "get": {
+        "tags": [
+          "Forums"
+        ],
+        "summary": "Get all forum posts related to the filter term",
+        "parameters": [
+          {
+            "name": "forumFilterTerm",
+            "in": "path",
+            "description": "Filter term to include all posts with the filter term",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllForumPosts"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroup}/forum/post": {
       "post": {
         "tags": [
           "Forums"
         ],
         "summary": "Make new post",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -2201,7 +2252,7 @@
         "x-codegen-request-body-name": "New forum post"
       }
     },
-    "/forum/post/{postId}": {
+    "/{topicGroup}/forum/post/{postId}": {
       "get": {
         "tags": [
           "Forums"
@@ -2212,6 +2263,15 @@
             "name": "postId",
             "in": "path",
             "description": "Id of post we want details for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
             "required": true,
             "schema": {
               "type": "string"
@@ -2259,6 +2319,15 @@
             "name": "postId",
             "in": "path",
             "description": "Id of post we want to edit",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
             "required": true,
             "schema": {
               "type": "string"
@@ -2338,6 +2407,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -2366,7 +2444,7 @@
         }
       }
     },
-    "/forum/post/{postId}/reply": {
+    "/{topicGroup}/forum/post/{postId}/reply": {
       "post": {
         "tags": [
           "Forums"
@@ -2377,6 +2455,15 @@
             "name": "postId",
             "in": "path",
             "description": "Id of post we want to reply to",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
             "required": true,
             "schema": {
               "type": "string"
@@ -2436,7 +2523,7 @@
         "x-codegen-request-body-name": "replyDetails"
       }
     },
-    "/forum/post/{postId}/reply/{replyId}": {
+    "/{topicGroup}/forum/post/{postId}/reply/{replyId}": {
       "put": {
         "tags": [
           "Forums"
@@ -2459,6 +2546,15 @@
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -2539,6 +2635,15 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -2567,7 +2672,7 @@
         }
       }
     },
-    "/forum/post/{postId}/comment": {
+    "/{topicGroup}/forum/post/{postId}/comment": {
       "post": {
         "tags": [
           "Forums"
@@ -2581,6 +2686,15 @@
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -2637,7 +2751,7 @@
         "x-codegen-request-body-name": "commentDetails"
       }
     },
-    "/forum/post/{postId}/comment/{commentId}": {
+    "/{topicGroup}/forum/post/{postId}/comment/{commentId}": {
       "put": {
         "tags": [
           "Forums"
@@ -2660,6 +2774,15 @@
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -2740,6 +2863,15 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -2768,7 +2900,7 @@
         }
       }
     },
-    "/forum/post/{postId}/comment/{commentId}/endorse/{isEndorsed}": {
+    "/{topicGroup}/forum/post/{postId}/comment/{commentId}/endorse/{isEndorsed}": {
       "put": {
         "tags": [
           "Forums"
@@ -2801,6 +2933,15 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -2829,7 +2970,7 @@
         }
       }
     },
-    "/forum/post/pin/{postId}/{isPinned}": {
+    "/{topicGroup}/forum/post/pin/{postId}/{isPinned}": {
       "put": {
         "tags": [
           "Forums"
@@ -2853,6 +2994,15 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -2881,12 +3031,23 @@
         }
       }
     },
-    "/forum/tags": {
+    "/{topicGroup}/forum/tags": {
       "put": {
         "tags": [
           "Forums"
         ],
         "summary": "Get list of all tags",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forums posts for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2923,6 +3084,17 @@
           "Forums"
         ],
         "summary": "Create new tag",
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forums posts for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "description": "Body with tag name",
           "content": {
@@ -2961,7 +3133,7 @@
         "x-codegen-request-body-name": "tagName"
       }
     },
-    "/forum/tags/{tagId}": {
+    "/{topicGroup}/forum/tags/{tagId}": {
       "get": {
         "tags": [ "Forums" ],
         "summary": "Get tag from id",
@@ -2972,6 +3144,15 @@
             "description": "Tag id",
             "required": true,
             "schema": { "type": "integer" }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -3018,6 +3199,15 @@
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -3072,6 +3262,15 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -3100,7 +3299,7 @@
         }
       }
     },
-    "/forum/post/endorse/{postId}/{isEndorsed}": {
+    "/{topicGroup}/forum/post/endorse/{postId}/{isEndorsed}": {
       "put": {
         "tags": [
           "Forums"
@@ -3124,6 +3323,15 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -3152,7 +3360,7 @@
         }
       }
     },
-    "/forum/post/like/{postId}": {
+    "/{topicGroup}/forum/post/like/{postId}": {
       "put": {
         "tags": [
           "Forums"
@@ -3166,6 +3374,15 @@
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -3212,7 +3429,7 @@
         }
       }
     },
-    "/forum/post/unlike/{postId}": {
+    "/{topicGroup}/forum/post/unlike/{postId}": {
       "put": {
         "tags": [
           "Forums"
@@ -3226,6 +3443,15 @@
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],

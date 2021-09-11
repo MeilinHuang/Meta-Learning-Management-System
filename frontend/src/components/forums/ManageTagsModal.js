@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useState } from "react"
 import {
     Box,
     Button,
@@ -31,14 +31,14 @@ import {
 import { GrAdd } from 'react-icons/gr'
 import { BsTrash } from 'react-icons/bs'
 
-function ManageTagsModal({ isOpen, onClose, tags, setTags }) {
+function ManageTagsModal({ isOpen, onClose, tags, setTags, code }) {
     const [tagName, setTagName] = useState('')
     const toast = useToast()
 
     const handleDelete = (id, onClose) => {
-        fetch(`http://localhost:8000/forum/tags/${id}`, { method: 'DELETE' }).then(r => {
+        fetch(`http://localhost:8000/${code}/forum/tags/${id}`, { method: 'DELETE' }).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => {
+                fetch(`http://localhost:8000/${code}/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => {
                     setTags(data)
                     onClose()
                 })
@@ -89,7 +89,7 @@ function ManageTagsModal({ isOpen, onClose, tags, setTags }) {
 
     const handleSubmit = e => {
         e.preventDefault()
-        fetch(`http://localhost:8000/forum/tags`, {
+        fetch(`http://localhost:8000/${code}/forum/tags`, {
             method: 'POST',
             body: JSON.stringify({
                 tagName
@@ -108,7 +108,7 @@ function ManageTagsModal({ isOpen, onClose, tags, setTags }) {
                     duration: 3000,
                     isClosable: true,
                 })  
-                fetch(`http://localhost:8000/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
+                fetch(`http://localhost:8000/${code}/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
             } else {
                 return r.json()
             }

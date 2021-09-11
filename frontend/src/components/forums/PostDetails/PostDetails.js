@@ -20,7 +20,7 @@ import styles from './PostDetails.module.css'
 
 const dummyUser = 3
 
-function PostDetails({ post: { attachments, author, post_id, published_date, description, isendorsed, num_of_upvotes, upvoters, user_id }, setPost}) {
+function PostDetails({ post: { attachments, author, post_id, published_date, description, isendorsed, num_of_upvotes, upvoters, user_id }, setPost, code}) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState()
     const toast = useToast()
@@ -49,7 +49,7 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
     const handleSubmit = e => {
         e.preventDefault()
         fetch(
-            `http://localhost:8000/forum/post/${post_id}`,
+            `http://localhost:8000/${code}/forum/post/${post_id}`,
             {
                 method: 'PUT',
                 body: JSON.stringify({
@@ -62,7 +62,7 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
             }
         ).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
+                fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
             }
         }) // TODO: handle errors
         setEditorState('')
@@ -70,10 +70,10 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
 
     const handleEndorse = () => {
         fetch(
-            `http://localhost:8000/forum/post/endorse/${post_id}/${!isendorsed}`, { method: 'PUT' }
+            `http://localhost:8000/${code}/forum/post/endorse/${post_id}/${!isendorsed}`, { method: 'PUT' }
         ).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
+                fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
             }
             // TODO: handle errors
         })

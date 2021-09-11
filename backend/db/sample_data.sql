@@ -38,19 +38,19 @@ INSERT INTO user_enrolled(topic_group_id, user_id) values(1, 2);
 INSERT INTO user_enrolled(topic_group_id, user_id) values(2, 1);
 
 -- Create Forum Posts
-INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
-VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false, NULL, 2, true);
-INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
-VALUES(default, 'Assignment 1 Help', 1, 'David Nguyen', current_timestamp, 'Ask questions here for help', true, NULL, 0, false);
+INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group) 
+VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false, NULL, 2, true, 1);
+INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group) 
+VALUES(default, 'Assignment 1 Help', 1, 'David Nguyen', current_timestamp, 'Ask questions here for help', true, NULL, 0, false, 2);
 
 -- Create upvotes
 INSERT INTO upvotes(post_id, user_id) VALUES (1, 2);
 INSERT INTO upvotes(post_id, user_id) VALUES (1, 3);
 
 -- Create Tags
-INSERT INTO tags(tag_id, name) VALUES(default, 'Introduction');
-INSERT INTO tags(tag_id, name) VALUES(default, 'New');
-INSERT INTO tags(tag_id, name) VALUES(default, 'Ass1');
+INSERT INTO tags(tag_id, name, topic_group) VALUES(default, 'Introduction', 1);
+INSERT INTO tags(tag_id, name, topic_group) VALUES(default, 'New', 1);
+INSERT INTO tags(tag_id, name, topic_group) VALUES(default, 'Ass1', 2);
 
 -- Create Topic Tags
 INSERT INTO tags(tag_id, name) VALUES(default, 'Memory');

@@ -25,11 +25,11 @@ const getRow = ({ post_id, title, published_date, replies, comments, ispinned, d
     const dateString = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
 
     const handlePinUnpin = () => {
-        fetch(`http://localhost:8000/forum/post/pin/${post_id}/${!ispinned}`, { method: 'PUT' })
+        fetch(`http://localhost:8000/${code}forum/post/pin/${post_id}/${!ispinned}`, { method: 'PUT' })
             .then(r => { 
                 if (r.status === 200) {
-                    fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
-                    fetch('http://localhost:8000/forum/pinned').then(r => r.json()).then(data => {
+                    fetch(`http://localhost:8000/${code}/forum`).then(r => r.json()).then(data => setPosts(data))
+                    fetch(`http://localhost:8000/${code}/forum/pinned`).then(r => r.json()).then(data => {
                         setPinnedPosts(data)
                         setShowPinned(!!data.length)
                     })
@@ -92,7 +92,7 @@ function PostTable({ isAdmin, posts: postData, code }) {
     const orderedPosts = [...postData].reverse()
     const context = useContext(StoreContext)
     const { posts: [, setPosts], pinnedPosts: [, setPinnedPosts], showPinned: [, setShowPinned] } = context;
-    console.log(orderedPosts)
+    // console.log(orderedPosts)
 
     return (
         <Table variant="simple">
@@ -108,7 +108,7 @@ function PostTable({ isAdmin, posts: postData, code }) {
                 </Tr>
             </Thead>
             <Tbody>
-                {orderedPosts.map(post => getRow(post, setPosts, setPinnedPosts, setShowPinned, code))}
+                {orderedPosts && !!orderedPosts.length && orderedPosts.map(post => getRow(post, setPosts, setPinnedPosts, setShowPinned, code))}
             </Tbody>
         </Table>
     )

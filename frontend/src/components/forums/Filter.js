@@ -9,7 +9,7 @@ import TagSelect from './TagSelect/TagSelect'
 import ManageTagsModal from "./ManageTagsModal"
 import { StoreContext } from '../../utils/store'
 
-function Filter() {
+function Filter({ code }) {
     const [tags, setTags] = useState([])
     const [filteredTags, setFilteredTags] = useState([])
     const context = useContext(StoreContext)
@@ -18,12 +18,12 @@ function Filter() {
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     useEffect(() => {
-        fetch(`http://localhost:8000/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
-    }, [])
+        fetch(`http://localhost:8000/${code}/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
+    }, [code])
 
     useEffect(() => {
         if (!filteredTags.length) {
-            fetch('http://localhost:8000/forum').then(r => r.json()).then(data => {
+            fetch(`http://localhost:8000/${code}forum`).then(r => r.json()).then(data => {
                 setPosts(data)
                 setShowPinned(!!data.length)
             })
@@ -35,12 +35,12 @@ function Filter() {
         setShowPinned(false)
         const filteredPosts = []
         tagNames.forEach(t => {
-            fetch(`http://localhost:8000/forum/${t}`).then(r => r.json()).then(data => {
+            fetch(`http://localhost:8000/${code}/forum/${t}`).then(r => r.json()).then(data => {
                 filteredPosts.push(...data)
                 setPosts(filteredPosts)
             })
         })
-    }, [setPosts, setShowPinned, filteredTags])
+    }, [setPosts, setShowPinned, filteredTags, code])
 
     return (
         <Flex my="24px" mx="auto" pb="8px" width={{ base: '100%', lg: '80%' }} justifyContent="space-between">
@@ -50,7 +50,7 @@ function Filter() {
             </Box>
             {/* Show if staff */}
             <Button onClick={onOpen}>Manage Tags</Button>
-            <ManageTagsModal isOpen={isOpen} onClose={onClose} tags={tags} setTags={setTags} />
+            <ManageTagsModal isOpen={isOpen} onClose={onClose} tags={tags} setTags={setTags} code={code} />
         </Flex>
 
     )

@@ -15,7 +15,7 @@ import styles from './CommentsResponses.module.css'
 const dummyAuthor = 3
 const isAdmin = true
 
-function CommentsResponses({ isComments, posts, post_id, setPost }) {
+function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
     const [editorState, setEditorState] = useState('')
     const [ showEditor, setShowEditor ] = useState(false)
     const [details, setDetails] = useState('')
@@ -36,7 +36,7 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
                 reply: details,
             }
 
-        fetch(`http://localhost:8000/forum/post/${post_id}/${isComments ? 'comment' : 'reply'}`, {
+        fetch(`http://localhost:8000/${code}/forum/post/${post_id}/${isComments ? 'comment' : 'reply'}`, {
             method: 'POST',
             body: JSON.stringify(body),
             headers: {
@@ -45,7 +45,7 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
             }
         }).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
+                fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => {
                     setPost(data)
                     setEditorState('') // TODO: work out how to clear editor on save
                     setShowEditor(false)
@@ -59,7 +59,7 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mb={isComments ? '32px' : ''} mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">
             <Heading size="md" mb="12px">{isComments ? 'Comments' : 'Responses'}</Heading>
             {posts && posts[0] !== null && posts.map(post => (
-                post !== null && <CommentResponse {...post} post_id={post_id} setPost={setPost} />
+                post !== null && <CommentResponse {...post} post_id={post_id} setPost={setPost} code={code} />
             ))}
             {isComments &&
                 <form id={`create${isComments ? 'Comment' : 'Response'}`} onSubmit={handleSubmit}>
