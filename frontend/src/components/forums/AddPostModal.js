@@ -88,7 +88,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit, code }) {
                     <form id="createPost" onSubmit={handleSubmit} enctype="multipart/form-data">
                         <Flex flexDirection="column" mb="16px">
                             <Heading size="sm" mb="4px">Title*</Heading>
-                            <Input name="postTitle" onChange={e => setTitle(e.target.value)} />
+                            <Input name="postTitle" onChange={e => setTitle(e.target.value)} autoFocus />
                         </Flex>
                         <Flex flexDirection="column">
                             <Heading size="sm" mb="4px">Details*</Heading>

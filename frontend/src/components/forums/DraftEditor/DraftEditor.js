@@ -50,7 +50,9 @@ export default class SimpleStaticToolbarEditor extends Component {
     this.setState({
       editorState: this.props.content ? EditorState.createWithContent(this.props.content) : createEditorStateWithText(''),
     });
-    this.editor.focus()
+    if (this.props.doFocus) {
+      this.editor.focus()
+    }
   }
 
   focus = () => {

@@ -7,7 +7,7 @@ import {
     Input,
     InputGroup,
 } from "@chakra-ui/react"
-import { AiOutlineSend } from 'react-icons/ai'
+import { AiOutlineSend, AiOutlineClose } from 'react-icons/ai'
 import CommentResponse from "../CommentResponse/CommentResponse"
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './CommentsResponses.module.css'
@@ -68,12 +68,15 @@ function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
                             {
                                 showEditor
                                     ?
-                                        <DraftEditor content={editorState} setDetails={setDetails} className={styles.editor} showEditor={showEditor} />
+                                        <DraftEditor content={editorState} setDetails={setDetails} className={styles.editor} showEditor={showEditor} doFocus />
                                     :
                                         <Input variant="outline" onClick={() => setShowEditor(true)} />
                             }
                         </InputGroup>
-                        <Button pr="8px" leftIcon={<AiOutlineSend />} form={`create${isComments ? 'Comment' : 'Response'}`} type="submit" />
+                        <Flex flexDirection="column">
+                            {showEditor && <Button pr="8px" mb="8px" leftIcon={<AiOutlineClose />} onClick={() => setShowEditor(false)} />}
+                            <Button pr="8px" leftIcon={<AiOutlineSend />} form={`create${isComments ? 'Comment' : 'Response'}`} type="submit" />
+                        </Flex>
                     </Flex>
                 </form> 
             }
@@ -83,12 +86,15 @@ function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
                             {
                                 showEditor
                                     ?
-                                        <DraftEditor content={editorState} setDetails={setDetails} className={styles.editor} showEditor={showEditor} />
+                                        <DraftEditor content={editorState} setDetails={setDetails} className={styles.editor} showEditor={showEditor} doFocus />
                                     :
                                         <Input variant="outline" onClick={() => setShowEditor(true)} />
                             }
                         </InputGroup>
-                        <Button pr="8px" leftIcon={<AiOutlineSend />} form={`create${isComments ? 'Comment' : 'Response'}`} type="submit" />
+                        <Flex flexDirection="column">
+                            {showEditor && <Button pr="8px" mb="8px" leftIcon={<AiOutlineClose />} onClick={() => setShowEditor(false)} />}
+                            <Button pr="8px" leftIcon={<AiOutlineSend />} form={`create${isComments ? 'Comment' : 'Response'}`} type="submit" />
+                        </Flex>
                     </Flex>
                 </form> }
         </Box>
