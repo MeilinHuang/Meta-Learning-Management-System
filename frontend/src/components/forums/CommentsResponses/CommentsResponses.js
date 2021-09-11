@@ -47,7 +47,7 @@ function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
             if (r.status === 200) {
                 fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => {
                     setPost(data)
-                    setEditorState('') // TODO: work out how to clear editor on save
+                    setEditorState('')
                     setShowEditor(false)
                 })
             } 
@@ -70,7 +70,10 @@ function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
                                     ?
                                         <DraftEditor content={editorState} setDetails={setDetails} className={styles.editor} showEditor={showEditor} doFocus />
                                     :
-                                        <Input variant="outline" onClick={() => setShowEditor(true)} />
+                                        <Input variant="outline" onClick={() => {
+                                            setEditorState('')
+                                            setShowEditor(true)
+                                        }} />
                             }
                         </InputGroup>
                         <Flex flexDirection="column">
@@ -88,7 +91,10 @@ function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
                                     ?
                                         <DraftEditor content={editorState} setDetails={setDetails} className={styles.editor} showEditor={showEditor} doFocus />
                                     :
-                                        <Input variant="outline" onClick={() => setShowEditor(true)} />
+                                        <Input variant="outline" onClick={() => {
+                                            setEditorState('')
+                                            setShowEditor(true)
+                                        }} />
                             }
                         </InputGroup>
                         <Flex flexDirection="column">
