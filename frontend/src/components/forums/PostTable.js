@@ -124,7 +124,7 @@ function PostTable({ isAdmin, posts: postData, code }) {
         },
     ], [code, setPinnedPosts, setPosts, setShowPinned])
 
-    const orderedPosts = useMemo(() => [...postData].reverse(), [postData])
+    const orderedPosts = useMemo(() => postData, [postData])
 
     const {
         getTableProps,
@@ -135,9 +135,17 @@ function PostTable({ isAdmin, posts: postData, code }) {
     } = useTable(
         {
             columns,
-            data: orderedPosts
+            data: orderedPosts,
+            initialState: {
+                sortBy: [
+                    {
+                        id: 'published_date',
+                        desc: true,
+                    }
+                ]
+            }
         },
-        useSortBy
+        useSortBy,
     )
 
     return (
