@@ -32,11 +32,9 @@ function ForumOverviewPage({ match: { params: { code }}}) {
 
     useEffect(() => {
         fetch(`http://localhost:8000/${code}/forum`).then(r => r.json()).then(data => {
-            console.log(data)
             setPosts(data)
         })
         fetch(`http://localhost:8000/${code}/forum/pinned`).then(r => r.json()).then(data => {
-            console.log(data)
             setPinnedPosts(data)
             setShowPinned(!!data.length)
         })
@@ -77,8 +75,6 @@ function ForumOverviewPage({ match: { params: { code }}}) {
             // TODO: Handle error case
         })
     }
-
-    console.log(posts, pinnedPosts)
 
     return (
         <>

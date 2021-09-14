@@ -24,7 +24,7 @@ function PostTableContainer({ pinnedPosts, posts, showPinned, code }) {
                 </AccordionButton> 
                 </h2>
                 <AccordionPanel pb={4} px={0} overflowX={{ base: 'scroll', md: 'initial' }}>
-                    {/* <PostTable posts={pinnedPosts} code={code} /> */}
+                    <PostTable posts={pinnedPosts} code={code} />
                 </AccordionPanel>
             </AccordionItem>} 
             <AccordionItem>
