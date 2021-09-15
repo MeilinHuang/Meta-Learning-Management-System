@@ -12,7 +12,7 @@ import { set } from 'draft-js/lib/DefaultDraftBlockRenderMap';
 var g;
 var svg;
 var expand = {};
-var circles, link, node, lables, simulation, tempNodes, linkNodes, tempLinks;
+var circles, link, node, lables, simulation, tempNodes, linkNodes, tempLinks, arrows;
 
 function zoomed() {
     g.attr("transform", d3.event.transform);
@@ -91,7 +91,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
     }
 
 
-    const getListOfPrerequisites = (id, data) => {
+    /* const getListOfPrerequisites = (id, data) => {
         
         
         let linksArray = [];
@@ -121,22 +121,29 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
         setListPrereqs(prereqs);
         setNotListPrereqs(nodes);
         onOpenModal();
-    }
+    } */
 
     function init(data) {
-        let preprocessedData = {};
-        // make it easier to access instead of having to traverse data.nodes each time
-        for (let node of data.nodes) {
-            if (node.hasOwnProperty('id')) {
-                preprocessedData[node.id.toString()] = node;
-            }
-        }
         
-        tempNodes = [];
+
+        if (simulation) {
+            // clear graph
+            // d3.selectAll("svg > *").remove();
+            circles && circles.remove();
+            node && node.remove();
+            // arrows && arrows.remove();
+            link && link.remove();
+            // lables && lables.remove();
+        }
+
+        console.log('data nodes', data.nodes);
+        
+        tempNodes = [{}];
         let seenGroups = {};
         let nodeDict = {};
         let i = 76754;
         for (let node of data.nodes) {
+
             if (expand[node.group] == false) {
                 if (!seenGroups.hasOwnProperty(node.group)) {
                     seenGroups[node.group] = i;
@@ -146,14 +153,32 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
                         'title': node.group,
                         'type': 'group'
                     });
+                    console.log({
+                        'id': i,
+                        'name': node.group,
+                        'title': node.group,
+                        'type': 'group'
+                    });
                 }
-            } else {
+            } else if (node.hasOwnProperty('id')) {
                 node.type = 'topic';
-                tempNodes.push(node)
+                console.log({
+                    'id': node.id,
+                    'name': node.title,
+                    'title': node.title,
+                    'type': 'topic'
+                });
+                tempNodes.push({
+                    'id': node.id,
+                    'name': node.title,
+                    'title': node.title,
+                    'type': 'topic'
+                });
             }
             nodeDict[node.id] = node;
             i += 1;
         }
+        console.log('nodes', tempNodes);
         
 
         tempLinks = [];
@@ -174,14 +199,27 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
                 linkToAppend['target'] = link.target;
             }
             let linkStr = linkToAppend['source'] + ',' + linkToAppend['target'];
+            
             if (!linkDict.hasOwnProperty(linkStr) && linkToAppend['source'] != linkToAppend['target']) {
+                
                 linkDict[linkStr] = true;
                 tempLinks.push(JSON.parse(JSON.stringify(linkToAppend)));
             }   
         }
+
+        console.log('')
+        
+        let preprocessedData = {};
+        // make it easier to access instead of having to traverse data.nodes each time
+        for (let node of tempNodes) {
+            if (node.hasOwnProperty('id')) {
+                preprocessedData[node.id.toString()] = node;
+            }
+        }
+        
         
         // arrow heads
-        svg.append("svg:defs").selectAll("marker")
+        arrows = svg.append("svg:defs").selectAll("marker")
             .data(["end"])
             .enter().append("svg:marker")
             .attr("id", String)
@@ -193,7 +231,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
             .attr("orient", "auto")
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
-
+        
         // Initialize the links
         link = g.append('g')
             .attr('class', 'links')
@@ -216,16 +254,20 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
             .data(tempNodes)
             .enter().append("g")
             .on("click", function() {
-                let topicName = d3.select(this).text();
                 
-                let nodeData = tempNodes.filter(function (dataValue) {
+                let topicName = d3.select(this).text();
+                expand[topicName] = true;
+                init(data);
+                // let topicName = d3.select(this).text();
+                
+                // let nodeData = tempNodes.filter(function (dataValue) {
                     
-                    return dataValue.title === topicName;
-                });
+                //     return dataValue.title === topicName;
+                // });
                 
 
-                setSelectedNode(nodeData[0]);
-                getListOfPrerequisites(nodeData[0].id, data);
+                // setSelectedNode(nodeData[0]);
+                // getListOfPrerequisites(nodeData[0].id, data);
 
 
 
@@ -236,7 +278,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
             return r.type == 'group' ? radius * 2 : radius;
         })
         .attr("fill", function(r) {
-            console.log(r);
+            
             if (r.type == 'group') {
                 return '#68b559';
             }
@@ -263,6 +305,30 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
                 target: preprocessedData[link.target]
             });
         });
+        
+        simulation
+            .nodes(tempNodes.concat(linkNodes))
+            .on("tick", ticked);
+        simulation.force("link")
+            .links(tempLinks.concat(linkNodes));
+        
+
+        // This function is run at each iteration of the force algorithm, updating the nodes position.
+        function ticked() {
+            link.attr('d', function (d) {
+                var dx = d.target.x - d.source.x,
+                    dy = d.target.y - d.source.y,
+                    dr = Math.sqrt(dx * dx + dy * dy);
+
+                var val2 = 'M' + d.source.x + ',' + d.source.y + 'L' + (d.target.x) + ',' + (d.target.y);
+                return val2;
+            });
+        
+            node.attr("transform", function(d) {
+                    return "translate(" + d.x + "," + d.y + ")";
+                })
+                
+        }
     }
 
     useEffect(() => {
@@ -274,7 +340,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
         let width = window.innerWidth;
         let height = window.innerHeight - document.getElementById('topic-tree-header').getBoundingClientRect().height;
         let zoom = d3.zoom()
-            .scaleExtent([0.3, 4])
+            .scaleExtent([0.3, 10])
             .on("zoom", zoomed);
         svg = d3.select(ref.current)
                         .append("svg")
@@ -298,32 +364,6 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
         })
         .then( function(data) {
             init(data);
-            
-            
-            simulation
-                .nodes(tempNodes.concat(linkNodes))
-                .on("tick", ticked);
-            simulation.force("link")
-                .links(tempLinks.concat(linkNodes));
-
-    
-            // This function is run at each iteration of the force algorithm, updating the nodes position.
-            function ticked() {
-                link.attr('d', function (d) {
-                    var dx = d.target.x - d.source.x,
-                        dy = d.target.y - d.source.y,
-                        dr = Math.sqrt(dx * dx + dy * dy);
-    
-                    var val2 = 'M' + d.source.x + ',' + d.source.y + 'L' + (d.target.x) + ',' + (d.target.y);
-                    return val2;
-                });
-            
-                node.attr("transform", function(d) {
-                      return "translate(" + d.x + "," + d.y + ")";
-                    })
-                    
-            }
-
 
         });
         

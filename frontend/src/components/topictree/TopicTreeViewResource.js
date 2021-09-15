@@ -95,7 +95,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
   }
 
   const addPrereq = async(newPrereq, action) => {
-    console.log('newPrereqId', newPrereq);
+    
 
     // Add to prereqs
     let copyPrereqs = JSON.parse(JSON.stringify(tempPrereqs));
@@ -108,7 +108,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
 
     // delete from non prereqs
     let copyNonPrereqs = JSON.parse(JSON.stringify(notPrereqs));
-    console.log('copyNonPrereqs', copyNonPrereqs);
+    
     const index = nodes.indexOf(newPrereq);
     if (copyNonPrereqs.length > 1) {
       if (index > -1) {

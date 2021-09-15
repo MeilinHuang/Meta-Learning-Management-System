@@ -139,8 +139,8 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
         }
         setNotListPrereqs(notPrereqs);
 
-        console.log('notPrereqs', notPrereqs);
-        console.log('prereqList', prereqList);
+        
+        
         
         onOpenViewModal();
     }
