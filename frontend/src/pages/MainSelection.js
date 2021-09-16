@@ -117,8 +117,12 @@ function MainSelection() {
                 <Flex width={["100%", "100%", "100%", "100%", "100%", "50%"]} flexDirection="column">
                     <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5}>
                         <Text fontSize="2xl" letterSpacing="wide" fontWeight={600}>Recent Announcement</Text>
-                        { recent_announce &&
+                        { recent_announce ?
                             <Announcement padding={0} margin={0} announcement={recent_announce} course={code} setAnnouncements={setAnnouncements} isAnnouncementPage={false}/>
+                            : 
+                                <Flex justifyContent="center">
+                                    <Spinner></Spinner>
+                                </Flex>
                         }
                     </Flex>
                     {/* Need to figure out what to put here
@@ -158,7 +162,7 @@ function MainSelection() {
                     </Flex>
                     <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} marginTop={5}>
                         <Text fontSize="2xl" letterSpacing="wide" fontWeight={600} marginBottom={5}>Continue</Text>
-                        { content &&
+                        { content ? 
                             <Flex flexDirection="column">
                                 <Text fontSize="lg" letterSpacing="wide">{content[1] + " " + content[0].name}</Text>
                                 <Accordion allowMultiple>
@@ -190,6 +194,10 @@ function MainSelection() {
                                     }
                                 </Accordion>
                             </Flex>
+                            : 
+                                <Flex justifyContent="center">
+                                    <Spinner></Spinner>
+                                </Flex>
                         }
                     </Flex>
                 </Flex> 
