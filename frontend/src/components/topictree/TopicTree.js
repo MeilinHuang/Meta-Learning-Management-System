@@ -13,6 +13,7 @@ var g;
 var svg;
 var expand = {};
 var circles, link, node, lables, simulation, tempNodes, linkNodes, tempLinks, arrows;
+var emptyNodes = 1; //fix later
 
 function zoomed() {
     g.attr("transform", d3.event.transform);
@@ -138,7 +139,9 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
 
         console.log('data nodes', data.nodes);
         
-        tempNodes = [{}];
+        tempNodes = new Array(emptyNodes).fill({}); // temporary fix
+        emptyNodes += 1;
+        console.log('tempNodes', tempNodes);
         let seenGroups = {};
         let nodeDict = {};
         let i = 76754;
