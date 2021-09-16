@@ -8,9 +8,9 @@ import { ReactComponent as Study } from "../static/svgs/undraw_studying_s3l7.svg
 
 function MainSelection() {
     const [courses, setCourses] = useState([])
-    //const [announcements, setAnnouncements] = useState([])
     const [recent_announce, setRecent] = useState(null)
     const [code, setCode] = useState(null)
+    //For announcement
     const [announcements, setAnnouncements] = useState([])
     const [content, setContent] = useState(null)
 
@@ -60,7 +60,6 @@ function MainSelection() {
 
     let counter = 0
     let history = useHistory()
-    console.log(content)
     return (
         <Flex marginTop={[30, 30, 0, 0]} flexDirection="column">
             <Flex width="100%" flexDirection={["column", "column", "column", "column", "column", "row"]}>
@@ -79,7 +78,7 @@ function MainSelection() {
                     </Flex>
                     <Flex flexGrow={1} alignItems="center" justifyContent="center">
                         <Flex display={["none", "none", "none", "none", "flex"]}>
-                            <Study width={[250, 350]} height={[150, 250]}></Study>
+                            <Study width={"100%"} height={"100%"}></Study>
                         </Flex>
                     </Flex>
                 </Flex>
@@ -108,18 +107,25 @@ function MainSelection() {
                         </Flex>
                         <Flex flexGrow={1} alignItems="center" justifyContent="center">
                             <Flex display={["none", "flex", "flex", "flex", "flex", "none"]}>
-                                <Learn width={[0, 0]} height={[0, 0]}></Learn>
+                                <Learn width={"100%"} height={"100%"}></Learn>
                             </Flex>
                         </Flex>
                     </Flex>
                 </Flex>
             </Flex>
             <Flex width="100%" marginTop={5} flexDirection={["column", "column", "column", "column", "column", "row"]}>
-                <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} width={["100%", "100%", "100%", "100%", "100%", "50%"]} height="fit-content">
-                    <Text fontSize="2xl" letterSpacing="wide" fontWeight={600}>Recent Announcement</Text>
-                    { recent_announce &&
-                        <Announcement padding={0} margin={0} announcement={recent_announce} course={code} setAnnouncements={setAnnouncements} isAnnouncementPage={false}/>
-                    }
+                <Flex width={["100%", "100%", "100%", "100%", "100%", "50%"]} flexDirection="column">
+                    <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5}>
+                        <Text fontSize="2xl" letterSpacing="wide" fontWeight={600}>Recent Announcement</Text>
+                        { recent_announce &&
+                            <Announcement padding={0} margin={0} announcement={recent_announce} course={code} setAnnouncements={setAnnouncements} isAnnouncementPage={false}/>
+                        }
+                    </Flex>
+                    {/* Need to figure out what to put here
+                        <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} marginTop={5}>
+                            <Text fontSize="2xl" letterSpacing="wide" fontWeight={600}>WORK IN PROGRESS</Text>
+                        </Flex>
+                    */}
                 </Flex>
                 <Flex width={["100%", "100%", "100%", "100%", "100%", "50%"]} marginLeft={[0, 0, 0, 0, 0, 10]} flexDirection={"column"}>
                     <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} width={["100%"]}>
@@ -150,44 +156,44 @@ function MainSelection() {
                             }
                         </VStack>
                     </Flex>
+                    <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} marginTop={5}>
+                        <Text fontSize="2xl" letterSpacing="wide" fontWeight={600} marginBottom={5}>Continue</Text>
+                        { content &&
+                            <Flex flexDirection="column">
+                                <Text fontSize="lg" letterSpacing="wide">{content[1] + " " + content[0].name}</Text>
+                                <Accordion allowMultiple>
+                                    { 
+                                        categories.map(e => {
+                                            return (
+                                                <AccordionItem key={e + "-accordion"}>
+                                                    <AccordionButton>
+                                                        <Text flexGrow={1} textAlign="left" fontWeight="500">{e}</Text>
+                                                        <AccordionIcon></AccordionIcon>
+                                                    </AccordionButton>
+                                                    <AccordionPanel>
+                                                        <Stack divider={<Divider></Divider>} spacing={2}>
+                                                            {
+                                                                //Need to check if is correct category
+                                                                content[0].course_materials.map(mat => {
+                                                                    return (
+                                                                        <Flex key={e + "-material-" + mat.name} marginLeft={5}>
+                                                                            <Text fontSize="sm">{mat.name}</Text>
+                                                                        </Flex>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </Stack>
+                                                    </AccordionPanel>
+                                                </AccordionItem>
+                                            )
+                                        })
+                                    }
+                                </Accordion>
+                            </Flex>
+                        }
+                    </Flex>
                 </Flex> 
             </Flex>
-            <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} width={["100%", "100%", "100%", "100%", "100%", "50%"]} marginTop={5}>
-                    <Text fontSize="2xl" letterSpacing="wide" fontWeight={600} marginBottom={5}>Continue</Text>
-                    { content &&
-                        <Flex flexDirection="column">
-                            <Text fontSize="lg" letterSpacing="wide">{content[1] + " " + content[0].name}</Text>
-                            <Accordion allowMultiple>
-                                { 
-                                    categories.map(e => {
-                                        return (
-                                            <AccordionItem>
-                                                <AccordionButton>
-                                                    <Text flexGrow={1} textAlign="left" fontWeight="500">{e}</Text>
-                                                    <AccordionIcon></AccordionIcon>
-                                                </AccordionButton>
-                                                <AccordionPanel>
-                                                    <Stack divider={<Divider></Divider>} spacing={2}>
-                                                        {
-                                                            //Need to check if is correct category
-                                                            content[0].course_materials.map(mat => {
-                                                                return (
-                                                                    <Flex marginLeft={5}>
-                                                                        <Text fontSize="sm">{mat.name}</Text>
-                                                                    </Flex>
-                                                                )
-                                                            })
-                                                        }
-                                                    </Stack>
-                                                </AccordionPanel>
-                                            </AccordionItem>
-                                        )
-                                    })
-                                }
-                            </Accordion>
-                        </Flex>
-                    }
-                </Flex>
         </Flex>
     )
 }
