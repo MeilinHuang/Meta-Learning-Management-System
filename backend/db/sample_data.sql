@@ -99,28 +99,6 @@ VALUES(default, 2, 2, 'First actual announcement for DBS', 'This is the real DBS
 INSERT INTO announcement_comment(id, announcement_id, author, content, post_date) VALUES(default, 1, 1, 'This is the wrong course', current_timestamp);
 INSERT INTO announcement_comment(id, announcement_id, author, content, post_date) VALUES(default, 2, 3, 'There is a duplicate', current_timestamp);
 
-/* -- Create Gamification Questions
-INSERT INTO gamification_question(id, title, questiontype, potentialAnswers, correctAnswer, availableFrom, numberOfAnswers, mediaLink, estimatedTimeRequired)
-VALUES(default, 'Gamification Question 1', 'mpc', 'a', 'a', current_timestamp, 4, 'question_image1.png', 2);
-INSERT INTO gamification_question(id, title, questiontype, potentialAnswers, correctAnswer, availableFrom, numberOfAnswers, mediaLink, estimatedTimeRequired)
-VALUES(default, 'Gamification Question 2', 'mpc', 'd', 'd', current_timestamp, 4, 'question_image2.png', 2);
-
--- Create gamification levels
-INSERT INTO levels(id, title, topic_group_id, typeOfLevel, availableFrom, numberOfQuestions, estimatedTimeRequired) 
-VALUES(default, 'Level 1', 1, 'Beginner', current_timestamp, 12, 20);
-INSERT INTO levels(id, title, topic_group_id, typeOfLevel, availableFrom, numberOfQuestions, estimatedTimeRequired) 
-VALUES(default, 'Level 2', 1, 'Intermediate', current_timestamp, 20, 45);
-
--- Link questions to levels
-INSERT INTO levels_questions(level_id, question_id) 
-VALUES(3, 1);
-INSERT INTO levels_questions(level_id, question_id) 
-VALUES(3, 2);
-
--- Link levels to topic group
-INSERT INTO topic_group_levels(topic_group_id, levelsid) 
-VALUES(1, 2); */
-
 -- Create quiz
 INSERT INTO quiz(id, name, due_date, time_given) VALUES(default, 'Quiz 1', '2016-06-22 19:10:25-07', 30);
 INSERT INTO quiz(id, name, due_date, time_given) VALUES(default, 'Quiz 2', '2016-06-22 19:10:25-07', 45);
