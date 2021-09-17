@@ -42,6 +42,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
     } = useDisclosure();
 
     const treeStructure = (jsonData) => {
+        console.log('jsondata', jsonData);
         let newJson = {
             "nodes": [{}],
             "links": []
@@ -133,14 +134,6 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
             .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(400))
             .force("charge", d3.forceManyBody().strength(-70))
             .force("center", d3.forceCenter(width / 2, height / 2));
-
-        //fetching topic groups
-        //could be done in a promise all to improve performance
-        fetch(get_topic_groups()).then(e => {
-            return e.json()
-        }).then(e => {
-            setData(e)
-        })
 
         // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
         fetch(get_topics_url(topicGroup))
