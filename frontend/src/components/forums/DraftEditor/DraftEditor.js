@@ -59,6 +59,12 @@ export default class DraftEditor extends Component {
                 'history'
               ]
           }}
+          mention={{
+            separator: ' ',
+            trigger: '@',
+            // TODO: add suggestions from list of enrolled people
+            suggestions: []
+          }}
         />
       </div>
     );
