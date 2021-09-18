@@ -1,4 +1,4 @@
--- \i 'C:/Users/Dave/Desktop/COMP4962 - Thesis B/metalms/backend/db/sample_data.sql';
+-- \i 'C:/Users/Dave/Desktop/COMP4973 - Thesis C/metalms/backend/db/sample_data.sql';
 
 -- Create Users
 INSERT INTO users(id, name, zid) values(default, 'David Nguyen', 'z5166106');
@@ -48,14 +48,22 @@ INSERT INTO upvotes(post_id, user_id) VALUES (1, 2);
 INSERT INTO upvotes(post_id, user_id) VALUES (1, 3);
 
 -- Create Tags
+<<<<<<< HEAD
 INSERT INTO tags(tag_id, name, topic_group) VALUES(default, 'Introduction', 1);
 INSERT INTO tags(tag_id, name, topic_group) VALUES(default, 'New', 1);
 INSERT INTO tags(tag_id, name, topic_group) VALUES(default, 'Ass1', 2);
+=======
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Intro');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'New');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Ass1');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 2, 'Ass1');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 2, 'FinalExam');
+>>>>>>> backend
 
 -- Create Topic Tags
-INSERT INTO tags(tag_id, name) VALUES(default, 'Memory');
-INSERT INTO tags(tag_id, name) VALUES(default, 'For loops');
-INSERT INTO tags(tag_id, name) VALUES(default, 'Lists');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Memory');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Loops');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Lists');
 
 -- Link tags
 INSERT INTO post_tags(post_id, tag_id) VALUES(1, 1);
@@ -98,28 +106,6 @@ VALUES(default, 2, 2, 'First actual announcement for DBS', 'This is the real DBS
 -- Create announcement comments
 INSERT INTO announcement_comment(id, announcement_id, author, content, post_date) VALUES(default, 1, 1, 'This is the wrong course', current_timestamp);
 INSERT INTO announcement_comment(id, announcement_id, author, content, post_date) VALUES(default, 2, 3, 'There is a duplicate', current_timestamp);
-
-/* -- Create Gamification Questions
-INSERT INTO gamification_question(id, title, questiontype, potentialAnswers, correctAnswer, availableFrom, numberOfAnswers, mediaLink, estimatedTimeRequired)
-VALUES(default, 'Gamification Question 1', 'mpc', 'a', 'a', current_timestamp, 4, 'question_image1.png', 2);
-INSERT INTO gamification_question(id, title, questiontype, potentialAnswers, correctAnswer, availableFrom, numberOfAnswers, mediaLink, estimatedTimeRequired)
-VALUES(default, 'Gamification Question 2', 'mpc', 'd', 'd', current_timestamp, 4, 'question_image2.png', 2);
-
--- Create gamification levels
-INSERT INTO levels(id, title, topic_group_id, typeOfLevel, availableFrom, numberOfQuestions, estimatedTimeRequired) 
-VALUES(default, 'Level 1', 1, 'Beginner', current_timestamp, 12, 20);
-INSERT INTO levels(id, title, topic_group_id, typeOfLevel, availableFrom, numberOfQuestions, estimatedTimeRequired) 
-VALUES(default, 'Level 2', 1, 'Intermediate', current_timestamp, 20, 45);
-
--- Link questions to levels
-INSERT INTO levels_questions(level_id, question_id) 
-VALUES(3, 1);
-INSERT INTO levels_questions(level_id, question_id) 
-VALUES(3, 2);
-
--- Link levels to topic group
-INSERT INTO topic_group_levels(topic_group_id, levelsid) 
-VALUES(1, 2); */
 
 -- Create quiz
 INSERT INTO quiz(id, name, due_date, time_given) VALUES(default, 'Quiz 1', '2016-06-22 19:10:25-07', 30);

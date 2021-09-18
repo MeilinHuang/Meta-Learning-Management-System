@@ -1,5 +1,0 @@
-Database 
-  - Change file storage to paths or use S3
-
-Topic group
-  - Add PUT topicGroup, topic
