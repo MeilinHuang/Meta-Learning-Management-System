@@ -2,9 +2,9 @@
 const Pool = require('pg').Pool;
 
 const pool = new Pool({
-  host: "localhost",
+  host: "db.metalms.tech",
   port: 5432,
-  user: "postgres",
+  user: "service",
   password: "metalms",
   database: "metalms",
   idleTimeoutMillis: 100,
