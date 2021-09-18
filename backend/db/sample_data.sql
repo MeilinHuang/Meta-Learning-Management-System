@@ -48,17 +48,11 @@ INSERT INTO upvotes(post_id, user_id) VALUES (1, 2);
 INSERT INTO upvotes(post_id, user_id) VALUES (1, 3);
 
 -- Create Tags
-<<<<<<< HEAD
-INSERT INTO tags(tag_id, name, topic_group) VALUES(default, 'Introduction', 1);
-INSERT INTO tags(tag_id, name, topic_group) VALUES(default, 'New', 1);
-INSERT INTO tags(tag_id, name, topic_group) VALUES(default, 'Ass1', 2);
-=======
 INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Intro');
 INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'New');
 INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Ass1');
 INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 2, 'Ass1');
 INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 2, 'FinalExam');
->>>>>>> backend
 
 -- Create Topic Tags
 INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Memory');
