@@ -1,4 +1,4 @@
--- \i 'C:/Users/Dave/Desktop/COMP4962 - Thesis B/metalms/backend/db/sample_data.sql';
+-- \i 'C:/Users/Dave/Desktop/COMP4973 - Thesis C/metalms/backend/db/sample_data.sql';
 
 -- Create Users
 INSERT INTO users(id, name, zid) values(default, 'David Nguyen', 'z5166106');
@@ -48,14 +48,16 @@ INSERT INTO upvotes(post_id, user_id) VALUES (1, 2);
 INSERT INTO upvotes(post_id, user_id) VALUES (1, 3);
 
 -- Create Tags
-INSERT INTO tags(tag_id, name) VALUES(default, 'Introduction');
-INSERT INTO tags(tag_id, name) VALUES(default, 'New');
-INSERT INTO tags(tag_id, name) VALUES(default, 'Ass1');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Intro');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'New');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Ass1');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 2, 'Ass1');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 2, 'FinalExam');
 
 -- Create Topic Tags
-INSERT INTO tags(tag_id, name) VALUES(default, 'Memory');
-INSERT INTO tags(tag_id, name) VALUES(default, 'For loops');
-INSERT INTO tags(tag_id, name) VALUES(default, 'Lists');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Memory');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Loops');
+INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Lists');
 
 -- Link tags
 INSERT INTO post_tags(post_id, tag_id) VALUES(1, 1);

@@ -2887,6 +2887,17 @@
           "Forums"
         ],
         "summary": "Get list of all tags",
+        "requestBody": {
+          "description": "Body with topic group name",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetTopicGroupTags"
+              }
+            }
+          },
+          "required": false
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -2916,7 +2927,8 @@
               }
             }
           }
-        }
+        },
+        "x-codegen-request-body-name": "tagName"
       },
       "post": {
         "tags": [
@@ -4731,6 +4743,15 @@
           }
         },
         "description": "Forbidden"
+      },
+      "GetTopicGroupTags": {
+        "type": "object",
+        "properties": {
+          "topicGroupName": {
+            "type": "string",
+            "example": "C++ Programming"
+          }
+        }
       },
       "PostTutorial": {
         "type": "object",

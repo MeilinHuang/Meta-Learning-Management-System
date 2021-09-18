@@ -9,7 +9,7 @@ const { start } = require('repl');
 // Gets weeks
 async function getWeeks (request, response) {
   try {
-    void request;
+    void (request);
     const resp = await pool.query(`SELECT * FROM weeks`);
     response.status(200).json(resp.rows);
   } catch (e) {
