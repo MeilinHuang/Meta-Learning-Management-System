@@ -91,13 +91,8 @@ CREATE TABLE IF NOT EXISTS "forum_posts" (
 DROP TABLE IF EXISTS "tags" CASCADE;
 CREATE TABLE IF NOT EXISTS "tags" (
   tag_id SERIAL NOT NULL PRIMARY KEY,
-<<<<<<< HEAD
-  name TEXT NOT NULL,
-  topic_group INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE
-=======
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
   name TEXT NOT NULL
->>>>>>> backend
 );
 
 DROP TABLE IF EXISTS "topic_tags" CASCADE;
