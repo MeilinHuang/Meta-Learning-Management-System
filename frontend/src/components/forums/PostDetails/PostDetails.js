@@ -13,12 +13,13 @@ import { GrEdit, GrShare } from 'react-icons/gr'
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai"
 import { FaRegCheckCircle, FaCheckCircle } from 'react-icons/fa'
 import { TiArrowUpOutline, TiArrowUpThick } from 'react-icons/ti'
-import { ContentState, convertFromHTML } from 'draft-js'
+import { ContentState, EditorState } from 'draft-js'
 import AuthorDetails from '../AuthorDetails'
 import DraftEditor from '../DraftEditor/DraftEditor'
+import htmlToDraft from 'html-to-draftjs'
 import styles from './PostDetails.module.css'
 
-const dummyUser = 3
+const dummyUser = 2
 
 function PostDetails({ post: { attachments, author, post_id, published_date, description, isendorsed, num_of_upvotes, upvoters, user_id }, setPost, code}) {
     const [ editorState, setEditorState ] = useState('')
@@ -41,9 +42,10 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
     }
 
     const editPost = () => {
-        const markup = convertFromHTML(details)
-        const state = ContentState.createFromBlockArray(markup)
-        setEditorState(state)
+        const contentBlock = htmlToDraft(details)
+        const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks)
+        const editorState = EditorState.createWithContent(contentState);
+        setEditorState(editorState)
     }
 
     const handleSubmit = e => {
@@ -93,9 +95,9 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
                             <InputGroup variant="filled" mr="8px" width="100%">
                                 <DraftEditor content={editorState} setDetails={setDetails} /> 
                             </InputGroup>
-                            <Flex flexDirection="column" justifyContent="space-between">
+                            <Flex flexDirection="column">
                                 <Button pr="8px" leftIcon={<AiOutlineClose />} onClick={() => setEditorState('')} />
-                                <Button pr="8px" mb="16px" height="160px" leftIcon={<AiOutlineSend />} form="editPost" type="submit" />
+                                <Button pr="8px" mb="16px" mt="8px" leftIcon={<AiOutlineSend />} form="editPost" type="submit" />
                             </Flex>
                         </Flex>
                     </form>

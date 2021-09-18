@@ -20,7 +20,8 @@ import {
 } from "@chakra-ui/react"
 import AuthorDetails from '../AuthorDetails'
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai"
-import { ContentState, convertFromHTML } from 'draft-js'
+import { ContentState, EditorState, convertFromHTML } from 'draft-js'
+import htmlToDraft from 'html-to-draftjs'
 import { FaRegCheckCircle, FaCheckCircle } from 'react-icons/fa'
 import { BsTrash } from 'react-icons/bs'
 import { GrEdit } from 'react-icons/gr'
@@ -39,9 +40,10 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
     }, [comment, reply])
 
     const editPost = () => {
-        const markup = convertFromHTML(details)
-        const state = ContentState.createFromBlockArray(markup)
-        setEditorState(state)
+        const contentBlock = htmlToDraft(details)
+        const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks)
+        const editorState = EditorState.createWithContent(contentState);
+        setEditorState(editorState)
     }
 
     const handleSubmit = e => {

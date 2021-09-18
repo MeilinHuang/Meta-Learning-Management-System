@@ -1,3 +1,4 @@
+// Code based on sample code from https://codesandbox.io/s/mjk1v?file=/src/App.js
 import React, { useContext, useMemo } from "react"
 import { Link as RouterLink } from 'react-router-dom'
 import { useTable, useSortBy } from 'react-table'
@@ -38,7 +39,6 @@ function PostTable({ isAdmin, posts: postData, code }) {
                             if (r.status === 200) {
                                 fetch(`http://localhost:8000/${code}/forum`).then(r => r.json()).then(data => setPosts(data))
                                 fetch(`http://localhost:8000/${code}/forum/pinned`).then(r => r.json()).then(data => {
-                                    console.log(data)
                                     setPinnedPosts(data)
                                     setShowPinned(!!data.length)
                                 })
