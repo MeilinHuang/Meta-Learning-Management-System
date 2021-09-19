@@ -5145,6 +5145,10 @@
       "ForumTag": {
         "type": "object",
         "properties": {
+          "topicGroupName": {
+            "type": "string",
+            "example": "C++ Programming"
+          },
           "tagName": {
             "type": "string",
             "example": "FinalExam"

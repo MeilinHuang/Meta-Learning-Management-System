@@ -1468,7 +1468,7 @@ async function postTag (request, response) {
       return;
     } 
 
-    await pool.query(`INSERT INTO tags(tag_id, name) VALUES(default, $1)`, [tagName]);
+    await pool.query(`INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, $1, $2)`, [topicGroupId, tagName]);
     response.sendStatus(200);
   } catch(e) {
     response.status(400).send(e);
