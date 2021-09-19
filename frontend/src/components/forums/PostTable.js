@@ -52,7 +52,8 @@ function PostTable({ isAdmin, posts: postData, code }) {
                     backgroundColor="white"
                     onClick={handlePinUnpin}
                 />
-            })
+            }),
+            width: '10%',
         },
         {
             Header: 'Post',
@@ -88,7 +89,8 @@ function PostTable({ isAdmin, posts: postData, code }) {
                         <Text fontSize="13px" lineHeight="16px" mt="4px" dangerouslySetInnerHTML={{__html: unformattedDesc}}></Text>
                     </>
                 )
-            })
+            }),
+            width: '70%',
         },
         {
             Header: 'Date Created',
@@ -154,19 +156,19 @@ function PostTable({ isAdmin, posts: postData, code }) {
                 {headerGroups.map(headerGroup => (
                     <Tr {...headerGroup.getHeaderGroupProps()}>
                         {headerGroup.headers.map(column => (
-                            <Th userSelect="none" {...column.getHeaderProps(column.getSortByToggleProps())}>
-                                <Flex alignItems="center">
+                            <Th userSelect="none" width={column.width} {...column.getHeaderProps(column.getSortByToggleProps())}>
+                                <Flex alignItems="center" position="relative">
                                     {column.render("Header")}
-                                    {/* Add a sort direction indicator */}
-                                    {column.isSorted ? (
-                                        column.isSortedDesc ? (
-                                            <ChevronDownIcon ml={1} w={4} h={4} />
-                                        ) : (
-                                            <ChevronUpIcon ml={1} w={4} h={4} />
-                                        )
-                                    ) : (
-                                    ""
-                                    )}
+                                    <span style={{ position: "absolute", right: "-16px" }}> 
+                                        {column.isSorted ?
+                                            (column.isSortedDesc ?
+                                                <ChevronDownIcon ml={1} w={4} h={4} />
+                                            :
+                                                <ChevronUpIcon ml={1} w={4} h={4} />)
+                                        :
+                                            ""
+                                        }
+                                    </span>
                                 </Flex>
                             </Th>
                         ))}
@@ -180,9 +182,10 @@ function PostTable({ isAdmin, posts: postData, code }) {
                         return (
                             <Tr {...row.getRowProps()}>
                                 {
-                                    row.cells.map(cell => (
-                                        <Td {...cell.getCellProps()} fontSize="15px">{cell.render("Cell")}</Td>
-                                    ))
+                                    row.cells.map(cell => {
+                                        console.log(cell.getCellProps())
+                                        return <Td {...cell.getCellProps()} fontSize="15px">{cell.render("Cell")}</Td>
+                                    })
                                 }
                             </Tr>
                         )
