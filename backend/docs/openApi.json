@@ -1404,6 +1404,58 @@
         }
       }
     },
+    "/user/{userId}/progress": {
+      "put": {
+        "tags": [ "User" ],
+        "summary": "Update user progress for topic group",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Put user progress body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutUserProgress"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/{topicGroup}/announcement": {
       "get": {
         "tags": [
@@ -4743,6 +4795,19 @@
           }
         },
         "description": "Forbidden"
+      },
+      "PutUserProgress": {
+        "type": "object",
+        "properties": {
+          "topicGroupName": {
+            "type": "string",
+            "example": "C++ Programming"
+          },
+          "progressVal": {
+            "type": "float",
+            "example": 50.5
+          }
+        }
       },
       "GetTopicGroupTags": {
         "type": "object",

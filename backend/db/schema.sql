@@ -31,6 +31,7 @@ DROP TABLE IF EXISTS "user_enrolled" CASCADE;
 CREATE TABLE IF NOT EXISTS "user_enrolled" (
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
   user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  progress DECIMAL NOT NULL,
   PRIMARY KEY(user_id, topic_group_id)
 );
 
