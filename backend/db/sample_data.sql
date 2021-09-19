@@ -33,9 +33,9 @@ INSERT INTO prerequisites(prereq, topic) values(2, 1);
 INSERT INTO user_admin(admin_id, topic_group_id) values(3, 1);
 
 -- Enroll Students
-INSERT INTO user_enrolled(topic_group_id, user_id) values(1, 1);
-INSERT INTO user_enrolled(topic_group_id, user_id) values(1, 2);
-INSERT INTO user_enrolled(topic_group_id, user_id) values(2, 1);
+INSERT INTO user_enrolled(topic_group_id, user_id, progress) values(1, 1, 9.5);
+INSERT INTO user_enrolled(topic_group_id, user_id, progress) values(1, 2, 28.0);
+INSERT INTO user_enrolled(topic_group_id, user_id, progress) values(2, 1, 93.6);
 
 -- Create Forum Posts
 INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group) 
