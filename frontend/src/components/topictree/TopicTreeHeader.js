@@ -53,6 +53,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [tempView, setTempView] = useState(view);
     const [topics, setTopics] = useState([]);
+    const [actualTopics, setActualTopics] = useState([]);
     const [listPrereqs, setListPrereqs] = useState([]);
     const [notListPrereqs, setNotListPrereqs] = useState([]);
     const [selectedNode, setSelectedNode] = useState({
@@ -84,14 +85,24 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
 
     const convertToList = (jsonData) => {
         let tempTopics = [];
+        let tempActualTopics = [];
         for (let topic of jsonData.topics_list) {
             topic['value'] = topic.name;
             topic['label'] = topic.name;
             topic['id'] = topic.id;
             topic['name'] = topic.name;
             tempTopics.push(topic);
-        }
+            tempActualTopics.push(topic);
+            if (topic.tags !== undefined) {
+                for (let tag of topic.tags) {
+                    tempTopics.push({'value': topic.name, 'label': tag.name, 'id': topic.id, 'name': topic.name});
+                }
+            }
 
+        }
+        
+        
+        setActualTopics(tempActualTopics);
         return tempTopics;
     };
 
@@ -114,7 +125,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
 
         setListPrereqs(prereqList);
         let notPrereqs = [];
-        for (let topic of topics) {
+        for (let topic of actualTopics) {
             let found = false;
             for (let prereq of prereqList) {
                 if (topic.id === prereq.id) {

@@ -171,7 +171,7 @@ const deleteAdmin = (request, response) => {
 async function getAllTopicGroups(request, response) {
   void (request);
   let resp = await pool.query(
-    `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.course_outline,
+    `SELECT tp_group.id, tp_group.name, tp_group.topic_code,
     array_agg(DISTINCT user_admin.admin_id) as admin_list,
     array_agg(DISTINCT topics.id) AS topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
     array_agg(DISTINCT announcements.id) as announcements_list
@@ -829,11 +829,13 @@ async function generateCode (request, response) {
 ***************************************************************/
 
 async function getAllForumPosts (request, response) {
-  void (request);
   try {
+    const topicGroupName = request.params.topicGroup
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.topic_group,
       array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
       array_agg(DISTINCT comments.comment_id) as comments
@@ -846,7 +848,8 @@ async function getAllForumPosts (request, response) {
       LEFT JOIN comments ON comments.comment_id = pc.comment_id
       LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
       LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
-      GROUP BY fp.post_id`);
+      WHERE fp.topic_group = $1
+      GROUP BY fp.post_id`, [topicGroupId]);
 
     for (var object of resp.rows) {
       var tagsArr = [];
@@ -886,6 +889,7 @@ async function getAllForumPosts (request, response) {
       object.comments = commentsArr;
       object.attachments = fileArr;
     }
+    console.log(resp.rows)
     response.status(200).json(resp.rows);
   } catch (e) {
     console.log(e)
@@ -895,8 +899,10 @@ async function getAllForumPosts (request, response) {
 
 // Get all pinned forum posts
 async function getAllPinnedPosts (request, response) {
-  void (request);
   try {
+    const topicGroupName = request.params.topicGroup
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
       fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
@@ -913,7 +919,8 @@ async function getAllPinnedPosts (request, response) {
       LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
       LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       WHERE fp.ispinned = TRUE
-      GROUP BY fp.post_id`);
+      AND fp.topic_group = $1
+      GROUP BY fp.post_id`, [topicGroupId]);
 
       for (var object of resp.rows) {
         var tagsArr = [];
@@ -963,6 +970,9 @@ async function getAllPinnedPosts (request, response) {
 // Get all posts related search term
 async function getSearchPosts (request, response) {
   try {
+    const topicGroupName = request.params.topicGroup
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
     const forumSearchTerm = request.params.forumSearchTerm;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
@@ -981,7 +991,8 @@ async function getSearchPosts (request, response) {
       LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       WHERE LOWER (fp.title) LIKE LOWER($1)
       OR LOWER (fp.description) LIKE LOWER($1)
-      GROUP BY fp.post_id`, [`%${forumSearchTerm}%`]);
+      AND fp.topic_group = $2
+      GROUP BY fp.post_id`, [`%${forumSearchTerm}%`, topicGroupId]);
 
     for (var object of resp.rows) {
       var tagsArr = [];
@@ -1031,6 +1042,9 @@ async function getSearchPosts (request, response) {
 // Get all posts related tag term
 async function getFilterPosts (request, response) {
   try {
+    const topicGroupName = request.params.topicGroup
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
     const forumFilterTerm = request.params.forumFilterTerm;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
@@ -1048,7 +1062,8 @@ async function getFilterPosts (request, response) {
       LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
       LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
       WHERE LOWER(t.name) LIKE LOWER($1)
-      GROUP BY fp.post_id`, [`%${forumFilterTerm}%`]);
+      AND fp.topic_group = $2
+      GROUP BY fp.post_id`, [`%${forumFilterTerm}%`, topicGroupId]);
 
       for (var object of resp.rows) {
         var tagsArr = [];
@@ -1108,13 +1123,17 @@ async function postForum (request, response) {
     const publishedDate = request.body.publishedDate;
     const description = request.body.description;
     const related_link = request.body.related_link;
+
+    const topicGroupName = request.params.topicGroup
+    const tmpQ = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    const topicGroupId = tmpQ.rows[0].id;
   
     let resp = await pool.query(
       `INSERT INTO forum_posts(post_id, title, user_id, 
-        author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed) 
-        values(default, $1, $2, $3, $4, $5, false, $6, 0, false) 
+        author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group) 
+        values(default, $1, $2, $3, $4, $5, false, $6, 0, false, $7) 
         RETURNING post_id`,
-      [title, user_id, author, publishedDate, description, related_link]);
+      [title, user_id, author, publishedDate, description, related_link, topicGroupId]);
   
     if (request.body.tags) {
       const tags = request.body.tags.split(",");
@@ -1580,28 +1599,38 @@ async function putPostPin (request, response) {
     const postId = request.params.postId;
     const isPinned = request.params.isPinned;
 
-    let resp = await pool.query(`UPDATE forum_posts SET ispinned = $1 WHERE post_id = $2`,
+    await pool.query(`UPDATE forum_posts SET ispinned = $1 WHERE post_id = $2`,
     [isPinned, postId]);
 
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 }
 
-// Gets all tags
+// Gets all tags (topic group or ALL)
 async function getAllTags (request, response) {
-  void (request);
   try {
-    let resp = await pool.query(`SELECT * FROM tags`);
+    let resp;
+
+    if (request.body.topicGroupName) { // If topic group specified then get tags for topic group only
+      const topicGroupName = request.body.topicGroupName;
+      let topicGroupReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
+      if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
+
+      const topicGroupId = topicGroupReq.rows[0].id;
+      resp = await pool.query(`SELECT * FROM tags WHERE topic_group_id = $1`, [topicGroupId]);
+    } else { // No topic group specified (get all tags)
+      resp = await pool.query(`SELECT * FROM tags`);
+    }
+
     response.status(200).json(resp.rows);
   } catch(e) {
-    response.status(400)
-    response.send(e);
+    response.status(400).send(e);
   }
 };
 
+// Gets one tag
 async function getTag (request, response) {
   try {
     const tagId = request.params.tagId;
@@ -1617,18 +1646,25 @@ async function getTag (request, response) {
 async function postTag (request, response) {
   try {
     const tagName = request.body.tagName;
-    let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) like lower($1))`, [tagName]);
+    const topicGroupName = request.body.topicGroupName;
+    
+    const topicGroupReq = await pool.query(`SELECT id FROM topic_group 
+    WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
+    if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
+    const topicGroupId = topicGroupReq.rows[0].id;
+
+    let dupTagCheck = await pool.query(`
+    select exists(select * from tags where lower(name) like lower($1) AND topic_group_id = $2)`, [tagName, topicGroupId]);
 
     if (dupTagCheck.rows[0].exists) {
-      response.status(400).json({ error: `Tag '${tagName}' already exists`})
-      return
+      response.status(400).json({ error: `Tag '${tagName}' already exists for topic group '${topicGroupName}`});
+      return;
     } 
 
-    let resp = await pool.query(`INSERT INTO tags(tag_id, name) VALUES(default, $1)`, [tagName]);
+    await pool.query(`INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, $1, $2)`, [topicGroupId, tagName]);
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.json(e);
+    response.status(400).send(e);
   } 
 };
 
@@ -1643,12 +1679,11 @@ async function putTag (request, response) {
       return
     } 
 
-    let resp = await pool.query(`UPDATE tags SET name = $1 WHERE tag_id = $2`, 
+    await pool.query(`UPDATE tags SET name = $1 WHERE tag_id = $2`, 
     [request.body.tagName, request.params.tagId]);
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.json(e);
+    response.status(400).send(e);
   } 
 };
 
@@ -2098,274 +2133,6 @@ async function getSearchAnnouncements (request, response) {
   }
 
 }
-
-/***************************************************************
-                       Gamification Functions
-***************************************************************/
-
-async function getQuestions (request, response) {
-  void (request);
-  try {
-    let resp = await pool.query(
-      `SELECT * from gamification_question`)
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Create new gamification question
-async function postQuestion (request, response) {
-  const title = request.body.title;
-  const questionType = request.body.questionType;
-  const potentialAnswer = request.body.potentialAnswers;
-  const correctAnswer = request.body.correctAnswer;
-  const timeStampQuery = await pool.query(`SELECT current_timestamp`);
-  const availableFrom = timeStampQuery.rows[0].current_timestamp;
-  const numberOfAnswers = request.body.numberOfAnswers;
-  const mediaLink = request.body.mediaLink;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  let resp = await pool.query(
-    `INSERT INTO gamification_question(id, title, questiontype, potentialAnswers, 
-     correctAnswer, availableFrom, numberOfAnswers, mediaLink, estimatedTimeRequired)
-     VALUES(default, $1, $2, $3, $4, $5, $6, $7, $8)`, [title, questionType, potentialAnswer, correctAnswer,
-    availableFrom, numberOfAnswers, mediaLink, estimatedTime]);
-
-  response.status(200).send("Post gamification question success");
-  try {
-    
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get level data from question
-async function getLevelFromQuestion (request, response) {
-  const questionId = request.params.questionId;
-  try {
-    let resp = await pool.query(
-      `SELECT * from levels 
-      JOIN levels_questions ON question_id = $1 AND level_id = levels.id;`, [questionId])
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Edit existing question data
-async function putQuestion (request, response) {
-  const questionId = request.params.questionId;
-  const title = request.body.title;
-  const questionType = request.body.questionType;
-  const potentialAnswer = request.body.potentialAnswers;
-  const correctAnswer = request.body.correctAnswer;
-  const availableFrom = request.body.availableFrom;
-  const numberOfAnswers = request.body.numberOfAnswers;
-  const mediaLink = request.body.mediaLink;
-  const estimatedTime = request.body.estimatedTimeRequired;
-  
-  try {
-    let resp = await pool.query(
-      `UPDATE gamification_question SET title = $1, 
-      questionType = $2, potentialAnswers = $3, correctAnswer = $4, 
-      availableFrom = $5, numberOfAnswers = $6, mediaLink = $7, estimatedTimeRequired = $8
-      WHERE id = $9`,
-      [title, questionType, potentialAnswer, correctAnswer,
-      availableFrom, numberOfAnswers, mediaLink, estimatedTime, questionId]);
-    response.status(200).send("Gamification Question Update Success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Delete question from id
-async function deleteQuestion (request, response) {
-  const questionId = request.params.questionId;
-  
-  try {
-    let resp = await pool.query(
-      `DELETE FROM gamification_question WHERE id = $1`,
-      [questionId]);
-    response.status(200).send("Gamification Question Delete Success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get all gamification levels
-async function getAllLevels (request, response) {
-  void (request);
-  try {
-    let resp = await pool.query(
-      `SELECT * from levels`)
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get all gamification levels
-async function getLevelById (request, response) {
-  const levelId = request.params.levelId;
-  try {
-    let resp = await pool.query(
-      `SELECT * from levels WHERE id = $1`, [levelId]);
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-}
-
-// Edit existing level data
-async function putLevel (request, response) {
-  const levelId = request.params.levelId;
-  const title = request.body.title;
-  const topicGroupId = request.body.topicGroupId;
-  const levelType = request.body.levelType;
-  const availableFrom = request.body.availableFrom;
-  const questionNumbers = request.body.questionNumbers;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  try {
-    let resp = await pool.query(
-      `UPDATE levels SET title = $1, topic_group_id = $2, typeoflevel = $3, 
-      availableFrom = $4, numberofquestions = $5, estimatedTimeRequired = $6
-      WHERE id = $7`, [title, topicGroupId, levelType, availableFrom, 
-      questionNumbers, estimatedTime, levelId]);
-    response.status(200).send("Update level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Delete level from id
-async function deleteLevel (request, response) {
-  const levelId = request.params.levelId;
-  try {
-    let resp = await pool.query(
-      `DELETE from levels WHERE id = $1`, [levelId]);
-    response.status(200).send("Delete level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Create new level 
-async function postLevel (request, response) {
-  const title = request.body.title;
-  const topicGroupId = request.body.topicGroupId;
-  const levelType = request.body.levelType;
-  const availableFrom = request.body.availableFrom;
-  const questionNumbers = request.body.questionNumbers;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  try {
-    let resp = await pool.query(
-      `INSERT INTO levels(id, title, topic_group_id, typeOfLevel, 
-        availableFrom, numberOfQuestions, estimatedTimeRequired) 
-      VALUES(default, $1, $2, $3, $4, $5, $6) RETURNING id`,
-      [title, topicGroupId, levelType, availableFrom, questionNumbers, estimatedTime]);
-
-    let insertLink = await pool.query(`INSERT INTO topic_group_levels(topic_group_id, levelsid) 
-    VALUES($1, $2)`, [topicGroupId, resp.rows[0].id]);
-    response.status(200).send("Post level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get all questions linked to level 
-async function getLevelQuestions (request, response) {
-  const levelName = request.params.level;
-
-  try {
-    let resp = await pool.query(
-      `SELECT array_agg(q.id) as questions_list
-      FROM gamification_question q
-      JOIN levels_questions lq ON lq.question_id = q.id
-      JOIN levels l ON l.title = $1 AND lq.level_id = l.id`,
-      [levelName]);
-
-      var finalQuery = resp.rows;
-
-      for (var object of finalQuery) { // Loop through list of topic groups
-        var questionsArr = [];
-  
-        for (const questionId of object.questions_list) {
-          let tmp = await pool.query(`SELECT * FROM gamification_question WHERE id = $1`, [questionId]);
-          questionsArr.push(tmp.rows[0]);
-        };
-  
-        object.questions_list = questionsArr;
-      }
-
-    response.status(200).json(finalQuery[0]);
-
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Remove level from topic group
-async function removeTGLevel (request, response) {
-  const topicGroupName = request.params.topicGroup;
-  const tgQuery = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [topicGroupName]);
-  const tgId = tgQuery.rows[0].id;
-  const level = request.params.level;
-
-  try {
-    let resp = await pool.query(
-      `DELETE FROM levels 
-      WHERE levels.title = $1 AND levels.id IN 
-      (SELECT levelsid from topic_group_levels WHERE topic_group_id = $2);`,
-      [level, tgId]);
-
-    response.status(200).send("Removed level from topic group");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Post new level for topic group
-async function postTGLevel (request, response) {
-  const title = request.body.title;
-  const topicGroupId = request.params.topicGroupId;
-  const levelType = request.body.levelType;
-  const availableFrom = request.body.availableFrom;
-  const questionNumbers = request.body.questionNumbers;
-  const estimatedTime = request.body.estimatedTimeRequired;
-
-  try {
-    let resp = await pool.query(
-      `INSERT INTO levels(id, title, topic_group_id, typeOfLevel, 
-        availableFrom, numberOfQuestions, estimatedTimeRequired) 
-      VALUES(default, $1, $2, $3, $4, $5, $6) RETURNING id`,
-      [title, topicGroupId, levelType, availableFrom, questionNumbers, estimatedTime]);
-
-    let insertLink = await pool.query(`INSERT INTO topic_group_levels(topic_group_id, levelsid) 
-    VALUES($1, $2)`, [topicGroupId, resp.rows[0].id]);
-
-    response.status(200).send("Post topic group level success");
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
-
-// Get list of levels for topic group
-async function getTGLevels (request, response) {
-  const topicGroupId = request.params.topicGroupId;
-  try {
-    let resp = await pool.query(
-      `SELECT l.id, l.title, l.topic_group_id, l.typeOfLevel, 
-      l.availableFrom, l.numberOfquestions, l.estimatedTimeRequired
-      FROM levels l 
-      JOIN topic_group_levels tgl ON tgl.levelsid = l.id AND tgl.topic_group_id = $1`, [topicGroupId])
-    response.status(200).json(resp.rows);
-  } catch(e) {
-    response.status(400).send(e);
-  }
-};
 
 /***************************************************************
                        Assessment Functions
@@ -2833,14 +2600,6 @@ module.exports = {
   putQuizById,
   getQuizQuestions,
   postQuiz,
-  getTGLevels,
-  postTGLevel,
-  removeTGLevel,
-  getLevelQuestions,
-  getUser,
-  postAdmin,
-  deleteUser,
-  deleteAdmin,
   getAllTopicGroups,
   getTopics,
   getTopicPreReqs,
@@ -2870,16 +2629,6 @@ module.exports = {
   postAnnouncement,
   postAnnouncementComment,
   getSearchAnnouncements,
-  getQuestions,
-  postQuestion,
-  getLevelFromQuestion,
-  putQuestion,
-  deleteQuestion,
-  getAllLevels,
-  getLevelById,
-  putLevel,
-  deleteLevel,
-  postLevel,
   postQuizQuestion,
   login,
   register,
@@ -2889,6 +2638,5 @@ module.exports = {
   getTag,
   getTopicFile,
   putTopicGroup,
-  putTopic,
-  lecturesTutorialsApi
+  putTopic
 };

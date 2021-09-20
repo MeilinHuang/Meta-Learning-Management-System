@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { 
     Box,
     Button,
@@ -113,7 +113,7 @@ function CourseDashboard({ match: { params: { code }}}) {
                 <Center width={{ base: '100%', lg: '80%' }}>
                     {/* Only show for admin/staff */}
                     <Button onClick={onOpen} leftIcon={buttonIcon} pr={{ base: '8px', md: '16px' }}>{buttonContents}</Button>
-                    <AddPostModal isOpen={isOpen} onClose={onClose} onSubmit={handleAddPostSubmit} />
+                    <AddPostModal isOpen={isOpen} onClose={onClose} onSubmit={handleAddPostSubmit} code={code} />
                     <Box as="form" onSubmit={handleSubmit} width="100%" ml={{ base: '16px', md: '24px'}}>
                         <InputGroup variant="outline">
                             <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>

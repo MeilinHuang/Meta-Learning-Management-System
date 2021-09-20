@@ -31,12 +31,14 @@ function ForumOverviewPage({ match: { params: { code }}}) {
     const [searchTerm, setSearchTerm] = useState('')
 
     useEffect(() => {
-        fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
-        fetch('http://localhost:8000/forum/pinned').then(r => r.json()).then(data => {
+        fetch(`http://localhost:8000/${code}/forum`).then(r => r.json()).then(data => {
+            setPosts(data)
+        })
+        fetch(`http://localhost:8000/${code}/forum/pinned`).then(r => r.json()).then(data => {
             setPinnedPosts(data)
             setShowPinned(!!data.length)
         })
-    }, [setPosts, setPinnedPosts, setShowPinned])
+    }, [setPosts, setPinnedPosts, setShowPinned, code])
 
     const buttonContents = useBreakpointValue({ base: '', md: 'Add Post' })
     const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null })
@@ -46,21 +48,21 @@ function ForumOverviewPage({ match: { params: { code }}}) {
         e.preventDefault()
 
         if (searchTerm === '') {
-            fetch('http://localhost:8000/forum').then(r => r.json()).then(data => {
+            fetch(`http://localhost:8000/${code}/forum`).then(r => r.json()).then(data => {
                 setPosts(data)
                 setShowPinned(!!data.length)
             })
             return
         }
 
-        fetch(`http://localhost:8000/forum/search/${searchTerm.toLowerCase()}`).then(r => r.json()).then(data => {
+        fetch(`http://localhost:8000/${code}/forum/search/${searchTerm.toLowerCase()}`).then(r => r.json()).then(data => {
             setPosts(data)
             setShowPinned(false)
         })
     }
 
     const handleAddPostSubmit = (formData) => {
-        fetch(`http://localhost:8000/forum/post`, {
+        fetch(`http://localhost:8000/${code}/forum/post`, {
             method: 'POST',
             body: formData,
             headers: {
@@ -68,7 +70,7 @@ function ForumOverviewPage({ match: { params: { code }}}) {
             }
         }).then(r => {
             if (r.status === 200) {
-                fetch('http://localhost:8000/forum').then(r => r.json()).then(data => setPosts(data))
+                fetch(`http://localhost:8000/${code}/forum`).then(r => r.json()).then(data => setPosts(data))
             } 
             // TODO: Handle error case
         })
@@ -79,7 +81,7 @@ function ForumOverviewPage({ match: { params: { code }}}) {
             <Flex justify="center">
                 <Center width={{ base: '100%', lg: '80%' }}>
                     <Button onClick={onOpen} leftIcon={buttonIcon} pr={{ base: '8px', md: '16px' }}>{buttonContents}</Button>
-                    <AddPostModal isOpen={isOpen} onClose={onClose} isForums onSubmit={handleAddPostSubmit} />
+                    <AddPostModal isOpen={isOpen} onClose={onClose} isForums onSubmit={handleAddPostSubmit} code={code} />
                     <Box as="form" onSubmit={handleSubmit} width="100%" ml={{ base: '16px', md: '24px'}}>
                         <InputGroup variant="outline">
                             <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
@@ -87,9 +89,9 @@ function ForumOverviewPage({ match: { params: { code }}}) {
                         </InputGroup>
                     </Box>
                 </Center>
-            </Flex>
-            <Filter />
-            <PostTableContainer posts={posts} pinnedPosts={pinnedPosts} showPinned={showPinned} code={code} />
+            </Flex>*
+            {/* <Filter code={code} /> */}
+            <PostTableContainer posts={posts} pinnedPosts={pinnedPosts} showPinned={showPinned} code={code} /> 
         </>
     )
 }

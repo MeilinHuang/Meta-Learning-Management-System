@@ -13,12 +13,15 @@ import { GrEdit, GrShare } from 'react-icons/gr'
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai"
 import { FaRegCheckCircle, FaCheckCircle } from 'react-icons/fa'
 import { TiArrowUpOutline, TiArrowUpThick } from 'react-icons/ti'
-import { ContentState, convertFromHTML } from 'draft-js'
+import { ContentState, EditorState } from 'draft-js'
 import AuthorDetails from '../AuthorDetails'
 import DraftEditor from '../DraftEditor/DraftEditor'
+import htmlToDraft from 'html-to-draftjs'
 import styles from './PostDetails.module.css'
 
-function PostDetails({ post: { attachments, author, post_id, published_date, description, isendorsed, num_of_upvotes, upvoters }, setPost}) {
+const dummyUser = 2
+
+function PostDetails({ post: { attachments, author, post_id, published_date, description, isendorsed, num_of_upvotes, upvoters, user_id }, setPost, code}) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState()
     const toast = useToast()
@@ -39,15 +42,16 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
     }
 
     const editPost = () => {
-        const markup = convertFromHTML(details)
-        const state = ContentState.createFromBlockArray(markup)
-        setEditorState(state)
+        const contentBlock = htmlToDraft(details)
+        const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks)
+        const editorState = EditorState.createWithContent(contentState);
+        setEditorState(editorState)
     }
 
     const handleSubmit = e => {
         e.preventDefault()
         fetch(
-            `http://localhost:8000/forum/post/${post_id}`,
+            `http://localhost:8000/${code}/forum/post/${post_id}`,
             {
                 method: 'PUT',
                 body: JSON.stringify({
@@ -60,7 +64,7 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
             }
         ).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
+                fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
             }
         }) // TODO: handle errors
         setEditorState('')
@@ -68,10 +72,10 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
 
     const handleEndorse = () => {
         fetch(
-            `http://localhost:8000/forum/post/endorse/${post_id}/${!isendorsed}`, { method: 'PUT' }
+            `http://localhost:8000/${code}/forum/post/endorse/${post_id}/${!isendorsed}`, { method: 'PUT' }
         ).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
+                fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
             }
             // TODO: handle errors
         })
@@ -91,9 +95,9 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
                             <InputGroup variant="filled" mr="8px" width="100%">
                                 <DraftEditor content={editorState} setDetails={setDetails} /> 
                             </InputGroup>
-                            <Flex flexDirection="column" justifyContent="space-between">
+                            <Flex flexDirection="column">
                                 <Button pr="8px" leftIcon={<AiOutlineClose />} onClick={() => setEditorState('')} />
-                                <Button pr="8px" mb="16px" height="160px" leftIcon={<AiOutlineSend />} form="editPost" type="submit" />
+                                <Button pr="8px" mb="16px" mt="8px" leftIcon={<AiOutlineSend />} form="editPost" type="submit" />
                             </Flex>
                         </Flex>
                     </form>
@@ -101,22 +105,19 @@ function PostDetails({ post: { attachments, author, post_id, published_date, des
                     <>
                         <Text className={styles.description} dangerouslySetInnerHTML={{ __html: details }} />
                         {!!attachments && !!attachments.length && attachments[0] !== null && attachments.map(image => getImage(image))}
-                        {isendorsed && (
-                            <Flex alignItems="center" mt="16px">
-                                <Icon h="13px" w="13px" mr="4px" color="green" as={FaCheckCircle} />
-                                <Text fontSize="13px" color="green" fontWeight="bold">This post is endorsed by staff</Text>
-                            </Flex>
-                        )}
                         <Divider my="16px" />
                         <Flex justifyContent="space-between">
                             <Flex>
                                 <Button leftIcon={<TiArrowUpOutline />}>{num_of_upvotes}</Button>
-                                <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} /> {/* ONLY SHOW IF USER IS STAFF */}
+                                {/* ONLY SHOW IF USER IS STAFF */}
+                                <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} /> 
                                 <Button pr="8px" leftIcon={<GrShare />} onClick={shareLink} ml="8px" />
                             </Flex>
-                            <Flex>
-                                <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
-                            </Flex>
+                            {user_id === dummyUser && (
+                                <Flex>
+                                    <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
+                                </Flex>
+                            )}
                         </Flex>
                     </>
             }
