@@ -1,10 +1,11 @@
 -- \i 'C:/Users/Dave/Desktop/COMP4973 - Thesis C/metalms/backend/db/sample_data.sql';
 
 -- Create Users
-INSERT INTO users(id, name, email, password, zid) values(default, 'David Nguyen', 'test1@test.com', 'passsword', 'z5166106');
-INSERT INTO users(id, name, email, password, zid) values(default, 'John Smith', 'test2@test.com', 'passsword', 'z5123821');
-INSERT INTO users(id, name, email, password, zid) values(default, 'Tutory Tutorer', 'test3@test.com', 'passsword', 'z5921738');
-INSERT INTO users(id, name, email, password, zid) values(default, 'Lecturey Lecturer', 'test4@test.com', 'passsword', 'z5928712');
+INSERT INTO users(id, name, email, password, zid, staff) values(default, 'David Nguyen', 'test1@test.com', 'passsword', 'z5166106', false);
+INSERT INTO users(id, name, email, password, zid, staff) values(default, 'John Smith', 'test2@test.com', 'passsword', 'z5123821', true);
+INSERT INTO users(id, name, email, password, zid, staff) values(default, 'Tutory Tutorer', 'test3@test.com', 'passsword', 'z5921738', true);
+INSERT INTO users(id, name, email, password, zid, staff) values(default, 'Lecturey Lecturer', 'test4@test.com', 'passsword', 'z5928712', false);
+INSERT INTO users(id, name, email, password, zid, staff) values(default, 'Daniel Ferraro', 'daniel@test.com', 'password', 'z5204902', true);
 
 -- Create Topic Groups invite codes
 INSERT INTO enroll_codes(id, code, topic_group_id) VALUES(default, 'aABc7J06', 1);

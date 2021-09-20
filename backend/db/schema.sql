@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS "users" (
   name TEXT NOT NULL,
   email TEXT NOT NULL,
   password TEXT NOT NULL,
-  zId TEXT NOT NULL
+  zId TEXT NOT NULL,
+  staff BOOLEAN NOT NULL
 );
 
 DROP TABLE IF EXISTS "topic_group" CASCADE;
