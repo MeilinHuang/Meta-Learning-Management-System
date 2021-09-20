@@ -23,7 +23,7 @@ function Filter({ code }) {
 
     useEffect(() => {
         if (!filteredTags.length) {
-            fetch(`http://localhost:8000/${code}forum`).then(r => r.json()).then(data => {
+            fetch(`http://localhost:8000/${code}/forum`).then(r => r.json()).then(data => {
                 setPosts(data)
                 setShowPinned(!!data.length)
             })
@@ -36,6 +36,7 @@ function Filter({ code }) {
         const filteredPosts = []
         tagNames.forEach(t => {
             fetch(`http://localhost:8000/${code}/forum/${t}`).then(r => r.json()).then(data => {
+                console.log(data)
                 filteredPosts.push(...data)
                 setPosts(filteredPosts)
             })

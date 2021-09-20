@@ -183,7 +183,6 @@ function PostTable({ isAdmin, posts: postData, code }) {
                             <Tr {...row.getRowProps()}>
                                 {
                                     row.cells.map(cell => {
-                                        console.log(cell.getCellProps())
                                         return <Td {...cell.getCellProps()} fontSize="15px">{cell.render("Cell")}</Td>
                                     })
                                 }
