@@ -59,6 +59,12 @@ INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Memory');
 INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Loops');
 INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, 1, 'Lists');
 
+-- Create Reserved Tags
+INSERT INTO reserved_tags(tag_id, name) VALUES(default, 'Announcement');
+INSERT INTO reserved_tags(tag_id, name) VALUES(default, 'Answered');
+INSERT INTO reserved_tags(tag_id, name) VALUES(default, 'Unanswered');
+INSERT INTO reserved_tags(tag_id, name) VALUES(default, 'Endorsed');
+
 -- Link tags
 INSERT INTO post_tags(post_id, tag_id) VALUES(1, 1);
 INSERT INTO post_tags(post_id, tag_id) VALUES(1, 2);

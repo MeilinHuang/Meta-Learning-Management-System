@@ -1381,13 +1381,21 @@ async function getAllTags (request, response) {
       if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
 
       const topicGroupId = topicGroupReq.rows[0].id;
-      resp = await pool.query(`SELECT * FROM tags WHERE topic_group_id = $1`, [topicGroupId]);
+      const tags = await pool.query(`SELECT * FROM tags WHERE topic_group_id = $1`, [topicGroupId]);
+
+      const reserved = await pool.query('SELECT * FROM reserved_tags')
+
+      resp = {
+        tags: tags.rows,
+        reserved_tags: reserved.rows
+      }
     } else { // No topic group specified (get all tags)
       resp = await pool.query(`SELECT * FROM tags`);
     }
 
-    response.status(200).json(resp.rows);
+    response.status(200).json(resp);
   } catch(e) {
+    console.log(e)
     response.status(400).send(e);
   }
 };
@@ -1415,6 +1423,14 @@ async function postTag (request, response) {
     if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
     const topicGroupId = topicGroupReq.rows[0].id;
 
+    let reservedTagCheck = await pool.query(`
+    select exists(select * from reserved_tags where lower(name) like lower($1))`, [tagName]);
+
+    if (reservedTagCheck.rows[0].exists) {
+      response.status(400).json({ error: `Tag '${tagName}' is a reserved tag name`});
+      return;
+    }
+
     let dupTagCheck = await pool.query(`
     select exists(select * from tags where lower(name) like lower($1) AND topic_group_id = $2)`, [tagName, topicGroupId]);
 
@@ -1433,6 +1449,14 @@ async function postTag (request, response) {
 // Update tag
 async function putTag (request, response) {
   try {
+    let reservedTagCheck = await pool.query(`
+    select exists(select * from reserved_tags where lower(name) like lower($1))`, [request.body.tagName]);
+
+    if (reservedTagCheck.rows[0].exists) {
+      response.status(400).json({ error: `Tag '${request.body.tagName}' is a reserved tag name`});
+      return;
+    }
+
     let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) 
     like lower($1))`, [request.body.tagName]);
 

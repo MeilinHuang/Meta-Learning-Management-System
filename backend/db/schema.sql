@@ -103,6 +103,12 @@ CREATE TABLE IF NOT EXISTS "topic_tags"(
   PRIMARY KEY(topic_id, tag_id)
 );
 
+DROP TABLE IF EXISTS "reserved_tags" CASCADE;
+CREATE TABLE IF NOT EXISTS "reserved_tags" (
+  tag_id SERIAL NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL
+);
+
 DROP TABLE IF EXISTS "replies" CASCADE;
 CREATE TABLE IF NOT EXISTS "replies" (
   reply_id SERIAL NOT NULL PRIMARY KEY,

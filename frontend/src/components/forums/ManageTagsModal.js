@@ -102,7 +102,6 @@ function ManageTagsModal({ isOpen, onClose, tags, setTags, code }) {
             if (r.status === 200) {
                 e.target.reset()
                 toast({
-                    title: r.error,
                     description: `Tag ${tagName} has been added`,
                     status: 'success',
                     duration: 3000,
@@ -116,7 +115,7 @@ function ManageTagsModal({ isOpen, onClose, tags, setTags, code }) {
             if (r && r.error) {
                 toast({
                     title: r.error,
-                    description: 'Please try again',
+                    description: 'Please try a different tag name',
                     status: 'error',
                     duration: 3000,
                     isClosable: true,
@@ -136,7 +135,7 @@ function ManageTagsModal({ isOpen, onClose, tags, setTags, code }) {
                     <Box height="250px" overflowY="scroll" mb="24px">
                         <Table variant="simple" size="sm">
                             <Tbody>
-                                {tags && tags[0] !== null && tags.map(tag => getRow(tag))}
+                                {tags && tags[0] !== null && tags.tags && tags.tags.map(tag => getRow(tag))}
                             </Tbody>
                         </Table>
                     </Box>
