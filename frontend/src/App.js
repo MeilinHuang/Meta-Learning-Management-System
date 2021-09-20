@@ -17,8 +17,7 @@ function App() {
         <ChakraProvider>
             <Router>
                 <Switch>
-                    <Route exact path="/topictree"><TopicGroupList /></Route>
-                    <Route exact path="/topictree/:topicGroup" component={TopicTree} />
+                    <Route exact path="/topictree"><TopicTree /></Route>
                     <Route exact path="/topictreelist"><TopicTreeList /></Route>
                     <Route path="/course-page/:code" ><CoursePage /></Route>
                     <Route path="/"><MainPage/></Route>

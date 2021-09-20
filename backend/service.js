@@ -246,6 +246,63 @@ async function getTopicGroup (request, response) {
 // Get topics of topic group
 async function getTopics (request, response) { 
   try {
+    const topicGroupName = request.params.topicGroupName;
+    let resp = await pool.query(
+      `SELECT array_agg(DISTINCT topics.id) AS topics_list
+      FROM topic_group tp_group 
+      JOIN topics ON topics.topic_group_id = tp_group.id
+      WHERE LOWER(tp_group.name) = LOWER($1)
+      GROUP BY tp_group.id;`, [topicGroupName]);
+
+    for (var object of resp.rows) { 
+      var topicArr = [];
+      var preReqsArr = [];
+      for (const topic_id of object.topics_list) {
+        let tmp = await pool.query(
+          `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(DISTINCT topic_files.id) as course_materials, 
+          array_agg(DISTINCT prerequisites.prereq) as prereqs
+          FROM topics 
+          FULL OUTER JOIN topic_files ON topic_files.topic_id = topics.id
+          FULL OUTER JOIN prerequisites ON prerequisites.topic = topics.id
+          WHERE topics.id = $1
+          GROUP BY topics.id`
+          , [topic_id]);
+
+        if (tmp.rows.length > 0) {
+          var courseMaterialsArr = [];
+          if (tmp.rows[0].course_materials[0] !== null) {
+            for (var material_id of tmp.rows[0].course_materials) {
+              let tmp2 = await pool.query(`SELECT * from topic_files WHERE id = $1`, [material_id]);
+              courseMaterialsArr.push(tmp2.rows[0]);
+            }
+          }
+          if (tmp.rows[0].prereqs[0] === null) {
+            tmp.rows[0].prereqs = [];
+          } else {
+            for (const preReqId of tmp.rows[0].prereqs) {
+              let tmp = await pool.query(`
+              SELECT t.id, t.name from topics t WHERE t.id = $1
+              `, [preReqId]);
+              preReqsArr.push(tmp.rows[0]);
+            }
+            tmp.rows[0].prereqs = preReqsArr;
+          }
+          tmp.rows[0].course_materials = courseMaterialsArr;
+          topicArr.push(tmp.rows[0]);
+        }
+      };
+
+      object.topics_list = topicArr;
+    }
+    response.status(200).json(resp.rows[0]);
+  } catch(e) {
+    response.status(400).send(e);
+  }
+}
+
+// Get topics of topic group
+async function getAllTopics (request, response) { 
+  try {
     let topicGroupResp = await pool.query(`SELECT name FROM topic_group`);
     console.log('topicGroupResp', topicGroupResp);
     let result = [];
@@ -2686,6 +2743,7 @@ module.exports = {
   deleteAdmin,
   getAllTopicGroups,
   getTopics,
+  getAllTopics,
   getTopicPreReqs,
   postPreReq,
   deletePreReq,

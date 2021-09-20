@@ -52,6 +52,10 @@ app.get('/topicGroup', async(request, response) => {
   await database.getAllTopicGroups(request, response);
 });
 
+app.get('/topicGroup/all', async(request, response) => {
+  await database.getAllTopics(request, response);
+});
+
 app.get('/topicGroup/:topicGroupName', async(request, response) => {
   await database.getTopicGroup(request, response);
 });

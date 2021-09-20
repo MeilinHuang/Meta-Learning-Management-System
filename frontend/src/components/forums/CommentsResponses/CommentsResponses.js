@@ -51,7 +51,7 @@ function CommentsResponses({ isComments, posts, post_id, setPost }) {
         })
     }
 
-    console.log(posts)
+    
 
     return (
         <Box width={{ base: '100%', lg: '80%' }} mt="24px" mb={isComments ? '32px' : ''} mx="auto" p="16px" borderRadius="8px" border="1px" borderColor="gray.300">

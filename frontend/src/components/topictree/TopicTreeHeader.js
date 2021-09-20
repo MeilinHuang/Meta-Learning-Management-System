@@ -48,7 +48,7 @@ const NavLink = ({ onClick, children, openUrl=true }) => (
 
 
   
-export default function TopicTreeHeader({id, topicGroupName='', view}) {
+export default function TopicTreeHeader({id, topicGroupName='', topicGroups, view}) {
     const history = useHistory();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [tempView, setTempView] = useState(view);
@@ -189,8 +189,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
                         as={'nav'}
                         spacing={4}
                         display={{ base: 'none', md: 'flex' }}>
-                        {topicGroupName !== '' ? 
-                        <>
+                        
                         <Link mt={1} px={2} py={1} color={'white'} rounded={'md'}
                             onClick={onOpenModal}>Add a Topic</Link>
                         <Box bg='white'  w={200}>
@@ -206,8 +205,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
                                 />
                             </FormControl>
                         </Box>
-                        </> : <></>
-                        }
+                        
                     </HStack>
                 </HStack>
                 <Flex alignItems={'center'} height="100%">
@@ -253,7 +251,7 @@ export default function TopicTreeHeader({id, topicGroupName='', view}) {
                 </Box>
             ) : null}
             </Box>
-            <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} topicGroupName={topicGroupName} />
+            <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} topicGroups={topicGroups}/>
             <TopicTreeViewResource data={selectedNode} isOpen={isOpenViewModal} onClose={onCloseViewModal} prereqs={listPrereqs} topicGroupName={topicGroupName} nodes={notListPrereqs} />
         </div>
     );

@@ -6,7 +6,7 @@ import { Button, Text, Heading, Box, Input, Flex, InputGroup, InputLeftElement, 
 import { SearchIcon, ArrowRightIcon } from '@chakra-ui/icons'
 import TopicTreeViewResource from "./TopicTreeViewResource.js"
 import { useDisclosure } from '@chakra-ui/hooks';
-import { backend_url, get_topics_url, get_topic_groups } from '../../Constants.js';
+import { backend_url, get_all_topics, get_topics_url, get_topic_groups } from '../../Constants.js';
 import { set } from 'draft-js/lib/DefaultDraftBlockRenderMap';
 
 var g;
@@ -19,11 +19,12 @@ function zoomed() {
     g.attr("transform", d3.event.transform);
 }
 
-export default function TopicTree({ match: { params: { topicGroup }}}) {
+export default function TopicTree() {
     const ref = useRef();
     const [data, setData] = useState([]);
     const [listPrereqs, setListPrereqs] = useState([]);
     const [notListPrereqs, setNotListPrereqs] = useState([]);
+    const [topicGroups, setTopicGroups] = useState([]);
     const [selectedNode, setSelectedNode] = useState({
         "id": 0,
         "title": "",
@@ -53,7 +54,9 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
             "nodes": [{}],
             "links": []
         };
+        let tempTopicGroups = [];
         for (let topicGroup of jsonData) {
+            tempTopicGroups.push({'label': topicGroup.name, 'value': topicGroup.name});
             expand[topicGroup.name] = false;
             for (let topic of topicGroup.topics_list) {
                 let node = {};
@@ -86,15 +89,16 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
                 }
             }
         }
-        
+        setTopicGroups(tempTopicGroups);
+        console.log('topicGroups', tempTopicGroups);
         
         return newJson;
     }
 
 
-    /* const getListOfPrerequisites = (id, data) => {
+    const getListOfPrerequisites = (id, data) => {
         
-        
+        console.log('data', data);
         let linksArray = [];
         for (let i = 0; i < data.links.length; i++) {
             if (data.links[i].target.id === id) {
@@ -122,7 +126,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
         setListPrereqs(prereqs);
         setNotListPrereqs(nodes);
         onOpenModal();
-    } */
+    }
 
     function init(data) {
         
@@ -259,21 +263,21 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
             .on("click", function() {
                 
                 let topicName = d3.select(this).text();
-                expand[topicName] = true;
-                init(data);
-                // let topicName = d3.select(this).text();
-                
-                // let nodeData = tempNodes.filter(function (dataValue) {
+                if (seenGroups.hasOwnProperty(topicName)) {
+                    expand[topicName] = true;
+                    init(data);
+                } else {
+                    let topicName = d3.select(this).text();
                     
-                //     return dataValue.title === topicName;
-                // });
-                
+                    let nodeData = tempNodes.filter(function (dataValue) {
+                        
+                        return dataValue.title === topicName;
+                    });
+                    
 
-                // setSelectedNode(nodeData[0]);
-                // getListOfPrerequisites(nodeData[0].id, data);
-
-
-
+                    setSelectedNode(nodeData[0]);
+                    getListOfPrerequisites(nodeData[0].id, data);
+                }
             });
         let radius = 30;
         circles = node.append("circle")
@@ -357,7 +361,7 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
             .force("center", d3.forceCenter(width / 2, height / 2));
 
         // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
-        fetch(get_topics_url(topicGroup))
+        fetch(get_all_topics())
         .then((res) => {
             return res.json();
         })
@@ -391,9 +395,9 @@ export default function TopicTree({ match: { params: { topicGroup }}}) {
 
     return (
         <div>
-            <TopicTreeHeader id="topic-tree-header" topicGroupName={topicGroup} view={"Graph View"}></TopicTreeHeader>
+            <TopicTreeHeader id="topic-tree-header" topicGroupName={""} topicGroups={topicGroups} view={"Graph View"}></TopicTreeHeader>
             <div id="graph" ref={ref} />
-            <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} topicGroupName={topicGroup} nodes={notListPrereqs} />
+            <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} topicGroupName={""} nodes={notListPrereqs} />
         </div>
     );
     

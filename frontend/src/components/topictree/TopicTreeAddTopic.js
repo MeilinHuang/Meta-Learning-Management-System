@@ -20,10 +20,11 @@ import {
 import Select from "./ChakraReactSelect.js";
 import { get_topics_url, post_new_topic_url, post_new_prereq } from "../../Constants.js";
 
-export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
+export default function TopicTreeAddTopic({isOpen, onClose, topicGroups}) {
 
 
     const [topics, setTopics] = useState([]);
+    const [topicGroupName, setTopicGroupName] = useState("");
     const [selectedTopics, setSelectedTopics] = useState([]);
     const [newTopicName, setNewTopicName] = useState("");
     const [showAlert, setShowAlert] = useState(false);
@@ -31,7 +32,7 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
 
     const convertToList = (jsonData) => {
         let tempTopics = [];
-        for (let topic of jsonData.result[0].topics_list) {
+        for (let topic of jsonData.topics_list) {
             topic['value'] = topic.name;
             topic['label'] = topic.name;
             tempTopics.push(topic);
@@ -44,6 +45,12 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
         
         setSelectedTopics(value);
     }
+
+    const onChangeTopicGroup = (value, action) => {
+        
+        setTopicGroupName(value.value);
+    }
+
 
     const onChangeNewName = (value) => {
         
@@ -105,7 +112,7 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
             });
         }
 
-    }, []);
+    }, [topicGroupName]);
     return (
         <>
         
@@ -127,6 +134,15 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroupName}) {
                         <FormControl mb={3} id="new-topic-name">
                             <FormLabel>Topic Name</FormLabel>
                             <Input onChange={onChangeNewName} placeholder="Enter topic name..." type="text" />
+                        </FormControl>
+                        <FormControl id="topic-group">
+                            <FormLabel>Topic Group</FormLabel>
+                            <Select
+                                name="topicGroups"
+                                options={topicGroups}
+                                placeholder="Select a Topic Group"
+                                size="sm" 
+                                onChange={onChangeTopicGroup} />
                         </FormControl>
                         <FormControl id="new-topic-dependencies">
                             <FormLabel>Select Topic Prerequisites</FormLabel>

@@ -31,7 +31,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState('')
     const toast = useToast()
-    console.log(isendorsed)
+    
 
     useEffect(() => {
         setDetails(comment || reply)
