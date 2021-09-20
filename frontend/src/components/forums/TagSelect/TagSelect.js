@@ -5,10 +5,24 @@ import makeAnimated from 'react-select/animated'
 import styles from './TagSelect.module.css'
 
 function TagSelect({ isFilter, setSelectedTags, tags }) {
-    const tagsList = tags.map(({ tag_id, name}) => ({ value: tag_id, label: name }))
-    
-    // Add default tags
-    // tagsList.push({ value: '000', label: 'Announcement'})
+    console.log(tags)
+    // if (!tags.length) {
+    //     return null
+    // }
+
+    const tagsList = tags.tags.map(({ tag_id, name}) => ({ value: tag_id, label: name }))
+    const reservedList = tags.reserved_tags.map(({ tag_id, name}) => ({ value: tag_id, label: name }))
+
+    const groupedOptions = [
+        {
+            label: 'Filters',
+            options: reservedList,
+        },
+        {
+            label: 'Tags',
+            options: tagsList,
+        }
+    ]
 
     const handleSelect = selectedTags => {
         let currentTags = []
@@ -22,7 +36,7 @@ function TagSelect({ isFilter, setSelectedTags, tags }) {
         <Select 
             className={classnames(styles.select, { [styles.filter]: isFilter })}
             isMulti
-            options={tagsList}
+            options={groupedOptions}
             components={makeAnimated()}
             placeholder={isFilter ? "Filter" : 'Select'}
             onChange={handleSelect}

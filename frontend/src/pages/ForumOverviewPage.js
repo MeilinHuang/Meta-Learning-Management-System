@@ -89,8 +89,8 @@ function ForumOverviewPage({ match: { params: { code }}}) {
                         </InputGroup>
                     </Box>
                 </Center>
-            </Flex>*
-            {/* <Filter code={code} /> */}
+            </Flex>
+            <Filter code={code} />
             <PostTableContainer posts={posts} pinnedPosts={pinnedPosts} showPinned={showPinned} code={code} /> 
         </>
     )

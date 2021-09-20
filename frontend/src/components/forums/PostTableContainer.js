@@ -11,7 +11,6 @@ import PostTable from './PostTable'
 
 function PostTableContainer({ pinnedPosts, posts, showPinned, code }) {
     // if isAdmin then show pin/unpin logo next to each post
-    console.log('posttabelcontainer', posts)
     return (
         <Accordion allowMultiple defaultIndex={[0, 1]} mx="auto" width={{ base: '100%', lg: '80%' }} borderColor="white">
             {showPinned && <AccordionItem>

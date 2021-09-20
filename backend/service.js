@@ -2243,6 +2243,7 @@ async function getAllTags(request, response) {
   try {
     let resp;
 
+<<<<<<< HEAD
     if (request.body.topicGroupName) {
       // If topic group specified then get tags for topic group only
       const topicGroupName = request.body.topicGroupName;
@@ -2264,6 +2265,29 @@ async function getAllTags(request, response) {
 
     response.status(200).json(resp.rows);
   } catch (e) {
+=======
+    if (request.params.topicGroup) { // If topic group specified then get tags for topic group only
+      const topicGroupName = request.params.topicGroup;
+      let topicGroupReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
+      if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
+
+      const topicGroupId = topicGroupReq.rows[0].id;
+      const tags = await pool.query(`SELECT * FROM tags WHERE topic_group_id = $1`, [topicGroupId]);
+
+      const reserved = await pool.query('SELECT * FROM reserved_tags')
+
+      resp = {
+        tags: tags.rows,
+        reserved_tags: reserved.rows
+      }
+    } else { // No topic group specified (get all tags)
+      resp = await pool.query(`SELECT * FROM tags`);
+    }
+
+    response.status(200).json(resp);
+  } catch(e) {
+    console.log(e)
+>>>>>>> 73efb3c69699a8b764d28cce961f9fc5b40af9ae
     response.status(400).send(e);
   }
 }
@@ -2286,6 +2310,7 @@ async function getTag(request, response) {
 async function postTag(request, response) {
   try {
     const tagName = request.body.tagName;
+<<<<<<< HEAD
     const topicGroupName = request.body.topicGroupName;
 
     const topicGroupReq = await pool.query(
@@ -2302,6 +2327,25 @@ async function postTag(request, response) {
     select exists(select * from tags where lower(name) like lower($1) AND topic_group_id = $2)`,
       [tagName, topicGroupId]
     );
+=======
+    const topicGroupName = request.params.topicGroup;
+    
+    const topicGroupReq = await pool.query(`SELECT id FROM topic_group 
+    WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
+    if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
+    const topicGroupId = topicGroupReq.rows[0].id;
+
+    let reservedTagCheck = await pool.query(`
+    select exists(select * from reserved_tags where lower(name) like lower($1))`, [tagName]);
+
+    if (reservedTagCheck.rows[0].exists) {
+      response.status(400).json({ error: `Tag '${tagName}' is a reserved tag name`});
+      return;
+    }
+
+    let dupTagCheck = await pool.query(`
+    select exists(select * from tags where lower(name) like lower($1) AND topic_group_id = $2)`, [tagName, topicGroupId]);
+>>>>>>> 73efb3c69699a8b764d28cce961f9fc5b40af9ae
 
     if (dupTagCheck.rows[0].exists) {
       response.status(400).json({
@@ -2323,11 +2367,24 @@ async function postTag(request, response) {
 // Update tag
 async function putTag(request, response) {
   try {
+<<<<<<< HEAD
     let dupTagCheck = await pool.query(
       `select exists(select * from tags where lower(name) 
     like lower($1))`,
       [request.body.tagName]
     );
+=======
+    let reservedTagCheck = await pool.query(`
+    select exists(select * from reserved_tags where lower(name) like lower($1))`, [request.body.tagName]);
+
+    if (reservedTagCheck.rows[0].exists) {
+      response.status(400).json({ error: `Tag '${request.body.tagName}' is a reserved tag name`});
+      return;
+    }
+
+    let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) 
+    like lower($1))`, [request.body.tagName]);
+>>>>>>> 73efb3c69699a8b764d28cce961f9fc5b40af9ae
 
     if (dupTagCheck.rows[0].exists) {
       response.status(400).json({ error: `Tag '${tagName}' already exists` });
