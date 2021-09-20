@@ -1404,6 +1404,58 @@
         }
       }
     },
+    "/user/{userId}/progress": {
+      "put": {
+        "tags": [ "User" ],
+        "summary": "Update user progress for topic group",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Put user progress body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutUserProgress"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/{topicGroup}/announcement": {
       "get": {
         "tags": [
@@ -3037,17 +3089,17 @@
           "Forums"
         ],
         "summary": "Get list of all tags",
-        "parameters": [
-          {
-            "name": "topicGroup",
-            "in": "path",
-            "description": "Name of topic group to get forums posts for",
-            "required": true,
-            "schema": {
-              "type": "string"
+        "requestBody": {
+          "description": "Body with topic group name",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetTopicGroupTags"
+              }
             }
-          }
-        ],
+          },
+          "required": false
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -3077,7 +3129,8 @@
               }
             }
           }
-        }
+        },
+        "x-codegen-request-body-name": "tagName"
       },
       "post": {
         "tags": [
@@ -4958,6 +5011,28 @@
         },
         "description": "Forbidden"
       },
+      "PutUserProgress": {
+        "type": "object",
+        "properties": {
+          "topicGroupName": {
+            "type": "string",
+            "example": "C++ Programming"
+          },
+          "progressVal": {
+            "type": "float",
+            "example": 50.5
+          }
+        }
+      },
+      "GetTopicGroupTags": {
+        "type": "object",
+        "properties": {
+          "topicGroupName": {
+            "type": "string",
+            "example": "C++ Programming"
+          }
+        }
+      },
       "PostTutorial": {
         "type": "object",
         "properties": {
@@ -5350,6 +5425,10 @@
       "ForumTag": {
         "type": "object",
         "properties": {
+          "topicGroupName": {
+            "type": "string",
+            "example": "C++ Programming"
+          },
           "tagName": {
             "type": "string",
             "example": "FinalExam"

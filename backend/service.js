@@ -6,70 +6,6 @@ const pool = require('./db/database');
 var fs = require('fs');
 
 /***************************************************************
-                       User Functions
-***************************************************************/
-
-async function getUser(request, response) {
-  try {
-    const id = parseInt(request.params.userId);
-    let resp = await pool.query(
-      `SELECT id, zid, u.name AS user_name, t.enrolled_courses 
-      FROM users u 
-      LEFT JOIN (SELECT us.user_id AS id, array_agg(t.id) 
-      AS enrolled_courses FROM user_enrolled us 
-      LEFT JOIN topic_group t ON t.id = us.topic_group_id 
-      GROUP BY us.user_id) t USING (id) WHERE id = $1`,
-      [id]);
-    var holderArr = [];
-
-    if (resp.rows[0].enrolled_courses) {
-      for (const topic_id of resp.rows[0].enrolled_courses) {
-        let tmp = await pool.query(`SELECT * FROM topic_group WHERE id = $1`, [topic_id]);
-        holderArr.push(tmp.rows[0]);
-      };
-      resp.rows[0].enrolled_courses = holderArr;
-    }
-    
-    response.status(200).json(resp.rows[0]);
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-const deleteUser = (request, response) => {
-  const id = parseInt(request.params.userId)
-
-  pool.query('DELETE FROM users WHERE id = $1 CASCADE', [id], (error, results) => {
-    if (error) { throw error }
-    response.status(200).send(`User deleted with ID: ${id}`)
-  })
-}
-
-const postAdmin = (request, response) => {
-  const id = parseInt(request.params.userId);
-  const topicGroupId = parseInt(request.params.topicGroupId);
-
-  pool.query(
-    'INSERT INTO user_admin(admin_id, topic_group_id) VALUES($1, $2)',
-    [id, topicGroupId],
-    (error, results) => {
-      if (error) { throw error }
-      response.status(200).send(`Admin added with ID: ${id}`)
-    }
-  )
-}
-
-const deleteAdmin = (request, response) => {
-  const id = parseInt(request.params.userId)
-
-  pool.query('DELETE FROM user_admin WHERE admin_id = $1 CASCADE', 
-  [id], (error, results) => {
-    if (error) { throw error }
-    response.status(200).send(`User deleted with ID: ${id}`)
-  })
-}
-
-/***************************************************************
                        Topic Group Functions
 ***************************************************************/
 
@@ -1425,28 +1361,38 @@ async function putPostPin (request, response) {
     const postId = request.params.postId;
     const isPinned = request.params.isPinned;
 
-    let resp = await pool.query(`UPDATE forum_posts SET ispinned = $1 WHERE post_id = $2`,
+    await pool.query(`UPDATE forum_posts SET ispinned = $1 WHERE post_id = $2`,
     [isPinned, postId]);
 
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.send(e);
+    response.status(400).send(e);
   }
 }
 
-// Gets all tags
+// Gets all tags (topic group or ALL)
 async function getAllTags (request, response) {
-  void (request);
   try {
-    let resp = await pool.query(`SELECT * FROM tags`);
+    let resp;
+
+    if (request.body.topicGroupName) { // If topic group specified then get tags for topic group only
+      const topicGroupName = request.body.topicGroupName;
+      let topicGroupReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
+      if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
+
+      const topicGroupId = topicGroupReq.rows[0].id;
+      resp = await pool.query(`SELECT * FROM tags WHERE topic_group_id = $1`, [topicGroupId]);
+    } else { // No topic group specified (get all tags)
+      resp = await pool.query(`SELECT * FROM tags`);
+    }
+
     response.status(200).json(resp.rows);
   } catch(e) {
-    response.status(400)
-    response.send(e);
+    response.status(400).send(e);
   }
 };
 
+// Gets one tag
 async function getTag (request, response) {
   try {
     const tagId = request.params.tagId;
@@ -1462,18 +1408,25 @@ async function getTag (request, response) {
 async function postTag (request, response) {
   try {
     const tagName = request.body.tagName;
-    let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) like lower($1))`, [tagName]);
+    const topicGroupName = request.body.topicGroupName;
+    
+    const topicGroupReq = await pool.query(`SELECT id FROM topic_group 
+    WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
+    if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
+    const topicGroupId = topicGroupReq.rows[0].id;
+
+    let dupTagCheck = await pool.query(`
+    select exists(select * from tags where lower(name) like lower($1) AND topic_group_id = $2)`, [tagName, topicGroupId]);
 
     if (dupTagCheck.rows[0].exists) {
-      response.status(400).json({ error: `Tag '${tagName}' already exists`})
-      return
+      response.status(400).json({ error: `Tag '${tagName}' already exists for topic group '${topicGroupName}`});
+      return;
     } 
 
-    let resp = await pool.query(`INSERT INTO tags(tag_id, name) VALUES(default, $1)`, [tagName]);
+    await pool.query(`INSERT INTO tags(tag_id, topic_group_id, name) VALUES(default, $1, $2)`, [topicGroupId, tagName]);
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.json(e);
+    response.status(400).send(e);
   } 
 };
 
@@ -1488,12 +1441,11 @@ async function putTag (request, response) {
       return
     } 
 
-    let resp = await pool.query(`UPDATE tags SET name = $1 WHERE tag_id = $2`, 
+    await pool.query(`UPDATE tags SET name = $1 WHERE tag_id = $2`, 
     [request.body.tagName, request.params.tagId]);
     response.sendStatus(200);
   } catch(e) {
-    response.status(400);
-    response.json(e);
+    response.status(400).send(e);
   } 
 };
 
@@ -2410,10 +2362,6 @@ module.exports = {
   putQuizById,
   getQuizQuestions,
   postQuiz,
-  getUser,
-  postAdmin,
-  deleteUser,
-  deleteAdmin,
   getAllTopicGroups,
   getTopics,
   getTopicPreReqs,
@@ -2448,5 +2396,5 @@ module.exports = {
   getTag,
   getTopicFile,
   putTopicGroup,
-  putTopic,
+  putTopic
 };

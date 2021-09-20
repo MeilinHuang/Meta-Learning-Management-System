@@ -23,6 +23,10 @@ function CoursePage() {
             name: 'Enrolments',
             url: '/enrolments',
         },
+        {
+            name: 'Gamification',
+            url: '/gamification',
+        },
     ]
     const smVariant = 'drawer'
     const mdVariant = 'sidebar'

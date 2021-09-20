@@ -26,6 +26,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 const database = require('./service.js');
 const lectureTutorial = require('./api/lecturesTutorials');
+const users = require('./api/user');
 
 /***************************************************************
                        Auth Functions
@@ -40,14 +41,18 @@ app.post('/auth/logout');
 ***************************************************************/
 
 app.get('/user/:userId', async(request, response) => {
-  await database.getUser(request, response);
+  await users.getUser(request, response);
 });
 
-app.delete('/user/:userId', database.deleteUser);
+app.delete('/user/:userId', users.deleteUser);
 
-app.post('/user/:userId/:topicGroupId', database.postAdmin);
+app.post('/user/:userId/:topicGroupId', users.postAdmin);
 
-app.delete('/user/:userId/:topicGroupId', database.deleteAdmin);
+app.delete('/user/:userId/:topicGroupId', users.deleteAdmin);
+
+app.put('/user/:userId/progress', async(request, response) => {
+  await users.putUserProgress(request, response);
+})
 
 /***************************************************************
                        Topic Group Functions
