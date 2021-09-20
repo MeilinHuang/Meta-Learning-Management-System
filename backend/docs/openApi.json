@@ -3089,17 +3089,17 @@
           "Forums"
         ],
         "summary": "Get list of all tags",
-        "requestBody": {
-          "description": "Body with topic group name",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GetTopicGroupTags"
-              }
+        "parameters": [
+          {
+            "name": "topicGroup",
+            "in": "path",
+            "description": "Name of topic group to get forum post for",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
-          },
-          "required": false
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5425,10 +5425,6 @@
       "ForumTag": {
         "type": "object",
         "properties": {
-          "topicGroupName": {
-            "type": "string",
-            "example": "C++ Programming"
-          },
           "tagName": {
             "type": "string",
             "example": "FinalExam"

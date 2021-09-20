@@ -1375,8 +1375,8 @@ async function getAllTags (request, response) {
   try {
     let resp;
 
-    if (request.body.topicGroupName) { // If topic group specified then get tags for topic group only
-      const topicGroupName = request.body.topicGroupName;
+    if (request.params.topicGroup) { // If topic group specified then get tags for topic group only
+      const topicGroupName = request.params.topicGroup;
       let topicGroupReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
       if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
 
@@ -1408,7 +1408,7 @@ async function getTag (request, response) {
 async function postTag (request, response) {
   try {
     const tagName = request.body.tagName;
-    const topicGroupName = request.body.topicGroupName;
+    const topicGroupName = request.params.topicGroup;
     
     const topicGroupReq = await pool.query(`SELECT id FROM topic_group 
     WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
