@@ -25,6 +25,7 @@ export default function TopicTree() {
     const [listPrereqs, setListPrereqs] = useState([]);
     const [notListPrereqs, setNotListPrereqs] = useState([]);
     const [topicGroups, setTopicGroups] = useState([]);
+    const [selectedTopicGroup, setSelectedTopicGroup] = useState("");
     const [selectedNode, setSelectedNode] = useState({
         "id": 0,
         "title": "",
@@ -97,14 +98,15 @@ export default function TopicTree() {
 
 
     const getListOfPrerequisites = (id, data) => {
-        
+        console.log('id', id);
         console.log('data', data);
         let linksArray = [];
         for (let i = 0; i < data.links.length; i++) {
-            if (data.links[i].target.id === id) {
-                linksArray.push(data.links[i].source.id);
+            if (data.links[i].target === id) {
+                linksArray.push(data.links[i].source);
             }
         }
+        console.log('linksArray', linksArray);
         
         let prereqs = [];
         let nodes = [];
@@ -118,10 +120,11 @@ export default function TopicTree() {
                     break;
                 }
             }
-            if (!found && data.nodes[i].id !== undefined && data.nodes[i].title !== undefined && data.nodes[i].id !== id) {
+            if (!found && data.nodes[i].hasOwnProperty('id') && data.nodes[i].hasOwnProperty('title') && data.nodes[i].id !== id) {
                 nodes.push({'value': data.nodes[i].id.toString(), 'label': data.nodes[i].title});
             }
         }
+        console.log('prereqs', prereqs);
         
         setListPrereqs(prereqs);
         setNotListPrereqs(nodes);
@@ -173,13 +176,15 @@ export default function TopicTree() {
                     'id': node.id,
                     'name': node.title,
                     'title': node.title,
-                    'type': 'topic'
+                    'type': 'topic',
+                    'materials_strings': node.materials_strings
                 });
                 tempNodes.push({
                     'id': node.id,
                     'name': node.title,
                     'title': node.title,
-                    'type': 'topic'
+                    'type': 'topic',
+                    'materials_strings': node.materials_strings
                 });
             }
             nodeDict[node.id] = node;
@@ -274,8 +279,9 @@ export default function TopicTree() {
                         return dataValue.title === topicName;
                     });
                     
-
+                    console.log('node', nodeData[0]);
                     setSelectedNode(nodeData[0]);
+                    setSelectedTopicGroup(nodeData[0].group);
                     getListOfPrerequisites(nodeData[0].id, data);
                 }
             });
@@ -395,9 +401,9 @@ export default function TopicTree() {
 
     return (
         <div>
-            <TopicTreeHeader id="topic-tree-header" topicGroupName={""} topicGroups={topicGroups} view={"Graph View"}></TopicTreeHeader>
+            <TopicTreeHeader id="topic-tree-header" topicGroups={topicGroups} view={"Graph View"}></TopicTreeHeader>
             <div id="graph" ref={ref} />
-            <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} topicGroupName={""} nodes={notListPrereqs} />
+            <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} topicGroupName={selectedTopicGroup} nodes={notListPrereqs} />
         </div>
     );
     
