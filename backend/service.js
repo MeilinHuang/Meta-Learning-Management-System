@@ -100,89 +100,6 @@ async function register(request, response) {
   }
 }
 
-// API
-const lecturesTutorialsApi = require("./api/lecturesTutorials");
-
-/***************************************************************
-                       User Functions
-***************************************************************/
-
-async function getUser(request, response) {
-  try {
-    const id = parseInt(request.params.userId);
-    let resp = await pool.query(
-      `SELECT id, zid, u.name AS user_name, t.enrolled_courses 
-      FROM users u 
-      LEFT JOIN (SELECT us.user_id AS id, array_agg(t.id) 
-      AS enrolled_courses FROM user_enrolled us 
-      LEFT JOIN topic_group t ON t.id = us.topic_group_id 
-      GROUP BY us.user_id) t USING (id) WHERE id = $1`,
-      [id]
-    );
-    var holderArr = [];
-
-    if (resp.rows[0].enrolled_courses) {
-      for (const topic_id of resp.rows[0].enrolled_courses) {
-        let tmp = await pool.query(`SELECT * FROM topic_group WHERE id = $1`, [
-          topic_id,
-        ]);
-        holderArr.push(tmp.rows[0]);
-      }
-      resp.rows[0].enrolled_courses = holderArr;
-    }
-
-    response.status(200).json(resp.rows[0]);
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-const deleteUser = (request, response) => {
-  const id = parseInt(request.params.userId);
-
-  pool.query(
-    "DELETE FROM users WHERE id = $1 CASCADE",
-    [id],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      response.status(200).send(`User deleted with ID: ${id}`);
-    }
-  );
-};
-
-const postAdmin = (request, response) => {
-  const id = parseInt(request.params.userId);
-  const topicGroupId = parseInt(request.params.topicGroupId);
-
-  pool.query(
-    "INSERT INTO user_admin(admin_id, topic_group_id) VALUES($1, $2)",
-    [id, topicGroupId],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      response.status(200).send(`Admin added with ID: ${id}`);
-    }
-  );
-};
-
-const deleteAdmin = (request, response) => {
-  const id = parseInt(request.params.userId);
-
-  pool.query(
-    "DELETE FROM user_admin WHERE admin_id = $1 CASCADE",
-    [id],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      response.status(200).send(`User deleted with ID: ${id}`);
-    }
-  );
-};
-
 /***************************************************************
                        Topic Group Functions
 ***************************************************************/
@@ -2243,29 +2160,6 @@ async function getAllTags(request, response) {
   try {
     let resp;
 
-<<<<<<< HEAD
-    if (request.body.topicGroupName) {
-      // If topic group specified then get tags for topic group only
-      const topicGroupName = request.body.topicGroupName;
-      let topicGroupReq = await pool.query(
-        `SELECT id FROM topic_group WHERE LOWER(name) LIKE LOWER($1)`,
-        [topicGroupName]
-      );
-      if (!topicGroupReq.rows.length)
-        throw `Topic Group '${topicGroupName}' does not exist`;
-
-      const topicGroupId = topicGroupReq.rows[0].id;
-      resp = await pool.query(`SELECT * FROM tags WHERE topic_group_id = $1`, [
-        topicGroupId,
-      ]);
-    } else {
-      // No topic group specified (get all tags)
-      resp = await pool.query(`SELECT * FROM tags`);
-    }
-
-    response.status(200).json(resp.rows);
-  } catch (e) {
-=======
     if (request.params.topicGroup) { // If topic group specified then get tags for topic group only
       const topicGroupName = request.params.topicGroup;
       let topicGroupReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
@@ -2287,7 +2181,6 @@ async function getAllTags(request, response) {
     response.status(200).json(resp);
   } catch(e) {
     console.log(e)
->>>>>>> 73efb3c69699a8b764d28cce961f9fc5b40af9ae
     response.status(400).send(e);
   }
 }
@@ -2310,24 +2203,6 @@ async function getTag(request, response) {
 async function postTag(request, response) {
   try {
     const tagName = request.body.tagName;
-<<<<<<< HEAD
-    const topicGroupName = request.body.topicGroupName;
-
-    const topicGroupReq = await pool.query(
-      `SELECT id FROM topic_group 
-    WHERE LOWER(name) LIKE LOWER($1)`,
-      [topicGroupName]
-    );
-    if (!topicGroupReq.rows.length)
-      throw `Topic Group '${topicGroupName}' does not exist`;
-    const topicGroupId = topicGroupReq.rows[0].id;
-
-    let dupTagCheck = await pool.query(
-      `
-    select exists(select * from tags where lower(name) like lower($1) AND topic_group_id = $2)`,
-      [tagName, topicGroupId]
-    );
-=======
     const topicGroupName = request.params.topicGroup;
     
     const topicGroupReq = await pool.query(`SELECT id FROM topic_group 
@@ -2345,7 +2220,6 @@ async function postTag(request, response) {
 
     let dupTagCheck = await pool.query(`
     select exists(select * from tags where lower(name) like lower($1) AND topic_group_id = $2)`, [tagName, topicGroupId]);
->>>>>>> 73efb3c69699a8b764d28cce961f9fc5b40af9ae
 
     if (dupTagCheck.rows[0].exists) {
       response.status(400).json({
@@ -2367,13 +2241,6 @@ async function postTag(request, response) {
 // Update tag
 async function putTag(request, response) {
   try {
-<<<<<<< HEAD
-    let dupTagCheck = await pool.query(
-      `select exists(select * from tags where lower(name) 
-    like lower($1))`,
-      [request.body.tagName]
-    );
-=======
     let reservedTagCheck = await pool.query(`
     select exists(select * from reserved_tags where lower(name) like lower($1))`, [request.body.tagName]);
 
@@ -2384,7 +2251,6 @@ async function putTag(request, response) {
 
     let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) 
     like lower($1))`, [request.body.tagName]);
->>>>>>> 73efb3c69699a8b764d28cce961f9fc5b40af9ae
 
     if (dupTagCheck.rows[0].exists) {
       response.status(400).json({ error: `Tag '${tagName}' already exists` });
