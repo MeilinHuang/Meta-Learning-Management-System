@@ -22,7 +22,8 @@ import {
 import { GrEdit, GrShare } from 'react-icons/gr'
 import { BiTrash } from 'react-icons/bi'
 import { AiOutlineSend } from "react-icons/ai"
-import { ContentState, convertFromHTML } from 'draft-js'
+import { ContentState, EditorState } from 'draft-js'
+import htmlToDraft from 'html-to-draftjs'
 import DraftEditor from '../../forums/DraftEditor/DraftEditor'
 import AuthorDetails from '../../forums/AuthorDetails'
 import AddPostModal from '../../forums/AddPostModal'
@@ -50,9 +51,10 @@ function Announcement({ announcement: { attachments, author, id, title, content,
     }
 
     const editPost = () => {
-        const markup = convertFromHTML(details)
-        const state = ContentState.createFromBlockArray(markup)
-        setEditorState(state)
+        const contentBlock = htmlToDraft(details)
+        const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks)
+        const editorState = EditorState.createWithContent(contentState);
+        setEditorState(editorState)
     }
 
     const handleSubmit = e => {

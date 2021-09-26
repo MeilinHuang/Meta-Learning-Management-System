@@ -23,6 +23,10 @@ function CoursePage() {
             name: 'Enrolments',
             url: '/enrolments',
         },
+        {
+            name: 'Gamification',
+            url: '/gamification',
+        },
     ]
     const smVariant = 'drawer'
     const mdVariant = 'sidebar'
@@ -38,7 +42,7 @@ function CoursePage() {
                     <WidgetsBar page="main"></WidgetsBar>
                 </Box>
             </Box>
-            <Flex marginLeft={[0, 0, 200, 200]} marginRight={[0, 0, 0, 200]}>
+            <Flex marginLeft={[0, 0, 250, 250]} marginRight={[0, 0, 0, 250]}>
                 <Container marginTop={50} mx={{ base: "0", md: "24px"}} maxWidth="100%">
                     <Switch>
                         {/* Add your page as a Route here */}
