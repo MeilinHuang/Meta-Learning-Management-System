@@ -28,7 +28,7 @@ import {
     ListItem
 } from "@chakra-ui/react";
 import Select from "./ChakraReactSelect.js";
-import { delete_topic_url, delete_prereqs, add_prereqs } from "../../Constants";
+import { delete_topic_url, delete_prereqs, add_prereqs, update_topic } from "../../Constants";
 
 
 export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, topicGroupName, nodes}) {
@@ -36,6 +36,8 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
   const [hasDeleted, setHasDelete] = useState(false);
   const [showAddPrereqBox, setShowAddPrereqBox] = useState(false);
   const [notPrereqs, setNotPrereqs] = useState([]);
+  const [files, setFiles] = useState({});
+
   useEffect(() => {
     setTempPrereqs(prereqs);
   }, [prereqs]);
@@ -75,6 +77,26 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
         'preReqId': prereqToDelete.id,
         'topicId': data.id
       }),
+    });
+  }
+
+  const handleUpload = (e, typeOfFile) => {
+    e.preventDefault();
+    let tempFiles = JSON.parse(JSON.stringify(files));
+    tempFiles[typeOfFile] = e.target.files[0];
+    setFiles(tempFiles);
+    console.log(e.target.files[0])
+  }
+
+  const uploadFile = async (e, typeOfFile) => {
+    const formData = new FormData();
+    formData.append('name', data.title);
+    formData.append('uploadFile', files[typeOfFile]);
+    formData.append('uploadedFileTypes', 'pdf');
+
+    await fetch(update_topic(topicGroupName, data.title), {
+      method: 'PUT',
+      body: formData
     });
   }
 
@@ -203,7 +225,11 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                 </Tbody>
               </Table>
               {data.materials_strings[typeOfFile.toLowerCase()].length == 0 ? <h6>No files here!</h6> : <></>}
-              <Button colorScheme="blue" mt={3}>Upload file</Button>
+              <Flex flexDirection="column" mb="16px">
+                  <input type="file" name="images" onChange={(e) => handleUpload(e, typeOfFile)} />
+                  <Button colorScheme="blue" mt={3} onClick={(e) => uploadFile(e, typeOfFile)}>Upload file</Button>
+              </Flex>
+              
               </Box>
             )})}
           </Box>

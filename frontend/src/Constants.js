@@ -41,3 +41,8 @@ export function get_topic_group(topicGroupName) {
 export function get_topic_groups() {
     return backend_url + "topicGroup/";
 }
+
+export function update_topic(topicGroupName, topicName) {
+    return backend_url + "topicGroup/" + topicGroupName + "/topic/" + topicName;
+
+}
