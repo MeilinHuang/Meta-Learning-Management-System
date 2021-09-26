@@ -128,7 +128,7 @@ export default function TopicTreeList() {
 
     let pageView = null;
     if (data != null) {
-        console.log(data)
+        
         //Data is a list of topic groups
         pageView = (
         <Box>
@@ -190,7 +190,7 @@ export default function TopicTreeList() {
                                                 // would remove the need to fetch everytime
                                                 return (
                                                     <Flex key={e.name + " " + topic.name} justifyContent="flex-start" padding={5} cursor="pointer" _hover={{bg:"gray.100", fontWeight:"medium"}} onClick={() => {
-                                                        console.log(topic.course_materials[0])
+                                                        
                                                         fetch(get_prereqs(e.name, topic.name)).then(x => x.json()).then(x => {
                                                             let matList = {"preparation": [], "content": [], "practice": [], "assessment": []}
                                                             topic.course_materials.map(mat => {

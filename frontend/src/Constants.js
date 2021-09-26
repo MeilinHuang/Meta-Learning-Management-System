@@ -6,6 +6,10 @@ export function get_topics_url(topicGroupName) {
     return backend_url + "topicGroup/" + topicGroupName + "/topic";
 }
 
+export function get_all_topics() {
+    return backend_url + "topicGroup/all";
+}
+
 export function post_new_topic_url(topicGroupName, newTopicName) {
     return backend_url + "topicGroup/" + topicGroupName + "/topic/" + newTopicName;
 }

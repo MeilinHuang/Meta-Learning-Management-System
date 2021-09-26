@@ -22,8 +22,6 @@ function App() {
                     <Route exact path="/topictree"><TopicTree /></Route>
                     <Route exact path="/login"><LoginForm /></Route>
                     <Route path="/invite/:code?"><CourseInvite/></Route>
-                    <Route exact path="/topictree"><TopicGroupList /></Route>
-                    <Route exact path="/topictree/:topicGroup" component={TopicTree} />
                     <Route exact path="/topictreelist"><TopicTreeList /></Route>
                     <Route path="/course-page/:code" ><CoursePage /></Route>
                     <Route path="/"><MainPage/></Route>
