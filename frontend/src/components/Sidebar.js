@@ -1,4 +1,4 @@
-import React, { useState} from "react"
+import React, { useEffect, useState} from "react"
 import { useHistory } from 'react-router-dom'
 import { Stack, Text, Box, Flex, Drawer, DrawerOverlay, DrawerCloseButton, DrawerContent, Select, Avatar, DrawerHeader, Menu, MenuButton, Portal, MenuList, MenuItem} from "@chakra-ui/react"
 import { ChevronDownIcon, ArrowBackIcon, HamburgerIcon } from '@chakra-ui/icons'
@@ -36,41 +36,117 @@ function SidebarContent({history, links}) {
 
 function Sidebar({links, isOpen, setOpen, variant, page}) {
     const history = useHistory()
-    const [code, setCode] = useState("")
-
-    let title = (
+    const [drawer_header, setDrawer] = useState(null)
+    const [title, setTitle] = useState((
         <Flex flexDirection="column" bg="blue.500" color="white" height={90} textAlign="left" justifyContent="center">
             <Box marginLeft={1} padding={4} fontSize="x-large">
                 <Text fontWeight="medium" letterSpacing="wider">MetaLMS</Text>
             </Box>
         </Flex>
-    )
+    ))
 
-    if (page === "course") {
-        //MAYBE STORE IN LOCAL STORAGE INSTEAD OF FETCHING EVERYTIME
-        const course = history.location.pathname.split("/").filter(e => e !== "")[1]
-        fetch(get_topic_group(course)).then(e => e.json()).then(e => setCode(e.topic_code))
-
-        title = (
-            <Menu isLazy placement="right">
-                <MenuButton>
-                    <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
-                        <Box marginLeft={1} padding={4} fontSize="larger">
-                            <Text fontWeight="medium" letterSpacing="wider">{code}</Text>
-                            <Text fontSize="medium" letterSpacing="wider">{course}</Text>
-                        </Box>
-                    </Flex>
-                </MenuButton>
-                <Portal>
-                    <MenuList zIndex={100} placement="right">
-                        {
-                            ["Course 1", "Course 2"].map(e => <MenuItem key={"course-menu-" + e}>{e}</MenuItem>)
-                        }
-                    </MenuList>
-                </Portal>
-            </Menu>
-        )
-    }
+    useEffect(() => {
+        if (page === "course") {
+            let curr_course = JSON.parse(localStorage.getItem("current-course"))
+            let curr_user = JSON.parse(localStorage.getItem("curr-user"))
+            if (curr_course === null) {
+                const course = history.location.pathname.split("/").filter(e => e !== "")[1]
+                fetch(get_topic_group(course)).then(e => e.json()).then(e => {
+                    let code = e.topic_code
+                    fetch("http://localhost:8000/user/1").then(e => e.json()).then(e => {
+                        let enrolled = []
+                        e.enrolled_courses.map(course => {
+                            enrolled.push(course)
+                        })
+                        /*
+                        setDrawer(
+                            <DrawerHeader>
+                                <Select width="80%" size="lg" fontSize="xl" fontWeight="bold" onChange={e => {history.push(e.target.value); setOpen(false)}}>
+                                    {enrolled.map(course => {
+                                        return (
+                                            <option key={"sidebar-menu-" + course.topic_code} value={course.name}>{course.topic_code}</option>
+                                        )
+                                    })}
+                                </Select>
+                            </DrawerHeader>
+                        )
+                        */
+                        setTitle(
+                            <Menu isLazy placement="right">
+                                <MenuButton>
+                                    <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
+                                        <Box marginLeft={1} padding={4} fontSize="larger">
+                                            <Text fontWeight="medium" letterSpacing="wider">{code}</Text>
+                                            <Text fontSize="medium" letterSpacing="wider">{course}</Text>
+                                        </Box>
+                                    </Flex>
+                                </MenuButton>
+                                <Portal>
+                                    <MenuList zIndex={100} placement="right">
+                                        {
+                                            enrolled.map(e => <MenuItem key={"course-menu-" + e.topic_code}>{e.topic_code}</MenuItem>)
+                                        }
+                                    </MenuList>
+                                </Portal>
+                            </Menu>
+                        )
+                        //Might need to change in the future when users are integrated
+                        localStorage.setItem("curr-user", JSON.stringify(e))
+                    })
+                    localStorage.setItem("current-course", JSON.stringify(e))
+                })
+            }
+            else {
+                let enrolled = []
+                curr_user.enrolled_courses.map(course => {
+                    enrolled.push(course)
+                })
+                /*
+                //something wrong with drawer
+                setDrawer(
+                    <DrawerHeader>
+                        <Select width="80%" size="lg" fontSize="xl" fontWeight="bold" onChange={e => {history.push(e.target.value); setOpen(false)}}>
+                            {enrolled.map(course => {
+                                return (
+                                    <option key={"sidebar-menu-" + course.topic_code} value={course.name}>{course.topic_code}</option>
+                                )
+                            })}
+                        </Select>
+                    </DrawerHeader>
+                )
+                */
+                setTitle(
+                    <Menu isLazy placement="right">
+                        <MenuButton>
+                            <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
+                                <Box marginLeft={1} padding={4} fontSize="larger">
+                                    <Text fontWeight="medium" letterSpacing="wider">{curr_course.topic_code}</Text>
+                                    <Text fontSize="medium" letterSpacing="wider">{curr_course.name}</Text>
+                                </Box>
+                            </Flex>
+                        </MenuButton>
+                        <Portal>
+                            <MenuList zIndex={100} placement="right">
+                                {
+                                    enrolled.map(e => {
+                                        return (
+                                            <MenuItem key={"course-menu-" + e.topic_code} onClick={() => {
+                                                let path = document.location.pathname.split("/").filter(elem => elem !== "")
+                                                path[1] = e.name
+                                                history.push(e.name)
+                                            }}>
+                                                {e.topic_code}
+                                            </MenuItem>
+                                        )
+                                    })
+                                }
+                            </MenuList>
+                        </Portal>
+                    </Menu>
+                )
+            }
+        }
+    }, [])
 
     if (variant === "drawer") {
         return (
@@ -104,28 +180,25 @@ function Sidebar({links, isOpen, setOpen, variant, page}) {
                     <DrawerOverlay></DrawerOverlay>
                     <DrawerContent>
                         <DrawerCloseButton></DrawerCloseButton>
-                        <DrawerHeader>
-                            <Select placeholder={code} width="80%" size="lg" fontSize="xl" fontWeight="bold">
-                                <option>Placeholder 1</option>
-                                <option>Placeholder 2</option>
-                            </Select>
-                        </DrawerHeader>
+                        {drawer_header}
                         <Box marginTop={15} fontWeight="medium">
                             <SidebarContent history={history} links={links}></SidebarContent>
                         </Box>
                         <Flex grow={1}></Flex>
-                        <Flex>
-                            <Flex key={"sidebar-link-return"} onClick={() => history.push("/")} width="100%" height={70} alignContent="center" justifyContent="flex-start" cursor="pointer" padding={4}>
-                                <Flex alignItems="center">
-                                    <Flex borderRadius={100} bg="blue.500" width="30px" height="30px" justifyContent="center" alignItems="center">
-                                        <Flex borderRadius={100} bg="white" width="26px" height="26px" justifyContent="center" alignitems="center">
-                                            <ArrowBackIcon color="blue.500" boxSize={5} alignSelf="center"></ArrowBackIcon>
+                        { page==="course" &&
+                            <Flex>
+                                <Flex key={"sidebar-link-return"} onClick={() => history.push("/")} width="100%" height={70} alignContent="center" justifyContent="flex-start" cursor="pointer" padding={4}>
+                                    <Flex alignItems="center">
+                                        <Flex borderRadius={100} bg="blue.500" width="30px" height="30px" justifyContent="center" alignItems="center">
+                                            <Flex borderRadius={100} bg="white" width="26px" height="26px" justifyContent="center" alignitems="center">
+                                                <ArrowBackIcon color="blue.500" boxSize={5} alignSelf="center"></ArrowBackIcon>
+                                            </Flex>
                                         </Flex>
+                                        <Text fontSize={["md", "md", "lg"]} marginLeft={3} textAlign="left" letterSpacing="wider">Return</Text>
                                     </Flex>
-                                    <Text fontSize={["md", "md", "lg"]} marginLeft={3} textAlign="left" letterSpacing="wider">Return</Text>
                                 </Flex>
                             </Flex>
-                        </Flex>
+                        }
                     </DrawerContent>
                 </Drawer>
             </div>

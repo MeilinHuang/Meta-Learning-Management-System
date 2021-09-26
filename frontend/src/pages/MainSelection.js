@@ -22,6 +22,7 @@ function MainSelection() {
 
         async function fetchData() {
             try {
+                
                 const enrolled = await fetch(get_topic_groups()).then(e => e.json()).then(e => {
                     //Getting first topic content
                     setContent([e[0].topics_list[0], e[0].topic_code])
