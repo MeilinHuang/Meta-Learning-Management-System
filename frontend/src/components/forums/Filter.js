@@ -36,7 +36,7 @@ function Filter({ code }) {
             return
         }
 
-        console.log(filteredTags)
+        
         const tagNames = filteredTags.map(t => t.name.toLowerCase())
         setShowPinned(false)
         const filteredPosts = []

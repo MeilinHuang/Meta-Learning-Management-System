@@ -181,8 +181,9 @@ async function getAllTopicGroups(request, response) {
     object.announcements_list = announcementArr;
     object.admin_list = adminArr;
   }
-  response.status(200).json(resp.rows);
+
   try {
+    response.status(200).json(resp.rows);
   } catch (e) {
     response.status(400).send(e);
   }
@@ -502,6 +503,70 @@ async function postTopicGroup(request, response) {
 
     response.sendStatus(200);
   } catch (e) {
+    console.log(e);
+    response.status(400).send(e);
+  }
+}
+
+async function getAllTopics (request, response) { 
+  try {
+    let topicGroupResp = await pool.query(`SELECT name FROM topic_group`);
+    console.log('topicGroupResp', topicGroupResp);
+    let result = [];
+    for (let topicGroupName of topicGroupResp.rows) {
+      console.log('topicGroupName', topicGroupName.name);
+      let resp = await pool.query(
+        `SELECT array_agg(DISTINCT topics.id) AS topics_list
+        FROM topic_group tp_group 
+        JOIN topics ON topics.topic_group_id = tp_group.id
+        WHERE LOWER(tp_group.name) = LOWER($1)
+        GROUP BY tp_group.id;`, [topicGroupName.name]);
+      for (var object of resp.rows) { 
+        var topicArr = [];
+        for (const topic_id of object.topics_list) {
+          let preReqsArr = [];
+          let tmp = await pool.query(
+            `SELECT topics.id, topics.topic_group_id, topics.name, array_agg(DISTINCT topic_files.id) as course_materials, 
+            array_agg(DISTINCT prerequisites.prereq) as prereqs
+            FROM topics 
+            FULL OUTER JOIN topic_files ON topic_files.topic_id = topics.id
+            FULL OUTER JOIN prerequisites ON prerequisites.topic = topics.id
+            WHERE topics.id = $1
+            GROUP BY topics.id`
+            , [topic_id]);
+          if (tmp.rows.length > 0) {
+            var courseMaterialsArr = [];
+            if (tmp.rows[0].course_materials[0] !== null) {
+              for (var material_id of tmp.rows[0].course_materials) {
+                let tmp2 = await pool.query(`SELECT * from topic_files WHERE id = $1`, [material_id]);
+                courseMaterialsArr.push(tmp2.rows[0]);
+              }
+            }
+            if (tmp.rows[0].prereqs[0] === null) {
+              tmp.rows[0].prereqs = [];
+            } else {
+              for (const preReqId of tmp.rows[0].prereqs) {
+                let tmp = await pool.query(`
+                SELECT t.id, t.name from topics t WHERE t.id = $1
+                `, [preReqId]);
+                preReqsArr.push(tmp.rows[0]);
+              }
+              tmp.rows[0].prereqs = preReqsArr;
+            }
+            let temp3 = await pool.query(`SELECT tags.name from tags JOIN topic_tags ON topic_tags.tag_id = tags.tag_id WHERE topic_id = $1 GROUP BY tags.tag_id`, [topic_id]);
+            tmp.rows[0].tags = temp3.rows;
+            tmp.rows[0].course_materials = courseMaterialsArr;
+            topicArr.push(tmp.rows[0]);
+          }
+        };
+        object.topics_list = topicArr;
+        object.name = topicGroupName.name;
+      }
+      result.push(resp.rows[0]);
+    }
+    console.log('result', result);
+    response.status(200).json({'result': result});
+  } catch(e) {
     response.status(400).send(e);
   }
 }
@@ -909,6 +974,7 @@ async function postTopic(request, response) {
 
     response.status(200).json({ success: true, topic: topicId });
   } catch (e) {
+    console.log(e);
     response.status(400).send(e);
   }
 }
@@ -3444,6 +3510,7 @@ module.exports = {
   putQuizById,
   getQuizQuestions,
   postQuiz,
+  getAllTopics,
   getAllTopicGroups,
   getTopics,
   getTopicPreReqs,
