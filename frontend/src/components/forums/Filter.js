@@ -19,7 +19,6 @@ function Filter({ code }) {
 
     useEffect(() => {
         fetch(`http://localhost:8000/${code}/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => {
-            console.log(data)
             setTags(data)
         })
     }, [code])
@@ -36,7 +35,6 @@ function Filter({ code }) {
             return
         }
 
-        console.log(filteredTags)
         const tagNames = filteredTags.map(t => t.name.toLowerCase())
         setShowPinned(false)
         const filteredPosts = []
