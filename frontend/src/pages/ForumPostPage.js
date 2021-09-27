@@ -9,6 +9,7 @@ import {
     Divider,
     Flex,
     Heading,
+    Icon,
     Popover,
     PopoverTrigger,
     PopoverContent,
@@ -17,12 +18,17 @@ import {
     PopoverFooter,
     PopoverArrow,
     PopoverCloseButton,
+    Tooltip,
     useToast,
 } from "@chakra-ui/react"
 import Tags from '../components/forums/Tags'
 import PostDetails from '../components/forums/PostDetails/PostDetails'
 import CommentsResponses from '../components/forums/CommentsResponses/CommentsResponses'
 import { BsTrash } from 'react-icons/bs'
+import { FaCheckCircle } from 'react-icons/fa'
+
+
+const dummyUser = 3
 
 function ForumPostPage({ match: { params: { code, id }}}) {
     const [post, setPost] = useState({})
@@ -30,12 +36,15 @@ function ForumPostPage({ match: { params: { code, id }}}) {
     const toast = useToast()
 
     useEffect(() => {
-        fetch(`http://localhost:8000/forum/post/${id}`).then(r => r.json()).then(data => setPost(data))
+        fetch(`http://localhost:8000/${code}/forum/post/${id}`).then(r => r.json()).then(data => {
+            console.log(data)
+            setPost(data)
+        })
     }, [id])
 
     const handleDelete = () => {
         fetch(
-            `http://localhost:8000/forum/post/${id}`, { method: 'DELETE' }
+            `http://localhost:8000/${code}/forum/post/${id}`, { method: 'DELETE' }
         ).then(r => {
             if (r.status === 200) {
                 history.push(`/course-page/${code}/forums`)
@@ -51,6 +60,8 @@ function ForumPostPage({ match: { params: { code, id }}}) {
         })
     }
 
+    console.log(post)
+
     return (
         <>
             <Breadcrumb separator=">">
@@ -62,8 +73,25 @@ function ForumPostPage({ match: { params: { code, id }}}) {
                 </BreadcrumbItem>
             </Breadcrumb>
             <Flex justifyContent="space-between" alignItems="baseline">
-                <Heading mt="16px">{post.title}</Heading>
-                <Popover placement="bottom-end">
+            <Flex alignItems="center" mt="16px">
+                <Heading>{post.title}</Heading>
+                {post.isendorsed && (
+                    <Tooltip
+                        label="This post is endorsed by staff"
+                        hasArrow
+                        placement="bottom"
+                        ml="12px"
+                        w="90px"
+                        textAlign="center"
+                        fontSize="12px"
+                    >
+                        <span>
+                            <Icon h="16px" w="16px" ml="12px" color="green" as={FaCheckCircle} />
+                        </span>
+                    </Tooltip>
+                )}
+                </Flex>
+                {post.user_id === dummyUser && <Popover placement="bottom-end">
                     <PopoverTrigger>
                         <Button pr="8px" leftIcon={<BsTrash />} variant="ghost" color="red" />
                     </PopoverTrigger>
@@ -81,13 +109,13 @@ function ForumPostPage({ match: { params: { code, id }}}) {
                             </ButtonGroup>
                         </PopoverFooter>
                     </PopoverContent>
-                </Popover>
+                </Popover>}
             </Flex>
             <Divider />
-            <Tags tags={post.tags} />
-            <PostDetails post={post} setPost={setPost} />
-            <CommentsResponses posts={post.replies} post_id={id} setPost={setPost} />
-            <CommentsResponses isComments posts={post.comments} post_id={id} setPost={setPost} />
+            <Tags tags={post.tags} fromAnnouncement={post.fromannouncement} />
+            <PostDetails post={post} setPost={setPost} code={code} />
+            <CommentsResponses posts={post.replies} post_id={id} setPost={setPost} code={code} />
+            <CommentsResponses isComments posts={post.comments} post_id={id} setPost={setPost} code={code} />
         </>
     )
 }

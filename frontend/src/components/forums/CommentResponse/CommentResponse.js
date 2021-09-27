@@ -20,27 +20,30 @@ import {
 } from "@chakra-ui/react"
 import AuthorDetails from '../AuthorDetails'
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai"
-import { ContentState, convertFromHTML } from 'draft-js'
+import { ContentState, EditorState, convertFromHTML } from 'draft-js'
+import htmlToDraft from 'html-to-draftjs'
 import { FaRegCheckCircle, FaCheckCircle } from 'react-icons/fa'
 import { BsTrash } from 'react-icons/bs'
 import { GrEdit } from 'react-icons/gr'
 import DraftEditor from '../DraftEditor/DraftEditor'
 import styles from './CommentResponse.module.css'
 
-function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id, setPost, isendorsed }) {
+const dummyUser = 3
+
+function CommentResponse({ author, comment, comment_id, post_id, published_date, reply, reply_id, setPost, isendorsed, user_id, code }) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState('')
     const toast = useToast()
-    console.log(isendorsed)
 
     useEffect(() => {
         setDetails(comment || reply)
     }, [comment, reply])
 
     const editPost = () => {
-        const markup = convertFromHTML(details)
-        const state = ContentState.createFromBlockArray(markup)
-        setEditorState(state)
+        const contentBlock = htmlToDraft(details)
+        const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks)
+        const editorState = EditorState.createWithContent(contentState);
+        setEditorState(editorState)
     }
 
     const handleSubmit = e => {
@@ -49,7 +52,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
 
         if (isComments) {
             fetch(
-                `http://localhost:8000/forum/post/${post_id}/comment/${comment_id}`,
+                `http://localhost:8000/${code}/forum/post/${post_id}/comment/${comment_id}`,
                 {
                     method: 'PUT',
                     body: JSON.stringify({
@@ -75,7 +78,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
             })
         } else {
             fetch(
-                `http://localhost:8000/forum/post/${post_id}/reply/${reply_id}`,
+                `http://localhost:8000/${code}/forum/post/${post_id}/reply/${reply_id}`,
                 {
                     method: 'PUT',
                     body: JSON.stringify({
@@ -106,10 +109,10 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
         const isComments = !!comment && !reply
         if (isComments) {
             fetch(
-                `http://localhost:8000/forum/post/${post_id}/comment/${comment_id}`, { method: 'DELETE' }
+                `http://localhost:8000/${code}/forum/post/${post_id}/comment/${comment_id}`, { method: 'DELETE' }
             ).then(r => {
                 if (r.status === 200) {
-                    fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
+                    fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => {
                         setPost(data)
                         onClose()
                     })
@@ -125,10 +128,10 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
             })
         } else {
             fetch(
-                `http://localhost:8000/forum/post/${post_id}/reply/${reply_id}`, { method: 'DELETE' }
+                `http://localhost:8000/${code}/forum/post/${post_id}/reply/${reply_id}`, { method: 'DELETE' }
             ).then(r => {
                 if (r.status === 200) {
-                    fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => {
+                    fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => {
                         setPost(data)
                         onClose()
                     })
@@ -147,10 +150,10 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
 
     const handleEndorse = () => {
         fetch(
-            `http://localhost:8000/forum/post/${post_id}/comment/${comment_id}/endorse/${!isendorsed}`, { method: 'PUT' }
+            `http://localhost:8000/${code}/forum/post/${post_id}/comment/${comment_id}/endorse/${!isendorsed}`, { method: 'PUT' }
         ).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
+                fetch(`http://localhost:8000/${code}/forum/post/${post_id}`).then(r => r.json()).then(data => setPost(data))
             }
             // TODO: handle errors
         })
@@ -158,7 +161,7 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
 
     return (
         <>
-            <AuthorDetails author={author} date={published_date} />
+            <AuthorDetails author={author} date={published_date} isEndorsed={isendorsed} />
             {!!editorState
                 ?
                     <form id="editPost" onSubmit={handleSubmit}>
@@ -175,41 +178,37 @@ function CommentResponse({ author, comment, comment_id, post_id, published_date,
                 :
                     <>
                         <Text className={styles.description} dangerouslySetInnerHTML={{ __html: details }} />
-                        <Flex justifyContent={isendorsed ? "space-between" : 'flex-end'}>
-                            {isendorsed && (
-                                <Flex alignItems="center" mt="16px">
-                                    <Icon h="13px" w="13px" mr="4px" color="green" as={FaCheckCircle} />
-                                    <Text fontSize="13px" color="green" fontWeight="bold">This comment is endorsed by staff</Text>
-                                </Flex>
+                        {/* show author controls if user is author */}
+                        <Flex mt="8px" justifyContent="flex-end">
+                            {!!comment_id && <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} />}
+                            {user_id === dummyUser && (
+                                <>
+                                    <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
+                                    <Popover placement="bottom-end">
+                                        {({ onClose }) => (
+                                            <>
+                                                <PopoverTrigger>
+                                                    <Button pr="8px" leftIcon={<BsTrash />} ml="8px" color="red" />
+                                                </PopoverTrigger>
+                                                <PopoverContent>
+                                                    <PopoverHeader fontWeight="semibold">Confirmation</PopoverHeader>
+                                                    <PopoverArrow />
+                                                    <PopoverCloseButton />
+                                                    <PopoverBody>
+                                                        Are you sure you want to delete this post?
+                                                    </PopoverBody>
+                                                    <PopoverFooter d="flex" justifyContent="flex-end">
+                                                        <ButtonGroup size="sm">
+                                                        <Button variant="outline">Cancel</Button>
+                                                        <Button colorScheme="red" onClick={() => handleDelete(onClose)}>Delete</Button>
+                                                        </ButtonGroup>
+                                                    </PopoverFooter>
+                                                </PopoverContent>
+                                            </>
+                                        )}
+                                    </Popover>
+                                </>
                             )}
-                            {/* show author controls if user is author */}
-                            <Flex mt="8px" justifyContent="flex-end">
-                                {!!comment_id && <Button pr="8px" ml="8px" leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />} onClick={handleEndorse} />}
-                                <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
-                                <Popover placement="bottom-end">
-                                    {({ onClose }) => (
-                                        <>
-                                            <PopoverTrigger>
-                                                <Button pr="8px" leftIcon={<BsTrash />} ml="8px" color="red" />
-                                            </PopoverTrigger>
-                                            <PopoverContent>
-                                                <PopoverHeader fontWeight="semibold">Confirmation</PopoverHeader>
-                                                <PopoverArrow />
-                                                <PopoverCloseButton />
-                                                <PopoverBody>
-                                                    Are you sure you want to delete this post?
-                                                </PopoverBody>
-                                                <PopoverFooter d="flex" justifyContent="flex-end">
-                                                    <ButtonGroup size="sm">
-                                                    <Button variant="outline">Cancel</Button>
-                                                    <Button colorScheme="red" onClick={() => handleDelete(onClose)}>Delete</Button>
-                                                    </ButtonGroup>
-                                                </PopoverFooter>
-                                            </PopoverContent>
-                                        </>
-                                    )}
-                                </Popover>
-                            </Flex>
                         </Flex>
                     </>
             }

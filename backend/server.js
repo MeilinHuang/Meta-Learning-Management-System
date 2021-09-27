@@ -26,6 +26,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 const database = require('./service.js');
 const lectureTutorial = require('./api/lecturesTutorials');
+const users = require('./api/user');
 
 /***************************************************************
                        Auth Functions
@@ -40,14 +41,18 @@ app.post('/auth/logout');
 ***************************************************************/
 
 app.get('/user/:userId', async(request, response) => {
-  await database.getUser(request, response);
+  await users.getUser(request, response);
 });
 
-app.delete('/user/:userId', database.deleteUser);
+app.delete('/user/:userId', users.deleteUser);
 
-app.post('/user/:userId/:topicGroupId', database.postAdmin);
+app.post('/user/:userId/:topicGroupId', users.postAdmin);
 
-app.delete('/user/:userId/:topicGroupId', database.deleteAdmin);
+app.delete('/user/:userId/:topicGroupId', users.deleteAdmin);
+
+app.put('/user/:userId/progress', async(request, response) => {
+  await users.putUserProgress(request, response);
+})
 
 /***************************************************************
                        Topic Group Functions
@@ -112,99 +117,99 @@ app.delete('/topicGroup/:topicGroupName/topic/:topicName', async(request, respon
                        Forum Functions
 ***************************************************************/
 
-app.get('/forum', async(request, response) => {
+app.get('/:topicGroup/forum', async(request, response) => {
   await database.getAllForumPosts(request, response);
 });
 
-app.get('/forum/pinned', async(request, response) => {
+app.get('/:topicGroup/forum/pinned', async(request, response) => {
   await database.getAllPinnedPosts(request, response);
 });
 
-app.get('/forum/search/:forumSearchTerm', async(request, response) => {
+app.get('/:topicGroup/forum/search/:forumSearchTerm', async(request, response) => {
   await database.getSearchPosts(request, response);
 });
 
-app.get('/forum/:forumFilterTerm', async(request, response) => {
+app.get('/:topicGroup/forum/:forumFilterTerm', async(request, response) => {
   await database.getFilterPosts(request, response);
 });
 
-app.post('/forum/post', async(request, response) => {
+app.post('/:topicGroup/forum/post', async(request, response) => {
   await database.postForum(request, response);
 });
 
-app.get('/forum/post/:postId', async(request, response) => {
+app.get('/:topicGroup/forum/post/:postId', async(request, response) => {
   await database.getPostById(request, response);
 });
 
-app.put('/forum/post/:postId', async(request, response) => {
+app.put('/:topicGroup/forum/post/:postId', async(request, response) => {
   await database.putPost(request, response);
 });
 
-app.delete('/forum/post/:postId', async(request, response) => {
+app.delete('/:topicGroup/forum/post/:postId', async(request, response) => {
   await database.deletePost(request, response);
 });
 
-app.put('/forum/post/:postId/reply/:replyId', async(request, response) => {
+app.put('/:topicGroup/forum/post/:postId/reply/:replyId', async(request, response) => {
   await database.putPostReply(request, response);
 });
 
-app.post('/forum/post/:postId/reply', async(request, response) => {
+app.post('/:topicGroup/forum/post/:postId/reply', async(request, response) => {
   await database.postReply(request, response);
 });
 
-app.delete('/forum/post/:postId/reply/:replyId', async(request, response) => {
+app.delete('/:topicGroup/forum/post/:postId/reply/:replyId', async(request, response) => {
   await database.deletePostReply(request, response);
 });
 
-app.post('/forum/post/:postId/comment', async(request, response) => {
+app.post('/:topicGroup/forum/post/:postId/comment', async(request, response) => {
   await database.postComment(request, response);
 });
 
-app.put('/forum/post/:postId/comment/:commentId', async(request, response) => {
+app.put('/:topicGroup/forum/post/:postId/comment/:commentId', async(request, response) => {
   await database.putComment(request, response);
 });
 
-app.delete('/forum/post/:postId/comment/:commentId', async(request, response) => {
+app.delete('/:topicGroup/forum/post/:postId/comment/:commentId', async(request, response) => {
   await database.deleteComment(request, response);
 });
 
-app.put('/forum/post/:postId/comment/:commentId/endorse/:isEndorsed', async(request, response) => {
+app.put('/:topicGroup/forum/post/:postId/comment/:commentId/endorse/:isEndorsed', async(request, response) => {
   await database.putCommentEndorse(request, response);
 });
 
-app.put('/forum/post/pin/:postId/:isPinned', async(request, response) => {
+app.put('/:topicGroup/forum/post/pin/:postId/:isPinned', async(request, response) => {
   await database.putPostPin(request, response);
 });
 
-app.get('/forum/tags/:tagId', async(request, response) => {
+app.get('/:topicGroup/forum/tags/:tagId', async(request, response) => {
   await database.getTag(request, response);
 });
 
-app.put('/forum/tags/:tagId', async(request, response) => {
+app.put('/:topicGroup/forum/tags/:tagId', async(request, response) => {
   await database.putTag(request, response);
 });
 
-app.put('/forum/tags', async(request, response) => {
+app.put('/:topicGroup/forum/tags', async(request, response) => {
   await database.getAllTags(request, response);
 });
 
-app.post('/forum/tags', async(request, response) => {
+app.post('/:topicGroup/forum/tags', async(request, response) => {
   await database.postTag(request, response);
 });
 
-app.delete('/forum/tags/:tagId', async(request, response) => {
+app.delete('/:topicGroup/forum/tags/:tagId', async(request, response) => {
   await database.deleteTag(request, response);
 });
 
-app.put('/forum/post/endorse/:postId/:isEndorsed', async(request, response) => {
+app.put('/:topicGroup/forum/post/endorse/:postId/:isEndorsed', async(request, response) => {
   await database.putPostEndorse(request, response);
 });
 
-app.put('/forum/post/like/:postId', async(request, response) => {
+app.put('/:topicGroup/forum/post/like/:postId', async(request, response) => {
   await database.putPostLike(request, response);
 });
 
-app.put('/forum/post/unlike/:postId', async(request, response) => {
+app.put('/:topicGroup/forum/post/unlike/:postId', async(request, response) => {
   await database.putPostUnlike(request, response);
 });
 

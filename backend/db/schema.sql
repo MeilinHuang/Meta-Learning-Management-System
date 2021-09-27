@@ -1,4 +1,4 @@
--- \i 'C:/Users/Dave/Desktop/COMP4962 - Thesis B/metalms/backend/db/schema.sql';
+-- \i 'C:/Users/Dave/Desktop/COMP4973 - Thesis C/metalms/backend/db/schema.sql';
 
 -- Reset Schema
 DROP SCHEMA public cascade;
@@ -31,10 +31,11 @@ DROP TABLE IF EXISTS "user_enrolled" CASCADE;
 CREATE TABLE IF NOT EXISTS "user_enrolled" (
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
   user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  progress DECIMAL NOT NULL,
   PRIMARY KEY(user_id, topic_group_id)
 );
 
--- TOPIC GROUPSS
+-- TOPIC GROUPS
 DROP TABLE IF EXISTS "topics" CASCADE;
 CREATE TABLE IF NOT EXISTS "topics" (
   id SERIAL NOT NULL PRIMARY KEY,
@@ -83,11 +84,28 @@ CREATE TABLE IF NOT EXISTS "forum_posts" (
   isPinned BOOLEAN NOT NULL,
   related_link TEXT,
   num_of_upvotes INTEGER NOT NULL,
-  isEndorsed BOOLEAN NOT NULL
+  isEndorsed BOOLEAN NOT NULL,
+  topic_group INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  fromAnnouncement BOOLEAN NOT NULL
 );
 
+-- Can combine tags/topic_tags
 DROP TABLE IF EXISTS "tags" CASCADE;
 CREATE TABLE IF NOT EXISTS "tags" (
+  tag_id SERIAL NOT NULL PRIMARY KEY,
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
+  name TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS "topic_tags" CASCADE;
+CREATE TABLE IF NOT EXISTS "topic_tags"(
+  topic_id INT NOT NULL REFERENCES topics(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  tag_id INT NOT NULL REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  PRIMARY KEY(topic_id, tag_id)
+);
+
+DROP TABLE IF EXISTS "reserved_tags" CASCADE;
+CREATE TABLE IF NOT EXISTS "reserved_tags" (
   tag_id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL
 );
@@ -185,13 +203,6 @@ CREATE TABLE IF NOT EXISTS "post_tags"(
   post_id INT NOT NULL REFERENCES forum_posts(post_id) ON UPDATE CASCADE ON DELETE CASCADE,
   tag_id INT NOT NULL REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
   PRIMARY KEY(post_id, tag_id)
-);
-
-DROP TABLE IF EXISTS "topic_tags" CASCADE;
-CREATE TABLE IF NOT EXISTS "topic_tags"(
-  topic_id INT NOT NULL REFERENCES topics(id) ON UPDATE CASCADE ON DELETE CASCADE,
-  tag_id INT NOT NULL REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
-  PRIMARY KEY(topic_id, tag_id)
 );
 
 -- Course Pages

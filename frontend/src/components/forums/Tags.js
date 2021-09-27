@@ -4,9 +4,10 @@ import {
     Tag,
 } from "@chakra-ui/react"
 
-function Tags({ tags }) {
+function Tags({ tags, fromAnnouncement }) {
     return (
         <Flex>
+            {fromAnnouncement && <Tag my="8px" mx="4px" px="12px" borderRadius="full" variant="outline">Announcement</Tag>}
             {tags && tags[0] !== null && tags.map(tag => {
                 if (tag === null) {
                     return null

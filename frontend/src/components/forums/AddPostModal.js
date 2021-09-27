@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import {
     Button,
     Flex,
@@ -18,18 +18,21 @@ import TagSelect from './TagSelect/TagSelect'
 
 const dummyAuthor = 2
 
-function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
+function AddPostModal({ isOpen, onClose, isForums, onSubmit, code, fromAnnouncement }) {
     const [title, setTitle] = useState('')
     const [details, setDetails] = useState('')
-    const [relatedLink, setRelatedLink] = useState('')
     const [images, setImages] = useState([])
     const [tags, setTags] = useState([])
     const [selectedTags, setSelectedTags] = useState([])
     const toast = useToast()
 
     useEffect(() => {
-        fetch(`http://localhost:8000/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
-    }, [])
+        if (isForums) {
+            fetch(`http://localhost:8000/${code}/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => {
+                setTags(data)
+            })
+        }
+    }, [code, isForums])
 
     const handleSubmit = e => {
         e.preventDefault()
@@ -55,6 +58,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
         formData.append('title', title)
         formData.append('description', details)
         formData.append('publishedDate', date)
+        formData.append('fromAnnouncement', !!fromAnnouncement)
 
         if (selectedTags) {
             const tags = []
@@ -86,7 +90,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
                     <form id="createPost" onSubmit={handleSubmit} enctype="multipart/form-data">
                         <Flex flexDirection="column" mb="16px">
                             <Heading size="sm" mb="4px">Title*</Heading>
-                            <Input name="postTitle" onChange={e => setTitle(e.target.value)} />
+                            <Input name="postTitle" onChange={e => setTitle(e.target.value)} autoFocus />
                         </Flex>
                         <Flex flexDirection="column">
                             <Heading size="sm" mb="4px">Details*</Heading>
@@ -100,12 +104,12 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit }) {
                             <>
                                 <Flex flexDirection="column">
                                     <Heading size="sm" mb="4px">Tags</Heading>
-                                    <TagSelect setSelectedTags={setSelectedTags} tags={tags} />
+                                    {!!Object.keys(tags).length && <TagSelect setSelectedTags={setSelectedTags} tags={tags} fromAnnouncement={fromAnnouncement} />}
                                 </Flex>
-                                <Flex flexDirection="column" mt="16px">
+                                {/* <Flex flexDirection="column" mt="16px">
                                     <Heading size="sm" mb="4px">Related Link</Heading>
                                     <Input name="postRelatedLink" onChange={e => setRelatedLink(e.target.value)} />
-                                </Flex>
+                                </Flex> */}
                             </>
                         }
                     </form>
