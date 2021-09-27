@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { 
     Box,
     Button,
@@ -100,7 +100,24 @@ function CourseDashboard({ match: { params: { code }}}) {
             }
         }).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/${code}/announcement`).then(r => r.json()).then(data => setAnnouncements(data.reverse()))
+                fetch(`http://localhost:8000/${code}/announcement`).then(r => r.json()).then(data => {
+                    const promises = []
+        
+                    for (const post of data) {
+                        promises.push(fetch(`http://localhost:8000/user/${post.author}`).then(r => r.json()))
+                    }
+        
+                    Promise.all(promises)
+                        .then(authorData => {
+                            const newPosts = []
+                            for (const i in authorData) {
+                                const withAuthor = {...data[i], author: authorData[i].user_name}
+                                newPosts.push(withAuthor)
+                            }
+                            setAnnouncements(newPosts.reverse())
+                            setLoading(false)
+                        })
+                })
             } 
             // TODO: Handle error case
             // TODO: clear form
@@ -113,7 +130,7 @@ function CourseDashboard({ match: { params: { code }}}) {
                 <Center width={{ base: '100%', lg: '80%' }}>
                     {/* Only show for admin/staff */}
                     <Button onClick={onOpen} leftIcon={buttonIcon} pr={{ base: '8px', md: '16px' }}>{buttonContents}</Button>
-                    <AddPostModal isOpen={isOpen} onClose={onClose} onSubmit={handleAddPostSubmit} code={code} />
+                    <AddPostModal isOpen={isOpen} onClose={onClose} onSubmit={handleAddPostSubmit} />
                     <Box as="form" onSubmit={handleSubmit} width="100%" ml={{ base: '16px', md: '24px'}}>
                         <InputGroup variant="outline">
                             <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>

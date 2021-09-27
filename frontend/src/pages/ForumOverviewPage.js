@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
+import { useHistory } from 'react-router-dom'
 import { 
     Box,
     Button,
@@ -23,6 +24,7 @@ const dummyAuthor = 3
 
 function ForumOverviewPage({ match: { params: { code }}}) {
     const context = useContext(StoreContext)
+    const history = useHistory()
     const {
         posts: [posts, setPosts],
         pinnedPosts: [pinnedPosts, setPinnedPosts],
@@ -70,9 +72,11 @@ function ForumOverviewPage({ match: { params: { code }}}) {
             }
         }).then(r => {
             if (r.status === 200) {
-                fetch(`http://localhost:8000/${code}/forum`).then(r => r.json()).then(data => setPosts(data))
+                return r.json()
             } 
             // TODO: Handle error case
+        }).then(data => {
+            history.push(`/course-page/${code}/forums/${data.post_id}`)
         })
     }
 

@@ -18,10 +18,9 @@ import TagSelect from './TagSelect/TagSelect'
 
 const dummyAuthor = 2
 
-function AddPostModal({ isOpen, onClose, isForums, onSubmit, code }) {
+function AddPostModal({ isOpen, onClose, isForums, onSubmit, code, fromAnnouncement }) {
     const [title, setTitle] = useState('')
     const [details, setDetails] = useState('')
-    const [relatedLink, setRelatedLink] = useState('')
     const [images, setImages] = useState([])
     const [tags, setTags] = useState([])
     const [selectedTags, setSelectedTags] = useState([])
@@ -29,7 +28,9 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit, code }) {
 
     useEffect(() => {
         if (isForums) {
-            fetch(`http://localhost:8000/${code}/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => setTags(data))
+            fetch(`http://localhost:8000/${code}/forum/tags`, { method: 'PUT' }).then(r => r.json()).then(data => {
+                setTags(data)
+            })
         }
     }, [code, isForums])
 
@@ -57,6 +58,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit, code }) {
         formData.append('title', title)
         formData.append('description', details)
         formData.append('publishedDate', date)
+        formData.append('fromAnnouncement', !!fromAnnouncement)
 
         if (selectedTags) {
             const tags = []
@@ -102,7 +104,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit, code }) {
                             <>
                                 <Flex flexDirection="column">
                                     <Heading size="sm" mb="4px">Tags</Heading>
-                                    <TagSelect setSelectedTags={setSelectedTags} tags={tags} />
+                                    {!!Object.keys(tags).length && <TagSelect setSelectedTags={setSelectedTags} tags={tags} fromAnnouncement={fromAnnouncement} />}
                                 </Flex>
                                 {/* <Flex flexDirection="column" mt="16px">
                                     <Heading size="sm" mb="4px">Related Link</Heading>

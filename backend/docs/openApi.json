@@ -2259,12 +2259,22 @@
                       "example": 1
                     }
                   },
+                  "reservedTags": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  },
                   "uploadFile": {
                     "type": "array",
                     "items": {
                       "type": "string",
                       "format": "binary"
                     }
+                  },
+                  "fromAnnouncement": {
+                    "type": "boolean"
                   }
                 }
               }
