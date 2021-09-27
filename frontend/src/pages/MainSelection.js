@@ -14,6 +14,7 @@ function MainSelection() {
     const [announcements, setAnnouncements] = useState([])
     const [content, setContent] = useState(null)
 
+
     const categories = ["Preparation", "Content", "Practice", "Assessments"]
 
     useEffect(() => {
@@ -22,34 +23,46 @@ function MainSelection() {
 
         async function fetchData() {
             try {
-                
-                const enrolled = await fetch(get_topic_groups()).then(e => e.json()).then(e => {
-                    //Getting first topic content
-                    setContent([e[0].topics_list[0], e[0].topic_code])
-                    setCourses(e)
-                    return e
+                //Need to get user logged in
+                const enrolled = await fetch("http://localhost:8000/user/1").then(e => e.json()).then(e => {
+                    setCourses(e.enrolled_courses)
+                    return e.enrolled_courses
                 })
-                const announcements = await Promise.all(
+                const topic_groups = await Promise.all(
                     enrolled.map(course => {
-                        return fetch("http://localhost:8000/" + course.name + "/announcement").then(e => {
-                            return [e, course.name]
+                        return fetch("http://localhost:8000/topicgroup/" + course.name ).then(e => e.json()).then(e => {
+                            console.log(e)
+                            //Need to get most recently accessed
+                            setContent([e.topics_list[0], e.topic_code])
+                            return e
                         })
                     })
                 )
                 Promise.all(
+                    topic_groups.map(e => {
+                        e.announcements_list.map(announce => {
+                            if (recent_announce === null || Date.parse(recent_announce.post_date) > Date.parse(announce.post_date)) {
+                                fetch("http://localhost:8000/user/" + announce.author).then(resp => resp.json()).then(user => {
+                                    announce = {... announce, author: user.user_name}
+                                    setRecent(announce)
+                                    setCode(e.topic_code)
+                                })
+                            }
+                        })
+                    })
+                )
+                /*
+                Promise.all(
                     announcements.map(async e => {
+                        console.log(e)
                         let data = await e[0].json()
                         data = data[0]
                         if (recent_announce === null || Date.parse(recent_announce.post_date) > Date.parse(data.post_date)) {
-                            fetch("http://localhost:8000/user/" + data.author).then(resp => resp.json()).then(user => {
-                                data = {... data, author: user.user_name}
-                                setRecent(data)
-                                setCode(e[1])
-                                
-                            })
+                            
                         }
                     })
                 )
+                */
             }
             catch (error) {
                 console.log(error)
@@ -139,7 +152,7 @@ function MainSelection() {
                             {   courses.length > 0 ?
                                 courses.map(course => {
                                     //TODO GET COMPLETION
-                                    const progress = Math.floor(Math.random()*100) + "%"
+                                    const progress = parseInt(course.progress) + "%"
                                     return (
                                         <Flex width="100%" key={course.name + "-progress"}>
                                             <Flex flexDirection={["column", "row"]}>
@@ -152,7 +165,7 @@ function MainSelection() {
                                                         <Flex bg="blue.400" width={progress} color="blue.400" borderRadius={10}>'</Flex>
                                                     </Flex>
                                                 </Flex>
-                                                <Text color="blue.400" fontWeight={500} alignSelf="center">{progress}</Text>
+                                                <Text color="blue.400" width={"4ch"} fontWeight={500} alignSelf="center">{progress}</Text>
                                             </Flex>
                                         </Flex>
                                     )
@@ -180,11 +193,14 @@ function MainSelection() {
                                                             {
                                                                 //Need to check if is correct category
                                                                 content[0].course_materials.map(mat => {
-                                                                    return (
-                                                                        <Flex key={e + "-material-" + mat.name} marginLeft={5}>
-                                                                            <Text fontSize="sm">{mat.name}</Text>
-                                                                        </Flex>
-                                                                    )
+                                                                    if (mat.type === e.toLowerCase()) {
+                                                                        return (
+                                                                            <Flex key={e + "-material-" + mat.name} marginLeft={5}>
+                                                                                <Text fontSize="sm">{mat.name}</Text>
+                                                                            </Flex>
+                                                                        )
+                                                                    }
+                                                                    else return null
                                                                 })
                                                             }
                                                         </Stack>

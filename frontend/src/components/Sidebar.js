@@ -47,104 +47,51 @@ function Sidebar({links, isOpen, setOpen, variant, page}) {
 
     useEffect(() => {
         if (page === "course") {
-            let curr_course = JSON.parse(localStorage.getItem("current-course"))
-            let curr_user = JSON.parse(localStorage.getItem("curr-user"))
-            if (curr_course === null) {
-                const course = history.location.pathname.split("/").filter(e => e !== "")[1]
-                fetch(get_topic_group(course)).then(e => e.json()).then(e => {
-                    let code = e.topic_code
-                    fetch("http://localhost:8000/user/1").then(e => e.json()).then(e => {
-                        let enrolled = []
-                        e.enrolled_courses.map(course => {
-                            enrolled.push(course)
-                        })
-                        /*
-                        setDrawer(
-                            <DrawerHeader>
-                                <Select width="80%" size="lg" fontSize="xl" fontWeight="bold" onChange={e => {history.push(e.target.value); setOpen(false)}}>
-                                    {enrolled.map(course => {
-                                        return (
-                                            <option key={"sidebar-menu-" + course.topic_code} value={course.name}>{course.topic_code}</option>
-                                        )
-                                    })}
-                                </Select>
-                            </DrawerHeader>
-                        )
-                        */
-                        setTitle(
-                            <Menu isLazy placement="right">
-                                <MenuButton>
-                                    <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
-                                        <Box marginLeft={1} padding={4} fontSize="larger">
-                                            <Text fontWeight="medium" letterSpacing="wider">{code}</Text>
-                                            <Text fontSize="medium" letterSpacing="wider">{course}</Text>
-                                        </Box>
-                                    </Flex>
-                                </MenuButton>
-                                <Portal>
-                                    <MenuList zIndex={100} placement="right">
-                                        {
-                                            enrolled.map(e => <MenuItem key={"course-menu-" + e.topic_code}>{e.topic_code}</MenuItem>)
-                                        }
-                                    </MenuList>
-                                </Portal>
-                            </Menu>
-                        )
-                        //Might need to change in the future when users are integrated
-                        localStorage.setItem("curr-user", JSON.stringify(e))
+            const course = history.location.pathname.split("/").filter(e => e !== "")[1]
+            fetch(get_topic_group(course)).then(e => e.json()).then(e => {
+                let code = e.topic_code
+                fetch("http://localhost:8000/user/1").then(e => e.json()).then(e => {
+                    let enrolled = []
+                    e.enrolled_courses.map(course => {
+                        enrolled.push(course)
                     })
-                    localStorage.setItem("current-course", JSON.stringify(e))
+                    /*
+                    setDrawer(
+                        <DrawerHeader>
+                            <Select width="80%" size="lg" fontSize="xl" fontWeight="bold" onChange={e => {history.push(e.target.value); setOpen(false)}}>
+                                {enrolled.map(course => {
+                                    return (
+                                        <option key={"sidebar-menu-" + course.topic_code} value={course.name}>{course.topic_code}</option>
+                                    )
+                                })}
+                            </Select>
+                        </DrawerHeader>
+                    )
+                    */
+                    setTitle(
+                        <Menu isLazy placement="right">
+                            <MenuButton>
+                                <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
+                                    <Box marginLeft={1} padding={4} fontSize="larger">
+                                        <Text fontWeight="medium" letterSpacing="wider">{code}</Text>
+                                        <Text fontSize="medium" letterSpacing="wider">{course}</Text>
+                                    </Box>
+                                </Flex>
+                            </MenuButton>
+                            <Portal>
+                                <MenuList zIndex={100} placement="right" onClick={e => {
+                                    history.push(e.target.value)
+                                    window.location.reload()
+                                }}>
+                                    {
+                                        enrolled.map(e => <MenuItem key={"course-menu-" + e.topic_code} value={e.name}>{e.topic_code}</MenuItem>)
+                                    }
+                                </MenuList>
+                            </Portal>
+                        </Menu>
+                    )
                 })
-            }
-            else {
-                let enrolled = []
-                curr_user.enrolled_courses.map(course => {
-                    enrolled.push(course)
-                })
-                /*
-                //something wrong with drawer
-                setDrawer(
-                    <DrawerHeader>
-                        <Select width="80%" size="lg" fontSize="xl" fontWeight="bold" onChange={e => {history.push(e.target.value); setOpen(false)}}>
-                            {enrolled.map(course => {
-                                return (
-                                    <option key={"sidebar-menu-" + course.topic_code} value={course.name}>{course.topic_code}</option>
-                                )
-                            })}
-                        </Select>
-                    </DrawerHeader>
-                )
-                */
-                setTitle(
-                    <Menu isLazy placement="right">
-                        <MenuButton>
-                            <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
-                                <Box marginLeft={1} padding={4} fontSize="larger">
-                                    <Text fontWeight="medium" letterSpacing="wider">{curr_course.topic_code}</Text>
-                                    <Text fontSize="medium" letterSpacing="wider">{curr_course.name}</Text>
-                                </Box>
-                            </Flex>
-                        </MenuButton>
-                        <Portal>
-                            <MenuList zIndex={100} placement="right">
-                                {
-                                    enrolled.map(e => {
-                                        return (
-                                            <MenuItem key={"course-menu-" + e.topic_code} onClick={() => {
-                                                let path = document.location.pathname.split("/").filter(elem => elem !== "")
-                                                path[1] = e.name
-                                                history.push(e.name)
-                                            }}>
-                                                {e.topic_code}
-                                            </MenuItem>
-                                        )
-                                    })
-                                }
-                            </MenuList>
-                        </Portal>
-                    </Menu>
-                )
-            }
+            })
         }
     }, [])
 

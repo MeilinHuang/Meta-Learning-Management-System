@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -16,9 +16,6 @@ import {
 import Calendar from "./Calendar.js";
 import { isLoggedIn } from "../utils/helpers";
 import { useHistory } from "react-router-dom";
-//import Calendar from 'react-calendar'
-//import "./widgetBar.css"
-//import 'react-calendar/dist/Calendar.css';
 
 function logOut() {
   sessionStorage.removeItem("token");
@@ -27,6 +24,21 @@ function logOut() {
 
 function WidgetsBar({ page }) {
   const history = useHistory();
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    if (page === "course") {
+      let course_name = decodeURI(document.location.pathname.split("/").filter(e => e != "")[1])
+      fetch("http://localhost:8000/user/1").then(e => e.json()).then(e => {
+        e.enrolled_courses.map(course => {
+          if (course.name === course_name) {
+            setProgress(parseInt(course.progress) + "%")
+          }
+        })
+      })
+    }
+  })
+
   return (
     <Box
       display={["none", "none", "none", "block"]}
@@ -92,11 +104,12 @@ function WidgetsBar({ page }) {
               marginTop={5}
               borderRadius={10}
               width="100%"
-              height="100%"
+              position="relative"
             >
+              <Text position="absolute" left="45%">{progress}</Text>
               <Box
                 bg="blue.500"
-                width="50%"
+                width={progress}
                 height="100%"
                 borderRadius="10px 0px 0px 10px"
                 textAlign="center"
