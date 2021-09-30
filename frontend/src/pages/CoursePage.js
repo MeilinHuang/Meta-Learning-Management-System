@@ -33,10 +33,6 @@ function CoursePage() {
             name: 'Forums',
             url: '/forums',
         },
-        {
-            name: 'Support',
-            url: '/support',
-        },
     ]
     const smVariant = 'drawer'
     const mdVariant = 'sidebar'
