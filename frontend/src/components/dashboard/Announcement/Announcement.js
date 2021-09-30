@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
+import { Link as RouterLink } from 'react-router-dom'
 import {
     ButtonGroup,
     Button,
@@ -7,6 +8,7 @@ import {
     Flex,
     Heading,
     InputGroup,
+    Link,
     Popover,
     PopoverTrigger,
     PopoverContent,
@@ -16,23 +18,31 @@ import {
     PopoverArrow,
     PopoverCloseButton,
     Text,
+    Tooltip,
     useDisclosure,
     useToast,
 } from "@chakra-ui/react"
+import { useHistory } from 'react-router-dom'
 import { GrEdit, GrShare } from 'react-icons/gr'
 import { BiTrash } from 'react-icons/bi'
-import { AiOutlineSend } from "react-icons/ai"
+import { AiOutlineSend, AiOutlineQuestionCircle } from "react-icons/ai"
 import { ContentState, EditorState } from 'draft-js'
 import htmlToDraft from 'html-to-draftjs'
 import DraftEditor from '../../forums/DraftEditor/DraftEditor'
 import AuthorDetails from '../../forums/AuthorDetails'
 import AddPostModal from '../../forums/AddPostModal'
+import { StoreContext } from '../../../utils/store'
 import styles from './Announcement.module.css'
 
 function Announcement({ announcement: { attachments, author, id, title, content, post_date }, course, setAnnouncements, isAnnouncementPage }) {
     const [ editorState, setEditorState ] = useState('')
     const [ details, setDetails ] = useState()
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const context = useContext(StoreContext)
+    const history = useHistory()
+    const {
+        posts: [, setPosts],
+    } = context;
     const toast = useToast()
 
     useEffect(() => {
@@ -140,8 +150,29 @@ function Announcement({ announcement: { attachments, author, id, title, content,
 
     }
 
-    const handleAddPostSubmit = () => {
-
+    const handleAddPostSubmit = (formData) => {
+        fetch(`http://localhost:8000/${course}/forum/post`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': '*/*',
+            }
+        }).then(r => {
+            if (r.status === 200) {
+                return r.json()
+            } 
+            // TODO: Handle error case
+        }).then(data => {
+            history.push(`/course-page/${course}/forums/${data.post_id}`)
+            // toast({
+            //     render: () => (
+            //         <Link as={RouterLink} color="blue.500" lineHeight="18px" to={`/course-page/${course}`}>Return to announcements</Link>
+            //     ),
+            //     status: 'success',
+            //     duration: 3000,
+            //     isClosable: true,
+            // })
+        })
     }
 
     const getImage = ({ id, name, file }) => (
@@ -171,8 +202,18 @@ function Announcement({ announcement: { attachments, author, id, title, content,
                         <Flex justifyContent="space-between">
                             <Flex>
                                 <Button pr="8px" leftIcon={<GrShare />} onClick={shareLink} />
-                                {/* TODO: implement ask question from announcement */}
-                                {/* {!isAnnouncementPage && <Button ml="8px" onClick={onOpen}>Ask a question</Button>} */}
+                                {!isAnnouncementPage && 
+                                    <Tooltip
+                                        label="Ask a question"
+                                        hasArrow
+                                        placement="bottom"
+                                        w="90px"
+                                        textAlign="center"
+                                        fontSize="12px"
+                                    >
+                                        <Button pr="8px" ml="8px" leftIcon={<AiOutlineQuestionCircle />} onClick={onOpen} />
+                                    </Tooltip>
+                                }
                             </Flex>
                             {!isAnnouncementPage && <Flex>
                                 <Button ml="8px" pr="8px" leftIcon={<GrEdit />} onClick={editPost} /> {/*  ONLY SHOW THIS IF USER IS AUTHOR OF POST */}
@@ -201,7 +242,7 @@ function Announcement({ announcement: { attachments, author, id, title, content,
                                 </Popover>
                             </Flex>}
                         </Flex>
-                        <AddPostModal isOpen={isOpen} onClose={onClose} onSubmit={handleAddPostSubmit} isForums />
+                        <AddPostModal isOpen={isOpen} onClose={onClose} onSubmit={handleAddPostSubmit} code={course} isForums fromAnnouncement />
                     </>
             }
         </Box>

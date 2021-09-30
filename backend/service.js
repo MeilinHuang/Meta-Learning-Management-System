@@ -1106,7 +1106,7 @@ async function getAllForumPosts(request, response) {
     const topicGroupId = tmpQ.rows[0].id;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.topic_group,
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.topic_group, fp.fromAnnouncement,
       array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
       array_agg(DISTINCT comments.comment_id) as comments
@@ -1194,7 +1194,7 @@ async function getAllPinnedPosts(request, response) {
     const topicGroupId = tmpQ.rows[0].id;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
       array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
       array_agg(DISTINCT comments.comment_id) as comments
@@ -1283,7 +1283,7 @@ async function getSearchPosts(request, response) {
     const forumSearchTerm = request.params.forumSearchTerm;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
       array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
       array_agg(DISTINCT comments.comment_id) as comments
@@ -1373,7 +1373,7 @@ async function getFilterPosts(request, response) {
     const forumFilterTerm = request.params.forumFilterTerm;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
       array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
       array_agg(DISTINCT comments.comment_id) as comments
@@ -1467,6 +1467,7 @@ async function postForum(request, response) {
     const publishedDate = request.body.publishedDate;
     const description = request.body.description;
     const related_link = request.body.related_link;
+    const fromAnnouncement = request.body.fromAnnouncement;
 
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(
@@ -1477,8 +1478,8 @@ async function postForum(request, response) {
 
     let resp = await pool.query(
       `INSERT INTO forum_posts(post_id, title, user_id, 
-        author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group) 
-        values(default, $1, $2, $3, $4, $5, false, $6, 0, false, $7) 
+        author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group, fromAnnouncement) 
+        values(default, $1, $2, $3, $4, $5, false, $6, 0, false, $7, $8) 
         RETURNING post_id`,
       [
         title,
@@ -1488,9 +1489,9 @@ async function postForum(request, response) {
         description,
         related_link,
         topicGroupId,
+        fromAnnouncement,
       ]
     );
-
     if (request.body.tags) {
       const tags = request.body.tags.split(",");
       if (tags.length) {
@@ -1555,7 +1556,7 @@ async function postForum(request, response) {
       }
     }
 
-    response.sendStatus(200);
+    response.status(200).json(resp.rows[0]);
   } catch (e) {
     console.log(e);
     response.status(400).send(e);
@@ -1569,7 +1570,7 @@ async function getPostById(request, response) {
 
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
       array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
       array_agg(DISTINCT comments.comment_id) as comments

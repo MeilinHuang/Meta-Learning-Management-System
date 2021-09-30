@@ -36,7 +36,10 @@ function ForumPostPage({ match: { params: { code, id }}}) {
     const toast = useToast()
 
     useEffect(() => {
-        fetch(`http://localhost:8000/${code}/forum/post/${id}`).then(r => r.json()).then(data => setPost(data))
+        fetch(`http://localhost:8000/${code}/forum/post/${id}`).then(r => r.json()).then(data => {
+            console.log(data)
+            setPost(data)
+        })
     }, [id])
 
     const handleDelete = () => {
@@ -109,7 +112,7 @@ function ForumPostPage({ match: { params: { code, id }}}) {
                 </Popover>}
             </Flex>
             <Divider />
-            <Tags tags={post.tags} />
+            <Tags tags={post.tags} fromAnnouncement={post.fromannouncement} />
             <PostDetails post={post} setPost={setPost} code={code} />
             <CommentsResponses posts={post.replies} post_id={id} setPost={setPost} code={code} />
             <CommentsResponses isComments posts={post.comments} post_id={id} setPost={setPost} code={code} />
