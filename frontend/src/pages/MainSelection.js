@@ -31,7 +31,6 @@ function MainSelection() {
                 const topic_groups = await Promise.all(
                     enrolled.map(course => {
                         return fetch("http://localhost:8000/topicgroup/" + course.name ).then(e => e.json()).then(e => {
-                            console.log(e)
                             //Need to get most recently accessed
                             setContent([e.topics_list[0], e.topic_code])
                             return e
