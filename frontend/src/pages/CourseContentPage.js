@@ -5,7 +5,6 @@ import {
     Heading, 
     Text, 
     Button, 
-    Box, 
     Accordion, 
     AccordionItem, 
     AccordionButton, 
@@ -20,9 +19,10 @@ import {
     InputGroup,
     InputLeftElement,
     Input, 
+    IconButton,
 } from "@chakra-ui/react"
 import { GrTree } from "react-icons/gr"
-import { SearchIcon } from "@chakra-ui/icons"
+import { SearchIcon, DownloadIcon } from "@chakra-ui/icons"
 import {get_topics_url} from "../Constants.js"
 import { useHistory } from 'react-router-dom'
 
@@ -61,26 +61,26 @@ function CourseContentPage() {
                         { display.map(e => {
                             return (
                                 <AccordionItem key={"section " + e.name}>
-                                    <h2>
+                                    <Flex width="100%">
                                         <AccordionButton>
                                             <Flex flexGrow={1} textAlign="left">
-                                                <Heading size={["sm", "md"]}>
+                                                <Checkbox colorScheme="green" size="lg" marginRight="20px"></Checkbox>
+                                                <Heading size={["sm", "md"]} letterSpacing={1}>
                                                     {e.name}
                                                 </Heading>
                                             </Flex>
-                                            <AccordionIcon></AccordionIcon>
                                         </AccordionButton>
-                                    </h2>
+                                    </Flex>
                                     {   
                                         <AccordionPanel>
-                                            
                                                 <Accordion width="100%" allowMultiple>
                                                     {
                                                         categories.map(category => {
                                                             return (
                                                                 <AccordionItem key={e.name + "-" + category}>
                                                                     <AccordionButton paddingRight={0} paddingLeft={5}>
-                                                                        <Text flexGrow={1} textAlign="left">
+                                                                        <Checkbox colorScheme="green" size="md" marginRight="20px"></Checkbox>
+                                                                        <Text flexGrow={1} textAlign="left" letterSpacing={1}>
                                                                             {category}
                                                                         </Text>
                                                                         <AccordionIcon></AccordionIcon>
@@ -91,26 +91,16 @@ function CourseContentPage() {
                                                                             e.course_materials.map(mat => {
                                                                                 if (category.toLowerCase().indexOf(mat.type) != -1) {
                                                                                     return (
-                                                                                        <Box key={mat + "-" + e.name}>
-                                                                                            <Flex>
-                                                                                                <Checkbox onChange={box => {
-                                                                                                    let checked = box.target.checked
-                                                                                                    let old = files
-                                                                                                    if (checked) {
-                                                                                                        old.push(mat.name)
-                                                                                                        setFiles(old)
-                                                                                                    }
-                                                                                                    else {
-                                                                                                        const index = old.indexOf(mat.name)
-                                                                                                        if (index > -1) {
-                                                                                                            old.splice(index, 1)
-                                                                                                            setFiles(old)
-                                                                                                        }
-                                                                                                    }
-                                                                                                }}></Checkbox>
-                                                                                                <Text marginLeft={10} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">{mat.name}</Text>
+                                                                                        <Flex key={mat + "-" + e.name} width="100%">
+                                                                                            <Flex marginLeft="15px" flexGrow={1}>
+                                                                                                <Flex _hover={{textDecoration: "underline", cursor: "pointer"}} onClick={() => {
+                                                                                                    window.open("/_files/" + course + "/" + e.name + "/" + mat.name)
+                                                                                                }}>
+                                                                                                    <Checkbox colorScheme="green" size="md" marginRight="20px"></Checkbox>
+                                                                                                    <Text overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" >{mat.name}</Text>
+                                                                                                </Flex>
                                                                                             </Flex>
-                                                                                        </Box>
+                                                                                        </Flex>
                                                                                     )
                                                                                 }
                                                                             })
@@ -122,46 +112,12 @@ function CourseContentPage() {
                                                         })
                                                     }
                                                 </Accordion>
-                                                {/*TODO redirect to view content after click*/}
-                                                {/*
-                                                    e.course_materials.map(e => {
-                                                        counter += 1
-                                                        return (
-                                                            
-                                                        )
-                                                    })
-                                                */}
                                         </AccordionPanel>
                                     }
                                 </AccordionItem>
                             )
                         }) }
                     </Accordion>
-                    {/*TODO actually download files after file system is implemented in backend */}
-                    <Button marginTop={5} alignSelf="flex-end" onClick={e =>{
-                        if (files.length > 0) {
-                            return (
-                                download({
-                                    title: "Downloading",
-                                    description: "The files will be downloaded shortly",
-                                    status: "info",
-                                    duration: 3000,
-                                    isClosable: true,
-                                })
-                            )
-                        }
-                        else {
-                            return (
-                                download({
-                                    title: "No selected files",
-                                    description: "Please select files to download",
-                                    status: "warning",
-                                    duration: 3000,
-                                    isClosable: true,
-                                })
-                            )
-                        }
-                    }}>DOWNLOAD</Button>
                 </Flex>
             </Flex>
         )
