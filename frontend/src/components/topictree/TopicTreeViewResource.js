@@ -85,14 +85,14 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     let tempFiles = JSON.parse(JSON.stringify(files));
     tempFiles[typeOfFile] = e.target.files[0];
     setFiles(tempFiles);
-    console.log(e.target.files[0])
+    console.log(e.target.files[0]);
   }
 
   const uploadFile = async (e, typeOfFile) => {
     const formData = new FormData();
     formData.append('name', data.title);
     formData.append('uploadFile', files[typeOfFile]);
-    formData.append('uploadedFileTypes', 'pdf');
+    formData.append('uploadedFileTypes', files[typeOfFile].split('.').pop());
 
     await fetch(update_topic(topicGroupName, data.title), {
       method: 'PUT',
