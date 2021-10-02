@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { useHistory } from 'react-router-dom'
 import { Flex, Text, Heading, VStack, Spinner, Box, Divider, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Stack } from "@chakra-ui/react"
-import { get_topic_groups } from "../Constants.js"
+import { backend_url } from "../Constants.js"
 import Announcement from '../components/dashboard/Announcement/Announcement'
 import { ReactComponent as Learn } from "../static/svgs/undraw_Online_learning_re_qw08.svg"
 import { ReactComponent as Study } from "../static/svgs/undraw_studying_s3l7.svg"
@@ -24,13 +24,13 @@ function MainSelection() {
         async function fetchData() {
             try {
                 //Need to get user logged in
-                const enrolled = await fetch("http://localhost:8000/user/1").then(e => e.json()).then(e => {
+                const enrolled = await fetch( backend_url + "user/1").then(e => e.json()).then(e => {
                     setCourses(e.enrolled_courses)
                     return e.enrolled_courses
                 })
                 const topic_groups = await Promise.all(
                     enrolled.map(course => {
-                        return fetch("http://localhost:8000/topicgroup/" + course.name ).then(e => e.json()).then(e => {
+                        return fetch(backend_url + "topicgroup/" + course.name ).then(e => e.json()).then(e => {
                             //Need to get most recently accessed
                             setContent([e.topics_list[0], e.topic_code])
                             return e
@@ -41,7 +41,7 @@ function MainSelection() {
                     topic_groups.map(e => {
                         e.announcements_list.map(announce => {
                             if (recent_announce === null || Date.parse(recent_announce.post_date) > Date.parse(announce.post_date)) {
-                                fetch("http://localhost:8000/user/" + announce.author).then(resp => resp.json()).then(user => {
+                                fetch(backend_url + "user/" + announce.author).then(resp => resp.json()).then(user => {
                                     announce = {... announce, author: user.user_name}
                                     setRecent(announce)
                                     setCode(e.topic_code)

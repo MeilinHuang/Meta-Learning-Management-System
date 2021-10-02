@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Sidebar from "../components/Sidebar.js"
 import WidgetsBar from "../components/WidgetsBar.js"
 import CourseContentPage from "../pages/CourseContentPage.js"

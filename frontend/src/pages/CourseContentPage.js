@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { 
-    useToast, 
+import {  
     Spinner, 
     Heading, 
     Text, 
@@ -19,20 +18,18 @@ import {
     InputGroup,
     InputLeftElement,
     Input, 
-    IconButton,
 } from "@chakra-ui/react"
 import { GrTree } from "react-icons/gr"
-import { SearchIcon, DownloadIcon } from "@chakra-ui/icons"
+import { SearchIcon } from "@chakra-ui/icons"
 import {get_topics_url} from "../Constants.js"
 import { useHistory } from 'react-router-dom'
 
 function CourseContentPage() {
     const [data, setData] = useState(null)
     const [display, setDisplay] = useState([])
-    const [files, setFiles] = useState([])
+    const [loaded, setLoaded] = useState([])
     const treeButton = useBreakpointValue({base: <GrTree/>, md: "TOPIC TREE"})
 
-    const download = useToast()
     let history = useHistory()
     let course = history.location.pathname.split("/").filter(e => e !== "")[1]
     useEffect(() => {
@@ -44,9 +41,39 @@ function CourseContentPage() {
         })
     }, [])
     
+    useEffect(() => {
+        if (data) {
+            data.map(topic => {
+                topic.prereqs.map(prereq => {
+                    let button = document.getElementById("prereq-" + prereq.name)
+                    if (button) {
+                        button.addEventListener("click", e => {
+                            let prereq_button = document.getElementById("accordion-button-topic-" + prereq.name)
+                            if (prereq_button) {
+                                const position = prereq_button.getBoundingClientRect()
+                                prereq_button.animate([{
+                                    transform: "scale(1)",
+                                },
+                                {
+                                    transform: "scale(1.04)",
+                                },
+                                {
+                                    transform: "scale(1)",
+                                }
+                                ], 300)
+                                window.scrollTo({
+                                    top: position.top
+                                })
+                            }
+                        })
+                    }
+                })
+            })
+        }
+    })
+
     const categories = ["Preparation", "Content", "Practice", "Assessments"]
 
-    let counter = 0
     let pageView = (
 
         <Center alignContent="center">
@@ -60,7 +87,7 @@ function CourseContentPage() {
                     <Accordion width="100%" allowMultiple>
                         { display.map(e => {
                             return (
-                                <AccordionItem key={"section " + e.name}>
+                                <AccordionItem key={"section " + e.name} id={"topic-" + e.name}>
                                     <Flex width="100%">
                                         <AccordionButton>
                                             <Flex flexGrow={1} textAlign="left">
@@ -69,11 +96,27 @@ function CourseContentPage() {
                                                     {e.name}
                                                 </Heading>
                                             </Flex>
+                                            <AccordionIcon></AccordionIcon>
                                         </AccordionButton>
                                     </Flex>
                                     {   
                                         <AccordionPanel>
                                                 <Accordion width="100%" allowMultiple>
+                                                    <Flex paddingBlock={3}>
+                                                        { e.prereqs.length > 0 ?
+                                                            <Flex>
+                                                                <Text>Prerequisites: </Text>
+                                                                {e.prereqs.map(prereq => {
+                                                                    return (
+                                                                        <Button key={e.name + "-prereq-" + prereq.name} marginLeft={"1vw"} height={7} id={"prereq-" + prereq.name}>
+                                                                            {prereq.name}
+                                                                        </Button>
+                                                                    )
+                                                                })}
+                                                            </Flex>
+                                                            : <Text>No prerequisites</Text>
+                                                        }
+                                                    </Flex>
                                                     {
                                                         categories.map(category => {
                                                             return (

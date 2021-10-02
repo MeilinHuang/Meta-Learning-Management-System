@@ -1,8 +1,8 @@
 import React, { useEffect, useState} from "react"
 import { useHistory } from 'react-router-dom'
-import { Stack, Text, Box, Flex, Drawer, DrawerOverlay, DrawerCloseButton, DrawerContent, Select, Avatar, DrawerHeader, Menu, MenuButton, Portal, MenuList, MenuItem} from "@chakra-ui/react"
+import { Stack, Text, Box, Flex, Drawer, DrawerOverlay, DrawerCloseButton, DrawerContent, Avatar, Menu, MenuButton, Portal, MenuList, MenuItem} from "@chakra-ui/react"
 import { ChevronDownIcon, ArrowBackIcon, HamburgerIcon } from '@chakra-ui/icons'
-import { get_topic_group } from "../Constants.js"
+import { get_topic_group, backend_url } from "../Constants.js"
 
 
 function SidebarContent({history, links}) {
@@ -36,6 +36,7 @@ function SidebarContent({history, links}) {
 
 function Sidebar({links, isOpen, setOpen, variant, page}) {
     const history = useHistory()
+    const [url, setURL] = useState(window.location.pathname)
     const [drawer_header, setDrawer] = useState(null)
     const [title, setTitle] = useState((
         <Flex flexDirection="column" bg="blue.500" color="white" height={90} textAlign="left" justifyContent="center">
@@ -50,10 +51,11 @@ function Sidebar({links, isOpen, setOpen, variant, page}) {
             const course = history.location.pathname.split("/").filter(e => e !== "")[1]
             fetch(get_topic_group(course)).then(e => e.json()).then(e => {
                 let code = e.topic_code
-                fetch("http://localhost:8000/user/1").then(e => e.json()).then(e => {
+                fetch(backend_url + "user/1").then(e => e.json()).then(e => {
                     let enrolled = []
                     e.enrolled_courses.map(course => {
                         enrolled.push(course)
+                        return course
                     })
                     /*
                     setDrawer(
@@ -80,8 +82,12 @@ function Sidebar({links, isOpen, setOpen, variant, page}) {
                             </MenuButton>
                             <Portal>
                                 <MenuList zIndex={100} placement="right" onClick={e => {
-                                    history.push(e.target.value)
-                                    window.location.reload()
+                                    let tmp = window.location.pathname.split("/").filter(e => e !== "").slice(0, 2)
+                                    tmp[1] = e.target.value
+                                    tmp = "/" + tmp.join("/")
+                                    setURL(tmp)
+                                    history.push(tmp)
+                                    //window.location.reload()
                                 }}>
                                     {
                                         enrolled.map(e => <MenuItem key={"course-menu-" + e.topic_code} value={e.name}>{e.topic_code}</MenuItem>)
@@ -90,10 +96,11 @@ function Sidebar({links, isOpen, setOpen, variant, page}) {
                             </Portal>
                         </Menu>
                     )
+                    return e
                 })
             })
         }
-    }, [])
+    }, [history, page, url])
 
     if (variant === "drawer") {
         return (

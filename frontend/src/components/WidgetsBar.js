@@ -16,6 +16,7 @@ import {
 import Calendar from "./Calendar.js";
 import { isLoggedIn } from "../utils/helpers";
 import { useHistory } from "react-router-dom";
+import { backend_url} from "../Constants.js"
 
 function logOut() {
   sessionStorage.removeItem("token");
@@ -28,12 +29,13 @@ function WidgetsBar({ page }) {
 
   useEffect(() => {
     if (page === "course") {
-      let course_name = decodeURI(document.location.pathname.split("/").filter(e => e != "")[1])
-      fetch("http://localhost:8000/user/1").then(e => e.json()).then(e => {
+      let course_name = decodeURI(document.location.pathname.split("/").filter(e => e !== "")[1])
+      fetch(backend_url + "user/1").then(e => e.json()).then(e => {
         e.enrolled_courses.map(course => {
           if (course.name === course_name) {
             setProgress(parseInt(course.progress) + "%")
           }
+          return course
         })
       })
     }
@@ -63,7 +65,7 @@ function WidgetsBar({ page }) {
                 <MenuItem>Settings</MenuItem>
                 {isLoggedIn ? (
                   <MenuItem
-                    onclick={(e) => {
+                    onClick={(e) => {
                       console.log("here55");
                       logOut();
                       history.push("/");
