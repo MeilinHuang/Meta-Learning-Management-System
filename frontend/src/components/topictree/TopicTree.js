@@ -39,7 +39,8 @@ export default function TopicTree() {
         },
         "group": "",
         "discipline": "",
-        "creator": ""
+        "creator": "",
+        'tags': []
     });
     const { 
         isOpen: isOpenModal, 
@@ -80,6 +81,8 @@ export default function TopicTree() {
                         node.materials_strings.content.push(course_material.name);
                     }
                 }
+                console.log('tags', topic.tags);
+                node['tags'] = topic.tags;
                 
                 newJson.nodes.push(node);
                 for (let prereq of topic.prereqs) {
@@ -178,7 +181,8 @@ export default function TopicTree() {
                     'title': node.title,
                     'type': 'topic',
                     'materials_strings': node.materials_strings,
-                    'group': node.group
+                    'group': node.group,
+                    'tags': node.tags
                 });
                 tempNodes.push({
                     'id': node.id,
@@ -186,7 +190,8 @@ export default function TopicTree() {
                     'title': node.title,
                     'type': 'topic',
                     'materials_strings': node.materials_strings,
-                    'group': node.group
+                    'group': node.group,
+                    'tags': node.tags
                 });
             }
             nodeDict[node.id] = node;
