@@ -32,9 +32,8 @@ function MainSelection() {
                 const topic_groups = await Promise.all(
                     enrolled.map(course => {
                         return fetch(backend_url + "topicgroup/" + course.name ).then(e => e.json()).then(e => {
-                            console.log(e)
                             //Need to get most recently accessed
-                            setContent([e.topics_list[0], e.topic_code])
+                            setContent(e)
                             return e
                         })
                     })
@@ -164,11 +163,12 @@ function MainSelection() {
                     </Flex>
                     <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} marginBlock={5}>
                         <Text fontSize="2xl" letterSpacing="wide" fontWeight={600} marginBottom={5}>Continue</Text>
+                        { /* Use most recently accessed topic here */}
                         { content ? 
                             <Flex flexDirection="column">
-                                <Text fontSize="lg" letterSpacing="wide">{content[1] + " " + content[0].name}</Text>
+                                <Text fontSize="lg" letterSpacing="wide">{content.topic_code + " " + content.topics_list[0].name}</Text>
                                 <Accordion allowMultiple>
-                                    <CategoriesList topic={content[0]} course={content[1]}></CategoriesList>
+                                    <CategoriesList topic={content.topics_list[0]} course={content.name}></CategoriesList>
                                 </Accordion>
                             </Flex>
                             : 
