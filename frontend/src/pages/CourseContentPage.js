@@ -1,19 +1,10 @@
 import React, { useEffect, useState } from "react"
 import {  
-    Spinner, 
-    Heading, 
-    Text, 
+    Spinner,  
     Button, 
     Accordion, 
-    AccordionItem, 
-    AccordionButton, 
-    AccordionPanel, 
-    Stack, 
-    Checkbox, 
     Center, 
-    AccordionIcon, 
     Flex, 
-    Divider, 
     useBreakpointValue, 
     InputGroup,
     InputLeftElement,
@@ -23,11 +14,11 @@ import { GrTree } from "react-icons/gr"
 import { SearchIcon } from "@chakra-ui/icons"
 import {get_topics_url} from "../Constants.js"
 import { useHistory } from 'react-router-dom'
+import TopicAccordion from "../components/content/TopicAccordion.js"
 
 function CourseContentPage() {
     const [data, setData] = useState(null)
     const [display, setDisplay] = useState([])
-    const [loaded, setLoaded] = useState([])
     const treeButton = useBreakpointValue({base: <GrTree/>, md: "TOPIC TREE"})
 
     let history = useHistory()
@@ -72,8 +63,6 @@ function CourseContentPage() {
         }
     })
 
-    const categories = ["Preparation", "Content", "Practice", "Assessments"]
-
     let pageView = (
 
         <Center alignContent="center">
@@ -87,77 +76,7 @@ function CourseContentPage() {
                     <Accordion width="100%" allowMultiple>
                         { display.map(e => {
                             return (
-                                <AccordionItem key={"section " + e.name} id={"topic-" + e.name}>
-                                    <Flex width="100%">
-                                        <AccordionButton>
-                                            <Flex flexGrow={1} textAlign="left">
-                                                <Checkbox colorScheme="green" size="lg" marginRight="20px"></Checkbox>
-                                                <Heading size={["sm", "md"]} letterSpacing={1}>
-                                                    {e.name}
-                                                </Heading>
-                                            </Flex>
-                                            <AccordionIcon></AccordionIcon>
-                                        </AccordionButton>
-                                    </Flex>
-                                    {   
-                                        <AccordionPanel>
-                                                <Accordion width="100%" allowMultiple>
-                                                    <Flex paddingBlock={3}>
-                                                        { e.prereqs.length > 0 ?
-                                                            <Flex>
-                                                                <Text>Prerequisites: </Text>
-                                                                {e.prereqs.map(prereq => {
-                                                                    return (
-                                                                        <Button key={e.name + "-prereq-" + prereq.name} marginLeft={"1vw"} height={7} id={"prereq-" + prereq.name}>
-                                                                            {prereq.name}
-                                                                        </Button>
-                                                                    )
-                                                                })}
-                                                            </Flex>
-                                                            : <Text>No prerequisites</Text>
-                                                        }
-                                                    </Flex>
-                                                    {
-                                                        categories.map(category => {
-                                                            return (
-                                                                <AccordionItem key={e.name + "-" + category}>
-                                                                    <AccordionButton paddingRight={0} paddingLeft={5}>
-                                                                        <Checkbox colorScheme="green" size="md" marginRight="20px"></Checkbox>
-                                                                        <Text flexGrow={1} textAlign="left" letterSpacing={1}>
-                                                                            {category}
-                                                                        </Text>
-                                                                        <AccordionIcon></AccordionIcon>
-                                                                    </AccordionButton>
-                                                                    <AccordionPanel>
-                                                                        <Stack spacing={5} divider={<Divider></Divider>} paddingTop={3}>
-                                                                        { 
-                                                                            e.course_materials.map(mat => {
-                                                                                if (category.toLowerCase().indexOf(mat.type) != -1) {
-                                                                                    return (
-                                                                                        <Flex key={mat + "-" + e.name} width="100%">
-                                                                                            <Flex marginLeft="15px" flexGrow={1}>
-                                                                                                <Flex _hover={{textDecoration: "underline", cursor: "pointer"}} onClick={() => {
-                                                                                                    window.open("/_files/" + course + "/" + e.name + "/" + mat.name)
-                                                                                                }}>
-                                                                                                    <Checkbox colorScheme="green" size="md" marginRight="20px"></Checkbox>
-                                                                                                    <Text overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" >{mat.name}</Text>
-                                                                                                </Flex>
-                                                                                            </Flex>
-                                                                                        </Flex>
-                                                                                    )
-                                                                                }
-                                                                            })
-                                                                        }
-                                                                        </Stack>
-                                                                    </AccordionPanel>
-                                                                </AccordionItem>
-                                                            )
-                                                        })
-                                                    }
-                                                </Accordion>
-                                        </AccordionPanel>
-                                    }
-                                </AccordionItem>
+                                <TopicAccordion topic={e} course={course} key={"section " + e.name} ></TopicAccordion>
                             )
                         }) }
                     </Accordion>

@@ -5,6 +5,7 @@ import { backend_url } from "../Constants.js"
 import Announcement from '../components/dashboard/Announcement/Announcement'
 import { ReactComponent as Learn } from "../static/svgs/undraw_Online_learning_re_qw08.svg"
 import { ReactComponent as Study } from "../static/svgs/undraw_studying_s3l7.svg"
+import CategoriesList from "../components/content/CategoriesList.js"
 
 function MainSelection() {
     const [courses, setCourses] = useState([])
@@ -31,6 +32,7 @@ function MainSelection() {
                 const topic_groups = await Promise.all(
                     enrolled.map(course => {
                         return fetch(backend_url + "topicgroup/" + course.name ).then(e => e.json()).then(e => {
+                            console.log(e)
                             //Need to get most recently accessed
                             setContent([e.topics_list[0], e.topic_code])
                             return e
@@ -50,18 +52,6 @@ function MainSelection() {
                         })
                     })
                 )
-                /*
-                Promise.all(
-                    announcements.map(async e => {
-                        console.log(e)
-                        let data = await e[0].json()
-                        data = data[0]
-                        if (recent_announce === null || Date.parse(recent_announce.post_date) > Date.parse(data.post_date)) {
-                            
-                        }
-                    })
-                )
-                */
             }
             catch (error) {
                 console.log(error)
@@ -150,7 +140,6 @@ function MainSelection() {
                         <VStack divider={<Divider></Divider>} spacing={5}>
                             {   courses.length > 0 ?
                                 courses.map(course => {
-                                    //TODO GET COMPLETION
                                     const progress = parseInt(course.progress) + "%"
                                     return (
                                         <Flex width="100%" key={course.name + "-progress"}>
@@ -173,41 +162,13 @@ function MainSelection() {
                             }
                         </VStack>
                     </Flex>
-                    <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} marginTop={5}>
+                    <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} marginBlock={5}>
                         <Text fontSize="2xl" letterSpacing="wide" fontWeight={600} marginBottom={5}>Continue</Text>
                         { content ? 
                             <Flex flexDirection="column">
                                 <Text fontSize="lg" letterSpacing="wide">{content[1] + " " + content[0].name}</Text>
                                 <Accordion allowMultiple>
-                                    { 
-                                        categories.map(e => {
-                                            return (
-                                                <AccordionItem key={e + "-accordion"}>
-                                                    <AccordionButton>
-                                                        <Text flexGrow={1} textAlign="left" fontWeight="500">{e}</Text>
-                                                        <AccordionIcon></AccordionIcon>
-                                                    </AccordionButton>
-                                                    <AccordionPanel>
-                                                        <Stack divider={<Divider></Divider>} spacing={2}>
-                                                            {
-                                                                //Need to check if is correct category
-                                                                content[0].course_materials.map(mat => {
-                                                                    if (mat.type === e.toLowerCase()) {
-                                                                        return (
-                                                                            <Flex key={e + "-material-" + mat.name} marginLeft={5}>
-                                                                                <Text fontSize="sm">{mat.name}</Text>
-                                                                            </Flex>
-                                                                        )
-                                                                    }
-                                                                    else return null
-                                                                })
-                                                            }
-                                                        </Stack>
-                                                    </AccordionPanel>
-                                                </AccordionItem>
-                                            )
-                                        })
-                                    }
+                                    <CategoriesList topic={content[0]} course={content[1]}></CategoriesList>
                                 </Accordion>
                             </Flex>
                             : 
