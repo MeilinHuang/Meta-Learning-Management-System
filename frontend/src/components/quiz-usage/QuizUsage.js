@@ -9,11 +9,19 @@ import {
   Flex,
   Heading,
   Icon,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalOverlay,
+  ModalHeader,
   Radio,
   RadioGroup,
   Stack,
   Text,
   Textarea,
+  useDisclosure,
   VStack,
 } from "@chakra-ui/react"
 
@@ -29,6 +37,7 @@ export default function QuizUsage() {
   const [studentSubmission, setStudentSubmission] = useState({});
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [currQuestionNo, setCurrQuestionNo] = useState(0);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     // TODO: Replace with a GET call to get questions
@@ -82,9 +91,7 @@ export default function QuizUsage() {
     // Store questions locally for quiz
     setQuestions(receivedQuestions);
 
-    console.log("Received questions:");
-    console.log(receivedQuestions);
-
+    // Fill student submissions object with relevant details and setup
     const newSubmission = {
       quiz_id: 1,
       answers: []
@@ -113,9 +120,6 @@ export default function QuizUsage() {
       quiz_id: 1,
       answers: []
     };
-
-    console.log("QUESTIONS: ");
-    console.log(questions);
 
     questions.forEach(qs => {
       const answerObj = {
@@ -170,8 +174,6 @@ export default function QuizUsage() {
 
   const renderMultipleChoiceAnswers = (q) => {
     const studentAnswer = getStudentAnswerToCurrentQuestion();
-    console.log("MC SA: ");
-    console.log(studentAnswer);
 
     return (
       <Box my={5}>
@@ -195,7 +197,7 @@ export default function QuizUsage() {
 
     return (
       <Box my={5}>
-        <Text mb={2} fontWeight="bold" color="gray.600">Enter a possible correct answer</Text>
+        <Text mb={2} fontWeight="bold" color="gray.600">Enter your answer</Text>
         <Textarea onChange={onChangeShortAnswer} value={displayedAnswer} />
       </Box>
     );
@@ -221,12 +223,10 @@ export default function QuizUsage() {
   };
 
   const onChangeCheckboxAnswer = (idx) => (e) => {
-    // TODO(Fix): Does not work - answer not being updated - crashes before it can happen
     let updatedAnswersForQuestion = [];
 
     const foundAnswer = studentSubmission?.answers?.find(ansObj => ansObj.question_id === questions[currQuestionNo].question_id);
-    console.log("#### CB Found answer");
-    console.log(foundAnswer);
+
     if (foundAnswer && foundAnswer.student_answers.length > 0) {
       foundAnswer.student_answers.forEach(ans => {
         updatedAnswersForQuestion.push(ans);
@@ -238,28 +238,18 @@ export default function QuizUsage() {
 
     if (e.target.checked && !isAlreadySelected) {
       // Add in new selected answer
-      // newSelectedAnswers = selectedAnswers.concat([newAnswer]);
       updatedAnswersForQuestion = updatedAnswersForQuestion.concat([newAnswer]);
 
       const updatedAnswers = studentSubmission.answers.map(ansObj => (ansObj.question_id === questions[currQuestionNo].question_id) ? { ...ansObj, student_answers: updatedAnswersForQuestion } : ansObj);
       setStudentSubmission({ ...studentSubmission, answers: updatedAnswers });
-      console.log("CB Updated Answer: ");
-      console.log(updatedAnswers);
     }
     else if (!e.target.checked && isAlreadySelected) {
       // Remove unselected answer
-      // newSelectedAnswers = [...selectedAnswers];
-      //  newSelectedAnswers.pop(newAnswer);
       updatedAnswersForQuestion.pop(newAnswer);
 
       const updatedAnswers = studentSubmission.answers.map(ansObj => (ansObj.question_id === questions[currQuestionNo].question_id) ? { ...ansObj, student_answers: updatedAnswersForQuestion } : ansObj);
       setStudentSubmission({ ...studentSubmission, answers: updatedAnswers });
-      console.log("CB Updated Answer: ");
-      console.log(updatedAnswers);
     }
-
-    // console.log(newSelectedAnswers);
-    // setSelectedAnswers(newSelectedAnswers);
   };
 
   const updateAnswerToCurrentQuestion = () => {
@@ -319,6 +309,7 @@ export default function QuizUsage() {
   };
 
   const onClickSubmitAnswers = () => {
+    console.log("Submitting answers....");
     // TODO: Add message indicating there are unanswered questions - "Are you sure?"
 
     // TODO: POST request to submit studentSubmission
@@ -338,6 +329,10 @@ export default function QuizUsage() {
     );
   };
 
+  const viewClickedQuestion = (qNumber) => {
+    setCurrQuestionNo(qNumber);
+  };
+
   const printStudentSubmissionAnswers = () => {
     console.log("---- Student submission ------");
     console.log(studentSubmission);
@@ -348,6 +343,13 @@ export default function QuizUsage() {
 
       </Box>
     );
+  };
+
+  const startTimer = () => {
+    // TODO: Send POST request to make new student attempt with current time as start time
+
+    // Get current time 
+
   };
 
   return (
@@ -361,14 +363,34 @@ export default function QuizUsage() {
         </Text>
         {/* TODO: Uncomment this when able to figure out render questions status box */}
         <Stack direction="row" mt={5} h="40%" p={4} border="1px" borderRadius="md" borderColor="gray.400">
-          {questions.map((qs, index) => <Box key={index}>{renderQuestionStatusBox(qs, index + 1)}</Box>)}
+          {questions.map((qs, index) => <Box key={index} onClick={() => viewClickedQuestion(index)}>{renderQuestionStatusBox(qs, index + 1)}</Box>)}
           {/* <Box>{renderQuestionStatusBox(questions[0], 1)}</Box>
           <Box>{renderQuestionStatusBox(questions[0], 2)}</Box>
           <Box>{renderQuestionStatusBox(questions[0], 3)}</Box> */}
         </Stack>
 
         <Box mt={10}>
-          <Button colorScheme="blue" onClick={onClickSubmitAnswers}>Submit answers</Button>
+          <Button colorScheme="blue" onClick={onOpen}>Submit answers</Button>
+
+          <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Submit answer</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text>Are you sure you want to submit?</Text>
+                <br></br>
+                <Text>You will not be able to edit your answers after submitting.</Text>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button colorScheme="blue" mr={3} onClick={onClose}>
+                  Submit
+              </Button>
+                <Button variant="ghost" onClick={() => { onClose(); onClickSubmitAnswers(); }}>Cancel</Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         </Box>
       </Box>
       <Box flex="0.1" borderLeft="1px" borderColor="gray.400" height="890px" />
@@ -377,6 +399,10 @@ export default function QuizUsage() {
         {/* {getStudentAnswerToCurrentQuestion()?.map(a => <Text key={a}>{a}</Text>)} */}
       </Box>
       {printStudentSubmissionAnswers()}
+
+      <Box>
+        <Button variant="ghost" onClick={startTimer}>Start Timer</Button>
+      </Box>
     </Flex>
 
   );
