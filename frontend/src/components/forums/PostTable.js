@@ -5,6 +5,7 @@ import { useTable, useSortBy } from 'react-table'
 import {
     Box,
     Button,
+    Center,
     Flex,
     Icon,
     IconButton,
@@ -80,9 +81,9 @@ function PostTable({ isAdmin, posts: postData, code }) {
                                     textAlign="center"
                                     fontSize="12px"
                                 >
-                                    <span>
-                                        <Icon h="13px" w="1px" ml="8px" color="green" as={FaCheckCircle} />
-                                    </span>
+                                    <Center as="span" verticalAlign="middle">
+                                        <Icon h="13px" w="13px" ml="8px" color="green" as={FaCheckCircle} />
+                                    </Center>
                                 </Tooltip>
                             )}
                         </Flex>

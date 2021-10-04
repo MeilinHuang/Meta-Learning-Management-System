@@ -1175,7 +1175,6 @@ async function getAllForumPosts(request, response) {
       object.comments = commentsArr;
       object.attachments = fileArr;
     }
-    console.log(resp.rows);
     response.status(200).json(resp.rows);
   } catch (e) {
     console.log(e);
@@ -1371,26 +1370,122 @@ async function getFilterPosts(request, response) {
     );
     const topicGroupId = tmpQ.rows[0].id;
     const forumFilterTerm = request.params.forumFilterTerm;
-    let resp = await pool.query(
-      `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
-      array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
-      array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
-      array_agg(DISTINCT comments.comment_id) as comments
-      FROM forum_posts fp
-      LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
-      LEFT JOIN tags t ON t.tag_id = pt.tag_id
-      LEFT JOIN post_replies pr ON pr.post_id = fp.post_id
-      LEFT JOIN replies r ON r.reply_id = pr.reply_id
-      LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
-      LEFT JOIN comments ON comments.comment_id = pc.comment_id
-      LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
-      LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
-      WHERE LOWER(t.name) LIKE LOWER($1)
-      AND fp.topic_group = $2
-      GROUP BY fp.post_id`,
-      [`%${forumFilterTerm}%`, topicGroupId]
-    );
+
+    const checkTag = await pool.query(`SELECT * from tags WHERE LOWER(name) LIKE LOWER($1)`, [`%${forumFilterTerm}%`])
+
+    let resp
+    if (checkTag.rows.length) {
+      resp = await pool.query(
+        `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
+        fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
+        array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
+        array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
+        array_agg(DISTINCT comments.comment_id) as comments
+        FROM forum_posts fp
+        LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
+        LEFT JOIN tags t ON t.tag_id = pt.tag_id
+        LEFT JOIN post_replies pr ON pr.post_id = fp.post_id
+        LEFT JOIN replies r ON r.reply_id = pr.reply_id
+        LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
+        LEFT JOIN comments ON comments.comment_id = pc.comment_id
+        LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
+        LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
+        WHERE LOWER(t.name) LIKE LOWER($1)
+        AND fp.topic_group = $2
+        GROUP BY fp.post_id`,
+        [`%${forumFilterTerm}%`, topicGroupId]
+      );
+    } else {
+      console.log(forumFilterTerm.toLowerCase())
+      switch(forumFilterTerm) {
+        case 'announcement':
+          resp = await pool.query(
+            `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
+            fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
+            array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
+            array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
+            array_agg(DISTINCT comments.comment_id) as comments
+            FROM forum_posts fp
+            LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
+            LEFT JOIN tags t ON t.tag_id = pt.tag_id
+            LEFT JOIN post_replies pr ON pr.post_id = fp.post_id
+            LEFT JOIN replies r ON r.reply_id = pr.reply_id
+            LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
+            LEFT JOIN comments ON comments.comment_id = pc.comment_id
+            LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
+            LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
+            WHERE fp.fromAnnouncement = true
+            AND fp.topic_group = $1
+            GROUP BY fp.post_id`,
+            [topicGroupId])
+          break
+        case 'answered':
+          resp = await pool.query(
+            `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
+            fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
+            array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
+            array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
+            array_agg(DISTINCT comments.comment_id) as comments
+            FROM forum_posts fp
+            LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
+            LEFT JOIN tags t ON t.tag_id = pt.tag_id
+            LEFT JOIN post_replies pr ON pr.post_id = fp.post_id
+            LEFT JOIN replies r ON r.reply_id = pr.reply_id
+            LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
+            LEFT JOIN comments ON comments.comment_id = pc.comment_id
+            LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
+            LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
+            WHERE fp.topic_group = $1
+            GROUP BY fp.post_id
+            HAVING Count(r.reply_id) > 0 OR Count(comments.comment_id) > 0`,
+            [topicGroupId])
+          break
+        case 'unanswered':
+          resp = await pool.query(
+            `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
+            fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
+            array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
+            array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
+            array_agg(DISTINCT comments.comment_id) as comments
+            FROM forum_posts fp
+            LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
+            LEFT JOIN tags t ON t.tag_id = pt.tag_id
+            LEFT JOIN post_replies pr ON pr.post_id = fp.post_id
+            LEFT JOIN replies r ON r.reply_id = pr.reply_id
+            LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
+            LEFT JOIN comments ON comments.comment_id = pc.comment_id
+            LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
+            LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
+            WHERE fp.topic_group = $1
+            GROUP BY fp.post_id
+            HAVING Count(r.reply_id) = 0 AND Count(comments.comment_id) = 0`,
+            [topicGroupId])
+          break
+        case 'endorsed':
+          resp = await pool.query(
+            `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
+            fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
+            array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
+            array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
+            array_agg(DISTINCT comments.comment_id) as comments
+            FROM forum_posts fp
+            LEFT JOIN post_tags pt ON pt.post_id = fp.post_id
+            LEFT JOIN tags t ON t.tag_id = pt.tag_id
+            LEFT JOIN post_replies pr ON pr.post_id = fp.post_id
+            LEFT JOIN replies r ON r.reply_id = pr.reply_id
+            LEFT JOIN post_comments pc ON pc.post_id = fp.post_id
+            LEFT JOIN comments ON comments.comment_id = pc.comment_id
+            LEFT JOIN forum_post_files file ON file.post_id = fp.post_id
+            LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
+            WHERE fp.isEndorsed = true
+            AND fp.topic_group = $1
+            GROUP BY fp.post_id`,
+            [topicGroupId])
+          break
+        default:
+          resp = []
+      }
+    }
 
     for (var object of resp.rows) {
       var tagsArr = [];
