@@ -81,6 +81,24 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     window.location.reload();
   };
 
+  const deleteTag = async (tagToDelete) => {
+    let copyTags = JSON.parse(JSON.stringify(tempTags));
+    const index = copyTags.indexOf(tagToDelete);
+    if (index > -1) {
+      copyTags.splice(index, 1);
+    }
+    setTempTags(copyTags);
+    await fetch(post_topic_tag(topicGroupName, data.title), {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'tagName': tagToDelete.name
+      })
+    });
+  }
+
   const deletePrerequisite = async (prereqToDelete) => {
     // Delete from array
     let copyPrereqs = JSON.parse(JSON.stringify(tempPrereqs));
@@ -242,7 +260,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                     return (
                       <Tr key={tag.name}>
                         <Td>{tag.name}</Td>
-                        <Td><Button colorScheme="red" onClick={(e) => console.log(e)}>Delete</Button></Td>
+                        <Td><Button colorScheme="red" onClick={() => deleteTag(tag)}>Delete</Button></Td>
                       </Tr>
                     );
                   })}
@@ -254,7 +272,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                     <Td><Flex flexDirection="row" w="8rem" alignItems="center" justifyContent="space-between"><Button colorScheme="green" onClick={createNewTag}>Create</Button><CloseButton onClick={hideAddTag}/></Flex></Td>
                   </Tr>
                   : <></>}
-                  <Button mb={5} colorScheme="blue" onClick={showAddTag}>Add Tag</Button>
+                  <Button mb={gb5} colorScheme="blue" onClick={showAddTag}>Add Tag</Button>
                 </Tbody>
               </Table>
             </Box>

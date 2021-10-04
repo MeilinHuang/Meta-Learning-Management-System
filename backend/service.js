@@ -804,6 +804,57 @@ async function putTopicTag(request, response) {
   }
 }
 
+async function deleteTopicTag(request, response) {
+  try {
+    const topicName = request.params.topicName;
+    const topicGroupName = request.params.topicGroupName;
+
+    const tagName = request.body.tagName;
+    console.log('tagName', tagName);
+    console.log('topicName', topicName);
+    console.log('topicGroupName', topicGroupName);
+    let tgReq = await pool.query(
+      `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
+      [topicGroupName]
+    );
+    if (!tgReq.rows.length)
+      throw `Failed: topic group {${topicGroupName}} does not exist`;
+
+    let tReq = await pool.query(
+      `SELECT id FROM topics WHERE LOWER(name) = LOWER($1)`,
+      [topicName]
+    );
+    if (!tReq.rows.length) throw `Failed: topic {${topicName}} does not exist`;
+
+    const topicGroupId = tgReq.rows[0].id;
+    const topicId = tReq.rows[0].id;
+    
+    let resp = await pool.query(
+      `SELECT tag_id FROM tags WHERE LOWER(name) = LOWER($1)`,
+      [tagName]
+    );
+    
+    for (let i = 0; i < resp.rows.length; i++) {
+      let tagId = resp.rows[i].tag_id;
+      let topicTagRes = await pool.query(
+        `SELECT topic_id, tag_id FROM topic_tags WHERE tag_id = $1 AND topic_id = $2`,
+        [tagId, topicId]
+      );
+      if (topicTagRes.rows.length > 0) {
+        await pool.query(`DELETE FROM topic_tags WHERE tag_id = $1 and topic_id = $2`,
+        [tagId, topicId]);
+        break;
+      }
+    }
+
+    response.sendStatus(200);
+
+  } catch (e) {
+    console.log(e);
+    response.status(400).json({ error: e });
+  }
+}
+
 // Update topic details
 async function putTopic(request, response) {
   try {
@@ -3595,5 +3646,6 @@ module.exports = {
   getTopicFile,
   putTopicGroup,
   putTopic,
-  putTopicTag
+  putTopicTag,
+  deleteTopicTag
 };
