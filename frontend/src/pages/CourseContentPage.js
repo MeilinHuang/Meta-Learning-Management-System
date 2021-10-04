@@ -12,11 +12,10 @@ import {
 } from "@chakra-ui/react"
 import { GrTree } from "react-icons/gr"
 import { SearchIcon } from "@chakra-ui/icons"
-import {get_topics_url} from "../Constants.js"
 import { useHistory } from 'react-router-dom'
 import TopicAccordion from "../components/content/TopicAccordion.js"
 
-function CourseContentPage() {
+function CourseContentPage({topicGroup}) {
     const [data, setData] = useState(null)
     const [display, setDisplay] = useState([])
     const treeButton = useBreakpointValue({base: <GrTree/>, md: "TOPIC TREE"})
@@ -24,14 +23,12 @@ function CourseContentPage() {
     let history = useHistory()
     let course = history.location.pathname.split("/").filter(e => e !== "")[1]
     useEffect(() => {
-        fetch(get_topics_url(course)).then(e => {
-            return e.json()
-        }).then(e => {
-            setData(e.topics_list)
-            setDisplay(e.topics_list)
-        })
-    }, [])
-    
+        if (topicGroup) {
+            setData(topicGroup.topics_list)
+            setDisplay(topicGroup.topics_list)
+        }
+    }, [topicGroup])
+
     useEffect(() => {
         if (data) {
             data.map(topic => {
@@ -51,9 +48,13 @@ function CourseContentPage() {
                                 {
                                     transform: "scale(1)",
                                 }
-                                ], 300)
+                                ], { 
+                                    duration: 300,
+                                    delay: 300
+                                })
                                 window.scrollTo({
-                                    top: position.top
+                                    top: position.top,
+                                    behavior: "smooth",
                                 })
                             }
                         })
@@ -62,28 +63,6 @@ function CourseContentPage() {
             })
         }
     })
-
-    let pageView = (
-
-        <Center alignContent="center">
-            <Spinner size="xl"/>
-        </Center>
-    )
-    if (data != null) {
-        pageView =  (
-            <Flex justify="center" marginBottom={10}>
-                <Flex flexDirection="column" width={["100%", "100%", "80%"]}>
-                    <Accordion width="100%" allowMultiple>
-                        { display.map(e => {
-                            return (
-                                <TopicAccordion topic={e} course={course} key={"section " + e.name} ></TopicAccordion>
-                            )
-                        }) }
-                    </Accordion>
-                </Flex>
-            </Flex>
-        )
-    }
     return (
         <>
             <Flex justify="center" marginBottom={10}>
@@ -110,7 +89,22 @@ function CourseContentPage() {
                     </InputGroup>
                 </Flex>
             </Flex>
-            {pageView}
+            { display ? 
+                <Flex justify="center" marginBottom={10}>
+                    <Flex flexDirection="column" width={["100%", "100%", "80%"]}>
+                        <Accordion width="100%" allowMultiple>
+                            { display.map(e => {
+                                return (
+                                    <TopicAccordion topic={e} course={course} key={"section " + e.name} ></TopicAccordion>
+                                )
+                            }) }
+                        </Accordion>
+                    </Flex>
+                </Flex> : 
+                <Center alignContent="center">
+                    <Spinner size="xl"/>
+                </Center>
+            }
         </>
     )
 }

@@ -6,12 +6,11 @@ import { ChakraProvider } from "@chakra-ui/react"
 import {
     BrowserRouter as Router,
     Switch,
-    Route
+    Route,
 } from "react-router-dom"
 import TopicTree from "./components/topictree/TopicTree.js"
 import LoginForm from "./components/login/LoginForm";
 import CourseInvite from "./components/enrollment/JoinCourse";
-import TopicGroupList from "./components/topictree/TopicGroupList.js";
 import TopicTreeList from "./components/topictree/TopicTreeList.js";
 
 function App() {

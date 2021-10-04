@@ -12,32 +12,32 @@ import {
   Portal,
   MenuList,
   MenuItem,
+  Spinner
 } from "@chakra-ui/react";
 import Calendar from "./Calendar.js";
 import { isLoggedIn } from "../utils/helpers";
 import { useHistory } from "react-router-dom";
-import { backend_url} from "../Constants.js"
 
 function logOut() {
   sessionStorage.removeItem("token");
   sessionStorage.removeItem("staff");
 }
 
-function WidgetsBar({ page }) {
+function WidgetsBar({ page, user }) {
   const history = useHistory();
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     if (page === "course") {
-      let course_name = decodeURI(document.location.pathname.split("/").filter(e => e !== "")[1])
-      fetch(backend_url + "user/1").then(e => e.json()).then(e => {
-        e.enrolled_courses.map(course => {
+      if (user) {
+        let course_name = decodeURI(document.location.pathname.split("/").filter(e => e !== "")[1])
+        user.enrolled_courses.map(course => {
           if (course.name === course_name) {
             setProgress(parseInt(course.progress) + "%")
           }
           return course
         })
-      })
+      }
     }
   })
 
@@ -52,12 +52,17 @@ function WidgetsBar({ page }) {
         <Flex alignItems="center" justifyContent="center" marginTop={3}>
           <Menu isLazy>
             <MenuButton _hover={{ textDecoration: "underline" }}>
-              <Flex alignItems="center">
-                <Avatar name="John Smith" src="https://bit.ly/dan-abramov" />
-                <Box paddingLeft={3}>
-                  <Text fontWeight="medium">John Smith</Text>
-                </Box>
-              </Flex>
+              {
+                  user ? (
+                    <Flex alignItems="center">
+                      <Avatar name={user.user_name}/>
+                      <Box paddingLeft={3}>
+                      <Text fontWeight="medium">{user.user_name}</Text>
+                      </Box>
+                    </Flex>
+                  )
+                  : <Spinner/>
+              }
             </MenuButton>
             <Portal>
               <MenuList zIndex={100}>
