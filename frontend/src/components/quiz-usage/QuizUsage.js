@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
+  Center,
   Checkbox,
   CheckboxGroup,
   Divider,
@@ -30,6 +31,7 @@ import { TiTick } from "react-icons/ti";
 import { FaQuestion } from "react-icons/fa";
 import { BsQuestion } from "react-icons/bs";
 import { select } from 'd3';
+import format from 'date-fns/format';
 
 export default function QuizUsage() {
   const [quizId, setQuizId] = useState(0);
@@ -37,6 +39,7 @@ export default function QuizUsage() {
   const [studentSubmission, setStudentSubmission] = useState({});
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [currQuestionNo, setCurrQuestionNo] = useState(0);
+  const [hasSubmittedAttempt, setHasSubmittedAttempt] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
@@ -92,8 +95,13 @@ export default function QuizUsage() {
     setQuestions(receivedQuestions);
 
     // Fill student submissions object with relevant details and setup
+    // TODO: Change this to when student presses "Start Quiz"
+    const currTime = format(new Date(), 'MMMM do yyyy, h:mm:ss aa');
+
     const newSubmission = {
       quiz_id: 1,
+      attempt_start_time: currTime,
+      attempt_end_time: currTime,
       answers: []
     };
 
@@ -313,6 +321,14 @@ export default function QuizUsage() {
     // TODO: Add message indicating there are unanswered questions - "Are you sure?"
 
     // TODO: POST request to submit studentSubmission
+
+    // Once POST request is done, show submission completed text, time submitted and how much time before due date
+    setHasSubmittedAttempt(true);
+
+    // Update attempt end time
+    const submittedSubmission = studentSubmission;
+    submittedSubmission.attempt_end_time = format(new Date(), 'MMMM do yyyy, h:mm:ss aa');
+    setStudentSubmission(submittedSubmission);
   };
 
   const renderQuestionStatusBox = (qs, index) => {
@@ -329,6 +345,21 @@ export default function QuizUsage() {
     );
   };
 
+
+  const renderSuccessfulSubmissionConfirmation = () => {
+    return (
+      <Box>
+        <Center mx="3" mt="10">
+          <Box>
+            <Text>Your quiz attempt has been submitted successfully.</Text>
+            <br></br>
+            <Text>Time submitted: {studentSubmission.attempt_end_time}</Text>
+          </Box>
+        </Center>
+      </Box>
+    );
+  };
+
   const viewClickedQuestion = (qNumber) => {
     setCurrQuestionNo(qNumber);
   };
@@ -337,19 +368,14 @@ export default function QuizUsage() {
     console.log("---- Student submission ------");
     console.log(studentSubmission);
     console.log("--------------");
+    console.log("Date: " + format(new Date(), 'MMMM do yyyy, h:mm:ss aa'));
 
     return (
       <Box>
-
+        <Text>{studentSubmission.attempt_start_time}</Text>
+        <Text>{studentSubmission.attempt_end_time}</Text>
       </Box>
     );
-  };
-
-  const startTimer = () => {
-    // TODO: Send POST request to make new student attempt with current time as start time
-
-    // Get current time 
-
   };
 
   return (
@@ -384,26 +410,30 @@ export default function QuizUsage() {
               </ModalBody>
 
               <ModalFooter>
-                <Button colorScheme="blue" mr={3} onClick={onClose}>
+                <Button colorScheme="blue" mr={3} onClick={() => { onClose(); onClickSubmitAnswers() }}>
                   Submit
               </Button>
-                <Button variant="ghost" onClick={() => { onClose(); onClickSubmitAnswers(); }}>Cancel</Button>
+                <Button variant="ghost" onClick={onClose}>Cancel</Button>
               </ModalFooter>
             </ModalContent>
           </Modal>
         </Box>
       </Box>
       <Box flex="0.1" borderLeft="1px" borderColor="gray.400" height="890px" />
-      <Box flex="3">
-        {questions.length > 0 && renderQuestion(questions[currQuestionNo], currQuestionNo + 1)}
-        {/* {getStudentAnswerToCurrentQuestion()?.map(a => <Text key={a}>{a}</Text>)} */}
-      </Box>
-      {printStudentSubmissionAnswers()}
 
-      <Box>
-        <Button variant="ghost" onClick={startTimer}>Start Timer</Button>
-      </Box>
-    </Flex>
+      {
+        !hasSubmittedAttempt ?
+          <Box flex="3">
+            {questions.length > 0 && renderQuestion(questions[currQuestionNo], currQuestionNo + 1)}
+            {/* {getStudentAnswerToCurrentQuestion()?.map(a => <Text key={a}>{a}</Text>)} */}
+          </Box>
+          :
+          <Box flex="3">
+            {renderSuccessfulSubmissionConfirmation()}
+          </Box>
+      }
+      {printStudentSubmissionAnswers()}
+    </Flex >
 
   );
 }

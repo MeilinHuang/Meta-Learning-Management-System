@@ -38,10 +38,10 @@ export default function Assessments() {
 
   return (
     <div>
-      {/* <EditQuiz /> */}
+      <EditQuiz />
       {/* <QuizCreation /> */}
       {/* <QuestionCreation /> */}
-      <QuizUsage />
+      {/* <QuizUsage /> */}
     </div>
   );
 

@@ -39,7 +39,8 @@ import QuestionCreation from '../question-creation/QuestionCreation';
 function generateNewQuiz() {
   return {
     name: "New Quiz",
-    due_date: new Date(),
+    open_date: new Date(),
+    close_date: new Date(),
     time_given: 30,
     num_questions: 0,
     questions: [
@@ -72,8 +73,12 @@ export default function EditQuiz() {
     // TODO: Get from database when connecting with backend
   };
 
-  const onChangeDueDate = (date) => {
-    setQuiz({ ...quiz, due_date: date });
+  const onChangeOpenDate = (date) => {
+    setQuiz({ ...quiz, open_date: date });
+  }
+
+  const onChangeCloseDate = (date) => {
+    setQuiz({ ...quiz, close_date: date });
   }
 
   const renderQuizDetails = () => {
@@ -81,12 +86,10 @@ export default function EditQuiz() {
 
     let allRelatedTopics = {};
     let sortedRelatedTopicsList = [];
-    for (let i = 0; i < quiz.questions?.length; i++) 
-    {
+    for (let i = 0; i < quiz.questions?.length; i++) {
       const currentTopicId = quiz.questions[i].related_topic_id;
       const currentTopic = topics[currentTopicId];
-      if (!(currentTopic in allRelatedTopics)) 
-      {
+      if (!(currentTopic in allRelatedTopics)) {
         allRelatedTopics[currentTopic] = 1;
         sortedRelatedTopicsList.push(currentTopic);
       }
@@ -98,7 +101,7 @@ export default function EditQuiz() {
     sortedRelatedTopicsList.sort();
 
     return (
-      <Box>       
+      <Box>
         <Text fontWeight="bold" fontSize="2xl">Quiz Details</Text>
         <HStack maxWidth="300">
           <Text fontWeight="bold">Name: </Text>
@@ -106,10 +109,20 @@ export default function EditQuiz() {
         </HStack>
 
         <HStack d="flex" my="2">
+          <Text fontWeight="bold">Open date: </Text>
+          <DatePicker
+            selected={quiz.open_date}
+            onChange={onChangeOpenDate}
+            showTimeSelect
+            dateFormat="Pp"
+          />
+        </HStack>
+
+        <HStack d="flex" my="2">
           <Text fontWeight="bold">Due date: </Text>
           <DatePicker
-            selected={quiz.due_date}
-            onChange={onChangeDueDate}
+            selected={quiz.close_date}
+            onChange={onChangeCloseDate}
             showTimeSelect
             dateFormat="Pp"
           />
@@ -146,7 +159,7 @@ export default function EditQuiz() {
   const renderQuiz = () => {
     return (
       <Box>
-        
+
       </Box>
     );
   };
@@ -168,7 +181,7 @@ export default function EditQuiz() {
           <Box>
             <QuestionCreation addQuestionToQuiz={addQuestionToQuiz} topics={topics} isCreatingQuestion={false} />
           </Box>
-        </AccordionPanel>        
+        </AccordionPanel>
       </Box>
     );
   };
@@ -176,7 +189,7 @@ export default function EditQuiz() {
   const renderQuestions = () => {
     return (
       <Box>
-        <HStack> 
+        <HStack>
           <Box d="flex">
             <Heading width="40rem">Questions</Heading>
             <HStack spacing="3">
@@ -199,27 +212,24 @@ export default function EditQuiz() {
   };
 
   const onChangeQuestionItems = (expandedIndices) => {
-    let newQuestions = quiz.questions?.map((qs, index) => { 
+    let newQuestions = quiz.questions?.map((qs, index) => {
       const obj = Object.assign({}, qs);
-      if (expandedIndices.includes(index) && !obj.is_expanded)
-      {
+      if (expandedIndices.includes(index) && !obj.is_expanded) {
         obj.is_expanded = true;
       }
-      else if (!expandedIndices.includes(index) && obj.is_expanded)
-      {
+      else if (!expandedIndices.includes(index) && obj.is_expanded) {
         obj.is_expanded = false;
       }
       return obj;
     });
 
-    setQuiz({ ...quiz, questions: newQuestions});
+    setQuiz({ ...quiz, questions: newQuestions });
   };
 
   const toggleQuestionItem = (questionIndex) => {
     let updatedExpandedQuestions = getExpandedQuestions();
-    
-    if (updatedExpandedQuestions.includes(questionIndex))
-    {
+
+    if (updatedExpandedQuestions.includes(questionIndex)) {
       // Selected question is currently expanded so we want to collapse it
       updatedExpandedQuestions.pop(questionIndex);
     }
@@ -235,8 +245,7 @@ export default function EditQuiz() {
   const getExpandedQuestions = () => {
     let expandedQuestions = [];
     quiz.questions?.forEach((qs, index) => {
-      if (qs.is_expanded)
-      {
+      if (qs.is_expanded) {
         expandedQuestions.push(index);
       }
     });
@@ -245,29 +254,29 @@ export default function EditQuiz() {
   };
 
   const expandAllQuestions = () => {
-    let newQuestions = quiz.questions?.map((qs, index) => { 
+    let newQuestions = quiz.questions?.map((qs, index) => {
       const obj = Object.assign({}, qs);
       obj.is_expanded = true;
       return obj;
     });
 
-    setQuiz({ ...quiz, questions: newQuestions});
+    setQuiz({ ...quiz, questions: newQuestions });
   };
 
   const collapseAllQuestions = () => {
-    let newQuestions = quiz.questions?.map((qs, index) => { 
+    let newQuestions = quiz.questions?.map((qs, index) => {
       const obj = Object.assign({}, qs);
       obj.is_expanded = false;
       return obj;
     });
 
-    setQuiz({ ...quiz, questions: newQuestions});
+    setQuiz({ ...quiz, questions: newQuestions });
   };
 
   const addQuestionToQuiz = (newQuestion) => {
     // Update questions in quiz
     const updatedQuestions = quiz.questions.concat([newQuestion])
-    setQuiz({ ...quiz, num_questions: quiz.num_questions + 1, questions: updatedQuestions});
+    setQuiz({ ...quiz, num_questions: quiz.num_questions + 1, questions: updatedQuestions });
   };
 
   const renderQuestionLinks = () => {
@@ -285,7 +294,7 @@ export default function EditQuiz() {
     return (
       <HStack key={index}>
         <Button colorScheme="teal" variant="link" onClick={() => toggleQuestionItem(+index)}>Question {index + 1}</Button>
-          <Text size="sm" color="grey">({qs.marks_awarded} {qs.marks_awarded > 1 ? "marks" : "mark"})</Text>
+        <Text size="sm" color="grey">({qs.marks_awarded} {qs.marks_awarded > 1 ? "marks" : "mark"})</Text>
         {renderTag(topics[qs.related_topic_id])}
       </HStack>
     );
@@ -295,7 +304,7 @@ export default function EditQuiz() {
     return (
       <Box size="sm" bgColor="gray.500" borderRadius="md" py={0.5} px={1}>
         <Text fontWeight="bold" fontSize="sm" color="white">{tagText}</Text>
-      </Box> 
+      </Box>
     );
   };
 
@@ -324,17 +333,14 @@ export default function EditQuiz() {
     const importingNewQuestion = (!selectingCreateOrImportQuestion && isImportingQuestion);
 
     let modalHeaderText = "";
-    
-    if (selectingCreateOrImportQuestion)
-    {
+
+    if (selectingCreateOrImportQuestion) {
       modalHeaderText = "Create or import a question";
-    } 
-    else if (creatingNewQuestion)
-    {
+    }
+    else if (creatingNewQuestion) {
       modalHeaderText = "Create a question";
     }
-    else if (importingNewQuestion)
-    {
+    else if (importingNewQuestion) {
       modalHeaderText = "Import a question";
     }
 
@@ -349,10 +355,10 @@ export default function EditQuiz() {
         <ModalContent as="form" onSubmit={handleSubmit}>
           <ModalHeader>{modalHeaderText}</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>  
-              { selectingCreateOrImportQuestion && renderCreateOrImportBox()}
-              { creatingNewQuestion && <QuestionCreation addQuestionToQuiz={addQuestionToQuiz} topics={topics} isCreatingQuestion={true} addToQuestionBank={addQuestionToQuestionBank}/> }
-              { importingNewQuestion && renderImportQuestionScreen()}
+          <ModalBody>
+            {selectingCreateOrImportQuestion && renderCreateOrImportBox()}
+            {creatingNewQuestion && <QuestionCreation addQuestionToQuiz={addQuestionToQuiz} topics={topics} isCreatingQuestion={true} addToQuestionBank={addQuestionToQuestionBank} />}
+            {importingNewQuestion && renderImportQuestionScreen()}
           </ModalBody>
           <ModalFooter>
             {/* <Button aria-label="Close" onClick={handleDialogClose}>Close</Button>
@@ -393,14 +399,14 @@ export default function EditQuiz() {
           <InputGroup>
             <Input placeholder="Enter amount" />
             <InputRightElement>
-              <SearchIcon color="gray.800"/>
-                
+              <SearchIcon color="gray.800" />
+
             </InputRightElement>
           </InputGroup>
         </Stack>
 
         <VStack spacing={10} px={9} mt={3}>
-        { questionBank.map(qs => {
+          {questionBank.map(qs => {
             return (
               <InputGroup>
                 <InputLeftElement>
@@ -412,7 +418,7 @@ export default function EditQuiz() {
                 </InputRightElement>
               </InputGroup>
             );
-        })}
+          })}
         </VStack>
       </Box>
     );

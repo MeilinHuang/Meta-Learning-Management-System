@@ -1,32 +1,32 @@
 import React, { useState, useEffect } from 'react'
 import { SmallCloseIcon, WarningIcon } from '@chakra-ui/icons'
-import { 
-          Box,
-          Button,
-          Center,
-          Checkbox, 
-          CheckboxGroup,
-          Flex, 
-          FormControl,
-          Heading,
-          HStack,
-          Input,
-          InputGroup,
-          InputLeftElement, 
-          InputRightElement,
-          NumberDecrementStepper,
-          NumberIncrementStepper,
-          NumberInput,
-          NumberInputField,
-          NumberInputStepper,
-          Radio, 
-          RadioGroup, 
-          Select, 
-          Stack,
-          Text, 
-          Textarea,
-          VStack
-        } from "@chakra-ui/react"
+import {
+  Box,
+  Button,
+  Center,
+  Checkbox,
+  CheckboxGroup,
+  Flex,
+  FormControl,
+  Heading,
+  HStack,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  Radio,
+  RadioGroup,
+  Select,
+  Stack,
+  Text,
+  Textarea,
+  VStack
+} from "@chakra-ui/react"
 import { AddIcon, QuestionOutlineIcon } from "@chakra-ui/icons"
 
 import './QuestionCreation.css'
@@ -37,14 +37,16 @@ const quizzes = {
   quiz1: {
     id: 1,
     name: "Quiz1",
-    due_date: "2016-06-22 19:10:25-07",
+    open_date: "2016-06-22 19:10:25-07",
+    close_date: "2016-06-22 19:10:25-07",
     time_given: 45,
     num_questions: 3,
   },
   quiz2: {
     id: 2,
     name: "Quiz2",
-    due_date: "2016-06-22 19:10:25-07",
+    open_date: "2016-06-22 19:10:25-07",
+    close_date: "2016-06-22 19:10:25-07",
     time_given: 45,
     num_questions: 3,
   },
@@ -53,7 +55,8 @@ const quizzes = {
 // POST /quiz
 const sampleQuiz = {
   name: "SampleQuiz",
-  due_date: "2016-06-22 19:10:25-07",
+  open_date: "2016-06-22 19:10:25-07",
+  close_date: "2016-06-22 19:10:25-07",
   time_given: 45,
   num_questions: 2,
   questions: [
@@ -170,11 +173,11 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
 
         <HStack my="2">
           <Text fontWeight="bold" color="gray.600">Marks awarded: </Text>
-          <NumberInput size="sm" maxW={16} min={0} onChange={onChangeMarksAwarded}value={newQuestion.marks_awarded}>
+          <NumberInput size="sm" maxW={16} min={0} onChange={onChangeMarksAwarded} value={newQuestion.marks_awarded}>
             <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
             </NumberInputStepper>
           </NumberInput>
         </HStack>
@@ -204,14 +207,14 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
 
         <HStack spacing={3} mt={5}>
           <Checkbox onChange={onChangeAddToQuestionBank}>Add to Question Bank</Checkbox>
-          <QuestionOutlineIcon color="blue"/>
+          <QuestionOutlineIcon color="blue" />
         </HStack>
       </Box>
     );
   };
 
   const onChangeAddToQuestionBank = (e) => {
-    setNewQuestion({ ...newQuestion, add_to_question_bank: e.target.checked});
+    setNewQuestion({ ...newQuestion, add_to_question_bank: e.target.checked });
   };
 
   const onChangeMarksAwarded = (newValue) => {
@@ -226,8 +229,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
     let defaultAnswers = [];
 
     // Reset answers based on question type
-    if (questionType === "mc")
-    {
+    if (questionType === "mc") {
       defaultAnswers = [
         {
           id: 1,
@@ -243,8 +245,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
         },
       ];
     }
-    else if (questionType === "sa")
-    {
+    else if (questionType === "sa") {
       defaultAnswers = [
         {
           id: 1,
@@ -254,8 +255,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
         }
       ];
     }
-    else if (questionType === "cb")
-    {
+    else if (questionType === "cb") {
       defaultAnswers = [
         {
           id: 1,
@@ -318,24 +318,20 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
   };
 
   const getCorrectAnswers = () => {
-    if (newQuestion.question_type === "mc")
-    {
+    if (newQuestion.question_type === "mc") {
       let foundCorrectAnswerIndex = newQuestion.answers.findIndex(a => a.is_correct);
       return foundCorrectAnswerIndex.toString();
     }
 
-    if (newQuestion.question_type === "sa")
-    {
+    if (newQuestion.question_type === "sa") {
       const suggestedAnswer = (newQuestion.answers.length > 0) ? newQuestion.answers[0].answer_text : "";
       return suggestedAnswer;
     }
 
-    if (newQuestion.question_type === "cb")
-    {
+    if (newQuestion.question_type === "cb") {
       let correctAnswers = [];
       newQuestion.answers.forEach((answer, index) => {
-        if (answer.is_correct)
-        {
+        if (answer.is_correct) {
           correctAnswers.push(index.toString());
         }
       });
@@ -365,14 +361,13 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
     const newAnswers = newQuestion.answers.map((answer, index) => (index === idx) ? { ...answer, answer_text: e.target.value } : answer);
     setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
-  
+
   const onClickAddExplanation = (idx) => {
     // TODO: Open up explanation textarea box to edit and cancel/save
-  }; 
+  };
 
   const renderPossibleAnswers = (question) => {
-    if (question.question_type === "mc")
-    {
+    if (question.question_type === "mc") {
       return (
         <Box mt={5}>
           <HStack mb={2} spacing={5}>
@@ -403,7 +398,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
                           height="1.75rem"
                           mr="3"
                           onClick={() => onClickAddExplanation(+i)}
-                          // isDisabled={question.answers.length <= 2}
+                        // isDisabled={question.answers.length <= 2}
                         >
                           Add explanation
                         </Button>
@@ -413,7 +408,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
                           size="sm"
                           height="1.75rem"
                           onClick={() => deletePossibleAnswer(+i)}
-                          // isDisabled={question.answers.length <= 2}
+                        // isDisabled={question.answers.length <= 2}
                         >
                           Delete
                         </Button>
@@ -427,8 +422,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
         </Box>
       );
     }
-    else if (question.question_type === "sa")
-    {
+    else if (question.question_type === "sa") {
       // Text box
       return (
         <Box mt={5}>
@@ -437,8 +431,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
         </Box>
       );
     }
-    else if (question.question_type === "cb")
-    {
+    else if (question.question_type === "cb") {
       // Checkboxes
       // Loop through list of possible answers
 
@@ -447,11 +440,11 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
           <HStack mb={2} spacing={5}>
             <Text fontWeight="bold" color="gray.600">Answers (select the correct answer/s) </Text>
             <Button leftIcon={<AddIcon />} size="xs" colorScheme="green" variant="solid" onClick={addPossibleAnswer}>
-                Add new answer
+              Add new answer
             </Button>
           </HStack>
 
-          <CheckboxGroup mt="1" colorScheme="green" defaultValue={getCorrectAnswers()}> 
+          <CheckboxGroup mt="1" colorScheme="green" defaultValue={getCorrectAnswers()}>
             <Stack>
               {Object.entries(question.answers).map(([i, ans]) =>
                 <FormControl isInvalid={!ans} key={i}>
@@ -466,28 +459,28 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
                     />
                     <InputRightElement width="15rem" zIndex="0">
                       <Box d="flex">
-                          <Button
-                            colorScheme="blue"
-                            variant="outline"
-                            size="sm"
-                            height="1.75rem"
-                            mr="3"
-                            onClick={() => onClickAddExplanation(+i)}
-                            // isDisabled={question.answers.length <= 2}
-                          >
-                            Add explanation
+                        <Button
+                          colorScheme="blue"
+                          variant="outline"
+                          size="sm"
+                          height="1.75rem"
+                          mr="3"
+                          onClick={() => onClickAddExplanation(+i)}
+                        // isDisabled={question.answers.length <= 2}
+                        >
+                          Add explanation
                           </Button>
-                          <Button
-                            colorScheme="red"
-                            variant="outline"
-                            size="sm"
-                            height="1.75rem"
-                            onClick={() => deletePossibleAnswer(+i)}
-                            // isDisabled={question.answers.length <= 2}
-                          >
-                            Delete
+                        <Button
+                          colorScheme="red"
+                          variant="outline"
+                          size="sm"
+                          height="1.75rem"
+                          onClick={() => deletePossibleAnswer(+i)}
+                        // isDisabled={question.answers.length <= 2}
+                        >
+                          Delete
                           </Button>
-                        </Box>
+                      </Box>
                     </InputRightElement>
                   </InputGroup>
                 </FormControl>
@@ -497,7 +490,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
         </Box>
       );
     }
-      
+
     return (<Text color="gray.600">Possible answers were not fetched properly</Text>);
   };
 
@@ -511,8 +504,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
     const correctAnswersList = [];
 
     newQuestion?.answers?.forEach(ans => {
-      if (ans.is_correct)
-      {
+      if (ans.is_correct) {
         correctAnswersList.push(ans.answer_text);
       }
     });
@@ -537,8 +529,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
     const hasSetCorrectAnswers = newQuestion.answers.some(correctAnswerExists);
     const isValidQuestionText = newQuestion.question_text !== "";
 
-    if (!hasSetCorrectAnswers || !isValidQuestionText)
-    {
+    if (!hasSetCorrectAnswers || !isValidQuestionText) {
       // TODO: Render user-friendly error message when not valid
       setIsValidQuestion(false);
       return;
@@ -546,10 +537,9 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
 
     setIsValidQuestion(true);
 
-    if (newQuestion.add_to_question_bank)
-    {
-        // Add question to question bank
-        addToQuestionBank(newQuestion);
+    if (newQuestion.add_to_question_bank) {
+      // Add question to question bank
+      addToQuestionBank(newQuestion);
     }
 
     addQuestionToQuiz(newQuestion);
