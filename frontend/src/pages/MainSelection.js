@@ -22,7 +22,7 @@ function MainSelection({ user }) {
         //NEED TO CHANGE TO GET ENROLLED COURSES AND MOST RECENTLY ACCESSED CONTENT
         //Getting currently enrolled courses and most recent announcement
         async function fetchData() {
-            try {
+            if (user) {
                 setCourses(user.enrolled_courses)
                 const topic_groups = await Promise.all(
                     user.enrolled_courses.map(course => {
@@ -46,9 +46,6 @@ function MainSelection({ user }) {
                         })
                     })
                 )
-            }
-            catch (error) {
-                console.log(error)
             }
         }
         fetchData()
