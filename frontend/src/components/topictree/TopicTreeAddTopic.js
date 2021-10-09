@@ -67,8 +67,12 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroups}) {
         let response = await fetch(post_new_topic_url(topicGroupName, newTopicName), {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                'uploadedFileTypes': "pdf"
+            })
         });
 
         let responseJson = await response.json();
@@ -77,7 +81,7 @@ export default function TopicTreeAddTopic({isOpen, onClose, topicGroups}) {
             setAlertTitle(responseJson.error);
             return;
         }
-        let groupId = responseJson.id;
+        let groupId = responseJson.topic;
         for (let prereq of selectedTopics) {
 
             response = await fetch(post_new_prereq(topicGroupName, newTopicName), {

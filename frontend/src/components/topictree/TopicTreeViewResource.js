@@ -28,21 +28,47 @@ import {
     ListItem
 } from "@chakra-ui/react";
 import Select from "./ChakraReactSelect.js";
-import { delete_topic_url, delete_prereqs, add_prereqs } from "../../Constants";
+import { delete_topic_url, delete_prereqs, add_prereqs, update_topic, post_topic_tag } from "../../Constants";
 
 
 export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, topicGroupName, nodes}) {
   const [tempPrereqs, setTempPrereqs] = useState([]);
   const [hasDeleted, setHasDelete] = useState(false);
   const [showAddPrereqBox, setShowAddPrereqBox] = useState(false);
+  const [showAddTagBox, setShowAddTagBox] = useState(false);
   const [notPrereqs, setNotPrereqs] = useState([]);
+  const [files, setFiles] = useState({});
+  const [newTag, setNewTag] = useState("");
+  const [tempTags, setTempTags] = useState([]);
+
   useEffect(() => {
+    console.log('data', data);
     setTempPrereqs(prereqs);
+    setTempTags(data.tags);
   }, [prereqs]);
 
   useEffect(() => {
     setNotPrereqs(nodes);
   }, [nodes]);
+
+  const createNewTag = async () => {
+    await fetch(post_topic_tag(topicGroupName, data.title), {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        tagName: newTag
+      })
+    });
+    let copyTempTags = JSON.parse(JSON.stringify(tempTags));
+    copyTempTags.push({
+      'name': newTag
+    });
+    setTempTags(copyTempTags);
+    setNewTag("");
+    hideAddTag();
+  }
 
   const deleteTopic = async () => {
     await fetch(delete_topic_url(topicGroupName, data.title), {
@@ -54,6 +80,25 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     
     window.location.reload();
   };
+
+  const deleteTag = async (tagToDelete) => {
+    console.log('tag to delete', tagToDelete);
+    let copyTags = JSON.parse(JSON.stringify(tempTags));
+    const result = copyTags.filter(tag => tag.name != tagToDelete.name);
+    console.log('temp tags after delete', result);
+    setTempTags(result);
+    await fetch(post_topic_tag(topicGroupName, data.title), {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'tagName': tagToDelete.name
+      })
+    });
+
+    window.location.reload();
+  }
 
   const deletePrerequisite = async (prereqToDelete) => {
     // Delete from array
@@ -78,6 +123,26 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     });
   }
 
+  const handleUpload = (e, typeOfFile) => {
+    e.preventDefault();
+    let tempFiles = JSON.parse(JSON.stringify(files));
+    tempFiles[typeOfFile] = e.target.files[0];
+    setFiles(tempFiles);
+    console.log(e.target.files[0]);
+  }
+
+  const uploadFile = async (e, typeOfFile) => {
+    const formData = new FormData();
+    formData.append('name', data.title);
+    formData.append('uploadFile', files[typeOfFile]);
+    formData.append('uploadedFileTypes', files[typeOfFile].split('.').pop());
+
+    await fetch(update_topic(topicGroupName, data.title), {
+      method: 'PUT',
+      body: formData
+    });
+  }
+
   const closeModal = () => {
     if (hasDeleted) {
       window.location.reload();
@@ -92,6 +157,14 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
 
   const hideAddPrereq = () => {
     setShowAddPrereqBox(false);
+  }
+
+  const showAddTag = () => {
+    setShowAddTagBox(true);
+  }
+
+  const hideAddTag = () => {
+    setShowAddTagBox(false);
   }
 
   const addPrereq = async(newPrereq, action) => {
@@ -161,6 +234,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                       </Tr>
                     );
                   })}
+
                   {showAddPrereqBox ?
                   <Tr>
                     <Td><Select
@@ -178,6 +252,30 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
               </Table>
               {tempPrereqs.length == 0 ? <h6>No prerequisites here!</h6> : <></>}
               <Button mb={5} colorScheme="blue" onClick={showAddPrereq}>Add prerequisite</Button>
+            </Box>
+            <Box>
+              <Heading as="h5" size="sm">Tags</Heading>
+              <Table variant="simple" mb={8}>
+                <Tbody>
+                  {tempTags.map((tag) => {
+                    return (
+                      <Tr key={tag.name}>
+                        <Td>{tag.name}</Td>
+                        <Td><Button colorScheme="red" onClick={() => deleteTag(tag)}>Delete</Button></Td>
+                      </Tr>
+                    );
+                  })}
+                  {showAddTagBox ? 
+                  <Tr>
+                    <Td>
+                       <Input placeholder="New Tag" onChange={(event) => setNewTag(event.target.value)} size="sm" value={newTag} />
+                    </Td>
+                    <Td><Flex flexDirection="row" w="8rem" alignItems="center" justifyContent="space-between"><Button colorScheme="green" onClick={createNewTag}>Create</Button><CloseButton onClick={hideAddTag}/></Flex></Td>
+                  </Tr>
+                  : <></>}
+                  <Button mb={5} colorScheme="blue" onClick={showAddTag}>Add Tag</Button>
+                </Tbody>
+              </Table>
             </Box>
             {typesOfFiles.map((typeOfFile) => {
               return (
@@ -203,7 +301,11 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                 </Tbody>
               </Table>
               {data.materials_strings[typeOfFile.toLowerCase()].length == 0 ? <h6>No files here!</h6> : <></>}
-              <Button colorScheme="blue" mt={3}>Upload file</Button>
+              <Flex flexDirection="column" mb="16px">
+                  <input type="file" name="images" onChange={(e) => handleUpload(e, typeOfFile)} />
+                  <Button colorScheme="blue" mt={3} onClick={(e) => uploadFile(e, typeOfFile)}>Upload file</Button>
+              </Flex>
+              
               </Box>
             )})}
           </Box>

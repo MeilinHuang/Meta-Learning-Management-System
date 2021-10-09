@@ -68,6 +68,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
             "practice": [],
             "assessments": []
         },
+        'tags': [],
         "group": "",
         "discipline": "",
         "creator": ""
