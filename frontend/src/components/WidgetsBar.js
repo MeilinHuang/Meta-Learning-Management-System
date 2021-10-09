@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -12,21 +12,35 @@ import {
   Portal,
   MenuList,
   MenuItem,
+  Spinner
 } from "@chakra-ui/react";
 import Calendar from "./Calendar.js";
 import { isLoggedIn } from "../utils/helpers";
 import { useHistory } from "react-router-dom";
-//import Calendar from 'react-calendar'
-//import "./widgetBar.css"
-//import 'react-calendar/dist/Calendar.css';
 
 function logOut() {
   sessionStorage.removeItem("token");
   sessionStorage.removeItem("staff");
 }
 
-function WidgetsBar({ page }) {
+function WidgetsBar({ page, user }) {
   const history = useHistory();
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    if (page === "course") {
+      if (user) {
+        let course_name = decodeURI(document.location.pathname.split("/").filter(e => e !== "")[1])
+        user.enrolled_courses.map(course => {
+          if (course.name === course_name) {
+            setProgress(parseInt(course.progress) + "%")
+          }
+          return course
+        })
+      }
+    }
+  })
+
   return (
     <Box
       display={["none", "none", "none", "block"]}
@@ -38,12 +52,17 @@ function WidgetsBar({ page }) {
         <Flex alignItems="center" justifyContent="center" marginTop={3}>
           <Menu isLazy>
             <MenuButton _hover={{ textDecoration: "underline" }}>
-              <Flex alignItems="center">
-                <Avatar name="John Smith" src="https://bit.ly/dan-abramov" />
-                <Box paddingLeft={3}>
-                  <Text fontWeight="medium">John Smith</Text>
-                </Box>
-              </Flex>
+              {
+                  user ? (
+                    <Flex alignItems="center">
+                      <Avatar name={user.user_name}/>
+                      <Box paddingLeft={3}>
+                      <Text fontWeight="medium">{user.user_name}</Text>
+                      </Box>
+                    </Flex>
+                  )
+                  : <Spinner/>
+              }
             </MenuButton>
             <Portal>
               <MenuList zIndex={100}>
@@ -51,7 +70,7 @@ function WidgetsBar({ page }) {
                 <MenuItem>Settings</MenuItem>
                 {isLoggedIn ? (
                   <MenuItem
-                    onclick={(e) => {
+                    onClick={(e) => {
                       console.log("here55");
                       logOut();
                       history.push("/");
@@ -92,11 +111,12 @@ function WidgetsBar({ page }) {
               marginTop={5}
               borderRadius={10}
               width="100%"
-              height="100%"
+              position="relative"
             >
+              <Text position="absolute" left="45%">{progress}</Text>
               <Box
                 bg="blue.500"
-                width="50%"
+                width={progress}
                 height="100%"
                 borderRadius="10px 0px 0px 10px"
                 textAlign="center"
