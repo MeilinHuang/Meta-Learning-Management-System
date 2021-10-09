@@ -12,7 +12,7 @@ import { set } from 'draft-js/lib/DefaultDraftBlockRenderMap';
 var g;
 var svg;
 var expand = {};
-var circles, link, node, lables, simulation, tempNodes, linkNodes, tempLinks, arrows;
+var circles, link, node, lables, simulation, tempNodes, linkNodes, tempLinks, arrows, groupPath;
 var emptyNodes = 1; //fix later
 
 function zoomed() {

@@ -82,12 +82,11 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
   };
 
   const deleteTag = async (tagToDelete) => {
+    console.log('tag to delete', tagToDelete);
     let copyTags = JSON.parse(JSON.stringify(tempTags));
-    const index = copyTags.indexOf(tagToDelete);
-    if (index > -1) {
-      copyTags.splice(index, 1);
-    }
-    setTempTags(copyTags);
+    const result = copyTags.filter(tag => tag.name != tagToDelete.name);
+    console.log('temp tags after delete', result);
+    setTempTags(result);
     await fetch(post_topic_tag(topicGroupName, data.title), {
       method: 'DELETE',
       headers: {
@@ -97,6 +96,8 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
         'tagName': tagToDelete.name
       })
     });
+
+    window.location.reload();
   }
 
   const deletePrerequisite = async (prereqToDelete) => {
@@ -272,7 +273,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                     <Td><Flex flexDirection="row" w="8rem" alignItems="center" justifyContent="space-between"><Button colorScheme="green" onClick={createNewTag}>Create</Button><CloseButton onClick={hideAddTag}/></Flex></Td>
                   </Tr>
                   : <></>}
-                  <Button mb={gb5} colorScheme="blue" onClick={showAddTag}>Add Tag</Button>
+                  <Button mb={5} colorScheme="blue" onClick={showAddTag}>Add Tag</Button>
                 </Tbody>
               </Table>
             </Box>
