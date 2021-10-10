@@ -132,15 +132,19 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
   }
 
   const uploadFile = async (e, typeOfFile) => {
+    e.preventDefault();
     const formData = new FormData();
+    console.log('uploadFile', files[typeOfFile]);
     formData.append('name', data.title);
     formData.append('uploadFile', files[typeOfFile]);
-    formData.append('uploadedFileTypes', files[typeOfFile].split('.').pop());
+    formData.append('uploadedFileTypes', 'pdf');
 
     await fetch(update_topic(topicGroupName, data.title), {
       method: 'PUT',
       body: formData
     });
+    window.location.reload();
+
   }
 
   const closeModal = () => {
