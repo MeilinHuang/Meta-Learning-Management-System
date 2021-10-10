@@ -106,10 +106,6 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit, code, fromAnnouncem
                                     <Heading size="sm" mb="4px">Tags</Heading>
                                     {!!Object.keys(tags).length && <TagSelect setSelectedTags={setSelectedTags} tags={tags} fromAnnouncement={fromAnnouncement} />}
                                 </Flex>
-                                {/* <Flex flexDirection="column" mt="16px">
-                                    <Heading size="sm" mb="4px">Related Link</Heading>
-                                    <Input name="postRelatedLink" onChange={e => setRelatedLink(e.target.value)} />
-                                </Flex> */}
                             </>
                         }
                     </form>
