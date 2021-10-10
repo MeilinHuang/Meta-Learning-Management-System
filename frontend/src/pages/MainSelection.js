@@ -7,7 +7,7 @@ import { ReactComponent as Learn } from "../static/svgs/undraw_Online_learning_r
 import { ReactComponent as Study } from "../static/svgs/undraw_studying_s3l7.svg"
 import CategoriesList from "../components/content/CategoriesList.js"
 
-function MainSelection() {
+function MainSelection({ user }) {
     const [courses, setCourses] = useState([])
     const [recent_announce, setRecent] = useState(null)
     const [code, setCode] = useState(null)
@@ -21,16 +21,11 @@ function MainSelection() {
     useEffect(() => {
         //NEED TO CHANGE TO GET ENROLLED COURSES AND MOST RECENTLY ACCESSED CONTENT
         //Getting currently enrolled courses and most recent announcement
-
         async function fetchData() {
-            try {
-                //Need to get user logged in
-                const enrolled = await fetch( backend_url + "user/1").then(e => e.json()).then(e => {
-                    setCourses(e.enrolled_courses)
-                    return e.enrolled_courses
-                })
+            if (user) {
+                setCourses(user.enrolled_courses)
                 const topic_groups = await Promise.all(
-                    enrolled.map(course => {
+                    user.enrolled_courses.map(course => {
                         return fetch(backend_url + "topicgroup/" + course.name ).then(e => e.json()).then(e => {
                             //Need to get most recently accessed
                             setContent(e)
@@ -52,12 +47,9 @@ function MainSelection() {
                     })
                 )
             }
-            catch (error) {
-                console.log(error)
-            }
         }
         fetchData()
-    }, [])
+    }, [user])
 
 
     let counter = 0
@@ -67,16 +59,20 @@ function MainSelection() {
             <Flex width="100%" flexDirection={["column", "column", "column", "column", "column", "row"]}>
                 <Flex width={["100%", "100%", "100%", "100%", "100%", "70%"]} borderRadius={10} shadow="lg">
                     <Flex paddingInline={[5, 5, 10]} paddingBlock={5}>
-                        <VStack textAlign="left" alignItems="flex-start" spacing={5}>
-                            <Flex>
-                                <Heading fontSize={["4xl", "5xl", "6xl"]} letterSpacing="wider" fontWeight="300">Welcome</Heading>
-                                <Heading fontSize={["4xl", "5xl", "6xl"]} letterSpacing="wider" fontWeight="500" marginLeft={"10px"}>{"John!"}</Heading>
-                            </Flex>
-                            <Box>
-                                <Text fontSize="large" letterSpacing="wide" fontWeight="200">You have 3 assignments due</Text>
-                                <Text fontSize="large" letterSpacing="wide" fontWeight="200">Your next assignment is COMP1234 Assignment 1</Text>
-                            </Box>
-                        </VStack>
+                        {
+                            user ? 
+                                <VStack textAlign="left" alignItems="flex-start" spacing={5}>
+                                    <Flex>
+                                        <Heading fontSize={["4xl", "5xl", "6xl"]} letterSpacing="wider" fontWeight="300">Welcome</Heading>
+                                        <Heading fontSize={["4xl", "5xl", "6xl"]} letterSpacing="wider" fontWeight="500" marginLeft={"10px"}>{user.user_name.split(" ")[0]}</Heading>
+                                    </Flex>
+                                    <Box>
+                                        <Text fontSize="large" letterSpacing="wide" fontWeight="200">You have 3 assignments due</Text>
+                                        <Text fontSize="large" letterSpacing="wide" fontWeight="200">Your next assignment is COMP1234 Assignment 1</Text>
+                                    </Box>
+                                </VStack>
+                            : <Spinner></Spinner>
+                        }
                     </Flex>
                     <Flex flexGrow={1} alignItems="center" justifyContent="center">
                         <Flex display={["none", "none", "none", "none", "flex"]}>

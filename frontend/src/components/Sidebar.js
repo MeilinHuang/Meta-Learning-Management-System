@@ -1,8 +1,24 @@
 import React, { useEffect, useState} from "react"
 import { useHistory } from 'react-router-dom'
-import { Stack, Text, Box, Flex, Drawer, DrawerOverlay, DrawerCloseButton, DrawerContent, Avatar, Menu, MenuButton, Portal, MenuList, MenuItem} from "@chakra-ui/react"
+import { 
+    Stack, 
+    Text, 
+    Box, 
+    Flex, 
+    Drawer, 
+    DrawerOverlay, 
+    DrawerCloseButton, 
+    DrawerContent, 
+    Avatar, 
+    Menu, 
+    MenuButton, 
+    Portal, 
+    MenuList, 
+    MenuItem,
+    DrawerHeader,
+    Select
+} from "@chakra-ui/react"
 import { ChevronDownIcon, ArrowBackIcon, HamburgerIcon } from '@chakra-ui/icons'
-import { get_topic_group, backend_url } from "../Constants.js"
 
 
 function SidebarContent({history, links}) {
@@ -34,9 +50,8 @@ function SidebarContent({history, links}) {
     )
 }
 
-function Sidebar({links, isOpen, setOpen, variant, page}) {
+function Sidebar({links, user, isOpen, setOpen, variant, groupState, nameState}) {
     const history = useHistory()
-    const [url, setURL] = useState(window.location.pathname)
     const [drawer_header, setDrawer] = useState(null)
     const [title, setTitle] = useState((
         <Flex flexDirection="column" bg="blue.500" color="white" height={90} textAlign="left" justifyContent="center">
@@ -47,60 +62,73 @@ function Sidebar({links, isOpen, setOpen, variant, page}) {
     ))
 
     useEffect(() => {
-        if (page === "course") {
-            const course = history.location.pathname.split("/").filter(e => e !== "")[1]
-            fetch(get_topic_group(course)).then(e => e.json()).then(e => {
-                let code = e.topic_code
-                fetch(backend_url + "user/1").then(e => e.json()).then(e => {
-                    let enrolled = []
-                    e.enrolled_courses.map(course => {
-                        enrolled.push(course)
-                        return course
-                    })
-                    /*
-                    setDrawer(
-                        <DrawerHeader>
-                            <Select width="80%" size="lg" fontSize="xl" fontWeight="bold" onChange={e => {history.push(e.target.value); setOpen(false)}}>
-                                {enrolled.map(course => {
-                                    return (
-                                        <option key={"sidebar-menu-" + course.topic_code} value={course.name}>{course.topic_code}</option>
-                                    )
-                                })}
-                            </Select>
-                        </DrawerHeader>
-                    )
-                    */
-                    setTitle(
-                        <Menu isLazy placement="right">
-                            <MenuButton>
-                                <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
-                                    <Box marginLeft={1} padding={4} fontSize="larger">
-                                        <Text fontWeight="medium" letterSpacing="wider">{code}</Text>
-                                        <Text fontSize="medium" letterSpacing="wider">{course}</Text>
-                                    </Box>
-                                </Flex>
-                            </MenuButton>
-                            <Portal>
-                                <MenuList zIndex={100} placement="right" onClick={e => {
-                                    let tmp = window.location.pathname.split("/").filter(e => e !== "").slice(0, 2)
-                                    tmp[1] = e.target.value
-                                    tmp = "/" + tmp.join("/")
-                                    setURL(tmp)
-                                    history.push(tmp)
-                                    //window.location.reload()
-                                }}>
-                                    {
-                                        enrolled.map(e => <MenuItem key={"course-menu-" + e.topic_code} value={e.name}>{e.topic_code}</MenuItem>)
-                                    }
-                                </MenuList>
-                            </Portal>
-                        </Menu>
-                    )
-                    return e
-                })
+        if (groupState["object"]) {
+            let code = groupState["object"].topic_code
+            
+            let enrolled = []
+            user.enrolled_courses.map(course => {
+                if (course.name === groupState["object"].name) {
+                    enrolled.unshift(course)
+                }
+                else {
+                    enrolled.push(course)
+                }
+                return course
             })
+            
+            setDrawer(
+                <DrawerHeader>
+                    <Select width="80%" size="lg" fontSize="xl" fontWeight="bold" onChange={e => {
+                        let tmp = window.location.pathname.split("/").filter(e => e !== "").slice(0, 2)
+                        tmp[1] = e.target.value
+                        tmp = "/" + tmp.join("/")
+                        history.push(tmp)
+                        nameState["set"](e.target.value) 
+                        setOpen(false)
+                    }}>
+                        {enrolled.map(course => {
+                            return (
+                                <option key={"sidebar-menu-" + course.topic_code} value={course.name}>{course.topic_code}</option>
+                            )
+                        })}
+                    </Select>
+                </DrawerHeader>
+            )
+            
+            setTitle(
+                <Menu isLazy placement="right">
+                    <MenuButton>
+                        <Flex flexDirection="column" bg="blue.500" color="white" width={200} height={90} textAlign="left" justifyContent="center" cursor="pointer">
+                            <Box marginLeft={1} padding={4} fontSize="larger">
+                                <Text fontWeight="medium" letterSpacing="wider">{code}</Text>
+                                <Text fontSize="medium" letterSpacing="wider">{groupState["object"].name}</Text>
+                            </Box>
+                        </Flex>
+                    </MenuButton>
+                    <Portal>
+                        <MenuList zIndex={100} placement="right" onClick={e => {
+                            let tmp = window.location.pathname.split("/").filter(e => e !== "").slice(0, 2)
+                            tmp[1] = e.target.value
+                            tmp = "/" + tmp.join("/")
+                            history.push(tmp)
+                            nameState["set"](e.target.value)                      
+                        }}>
+                            {
+                                enrolled.map(e => {
+                                    if (e.name === groupState["object"].name) {
+                                        return null
+                                    }
+                                    return (
+                                        <MenuItem key={"course-menu-" + e.topic_code} value={e.name}>{e.topic_code}</MenuItem>
+                                    )
+                                })
+                            }
+                        </MenuList>
+                    </Portal>
+                </Menu>
+            )
         }
-    }, [history, page, url])
+    }, [groupState["object"]])
 
     if (variant === "drawer") {
         return (
@@ -139,7 +167,7 @@ function Sidebar({links, isOpen, setOpen, variant, page}) {
                             <SidebarContent history={history} links={links}></SidebarContent>
                         </Box>
                         <Flex grow={1}></Flex>
-                        { page==="course" &&
+                        { groupState["object"] !== null &&
                             <Flex>
                                 <Flex key={"sidebar-link-return"} onClick={() => history.push("/")} width="100%" height={70} alignContent="center" justifyContent="flex-start" cursor="pointer" padding={4}>
                                     <Flex alignItems="center">
@@ -166,7 +194,7 @@ function Sidebar({links, isOpen, setOpen, variant, page}) {
                     <SidebarContent history={history} links={links}></SidebarContent>
                 </Flex>
                 <Flex grow={1}></Flex>
-                { page==="course" &&
+                { groupState["object"] !== null &&
                     <Flex>
                         <Flex key={"sidebar-link-return"} onClick={() => history.push("/")} color="white" width={200} height={70} alignContent="center" bg="blue.400" cursor="pointer" padding={4} _hover={{background:"white", color:"black", borderRadius:"0px 0px 0px 0px"}}>
                             <Flex alignItems="center">
