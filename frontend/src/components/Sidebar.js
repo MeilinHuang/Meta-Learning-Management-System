@@ -62,7 +62,7 @@ function Sidebar({links, user, isOpen, setOpen, variant, groupState, nameState})
     ))
 
     useEffect(() => {
-        if (groupState["object"]) {
+        if (groupState["object"] && user) {
             let code = groupState["object"].topic_code
             
             let enrolled = []
@@ -128,7 +128,7 @@ function Sidebar({links, user, isOpen, setOpen, variant, groupState, nameState})
                 </Menu>
             )
         }
-    }, [groupState["object"]])
+    }, [groupState["object"], user])
 
     if (variant === "drawer") {
         return (
