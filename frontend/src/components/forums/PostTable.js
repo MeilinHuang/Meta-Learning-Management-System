@@ -98,7 +98,7 @@ function PostTable({ isAdmin, posts: postData, code }) {
             accessor: 'published_date',
             Cell: (({ cell: { value } }) => {
                 const date = new Date(value)
-                const dateString = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
+                const dateString = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
                 return String(dateString)
             })
         },

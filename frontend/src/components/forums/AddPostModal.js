@@ -76,7 +76,6 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit, code, fromAnnouncem
 
     const handleUpload = e => {
         setImages(e.target.files[0])
-        console.log(e.target.files[0])
     }
 
     return (

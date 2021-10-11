@@ -31,6 +31,14 @@
     margin: 8px;
 }
 
+.description a {
+    color: #0e5ea8;
+}
+
+.description a:hover {
+    text-decoration: underline;
+}
+
 .attachment {
     margin-top: 16px;
 }
