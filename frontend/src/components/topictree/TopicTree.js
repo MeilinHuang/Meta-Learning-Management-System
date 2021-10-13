@@ -65,6 +65,7 @@ export default function TopicTree() {
                 node["id"] = topic.id;
                 node["title"] = topic.name;
                 node["group"] = topicGroup.name;
+                node["groupId"] = topicGroup.id;
                 node["materials_strings"] = {};
                 node.materials_strings["content"] = [];
                 node.materials_strings['preparation'] = [];
@@ -182,6 +183,7 @@ export default function TopicTree() {
                     'type': 'topic',
                     'materials_strings': node.materials_strings,
                     'group': node.group,
+                    'groupId': node.groupId,
                     'tags': node.tags
                 });
                 tempNodes.push({
@@ -191,6 +193,7 @@ export default function TopicTree() {
                     'type': 'topic',
                     'materials_strings': node.materials_strings,
                     'group': node.group,
+                    'groupId': node.groupId,
                     'tags': node.tags
                 });
             }
@@ -289,6 +292,7 @@ export default function TopicTree() {
                     console.log('node', nodeData[0]);
                     setSelectedNode(nodeData[0]);
                     console.log('group', nodeData[0].group);
+                    console.log('groupId', nodeData[0].groupId);
                     setSelectedTopicGroup(nodeData[0].group);
                     getListOfPrerequisites(nodeData[0].id, data);
                 }

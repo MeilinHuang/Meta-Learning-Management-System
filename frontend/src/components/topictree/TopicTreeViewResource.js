@@ -213,6 +213,10 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     })
   }
 
+  const downloadFile = (e, fileString) => {
+    window.open('/_files/topicGroup' + data.groupId + '/topic' + data.id + '/' + fileString);
+  }
+
   const typesOfFiles = ["Content", "Practice", "Preparation", "Assessments"];
   return (
     <>
@@ -298,7 +302,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                     return (
                       <Tr key={file_string}>
                         <Td>{file_string}</Td>
-                        <Td><Button colorScheme="green" mr={3}>Download file</Button></Td>
+                        <Td><Button colorScheme="green" mr={3} onClick={(e) => downloadFile(e, file_string)}>Download file</Button></Td>
                       </Tr>
                     );
                   })}

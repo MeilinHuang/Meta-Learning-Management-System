@@ -510,7 +510,7 @@ async function postTopicGroup(request, response) {
 
 async function getAllTopics (request, response) { 
   try {
-    let topicGroupResp = await pool.query(`SELECT name FROM topic_group`);
+    let topicGroupResp = await pool.query(`SELECT name, id FROM topic_group`);
     console.log('topicGroupResp', topicGroupResp);
     let result = [];
     for (let topicGroupName of topicGroupResp.rows) {
@@ -561,6 +561,7 @@ async function getAllTopics (request, response) {
         };
         object.topics_list = topicArr;
         object.name = topicGroupName.name;
+        object.id = topicGroupName.id;
       }
       result.push(resp.rows[0]);
     }
