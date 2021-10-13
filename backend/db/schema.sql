@@ -38,6 +38,20 @@ CREATE TABLE IF NOT EXISTS "user_enrolled" (
   PRIMARY KEY(user_id, topic_group_id)
 );
 
+DROP TABLE IF EXISTS "calendar_reminders" CASCADE;
+CREATE TABLE IF NOT EXISTS "calendar_reminders" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  remind_date TIMESTAMP,
+  description TEXT
+);
+
+DROP TABLE IF EXISTS "user_calendar_reminders" CASCADE;
+CREATE TABLE IF NOT EXISTS "user_calendar_reminders" (
+  reminder_id INTEGER NOT NULL REFERENCES calendar_reminders(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  PRIMARY KEY (reminder_id, user_id)
+);
+
 -- TOPIC GROUPS
 DROP TABLE IF EXISTS "topics" CASCADE;
 CREATE TABLE IF NOT EXISTS "topics" (
@@ -222,7 +236,7 @@ CREATE TABLE "user_content_progress" (
   user_id INTEGER NOT NULL REFERENCES users(id),
   topic_file_id INTEGER NOT NULL REFERENCES topic_files(id),
   topic_id INTEGER NOT NULL REFERENCES topics(id),
-  course_progression INTEGER NOT NULL 
+  completed BOOLEAN NOT NULL
 );
 
 DROP TABLE IF EXISTS "announcements" CASCADE;
@@ -320,6 +334,8 @@ CREATE TABLE "quiz_poll" (
 );
 
 -- Lectures and Tutorials
+
+-- not used
 DROP TABLE IF EXISTS "weeks" CASCADE;
 CREATE TABLE "weeks" (
   id SERIAL NOT NULL PRIMARY KEY,
@@ -406,3 +422,7 @@ CREATE TABLE "enrol_lectures" (
   curr_capacity INTEGER NOT NULL,
   max_capacity INTEGER NOT NULL
 );
+
+-- Alter Users
+ALTER TABLE users
+ADD last_accessed_topic INTEGER REFERENCES topics(id);

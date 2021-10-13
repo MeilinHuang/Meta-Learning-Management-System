@@ -27,6 +27,7 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 const database = require("./service.js");
 const lectureTutorial = require("./api/lecturesTutorials");
 const users = require("./api/user");
+const topics = require("./api/topics");
 
 /***************************************************************
                        Auth Functions
@@ -56,6 +57,11 @@ app.delete("/user/:userId", async (request, response) => {
   await users.deleteUser(request, response);
 });
 
+app.put("/user/:userId", async (request, response) => {
+  console.log(`PUT /user/${request.params.userId}`);
+  await users.putAccessedTopic(request, response);
+});
+
 app.post("/user/:userId/:topicGroupId", async (request, response) => {
   console.log(
     `POST /user/${request.params.userId}/${request.params.topicGroupId}`
@@ -74,6 +80,41 @@ app.put("/user/:userId/progress", async (request, response) => {
   console.log(`PUT /user/${request.params.userId}/progress`);
   await users.putUserProgress(request, response);
 });
+
+app.get("/user/:userId/calendar", async (request, response) => {
+  console.log(`GET /user/${request.params.userId}/calendar`);
+  await users.getUserCalendar(request, response);
+});
+
+app.get("/user/calendar/:calendarId", async (request, response) => {
+  console.log(`GET /user/calendar/${request.params.calendarId}`);
+  await users.getCalendarById(request, response);
+});
+
+app.delete("/user/calendar/:calendarId", async (request, response) => {
+  console.log(`DELETE /user/calendar/${request.params.calendarId}`);
+  await users.deleteCalendarById(request, response);
+});
+
+app.put("/user/:userId/calendar", async (request, response) => {
+  console.log(`POST /user/${request.params.userId}/calendar`);
+  await users.postCalendar(request, response);
+});
+
+app.put("/user/calendar/:calendarId", async (request, response) => {
+  console.log(`PUT /user/calendar/${request.params.calendarId}`);
+  await users.putCalendarById(request, response);
+});
+
+app.get("/user/:userId/progress/:topicId", async (request, response) => {
+  console.log(`GET /user/${request.params.userId}/progress/${request.params.topicId}`);
+  await users.getUserContentProgress(request, response);
+})
+
+app.put("/user/:userId/progress/:topicId", async (request, response) => {
+  console.log(`PUT /user/${request.params.userId}/progress/${request.params.topicId}`);
+  await users.putUserContentProgress(request, response);
+})
 
 /***************************************************************
                        Topic Group Functions
@@ -184,6 +225,14 @@ app.delete(
     await database.deleteTopic(request, response);
   }
 );
+
+app.get("/topic/:fileId", async (request, response) => {
+  await topics.getTopicFileById(request, response);
+})
+
+app.put("/topic/:fileId", async (request, response) => {
+  await topics.putTopicFileDueDate(request, response);
+})
 
 /***************************************************************
                     Enrollment Functions

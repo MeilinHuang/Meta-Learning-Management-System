@@ -1300,6 +1300,58 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update users recently accessed topic",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Put user progress body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutRecentTopic"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/user/{userId}/{topicGroupId}": {
@@ -1434,6 +1486,348 @@
           "200": {
             "description": "OK",
             "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/calendar/{calendarId}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get calendar by id",
+        "parameters": [
+          {
+            "name": "calendarId",
+            "in": "path",
+            "description": "Id of calendar",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarReminder"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Update calendar reminder for user",
+        "parameters": [
+          {
+            "name": "calendarId",
+            "in": "path",
+            "description": "Id of calendar reminder",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Calendar Reminder Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCalendarReminder"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [ "User" ],
+        "summary": "Delete calendar for user",
+        "parameters": [
+          {
+            "name": "calendarId",
+            "in": "path",
+            "description": "Id of calendar",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{userId}/calendar": {
+      "get": {
+        "tags": [ "User" ],
+        "summary": "Get calendar for user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Create calendar reminder for user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Calendar Reminder Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCalendarReminder"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{userId}/progress/{topicId}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get topic content progress for user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user",
+            "required": true,
+            "schema": {"type": "integer"}
+          },
+          {
+            "name": "topicId",
+            "in": "path",
+            "description": "Id of topic",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserContentProgress"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Put topic content progress for user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user",
+            "required": true,
+            "schema": {"type": "integer"}
+          },
+          {
+            "name": "topicId",
+            "in": "path",
+            "description": "Id of topic",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "topicFileId": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "completion": {
+                    "type": "boolean",
+                    "example": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { }
           },
           "400": {
             "content": {
@@ -4324,6 +4718,102 @@
         }
       }
     },
+    "/topic/{fileId}": {
+      "get": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Get topic file data by id",
+        "parameters": [
+          {
+            "name": "fileId",
+            "in": "path",
+            "description": "Id of file",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetTopicFile" }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "TopicGroup"
+      },
+      "put": {
+        "tags": [ "Topic Tree" ],
+        "summary": "Put topic file data by id",
+        "parameters": [
+          {
+            "name": "fileId",
+            "in": "path",
+            "description": "Id of file",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutTopicFileDueDate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "TopicGroup"
+      }
+    },
     "/file/{targetId}": {
       "post": {
         "tags": ["Lectures and Tutorials"],
@@ -5011,6 +5501,35 @@
         },
         "description": "Forbidden"
       },
+      "GetTopicFile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "while_loops.pdf"
+          },
+          "file": {
+            "type": "string",
+            "example": "while_loops_path"
+          },
+          "type": {
+            "type": "string",
+            "example": "content"
+          },
+          "topicId": {
+            "type": "integer",
+            "example": 1
+          },
+          "dueDate": {
+            "type": "string",
+            "example": "2021-08-08 22:52:35.388924"
+          }
+        }
+      },
       "PutUserProgress": {
         "type": "object",
         "properties": {
@@ -5178,7 +5697,7 @@
                   "example": 4
                 },
                 "timeslot": {
-                  "type": "timestamp",
+                  "type": "string",
                   "example": "2021-08-08 22:52:35.388924"
                 },
                 "curr_capacity": {
@@ -5533,6 +6052,23 @@
           }
         }
       },
+      "CalendarReminder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "remind_date": {
+            "type": "string",
+            "example": "2021-08-08 22:52:35.388924"
+          },
+          "description": {
+            "type": "string",
+            "example": "Reminder for assignmetn 2"
+          }
+        }
+      },
       "PreRequisite": {
         "type": "object",
         "properties": {
@@ -5721,6 +6257,15 @@
           }
         }
       },
+      "PutRecentTopic": {
+        "type": "object",
+        "properties": {
+          "lastTopic": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
       "GetAllForumTags": {
         "type": "object",
         "properties": {
@@ -5740,6 +6285,19 @@
                 }
               }
             }
+          }
+        }
+      },
+      "PostCalendarReminder": {
+        "type": "object",
+        "properties": {
+          "remind_date": {
+            "type": "string",
+            "example": "2021-08-08 22:52:35.388924"
+          },
+          "description": {
+            "type": "string",
+            "example": "Reminder for assignmetn 2"
           }
         }
       },
@@ -6542,6 +7100,36 @@
                 }
               }
             }
+          }
+        }
+      },
+      "PutTopicFileDueDate": {
+        "type": "object",
+        "properties": {
+          "newDate": {
+            "type": "string",
+            "example": "2021-08-08 22:52:35.388924"
+          }
+        }
+      },
+      "GetUserContentProgress": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "example": 1
+          },
+          "topicFileId": {
+            "type": "integer",
+            "example": 1
+          },
+          "topicId": {
+            "type": "integer",
+            "example": 1
+          },
+          "completed": {
+            "type": "boolean",
+            "example": true
           }
         }
       }

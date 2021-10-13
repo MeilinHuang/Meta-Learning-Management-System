@@ -1,6 +1,5 @@
 const pool = require('../db/database');
 var fs = require('fs');
-//const { start } = require('repl');
 
 /***************************************************************
                        Week Functions
@@ -23,7 +22,8 @@ async function getWeeks (request, response) {
 
 // Post file for lecture or tutorial
 async function postLectureTutorialFile (request, response) {
-  if (request.files == null) throw ("Failed: No file specified for upload");
+  try {
+    if (request.files == null) throw ("Failed: No file specified for upload");
     if (!request.query.target == "lecture" && !request.query.target == "tutorial") {
       throw ("Failed: file target incorrect choose (lecture or tutorial)");
     }
@@ -44,8 +44,6 @@ async function postLectureTutorialFile (request, response) {
     function (err) { if (err) throw err; });
 
     response.status(200).json({success: true, file: fileName, filePath: filePath});
-  try {
-    
   } catch (e) {
     response.status(400).json({error: e});
   }
@@ -130,6 +128,47 @@ async function getAllLectures (request, response) {
   }
 }
 
+// Get lectures by search term
+async function getSearchLectures (request, response) {
+  try {
+    const searchTerm = request.params.searchTerm.toLowerCase();
+    const topicGroup = request.params.topicGroupName;
+    const idReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroup]);
+    if (!idReq.rows.length) throw (`Failed: Topic group {${topicGroup}} does not exist`);
+    const topicGroupId = idReq.rows[0].id;
+
+    // Convert searchTerm to topicReference id
+    
+    const resp = await pool.query(
+      `SELECT l.id, l.week, l.topic_group_id, l.topic_reference, l.lecturer_id, 
+      l.start_time, l.end_time, l.lecture_video, array_agg(lf.id) as lecture_files
+      FROM lectures l
+      LEFT JOIN lecture_files lf ON lf.lecture_id = l.id
+      WHERE l.topic_group_id = $1 AND (l.week = $2 OR l.topic_reference = $2) 
+      GROUP BY l.id`, [topicGroupId, searchTerm, `%${searchTerm}%`]);
+  
+      for (const object of resp.rows) {
+        var fileArr = [];
+        
+        for (const attachment of object.lecture_files) {
+          if (attachment != null) { 
+            const fileResp = await pool.query(
+            `SELECT * FROM lecture_files 
+            WHERE id = $1 AND lecture_id = $2`,
+            [object.id, attachment])
+            fileArr.push(fileResp.rows[0]);
+          }
+        }
+  
+        object.lecture_files = fileArr;
+      }
+
+    response.status(200).json(resp.rows);
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
+}
+
 // Get lecture by id
 async function getLectureById (request, response) {
   try {
@@ -153,7 +192,7 @@ async function getLectureById (request, response) {
   }
 }
 
-// Get lecture by id
+// Create new lecture
 async function postLecture (request, response) {
   try {
     const topicGroupName = request.params.topicGroupName;
@@ -375,6 +414,8 @@ async function deleteTutorial (request, response) {
   }
 }
 
+
+
 module.exports = {
   getWeeks,
   postLectureTutorialFile,
@@ -388,5 +429,6 @@ module.exports = {
   getTutorialById,
   postTutorial,
   putTutorial,
-  deleteTutorial
+  deleteTutorial,
+  getSearchLectures
 };

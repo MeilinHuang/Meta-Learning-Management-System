@@ -1,0 +1,31 @@
+{
+  "GetTopicFile": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "example": 1
+      },
+      "name": {
+        "type": "string",
+        "example": "while_loops.pdf"
+      },
+      "file": {
+        "type": "string",
+        "example": "while_loops_path"
+      },
+      "type": {
+        "type": "string",
+        "example": "content"
+      },
+      "topicId": {
+        "type": "integer",
+        "example": 1
+      },
+      "dueDate": {
+        "type": "string",
+        "example": "2021-08-08 22:52:35.388924"
+      }
+    }
+  }
+}

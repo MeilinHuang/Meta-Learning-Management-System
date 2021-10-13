@@ -7,13 +7,23 @@ INSERT INTO users(id, name, email, password, zid, staff) values(default, 'Tutory
 INSERT INTO users(id, name, email, password, zid, staff) values(default, 'Lecturey Lecturer', 'test4@test.com', 'passsword', 'z5928712', false);
 INSERT INTO users(id, name, email, password, zid, staff) values(default, 'Daniel Ferraro', 'daniel@test.com', 'password', 'z5204902', true);
 
--- Create Topic Groups invite codes
-INSERT INTO enroll_codes(id, code, topic_group_id) VALUES(default, 'aABc7J06', 1);
-INSERT INTO enroll_codes(id, code, topic_group_id, uses) VALUES(default, 'sJD873Na', 1, 5);
+-- Create calendar reminders
+INSERT INTO calendar_reminders(id, remind_date, description) VALUES(default, current_timestamp, 'Assignment 1 due date');
+INSERT INTO calendar_reminders(id, remind_date, description) VALUES(default, current_timestamp, 'Assignment 2 due date');
+INSERT INTO calendar_reminders(id, remind_date, description) VALUES(default, current_timestamp, 'Assignment 3 due date');
+
+-- Create calendar links
+INSERT INTO user_calendar_reminders(reminder_id, user_id) VALUES(1, 1);
+INSERT INTO user_calendar_reminders(reminder_id, user_id) VALUES(2, 1);
+INSERT INTO user_calendar_reminders(reminder_id, user_id) VALUES(3, 1);
 
 -- Create Topic Groups
 INSERT INTO topic_group(id, name, topic_code) values(default, 'C++ Programming', 'COMP6771');
 INSERT INTO topic_group(id, name, topic_code) values(default, 'Database Systems', 'COMP3331');
+
+-- Create Topic Groups invite codes
+INSERT INTO enroll_codes(id, code, topic_group_id) VALUES(default, 'aABc7J06', 1);
+INSERT INTO enroll_codes(id, code, topic_group_id, uses) VALUES(default, 'sJD873Na', 1, 5);
 
 -- Create Topics
 INSERT INTO topics(id, topic_group_id, name) values(default, 1, 'Loops');
@@ -29,6 +39,12 @@ INSERT INTO topic_files(id, name, file, type, topic_id, due_date) values(default
 INSERT INTO topic_files(id, name, file, type, topic_id, due_date) values(default, 'pointers1.pdf', 'pointers1_path', 'content', 2, NULL);
 INSERT INTO topic_files(id, name, file, type, topic_id, due_date) values(default, 'dynamic_arrays.pdf', 'dynamic_arrays_path', 'content', 3, NULL);
 INSERT INTO topic_files(id, name, file, type, topic_id, due_date) values(default, 'ass1.pdf', 'dynamic_arrays_path', 'assessment', 3, NULL);
+
+-- Add user content progress
+INSERT INTO user_content_progress(user_id, topic_file_id, topic_id, completed) VALUES(1, 1, 1, false);
+INSERT INTO user_content_progress(user_id, topic_file_id, topic_id, completed) VALUES(1, 2, 1, true);
+INSERT INTO user_content_progress(user_id, topic_file_id, topic_id, completed) VALUES(1, 3, 2, true);
+INSERT INTO user_content_progress(user_id, topic_file_id, topic_id, completed) VALUES(1, 4, 3, false);
 
 -- Add prerequisites
 INSERT INTO prerequisites(prereq, topic) values(3, 1);
@@ -160,7 +176,7 @@ VALUES(default, 'Poll B', current_timestamp, current_timestamp, false, 'Poll typ
 INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type) 
 VALUES(default, 'Poll C', current_timestamp, current_timestamp, false, 'Poll type C');
 
--- Weeks
+-- Weeks (can remove)
 INSERT INTO weeks(id, num) VALUES(default, 1);
 INSERT INTO weeks(id, num) VALUES(default, 2);
 INSERT INTO weeks(id, num) VALUES(default, 3);
