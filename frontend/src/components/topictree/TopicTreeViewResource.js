@@ -29,9 +29,16 @@ import {
 } from "@chakra-ui/react";
 import Select from "./ChakraReactSelect.js";
 import { delete_topic_url, delete_prereqs, add_prereqs, update_topic, post_topic_tag } from "../../Constants";
+import { set } from "draft-js/lib/DefaultDraftBlockRenderMap";
 
 
 export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, topicGroupName, nodes}) {
+  const [tempFiles, setTempFiles] = useState({
+    'content': [],
+    'assessments': [],
+    'practice': [],
+    'preparation': []
+  });
   const [tempPrereqs, setTempPrereqs] = useState([]);
   const [hasDeleted, setHasDelete] = useState(false);
   const [showAddPrereqBox, setShowAddPrereqBox] = useState(false);
@@ -45,6 +52,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     console.log('data', data);
     setTempPrereqs(prereqs);
     setTempTags(data.tags);
+    setTempFiles(data.materials_strings);
   }, [prereqs]);
 
   useEffect(() => {
@@ -137,13 +145,20 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     console.log('uploadFile', files[typeOfFile]);
     formData.append('name', data.title);
     formData.append('uploadFile', files[typeOfFile]);
-    formData.append('uploadedFileTypes', 'pdf');
+    if (typeOfFile == 'Assessments') {
+      formData.append('uploadedFileTypes', 'assessment');
+    } else {
+      formData.append('uploadedFileTypes', typeOfFile.toLowerCase());
+    }
+
 
     await fetch(update_topic(topicGroupName, data.title), {
       method: 'PUT',
       body: formData
     });
-    window.location.reload();
+    let copyFiles = JSON.stringify(JSON.parse(tempFiles));
+    copyFiles[typeOfFile].push(files[typeOfFile]);
+    setTempFiles(copyFiles);
 
   }
 
@@ -298,7 +313,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                 </Thead>
                 <Tbody>
                   
-                  {data.materials_strings[typeOfFile.toLowerCase()].map((file_string) => {
+                  {tempFiles[typeOfFile.toLowerCase()].map((file_string) => {
                     return (
                       <Tr key={file_string}>
                         <Td>{file_string}</Td>
@@ -308,7 +323,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                   })}
                 </Tbody>
               </Table>
-              {data.materials_strings[typeOfFile.toLowerCase()].length == 0 ? <h6>No files here!</h6> : <></>}
+              {tempFiles[typeOfFile.toLowerCase()].length == 0 ? <h6>No files here!</h6> : <></>}
               <Flex flexDirection="column" mb="16px">
                   <input type="file" name="images" onChange={(e) => handleUpload(e, typeOfFile)} />
                   <Button colorScheme="blue" mt={3} onClick={(e) => uploadFile(e, typeOfFile)}>Upload file</Button>
