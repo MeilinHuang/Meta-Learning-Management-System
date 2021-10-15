@@ -34,7 +34,7 @@ function CategoriesList({topic, course}) {
                                             <Flex marginLeft="15px" flexGrow={1}>
                                                 <Checkbox colorScheme="green" size="md" marginRight="20px"></Checkbox>
                                                 <Flex _hover={{textDecoration: "underline", cursor: "pointer"}} onClick={() => {
-                                                    window.open("/_files/" + course + "/" + topic.name + "/" + mat.name)
+                                                    window.open("/_files/topicGroup" + course + "/topic" + topic.id + "/" + mat.name)
                                                 }}>
                                                     <Text overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" >{mat.name}</Text>
                                                 </Flex>

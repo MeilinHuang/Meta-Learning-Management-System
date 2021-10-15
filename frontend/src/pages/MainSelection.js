@@ -164,7 +164,7 @@ function MainSelection({ user }) {
                             <Flex flexDirection="column">
                                 <Text fontSize="lg" letterSpacing="wide">{content.topic_code + " " + content.topics_list[0].name}</Text>
                                 <Accordion allowMultiple>
-                                    <CategoriesList topic={content.topics_list[0]} course={content.name}></CategoriesList>
+                                    <CategoriesList topic={content.topics_list[0]} course={content.id}></CategoriesList>
                                 </Accordion>
                             </Flex>
                             : 

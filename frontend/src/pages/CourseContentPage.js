@@ -95,7 +95,7 @@ function CourseContentPage({topicGroup}) {
                         <Accordion width="100%" allowMultiple>
                             { display.map(e => {
                                 return (
-                                    <TopicAccordion topic={e} course={course} key={"section " + e.name} ></TopicAccordion>
+                                    <TopicAccordion topic={e} course={topicGroup.id} key={"section " + e.name} ></TopicAccordion>
                                 )
                             }) }
                         </Accordion>
