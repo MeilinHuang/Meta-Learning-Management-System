@@ -1,21 +1,10 @@
 import React, { useEffect, useState } from "react"
-import { 
-    useToast, 
-    Spinner, 
-    Heading, 
-    Text, 
+import {  
+    Spinner,  
     Button, 
-    Box, 
     Accordion, 
-    AccordionItem, 
-    AccordionButton, 
-    AccordionPanel, 
-    Stack, 
-    Checkbox, 
     Center, 
-    AccordionIcon, 
     Flex, 
-    Divider, 
     useBreakpointValue, 
     InputGroup,
     InputLeftElement,
@@ -23,149 +12,57 @@ import {
 } from "@chakra-ui/react"
 import { GrTree } from "react-icons/gr"
 import { SearchIcon } from "@chakra-ui/icons"
-import {get_topics_url} from "../Constants.js"
 import { useHistory } from 'react-router-dom'
+import TopicAccordion from "../components/content/TopicAccordion.js"
 
-function CourseContentPage() {
+function CourseContentPage({topicGroup}) {
     const [data, setData] = useState(null)
     const [display, setDisplay] = useState([])
-    const [files, setFiles] = useState([])
     const treeButton = useBreakpointValue({base: <GrTree/>, md: "TOPIC TREE"})
 
-    const download = useToast()
     let history = useHistory()
     let course = history.location.pathname.split("/").filter(e => e !== "")[1]
     useEffect(() => {
-        fetch(get_topics_url(course)).then(e => {
-            return e.json()
-        }).then(e => {
-            setData(e.topics_list)
-            setDisplay(e.topics_list)
-        })
-    }, [])
-    
-    const categories = ["Preparation", "Content", "Practice", "Assessments"]
+        if (topicGroup) {
+            setData(topicGroup.topics_list)
+            setDisplay(topicGroup.topics_list)
+        }
+    }, [topicGroup])
 
-    let counter = 0
-    let pageView = (
-
-        <Center alignContent="center">
-            <Spinner size="xl"/>
-        </Center>
-    )
-    if (data != null) {
-        pageView =  (
-            <Flex justify="center" marginBottom={10}>
-                <Flex flexDirection="column" width={["100%", "100%", "80%"]}>
-                    <Accordion width="100%" allowMultiple>
-                        { display.map(e => {
-                            return (
-                                <AccordionItem key={"section " + e.name}>
-                                    <h2>
-                                        <AccordionButton>
-                                            <Flex flexGrow={1} textAlign="left">
-                                                <Heading size={["sm", "md"]}>
-                                                    {e.name}
-                                                </Heading>
-                                            </Flex>
-                                            <AccordionIcon></AccordionIcon>
-                                        </AccordionButton>
-                                    </h2>
-                                    {   
-                                        <AccordionPanel>
-                                            
-                                                <Accordion width="100%" allowMultiple>
-                                                    {
-                                                        categories.map(category => {
-                                                            return (
-                                                                <AccordionItem key={e.name + "-" + category}>
-                                                                    <AccordionButton paddingRight={0} paddingLeft={5}>
-                                                                        <Text flexGrow={1} textAlign="left">
-                                                                            {category}
-                                                                        </Text>
-                                                                        <AccordionIcon></AccordionIcon>
-                                                                    </AccordionButton>
-                                                                    <AccordionPanel>
-                                                                        <Stack spacing={5} divider={<Divider></Divider>} paddingTop={3}>
-                                                                        { 
-                                                                            e.course_materials.map(mat => {
-                                                                                if (category.toLowerCase().indexOf(mat.type) != -1) {
-                                                                                    return (
-                                                                                        <Box key={mat + "-" + e.name}>
-                                                                                            <Flex>
-                                                                                                <Checkbox onChange={box => {
-                                                                                                    let checked = box.target.checked
-                                                                                                    let old = files
-                                                                                                    if (checked) {
-                                                                                                        old.push(mat.name)
-                                                                                                        setFiles(old)
-                                                                                                    }
-                                                                                                    else {
-                                                                                                        const index = old.indexOf(mat.name)
-                                                                                                        if (index > -1) {
-                                                                                                            old.splice(index, 1)
-                                                                                                            setFiles(old)
-                                                                                                        }
-                                                                                                    }
-                                                                                                }}></Checkbox>
-                                                                                                <Text marginLeft={10} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">{mat.name}</Text>
-                                                                                            </Flex>
-                                                                                        </Box>
-                                                                                    )
-                                                                                }
-                                                                            })
-                                                                        }
-                                                                        </Stack>
-                                                                    </AccordionPanel>
-                                                                </AccordionItem>
-                                                            )
-                                                        })
-                                                    }
-                                                </Accordion>
-                                                {/*TODO redirect to view content after click*/}
-                                                {/*
-                                                    e.course_materials.map(e => {
-                                                        counter += 1
-                                                        return (
-                                                            
-                                                        )
-                                                    })
-                                                */}
-                                        </AccordionPanel>
-                                    }
-                                </AccordionItem>
-                            )
-                        }) }
-                    </Accordion>
-                    {/*TODO actually download files after file system is implemented in backend */}
-                    <Button marginTop={5} alignSelf="flex-end" onClick={e =>{
-                        if (files.length > 0) {
-                            return (
-                                download({
-                                    title: "Downloading",
-                                    description: "The files will be downloaded shortly",
-                                    status: "info",
-                                    duration: 3000,
-                                    isClosable: true,
+    useEffect(() => {
+        if (data) {
+            data.map(topic => {
+                topic.prereqs.map(prereq => {
+                    let button = document.getElementById("prereq-" + prereq.name)
+                    if (button) {
+                        button.addEventListener("click", e => {
+                            let prereq_button = document.getElementById("accordion-button-topic-" + prereq.name)
+                            if (prereq_button) {
+                                const position = prereq_button.getBoundingClientRect()
+                                prereq_button.animate([{
+                                    transform: "scale(1)",
+                                },
+                                {
+                                    transform: "scale(1.04)",
+                                },
+                                {
+                                    transform: "scale(1)",
+                                }
+                                ], { 
+                                    duration: 300,
+                                    delay: 300
                                 })
-                            )
-                        }
-                        else {
-                            return (
-                                download({
-                                    title: "No selected files",
-                                    description: "Please select files to download",
-                                    status: "warning",
-                                    duration: 3000,
-                                    isClosable: true,
+                                window.scrollTo({
+                                    top: position.top,
+                                    behavior: "smooth",
                                 })
-                            )
-                        }
-                    }}>DOWNLOAD</Button>
-                </Flex>
-            </Flex>
-        )
-    }
+                            }
+                        })
+                    }
+                })
+            })
+        }
+    })
     return (
         <>
             <Flex justify="center" marginBottom={10}>
@@ -192,7 +89,22 @@ function CourseContentPage() {
                     </InputGroup>
                 </Flex>
             </Flex>
-            {pageView}
+            { display ? 
+                <Flex justify="center" marginBottom={10}>
+                    <Flex flexDirection="column" width={["100%", "100%", "80%"]}>
+                        <Accordion width="100%" allowMultiple>
+                            { display.map(e => {
+                                return (
+                                    <TopicAccordion topic={e} course={topicGroup.id} key={"section " + e.name} ></TopicAccordion>
+                                )
+                            }) }
+                        </Accordion>
+                    </Flex>
+                </Flex> : 
+                <Center alignContent="center">
+                    <Spinner size="xl"/>
+                </Center>
+            }
         </>
     )
 }

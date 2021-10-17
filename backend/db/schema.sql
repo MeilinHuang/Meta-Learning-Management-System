@@ -111,7 +111,8 @@ CREATE TABLE IF NOT EXISTS "forum_posts" (
   related_link TEXT,
   num_of_upvotes INTEGER NOT NULL,
   isEndorsed BOOLEAN NOT NULL,
-  topic_group INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE
+  topic_group INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  fromAnnouncement BOOLEAN NOT NULL
 );
 
 -- Can combine tags/topic_tags

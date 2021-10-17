@@ -182,6 +182,25 @@ app.delete(
   }
 );
 
+// Tags for topic group
+app.post("/topicGroup/:topicGroupName/topic/:topicName/tag",
+  async (request, response) => {
+    console.log(
+      `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/tag`
+    );
+    await database.putTopicTag(request, response);
+  }
+);
+
+app.delete("/topicGroup/:topicGroupName/topic/:topicName/tag",
+async (request, response) => {
+  console.log(
+    `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/tag`
+  );
+  await database.deleteTopicTag(request, response);
+}
+);
+
 app.post("/topicGroup/:topicGroupName", async (request, response) => {
   console.log(`POST /topicGroup/${request.params.topicGroupName}`);
   await database.postTopicGroup(request, response);

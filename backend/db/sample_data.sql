@@ -59,10 +59,10 @@ INSERT INTO user_enrolled(topic_group_id, user_id, progress) values(1, 2, 28.0);
 INSERT INTO user_enrolled(topic_group_id, user_id, progress) values(2, 1, 93.6);
 
 -- Create Forum Posts
-INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group) 
-VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false, NULL, 2, true, 1);
-INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group) 
-VALUES(default, 'Assignment 1 Help', 1, 'David Nguyen', current_timestamp, 'Ask questions here for help', true, NULL, 0, false, 2);
+INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group, fromAnnouncement) 
+VALUES(default, 'Welcome to the first post', 1, 'David Nguyen', current_timestamp, 'Description text of first post', false, NULL, 2, true, 1, true);
+INSERT INTO forum_posts(post_id, title, user_id, author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group, fromAnnouncement) 
+VALUES(default, 'Assignment 1 Help', 1, 'David Nguyen', current_timestamp, 'Ask questions here for help', true, NULL, 0, false, 2, false);
 
 -- Create upvotes
 INSERT INTO upvotes(post_id, user_id) VALUES (1, 2);

@@ -12,7 +12,7 @@ import { set } from 'draft-js/lib/DefaultDraftBlockRenderMap';
 var g;
 var svg;
 var expand = {};
-var circles, link, node, lables, simulation, tempNodes, linkNodes, tempLinks, arrows;
+var circles, link, node, lables, simulation, tempNodes, linkNodes, tempLinks, arrows, groupPath;
 var emptyNodes = 1; //fix later
 
 function zoomed() {
@@ -39,7 +39,8 @@ export default function TopicTree() {
         },
         "group": "",
         "discipline": "",
-        "creator": ""
+        "creator": "",
+        'tags': []
     });
     const { 
         isOpen: isOpenModal, 
@@ -80,6 +81,8 @@ export default function TopicTree() {
                         node.materials_strings.content.push(course_material.name);
                     }
                 }
+                console.log('tags', topic.tags);
+                node['tags'] = topic.tags;
                 
                 newJson.nodes.push(node);
                 for (let prereq of topic.prereqs) {
@@ -161,7 +164,7 @@ export default function TopicTree() {
                         'id': i,
                         'name': node.group,
                         'title': node.group,
-                        'type': 'group'
+                        'type': 'group',
                     });
                     console.log({
                         'id': i,
@@ -177,14 +180,18 @@ export default function TopicTree() {
                     'name': node.title,
                     'title': node.title,
                     'type': 'topic',
-                    'materials_strings': node.materials_strings
+                    'materials_strings': node.materials_strings,
+                    'group': node.group,
+                    'tags': node.tags
                 });
                 tempNodes.push({
                     'id': node.id,
                     'name': node.title,
                     'title': node.title,
                     'type': 'topic',
-                    'materials_strings': node.materials_strings
+                    'materials_strings': node.materials_strings,
+                    'group': node.group,
+                    'tags': node.tags
                 });
             }
             nodeDict[node.id] = node;
@@ -281,6 +288,7 @@ export default function TopicTree() {
                     
                     console.log('node', nodeData[0]);
                     setSelectedNode(nodeData[0]);
+                    console.log('group', nodeData[0].group);
                     setSelectedTopicGroup(nodeData[0].group);
                     getListOfPrerequisites(nodeData[0].id, data);
                 }
