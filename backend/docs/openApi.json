@@ -2557,15 +2557,6 @@
         "summary": "Get all forum posts related to the filter term",
         "parameters": [
           {
-            "name": "forumFilterTerm",
-            "in": "path",
-            "description": "Filter term to include all posts with the filter term",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "topicGroup",
             "in": "path",
             "description": "Name of topic group to get forum post for",
@@ -2573,6 +2564,21 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "forumFilterTerms",
+            "in": "query",
+            "description": "Array of filter terms",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items":  {
+                "type": "string",
+                "example": "Ass1"
+              }
+            },
+            "style": "form",
+            "explode": false
           }
         ],
         "responses": {

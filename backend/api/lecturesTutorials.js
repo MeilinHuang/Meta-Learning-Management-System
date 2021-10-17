@@ -414,8 +414,6 @@ async function deleteTutorial (request, response) {
   }
 }
 
-
-
 module.exports = {
   getWeeks,
   postLectureTutorialFile,

@@ -28,6 +28,7 @@ const database = require("./service.js");
 const lectureTutorial = require("./api/lecturesTutorials");
 const users = require("./api/user");
 const topics = require("./api/topics");
+const forums = require("./api/forums");
 
 /***************************************************************
                        Auth Functions
@@ -251,12 +252,12 @@ app.post("/enroll/code/:topicGroupName", async (request, response) => {
 
 app.get("/:topicGroup/forum", async (request, response) => {
   console.log(`GET /${request.params.topicGroup}/forum`);
-  await database.getAllForumPosts(request, response);
+  await forums.getAllForumPosts(request, response);
 });
 
 app.get("/:topicGroup/forum/pinned", async (request, response) => {
   console.log(`GET /${request.params.topicGroup}/forum/pinned`);
-  await database.getAllPinnedPosts(request, response);
+  await forums.getAllPinnedPosts(request, response);
 });
 
 app.get(
@@ -265,7 +266,7 @@ app.get(
     console.log(
       `GET /${request.params.topicGroup}/forum/search/${request.params.forumSearchTerm}`
     );
-    await database.getSearchPosts(request, response);
+    await forums.getSearchPosts(request, response);
   }
 );
 
@@ -273,33 +274,33 @@ app.get("/:topicGroup/forum/:forumFilterTerm", async (request, response) => {
   console.log(
     `GET /${request.params.topicGroup}/forum/${request.params.forumFilterTerm}`
   );
-  await database.getFilterPosts(request, response);
+  await forums.getFilterPosts(request, response);
 });
 
 app.post("/:topicGroup/forum/post", async (request, response) => {
   console.log(`POST /${request.params.topicGroup}/forum/post`);
-  await database.postForum(request, response);
+  await forums.postForum(request, response);
 });
 
 app.get("/:topicGroup/forum/post/:postId", async (request, response) => {
   console.log(
     `GET /${request.params.topicGroup}/forum/post/${request.params.postId}`
   );
-  await database.getPostById(request, response);
+  await forums.getPostById(request, response);
 });
 
 app.put("/:topicGroup/forum/post/:postId", async (request, response) => {
   console.log(
     `PUT /${request.params.topicGroup}/forum/post/${request.params.postId}`
   );
-  await database.putPost(request, response);
+  await forums.putPost(request, response);
 });
 
 app.delete("/:topicGroup/forum/post/:postId", async (request, response) => {
   console.log(
     `DELETE /${request.params.topicGroup}/forum/post/${request.params.postId}`
   );
-  await database.deletePost(request, response);
+  await forums.deletePost(request, response);
 });
 
 app.put(
@@ -308,7 +309,7 @@ app.put(
     console.log(
       `PUT /${request.params.topicGroup}/forum/post/${request.params.postId}/reply/${request.params.replyId}`
     );
-    await database.putPostReply(request, response);
+    await forums.putPostReply(request, response);
   }
 );
 
@@ -316,7 +317,7 @@ app.post("/:topicGroup/forum/post/:postId/reply", async (request, response) => {
   console.log(
     `POST /${request.params.topicGroup}/forum/post/${request.params.postId}/reply`
   );
-  await database.postReply(request, response);
+  await forums.postReply(request, response);
 });
 
 app.delete(
@@ -325,7 +326,7 @@ app.delete(
     console.log(
       `DELETE /${request.params.topicGroup}/forum/post/${request.params.postId}/reply/${request.params.replyId}`
     );
-    await database.deletePostReply(request, response);
+    await forums.deletePostReply(request, response);
   }
 );
 
@@ -335,7 +336,7 @@ app.post(
     console.log(
       `POST /${request.params.topicGroup}/forum/post/${request.params.postId}/comment`
     );
-    await database.postComment(request, response);
+    await forums.postComment(request, response);
   }
 );
 
@@ -345,7 +346,7 @@ app.put(
     console.log(
       `PUT /${request.params.topicGroup}/forum/post/${request.params.postId}/comment/${request.params.commentId}`
     );
-    await database.putComment(request, response);
+    await forums.putComment(request, response);
   }
 );
 
@@ -355,7 +356,7 @@ app.delete(
     console.log(
       `DELETE /${request.params.topicGroup}/forum/post/${request.params.postId}/comment/${request.params.commentId}`
     );
-    await database.deleteComment(request, response);
+    await forums.deleteComment(request, response);
   }
 );
 
@@ -365,7 +366,7 @@ app.put(
     console.log(
       `PUT /${request.params.topicGroup}/forum/post/${request.params.postId}/comment/${request.params.commentId}/endorse/${request.params.isEndorsed}`
     );
-    await database.putCommentEndorse(request, response);
+    await forums.putCommentEndorse(request, response);
   }
 );
 
@@ -375,7 +376,7 @@ app.put(
     console.log(
       `PUT /${request.params.topicGroup}/forum/post/pin/${request.params.postId}/${request.params.isPinned}`
     );
-    await database.putPostPin(request, response);
+    await forums.putPostPin(request, response);
   }
 );
 
@@ -383,31 +384,31 @@ app.get("/:topicGroup/forum/tags/:tagId", async (request, response) => {
   console.log(
     `GET /${request.params.topicGroup}/forum/tags/${request.params.tagId}`
   );
-  await database.getTag(request, response);
+  await forums.getTag(request, response);
 });
 
 app.put("/:topicGroup/forum/tags/:tagId", async (request, response) => {
   console.log(
     `PUT /${request.params.topicGroup}/forum/tags/${request.params.tagId}`
   );
-  await database.putTag(request, response);
+  await forums.putTag(request, response);
 });
 
 app.put("/:topicGroup/forum/tags", async (request, response) => {
   console.log(`PUT /${request.params.topicGroup}/forum/tags`);
-  await database.getAllTags(request, response);
+  await forums.getAllTags(request, response);
 });
 
 app.post("/:topicGroup/forum/tags", async (request, response) => {
   console.log(`POST /${request.params.topicGroup}/forum/tags`);
-  await database.postTag(request, response);
+  await forums.postTag(request, response);
 });
 
 app.delete("/:topicGroup/forum/tags/:tagId", async (request, response) => {
   console.log(
     `DELETE /${request.params.topicGroup}/forum/tags/${request.params.tagId}`
   );
-  await database.deleteTag(request, response);
+  await forums.deleteTag(request, response);
 });
 
 app.put(
@@ -416,7 +417,7 @@ app.put(
     console.log(
       `PUT /${request.params.topicGroup}/forum/post/endorse/${request.params.postId}/${request.params.isEndorsed}`
     );
-    await database.putPostEndorse(request, response);
+    await forums.putPostEndorse(request, response);
   }
 );
 
@@ -424,14 +425,14 @@ app.put("/:topicGroup/forum/post/like/:postId", async (request, response) => {
   console.log(
     `PUT /${request.params.topicGroup}/forum/post/like/${request.params.postId}`
   );
-  await database.putPostLike(request, response);
+  await forums.putPostLike(request, response);
 });
 
 app.put("/:topicGroup/forum/post/unlike/:postId", async (request, response) => {
   console.log(
     `PUT /${request.params.topicGroup}/forum/post/unlike/${request.params.postId}`
   );
-  await database.putPostUnlike(request, response);
+  await forums.putPostUnlike(request, response);
 });
 
 /***************************************************************
