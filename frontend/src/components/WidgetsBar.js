@@ -6,23 +6,17 @@ import {
   Divider,
   Skeleton,
   Avatar,
-  Link,
   Flex,
   Menu,
   MenuButton,
   Portal,
   MenuList,
   MenuItem,
-  Spinner,
 } from "@chakra-ui/react";
 import Calendar from "./Calendar.js";
 import { isLoggedIn } from "../utils/helpers";
 import { useHistory } from "react-router-dom";
-
-function logOut() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("staff");
-}
+import { logOut } from "../utils/helpers";
 
 function WidgetsBar({ page, user }) {
   const history = useHistory();
@@ -79,7 +73,7 @@ function WidgetsBar({ page, user }) {
                   <MenuItem
                     onClick={(e) => {
                       logOut();
-                      history.push("/");
+                      history.go(0);
                     }}
                   >
                     Log Out

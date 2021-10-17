@@ -35,7 +35,14 @@ function CoursePage() {
   useEffect(() => {
     //Need to get user logged in
     if (isLoggedIn()) {
-      fetch(backend_url + `user/${localStorage.getItem("id")}`)
+      const options = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/JSON",
+          Authorisation: `Bearer ${localStorage.getItem("token")}`,
+        },
+      };
+      fetch(backend_url + `user/${localStorage.getItem("id")}`, options)
         .then((e) => e.json())
         .then((e) => setUser(e));
     }
