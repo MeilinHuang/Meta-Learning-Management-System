@@ -12,34 +12,31 @@ import {
   Portal,
   MenuList,
   MenuItem,
-  Spinner
 } from "@chakra-ui/react";
 import Calendar from "./Calendar.js";
 import { isLoggedIn } from "../utils/helpers";
 import { useHistory } from "react-router-dom";
-
-function logOut() {
-  sessionStorage.removeItem("token");
-  sessionStorage.removeItem("staff");
-}
+import { logOut } from "../utils/helpers";
 
 function WidgetsBar({ page, user }) {
   const history = useHistory();
-  const [progress, setProgress] = useState(0)
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     if (page === "course") {
       if (user) {
-        let course_name = decodeURI(document.location.pathname.split("/").filter(e => e !== "")[1])
-        user.enrolled_courses.map(course => {
+        let course_name = decodeURI(
+          document.location.pathname.split("/").filter((e) => e !== "")[1]
+        );
+        user.enrolled_courses.map((course) => {
           if (course.name === course_name) {
-            setProgress(parseInt(course.progress) + "%")
+            setProgress(parseInt(course.progress) + "%");
           }
-          return course
-        })
+          return course;
+        });
       }
     }
-  })
+  });
 
   return (
     <Box
@@ -52,34 +49,43 @@ function WidgetsBar({ page, user }) {
         <Flex alignItems="center" justifyContent="center" marginTop={3}>
           <Menu isLazy>
             <MenuButton _hover={{ textDecoration: "underline" }}>
-              {
-                  user ? (
-                    <Flex alignItems="center">
-                      <Avatar name={user.user_name}/>
-                      <Box paddingLeft={3}>
-                      <Text fontWeight="medium">{user.user_name}</Text>
-                      </Box>
-                    </Flex>
-                  )
-                  : <Spinner/>
-              }
+              {user ? (
+                <Flex alignItems="center">
+                  <Avatar name={user.user_name} />
+                  <Box paddingLeft={3}>
+                    <Text fontWeight="medium">{user.user_name}</Text>
+                  </Box>
+                </Flex>
+              ) : (
+                <Flex alignItems="center">
+                  <Avatar />
+                  <Box paddingLeft={3}>
+                    <Text fontWeight="medium">Log In</Text>
+                  </Box>
+                </Flex>
+              )}
             </MenuButton>
             <Portal>
               <MenuList zIndex={100}>
                 <MenuItem>Profile</MenuItem>
                 <MenuItem>Settings</MenuItem>
-                {isLoggedIn ? (
+                {isLoggedIn() ? (
                   <MenuItem
                     onClick={(e) => {
-                      console.log("here55");
                       logOut();
-                      history.push("/");
+                      history.go(0);
                     }}
                   >
                     Log Out
                   </MenuItem>
                 ) : (
-                  <MenuItem>Log In</MenuItem>
+                  <MenuItem
+                    onClick={(e) => {
+                      history.push("/login");
+                    }}
+                  >
+                    Log In
+                  </MenuItem>
                 )}
               </MenuList>
             </Portal>
@@ -113,7 +119,9 @@ function WidgetsBar({ page, user }) {
               width="100%"
               position="relative"
             >
-              <Text position="absolute" left="45%">{progress}</Text>
+              <Text position="absolute" left="45%">
+                {progress}
+              </Text>
               <Box
                 bg="blue.500"
                 width={progress}

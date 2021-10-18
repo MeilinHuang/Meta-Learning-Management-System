@@ -26,13 +26,12 @@ async function getZIdFromAuthorization(auth) {
   }
 }
 
-// TODO staff check
 async function login(request, response) {
   let email = request.body.email;
   let password = request.body.password;
   try {
     resp = await pool.query(
-      `SELECT zId, email, password, staff FROM users
+      `SELECT id, zId, email, password, staff FROM users
       where email = '${email}'`
     );
     //If no matching email
@@ -51,7 +50,8 @@ async function login(request, response) {
     let token = jwt.sign({ zid }, JWT_SECRET, { algorithm: "HS256" });
 
     let staff = resp.rows[0].staff;
-    response.status(200).send({ token: token, staff: staff });
+    let id = resp.rows[0].id;
+    response.status(200).send({ token: token, staff: staff, id: id });
   } catch (e) {
     console.log(e);
   }
@@ -508,20 +508,22 @@ async function postTopicGroup(request, response) {
   }
 }
 
-async function getAllTopics (request, response) { 
+async function getAllTopics(request, response) {
   try {
     let topicGroupResp = await pool.query(`SELECT name FROM topic_group`);
-    console.log('topicGroupResp', topicGroupResp);
+    console.log("topicGroupResp", topicGroupResp);
     let result = [];
     for (let topicGroupName of topicGroupResp.rows) {
-      console.log('topicGroupName', topicGroupName.name);
+      console.log("topicGroupName", topicGroupName.name);
       let resp = await pool.query(
         `SELECT array_agg(DISTINCT topics.id) AS topics_list
         FROM topic_group tp_group 
         JOIN topics ON topics.topic_group_id = tp_group.id
         WHERE LOWER(tp_group.name) = LOWER($1)
-        GROUP BY tp_group.id;`, [topicGroupName.name]);
-      for (var object of resp.rows) { 
+        GROUP BY tp_group.id;`,
+        [topicGroupName.name]
+      );
+      for (var object of resp.rows) {
         var topicArr = [];
         for (const topic_id of object.topics_list) {
           let preReqsArr = [];
@@ -532,13 +534,17 @@ async function getAllTopics (request, response) {
             FULL OUTER JOIN topic_files ON topic_files.topic_id = topics.id
             FULL OUTER JOIN prerequisites ON prerequisites.topic = topics.id
             WHERE topics.id = $1
-            GROUP BY topics.id`
-            , [topic_id]);
+            GROUP BY topics.id`,
+            [topic_id]
+          );
           if (tmp.rows.length > 0) {
             var courseMaterialsArr = [];
             if (tmp.rows[0].course_materials[0] !== null) {
               for (var material_id of tmp.rows[0].course_materials) {
-                let tmp2 = await pool.query(`SELECT * from topic_files WHERE id = $1`, [material_id]);
+                let tmp2 = await pool.query(
+                  `SELECT * from topic_files WHERE id = $1`,
+                  [material_id]
+                );
                 courseMaterialsArr.push(tmp2.rows[0]);
               }
             }
@@ -546,27 +552,33 @@ async function getAllTopics (request, response) {
               tmp.rows[0].prereqs = [];
             } else {
               for (const preReqId of tmp.rows[0].prereqs) {
-                let tmp = await pool.query(`
+                let tmp = await pool.query(
+                  `
                 SELECT t.id, t.name from topics t WHERE t.id = $1
-                `, [preReqId]);
+                `,
+                  [preReqId]
+                );
                 preReqsArr.push(tmp.rows[0]);
               }
               tmp.rows[0].prereqs = preReqsArr;
             }
-            let temp3 = await pool.query(`SELECT tags.name from tags JOIN topic_tags ON topic_tags.tag_id = tags.tag_id WHERE topic_id = $1 GROUP BY tags.tag_id`, [topic_id]);
+            let temp3 = await pool.query(
+              `SELECT tags.name from tags JOIN topic_tags ON topic_tags.tag_id = tags.tag_id WHERE topic_id = $1 GROUP BY tags.tag_id`,
+              [topic_id]
+            );
             tmp.rows[0].tags = temp3.rows;
             tmp.rows[0].course_materials = courseMaterialsArr;
             topicArr.push(tmp.rows[0]);
           }
-        };
+        }
         object.topics_list = topicArr;
         object.name = topicGroupName.name;
       }
       result.push(resp.rows[0]);
     }
-    console.log('result', result);
-    response.status(200).json({'result': result});
-  } catch(e) {
+    console.log("result", result);
+    response.status(200).json({ result: result });
+  } catch (e) {
     response.status(400).send(e);
   }
 }
@@ -760,15 +772,15 @@ async function deleteTopic(request, response) {
 }
 
 async function putTopicTag(request, response) {
-  console.log('running inner function');
+  console.log("running inner function");
   try {
     const topicName = request.params.topicName;
     const topicGroupName = request.params.topicGroupName;
 
     const tagName = request.body.tagName;
-    console.log('tagName', tagName);
-    console.log('topicName', topicName);
-    console.log('topicGroupName', topicGroupName);
+    console.log("tagName", tagName);
+    console.log("topicName", topicName);
+    console.log("topicGroupName", topicGroupName);
     let tgReq = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
       [topicGroupName]
@@ -784,7 +796,7 @@ async function putTopicTag(request, response) {
 
     const topicGroupId = tgReq.rows[0].id;
     const topicId = tReq.rows[0].id;
-    
+
     let resp = await pool.query(
       "INSERT INTO tags(tag_id, topic_group_id, name) values(default, $1, $2) RETURNING tag_id",
       [topicGroupId, tagName]
@@ -797,7 +809,6 @@ async function putTopicTag(request, response) {
     );
 
     response.sendStatus(200);
-
   } catch (e) {
     console.log(e);
     response.status(400).json({ error: e });
@@ -810,9 +821,9 @@ async function deleteTopicTag(request, response) {
     const topicGroupName = request.params.topicGroupName;
 
     const tagName = request.body.tagName;
-    console.log('tagName', tagName);
-    console.log('topicName', topicName);
-    console.log('topicGroupName', topicGroupName);
+    console.log("tagName", tagName);
+    console.log("topicName", topicName);
+    console.log("topicGroupName", topicGroupName);
     let tgReq = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
       [topicGroupName]
@@ -828,12 +839,12 @@ async function deleteTopicTag(request, response) {
 
     const topicGroupId = tgReq.rows[0].id;
     const topicId = tReq.rows[0].id;
-    
+
     let resp = await pool.query(
       `SELECT tag_id FROM tags WHERE LOWER(name) = LOWER($1)`,
       [tagName]
     );
-    
+
     for (let i = 0; i < resp.rows.length; i++) {
       let tagId = resp.rows[i].tag_id;
       let topicTagRes = await pool.query(
@@ -841,14 +852,15 @@ async function deleteTopicTag(request, response) {
         [tagId, topicId]
       );
       if (topicTagRes.rows.length > 0) {
-        await pool.query(`DELETE FROM topic_tags WHERE tag_id = $1 and topic_id = $2`,
-        [tagId, topicId]);
+        await pool.query(
+          `DELETE FROM topic_tags WHERE tag_id = $1 and topic_id = $2`,
+          [tagId, topicId]
+        );
         break;
       }
     }
 
     response.sendStatus(200);
-
   } catch (e) {
     console.log(e);
     response.status(400).json({ error: e });
@@ -1189,6 +1201,8 @@ async function generateCode(request, response) {
 }
 
 /***************************************************************
+<<<<<<< HEAD
+=======
                        Forum Functions
 ***************************************************************/
 
@@ -1467,9 +1481,12 @@ async function getFilterPosts(request, response) {
     const topicGroupId = tmpQ.rows[0].id;
     const forumFilterTerm = request.params.forumFilterTerm;
 
-    const checkTag = await pool.query(`SELECT * from tags WHERE LOWER(name) LIKE LOWER($1)`, [`%${forumFilterTerm}%`])
+    const checkTag = await pool.query(
+      `SELECT * from tags WHERE LOWER(name) LIKE LOWER($1)`,
+      [`%${forumFilterTerm}%`]
+    );
 
-    let resp
+    let resp;
     if (checkTag.rows.length) {
       resp = await pool.query(
         `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
@@ -1492,9 +1509,9 @@ async function getFilterPosts(request, response) {
         [`%${forumFilterTerm}%`, topicGroupId]
       );
     } else {
-      console.log(forumFilterTerm.toLowerCase())
-      switch(forumFilterTerm) {
-        case 'announcement':
+      console.log(forumFilterTerm.toLowerCase());
+      switch (forumFilterTerm) {
+        case "announcement":
           resp = await pool.query(
             `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
             fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
@@ -1513,9 +1530,10 @@ async function getFilterPosts(request, response) {
             WHERE fp.fromAnnouncement = true
             AND fp.topic_group = $1
             GROUP BY fp.post_id`,
-            [topicGroupId])
-          break
-        case 'answered':
+            [topicGroupId]
+          );
+          break;
+        case "answered":
           resp = await pool.query(
             `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
             fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
@@ -1534,9 +1552,10 @@ async function getFilterPosts(request, response) {
             WHERE fp.topic_group = $1
             GROUP BY fp.post_id
             HAVING Count(r.reply_id) > 0 OR Count(comments.comment_id) > 0`,
-            [topicGroupId])
-          break
-        case 'unanswered':
+            [topicGroupId]
+          );
+          break;
+        case "unanswered":
           resp = await pool.query(
             `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
             fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
@@ -1555,9 +1574,10 @@ async function getFilterPosts(request, response) {
             WHERE fp.topic_group = $1
             GROUP BY fp.post_id
             HAVING Count(r.reply_id) = 0 AND Count(comments.comment_id) = 0`,
-            [topicGroupId])
-          break
-        case 'endorsed':
+            [topicGroupId]
+          );
+          break;
+        case "endorsed":
           resp = await pool.query(
             `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
             fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
@@ -1576,10 +1596,11 @@ async function getFilterPosts(request, response) {
             WHERE fp.isEndorsed = true
             AND fp.topic_group = $1
             GROUP BY fp.post_id`,
-            [topicGroupId])
-          break
+            [topicGroupId]
+          );
+          break;
         default:
-          resp = []
+          resp = [];
       }
     }
 
@@ -2418,27 +2439,36 @@ async function getAllTags(request, response) {
   try {
     let resp;
 
-    if (request.params.topicGroup) { // If topic group specified then get tags for topic group only
+    if (request.params.topicGroup) {
+      // If topic group specified then get tags for topic group only
       const topicGroupName = request.params.topicGroup;
-      let topicGroupReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
-      if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
+      let topicGroupReq = await pool.query(
+        `SELECT id FROM topic_group WHERE LOWER(name) LIKE LOWER($1)`,
+        [topicGroupName]
+      );
+      if (!topicGroupReq.rows.length)
+        throw `Topic Group '${topicGroupName}' does not exist`;
 
       const topicGroupId = topicGroupReq.rows[0].id;
-      const tags = await pool.query(`SELECT * FROM tags WHERE topic_group_id = $1`, [topicGroupId]);
+      const tags = await pool.query(
+        `SELECT * FROM tags WHERE topic_group_id = $1`,
+        [topicGroupId]
+      );
 
-      const reserved = await pool.query('SELECT * FROM reserved_tags')
+      const reserved = await pool.query("SELECT * FROM reserved_tags");
 
       resp = {
         tags: tags.rows,
-        reserved_tags: reserved.rows
-      }
-    } else { // No topic group specified (get all tags)
+        reserved_tags: reserved.rows,
+      };
+    } else {
+      // No topic group specified (get all tags)
       resp = await pool.query(`SELECT * FROM tags`);
     }
 
     response.status(200).json(resp);
-  } catch(e) {
-    console.log(e)
+  } catch (e) {
+    console.log(e);
     response.status(400).send(e);
   }
 }
@@ -2462,22 +2492,34 @@ async function postTag(request, response) {
   try {
     const tagName = request.body.tagName;
     const topicGroupName = request.params.topicGroup;
-    
-    const topicGroupReq = await pool.query(`SELECT id FROM topic_group 
-    WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
-    if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
+
+    const topicGroupReq = await pool.query(
+      `SELECT id FROM topic_group 
+    WHERE LOWER(name) LIKE LOWER($1)`,
+      [topicGroupName]
+    );
+    if (!topicGroupReq.rows.length)
+      throw `Topic Group '${topicGroupName}' does not exist`;
     const topicGroupId = topicGroupReq.rows[0].id;
 
-    let reservedTagCheck = await pool.query(`
-    select exists(select * from reserved_tags where lower(name) like lower($1))`, [tagName]);
+    let reservedTagCheck = await pool.query(
+      `
+    select exists(select * from reserved_tags where lower(name) like lower($1))`,
+      [tagName]
+    );
 
     if (reservedTagCheck.rows[0].exists) {
-      response.status(400).json({ error: `Tag '${tagName}' is a reserved tag name`});
+      response
+        .status(400)
+        .json({ error: `Tag '${tagName}' is a reserved tag name` });
       return;
     }
 
-    let dupTagCheck = await pool.query(`
-    select exists(select * from tags where lower(name) like lower($1) AND topic_group_id = $2)`, [tagName, topicGroupId]);
+    let dupTagCheck = await pool.query(
+      `
+    select exists(select * from tags where lower(name) like lower($1) AND topic_group_id = $2)`,
+      [tagName, topicGroupId]
+    );
 
     if (dupTagCheck.rows[0].exists) {
       response.status(400).json({
@@ -2499,16 +2541,26 @@ async function postTag(request, response) {
 // Update tag
 async function putTag(request, response) {
   try {
-    let reservedTagCheck = await pool.query(`
-    select exists(select * from reserved_tags where lower(name) like lower($1))`, [request.body.tagName]);
+    let reservedTagCheck = await pool.query(
+      `
+    select exists(select * from reserved_tags where lower(name) like lower($1))`,
+      [request.body.tagName]
+    );
 
     if (reservedTagCheck.rows[0].exists) {
-      response.status(400).json({ error: `Tag '${request.body.tagName}' is a reserved tag name`});
+      response
+        .status(400)
+        .json({
+          error: `Tag '${request.body.tagName}' is a reserved tag name`,
+        });
       return;
     }
 
-    let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) 
-    like lower($1))`, [request.body.tagName]);
+    let dupTagCheck = await pool.query(
+      `select exists(select * from tags where lower(name) 
+    like lower($1))`,
+      [request.body.tagName]
+    );
 
     if (dupTagCheck.rows[0].exists) {
       response.status(400).json({ error: `Tag '${tagName}' already exists` });
@@ -2612,6 +2664,7 @@ async function putPostUnlike(request, response) {
 }
 
 /***************************************************************
+>>>>>>> 0e62984a95c7179cf1e63e3275db0131caee4541
                        Course Pages Functions
 ***************************************************************/
 
@@ -3668,18 +3721,11 @@ async function getStudentAnswerCount(request, response) {
 }
 
 module.exports = {
-  putTag,
   putAnnouncementComment,
   putAnnouncement,
   getAnnouncementById,
   deleteAnnouncement,
   deleteAnnouncementComment,
-  deletePost,
-  deleteComment,
-  putCommentEndorse,
-  putComment,
-  deletePostReply,
-  deleteTag,
   getStudentAnswerCount,
   putQuestionAnswer,
   deleteAssessmentQuestion,
@@ -3712,22 +3758,6 @@ module.exports = {
   deleteTopicGroup,
   deleteTopic,
   postTopic,
-  getAllForumPosts,
-  getAllPinnedPosts,
-  getSearchPosts,
-  getFilterPosts,
-  postForum,
-  getPostById,
-  putPost,
-  putPostReply,
-  postReply,
-  postComment,
-  putPostPin,
-  getAllTags,
-  postTag,
-  putPostEndorse,
-  putPostLike,
-  putPostUnlike,
   getAnnouncements,
   postAnnouncement,
   postAnnouncementComment,
@@ -3738,10 +3768,9 @@ module.exports = {
   getZIdFromAuthorization,
   generateCode,
   getTopicGroup,
-  getTag,
   getTopicFile,
   putTopicGroup,
   putTopic,
   putTopicTag,
-  deleteTopicTag
+  deleteTopicTag,
 };
