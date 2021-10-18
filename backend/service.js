@@ -22,7 +22,7 @@ async function getZIdFromAuthorization(auth) {
 
     return zId;
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 }
 
@@ -53,7 +53,7 @@ async function login(request, response) {
     let id = resp.rows[0].id;
     response.status(200).send({ token: token, staff: staff, id: id });
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 }
 
@@ -96,7 +96,7 @@ async function register(request, response) {
     let token = jwt.sign({ zid }, JWT_SECRET, { algorithm: "HS256" });
     response.status(200).send({ token: token, staff: staff });
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 }
 
@@ -388,7 +388,7 @@ async function getTopicPreReqs(request, response) {
 
     var preReqsArr = [];
 
-    console.log(resp.rows[0]);
+    // console.log(resp.rows[0]);
     if (resp.rows[0].prerequisites_list !== null) {
       for (var prereq_id of resp.rows[0].prerequisites_list) {
         let tmp = await pool.query(`SELECT * from topics WHERE id = $1`, [
@@ -503,7 +503,7 @@ async function postTopicGroup(request, response) {
 
     response.sendStatus(200);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     response.status(400).send(e);
   }
 }
@@ -511,10 +511,10 @@ async function postTopicGroup(request, response) {
 async function getAllTopics(request, response) {
   try {
     let topicGroupResp = await pool.query(`SELECT name FROM topic_group`);
-    console.log("topicGroupResp", topicGroupResp);
+    // console.log("topicGroupResp", topicGroupResp);
     let result = [];
     for (let topicGroupName of topicGroupResp.rows) {
-      console.log("topicGroupName", topicGroupName.name);
+      // console.log("topicGroupName", topicGroupName.name);
       let resp = await pool.query(
         `SELECT array_agg(DISTINCT topics.id) AS topics_list
         FROM topic_group tp_group 
@@ -576,7 +576,7 @@ async function getAllTopics(request, response) {
       }
       result.push(resp.rows[0]);
     }
-    console.log("result", result);
+    // console.log("result", result);
     response.status(200).json({ result: result });
   } catch (e) {
     response.status(400).send(e);
@@ -772,15 +772,15 @@ async function deleteTopic(request, response) {
 }
 
 async function putTopicTag(request, response) {
-  console.log("running inner function");
+  // console.log("running inner function");
   try {
     const topicName = request.params.topicName;
     const topicGroupName = request.params.topicGroupName;
 
     const tagName = request.body.tagName;
-    console.log("tagName", tagName);
-    console.log("topicName", topicName);
-    console.log("topicGroupName", topicGroupName);
+    // console.log("tagName", tagName);
+    // console.log("topicName", topicName);
+    // console.log("topicGroupName", topicGroupName);
     let tgReq = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
       [topicGroupName]
@@ -810,7 +810,7 @@ async function putTopicTag(request, response) {
 
     response.sendStatus(200);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     response.status(400).json({ error: e });
   }
 }
@@ -821,9 +821,9 @@ async function deleteTopicTag(request, response) {
     const topicGroupName = request.params.topicGroupName;
 
     const tagName = request.body.tagName;
-    console.log("tagName", tagName);
-    console.log("topicName", topicName);
-    console.log("topicGroupName", topicGroupName);
+    // console.log("tagName", tagName);
+    // console.log("topicName", topicName);
+    // console.log("topicGroupName", topicGroupName);
     let tgReq = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
       [topicGroupName]
@@ -862,7 +862,7 @@ async function deleteTopicTag(request, response) {
 
     response.sendStatus(200);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     response.status(400).json({ error: e });
   }
 }
@@ -1082,7 +1082,7 @@ async function postTopic(request, response) {
 
     response.status(200).json({ success: true, topic: topicId });
   } catch (e) {
-    console.log(e);
+    console.error(e);
     response.status(400).send(e);
   }
 }
@@ -1196,7 +1196,7 @@ async function generateCode(request, response) {
     //return the code
     response.status(200).send(code);
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 }
 
@@ -1285,7 +1285,7 @@ async function getAllForumPosts(request, response) {
     }
     response.status(200).json(resp.rows);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     response.status(400).send(e.detail);
   }
 }
@@ -1507,7 +1507,7 @@ async function getFilterPosts(request, response) {
         [`%${forumFilterTerm}%`, topicGroupId]
       );
     } else {
-      console.log(forumFilterTerm.toLowerCase());
+      // console.log(forumFilterTerm.toLowerCase());
       switch (forumFilterTerm) {
         case "announcement":
           resp = await pool.query(
@@ -1768,7 +1768,7 @@ async function postForum(request, response) {
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     response.status(400).send(e);
   }
 }
@@ -1897,7 +1897,7 @@ async function getPostById(request, response) {
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     response.status(400).send(e.detail);
   }
 }
@@ -2466,7 +2466,7 @@ async function getAllTags(request, response) {
 
     response.status(200).json(resp);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     response.status(400).send(e);
   }
 }
@@ -2744,7 +2744,7 @@ async function getAnnouncementById(request, response) {
     var fileArr = [];
     var commArr = [];
 
-    console.log(resp.rows);
+    // console.log(resp.rows);
 
     if (resp.rows[0].comments.length && resp.rows[0].comments[0] !== null) {
       for (const commId of resp.rows[0].comments) {
@@ -2793,7 +2793,7 @@ async function getAnnouncementById(request, response) {
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     response.status(400).send(e);
   }
 }
@@ -3211,7 +3211,7 @@ async function getSearchAnnouncements(request, response) {
       [topicGroupId, `%${announcementSearchTerm}%`]
     );
 
-    console.log(resp);
+    // console.log(resp);
 
     for (const object of resp.rows) {
       var fileArr = [];

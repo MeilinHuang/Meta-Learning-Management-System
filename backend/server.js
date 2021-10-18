@@ -84,7 +84,7 @@ app.get("/topicGroup", async (request, response) => {
   await database.getAllTopicGroups(request, response);
 });
 
-app.get('/topicGroup/all', async(request, response) => {
+app.get("/topicGroup/all", async (request, response) => {
   await database.getAllTopics(request, response);
 });
 
@@ -141,7 +141,8 @@ app.delete(
 );
 
 // Tags for topic group
-app.post("/topicGroup/:topicGroupName/topic/:topicName/tag",
+app.post(
+  "/topicGroup/:topicGroupName/topic/:topicName/tag",
   async (request, response) => {
     console.log(
       `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/tag`
@@ -150,13 +151,14 @@ app.post("/topicGroup/:topicGroupName/topic/:topicName/tag",
   }
 );
 
-app.delete("/topicGroup/:topicGroupName/topic/:topicName/tag",
-async (request, response) => {
-  console.log(
-    `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/tag`
-  );
-  await database.deleteTopicTag(request, response);
-}
+app.delete(
+  "/topicGroup/:topicGroupName/topic/:topicName/tag",
+  async (request, response) => {
+    console.log(
+      `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/tag`
+    );
+    await database.deleteTopicTag(request, response);
+  }
 );
 
 app.post("/topicGroup/:topicGroupName", async (request, response) => {
@@ -579,26 +581,38 @@ app.post("/quiz", async (request, response) => {
 }) */
 
 app.get("/quiz/:quizId", async (request, response) => {
+  console.log(`GET /quiz/${request.params.quizId}`);
   await database.getQuizQuestions(request, response);
 });
 
 app.put("/quiz/:quizId", async (request, response) => {
+  console.log(`PUT /quiz/${request.params.quizId}`);
   await database.putQuizById(request, response);
 });
 
 app.delete("/quiz/:quizId", async (request, response) => {
+  console.log(`DELETE /quiz/${request.params.quizId}`);
   await database.deleteQuizById(request, response);
 });
 
 app.get("/quiz/:quizId/question/:questionId", async (request, response) => {
+  console.log(
+    `GET /quiz/${request.params.quizId}/question/${request.params.questionId}`
+  );
   await database.getQuestionFromQuiz(request, response);
 });
 
 app.put("/quiz/:quizId/question/:questionId", async (request, response) => {
+  console.log(
+    `PUT /quiz/${request.params.quizId}/question/${request.params.questionId}`
+  );
   await database.putQuestionFromQuiz(request, response);
 });
 
 app.get("/questionBank/:questionBankId", async (request, response) => {
+  console.log(
+    `GET /questionBank/${request.params.questionBankId}`
+  );
   await database.getQuestionBankQuestions(request, response);
 });
 
