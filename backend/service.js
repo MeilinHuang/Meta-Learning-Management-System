@@ -101,7 +101,7 @@ async function register(request, response) {
 
     //Do login
     let token = jwt.sign({ zid }, JWT_SECRET, { algorithm: "HS256" });
-    response.status(200).send({ token: token, staff: staff, id:id });
+    response.status(200).send({ token: token, staff: staff, id: id });
   } catch (e) {
     console.error(e);
   }
