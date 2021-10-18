@@ -18,7 +18,7 @@ async function getAllForumPosts(request, response) {
     const topicGroupId = tmpQ.rows[0].id;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.topic_group,
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.topic_group, fp.fromAnnouncement,
       array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
       array_agg(DISTINCT comments.comment_id) as comments
@@ -87,7 +87,6 @@ async function getAllForumPosts(request, response) {
       object.comments = commentsArr;
       object.attachments = fileArr;
     }
-    console.log(resp.rows);
     response.status(200).json(resp.rows);
   } catch (e) {
     console.log(e);
@@ -106,7 +105,7 @@ async function getAllPinnedPosts(request, response) {
     const topicGroupId = tmpQ.rows[0].id;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
       array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
       array_agg(DISTINCT comments.comment_id) as comments
@@ -195,7 +194,7 @@ async function getSearchPosts(request, response) {
     const forumSearchTerm = request.params.forumSearchTerm;
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
       array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
       array_agg(DISTINCT comments.comment_id) as comments
@@ -276,6 +275,7 @@ async function getSearchPosts(request, response) {
 // Get all posts related tag term
 async function getFilterPosts(request, response) {
   try {
+    const caseArr = ["announcement", "answered", "unanswered", "endorsed"];
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
@@ -285,7 +285,10 @@ async function getFilterPosts(request, response) {
     if (tmpQ.rows.length == 0) throw new Error (`Topic Group with name ${topicGroupName} does not exist`);
 
     const topicGroupId = tmpQ.rows[0].id;
-    const filterTerms = request.query.forumFilterTerms.split(",");
+
+    // Make array case insensitive
+    let filterArr = request.query.forumFilterTerms.split(",");
+    const filterTerms = filterArr.filter((str) => str.toLowerCase());
 
     let query = (`SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
     fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
@@ -303,16 +306,54 @@ async function getFilterPosts(request, response) {
     LEFT JOIN upvotes uv ON uv.post_id = fp.post_id 
     WHERE fp.topic_group = ${topicGroupId}`);
 
+    let answered = false, unanswered = false;
+
+    for (const x of caseArr) {
+      if (filterTerms.includes(x)) {
+        var index = filterTerms.indexOf(x);
+        switch (x) {
+          case "announcement": 
+            if (index !== -1) filterTerms.splice(index, 1);
+            query += ` AND fp.fromAnnouncement = true`
+            break;
+
+          case "answered": 
+            if (index !== -1) filterTerms.splice(index, 1);
+            answered = true;
+            break;
+
+          case "unanswered":
+            if (index !== -1) filterTerms.splice(index, 1);
+            unanswered = true;
+            break;
+          
+          case "endorsed": 
+            if (index !== -1) filterTerms.splice(index, 1);
+            query += ` AND fp.isEndorsed = true`
+            break
+
+          default:
+            resp = [];
+        }
+      }
+    }
+
+    // Tags
     if (filterTerms.length) {
       query += ` AND (`
-      for (var i = 0; i <= filterTerms.length; i++) {
+      for (var i = 0; i < filterTerms.length; i++) {
         query += `LOWER(t.name) LIKE LOWER('${filterTerms[i]}')`;
-        if (i+1 <= filterTerms.length) query += ` OR `;
+        if (i+1 < filterTerms.length) query += ` OR `;
       }
       query += `) `;
     }
-    
-    query += `GROUP BY fp.post_id`;
+
+    // Append final query parts
+    query += ` GROUP BY fp.post_id`;
+    if (answered) query += ` HAVING Count(r.reply_id) > 0 OR Count(comments.comment_id) > 0`;
+    else if (unanswered) query += ` HAVING Count(r.reply_id) = 0 AND Count(comments.comment_id) = 0`;
+
+    // console.log(query);
 
     let resp = await pool.query(query);
 
@@ -368,8 +409,6 @@ async function getFilterPosts(request, response) {
       object.attachments = fileArr;
     }
 
-    if (resp.rows.length == 0) throw (`Error: No posts found with filter`);
- 
     response.status(200).json(resp.rows);
   } catch (e) {
     response.send(e);
@@ -385,12 +424,15 @@ async function postForum(request, response) {
       user_id,
     ]);
 
-    if (!authReq.rows[0]) throw (`User does not exist with id: ${user_id}`);
+    if (!authReq.rows[0]) {
+      throw `User does not exist with id: ${user_id}`;
+    }
 
     const author = authReq.rows[0].name;
     const publishedDate = request.body.publishedDate;
     const description = request.body.description;
     const related_link = request.body.related_link;
+    const fromAnnouncement = request.body.fromAnnouncement;
 
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(
@@ -401,8 +443,8 @@ async function postForum(request, response) {
 
     let resp = await pool.query(
       `INSERT INTO forum_posts(post_id, title, user_id, 
-        author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group) 
-        values(default, $1, $2, $3, $4, $5, false, $6, 0, false, $7) 
+        author, published_date, description, isPinned, related_link, num_of_upvotes, isEndorsed, topic_group, fromAnnouncement) 
+        values(default, $1, $2, $3, $4, $5, false, $6, 0, false, $7, $8) 
         RETURNING post_id`,
       [
         title,
@@ -412,9 +454,9 @@ async function postForum(request, response) {
         description,
         related_link,
         topicGroupId,
+        fromAnnouncement,
       ]
     );
-
     if (request.body.tags) {
       const tags = request.body.tags.split(",");
       if (tags.length) {
@@ -479,7 +521,7 @@ async function postForum(request, response) {
       }
     }
 
-    response.sendStatus(200);
+    response.status(200).json(resp.rows[0]);
   } catch (e) {
     console.log(e);
     response.status(400).send(e);
@@ -493,7 +535,7 @@ async function getPostById(request, response) {
 
     let resp = await pool.query(
       `SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+      fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
       array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
       array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
       array_agg(DISTINCT comments.comment_id) as comments
@@ -1150,27 +1192,36 @@ async function getAllTags(request, response) {
   try {
     let resp;
 
-    if (request.params.topicGroup) { // If topic group specified then get tags for topic group only
+    if (request.params.topicGroup) {
+      // If topic group specified then get tags for topic group only
       const topicGroupName = request.params.topicGroup;
-      let topicGroupReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
-      if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
+      let topicGroupReq = await pool.query(
+        `SELECT id FROM topic_group WHERE LOWER(name) LIKE LOWER($1)`,
+        [topicGroupName]
+      );
+      if (!topicGroupReq.rows.length)
+        throw `Topic Group '${topicGroupName}' does not exist`;
 
       const topicGroupId = topicGroupReq.rows[0].id;
-      const tags = await pool.query(`SELECT * FROM tags WHERE topic_group_id = $1`, [topicGroupId]);
+      const tags = await pool.query(
+        `SELECT * FROM tags WHERE topic_group_id = $1`,
+        [topicGroupId]
+      );
 
-      const reserved = await pool.query('SELECT * FROM reserved_tags')
+      const reserved = await pool.query("SELECT * FROM reserved_tags");
 
       resp = {
         tags: tags.rows,
-        reserved_tags: reserved.rows
-      }
-    } else { // No topic group specified (get all tags)
+        reserved_tags: reserved.rows,
+      };
+    } else {
+      // No topic group specified (get all tags)
       resp = await pool.query(`SELECT * FROM tags`);
     }
 
     response.status(200).json(resp);
-  } catch(e) {
-    console.log(e)
+  } catch (e) {
+    console.log(e);
     response.status(400).send(e);
   }
 }
@@ -1194,22 +1245,34 @@ async function postTag(request, response) {
   try {
     const tagName = request.body.tagName;
     const topicGroupName = request.params.topicGroup;
-    
-    const topicGroupReq = await pool.query(`SELECT id FROM topic_group 
-    WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
-    if (!topicGroupReq.rows.length) throw (`Topic Group '${topicGroupName}' does not exist`);
+
+    const topicGroupReq = await pool.query(
+      `SELECT id FROM topic_group 
+    WHERE LOWER(name) LIKE LOWER($1)`,
+      [topicGroupName]
+    );
+    if (!topicGroupReq.rows.length)
+      throw `Topic Group '${topicGroupName}' does not exist`;
     const topicGroupId = topicGroupReq.rows[0].id;
 
-    let reservedTagCheck = await pool.query(`
-    select exists(select * from reserved_tags where lower(name) like lower($1))`, [tagName]);
+    let reservedTagCheck = await pool.query(
+      `
+    select exists(select * from reserved_tags where lower(name) like lower($1))`,
+      [tagName]
+    );
 
     if (reservedTagCheck.rows[0].exists) {
-      response.status(400).json({ error: `Tag '${tagName}' is a reserved tag name`});
+      response
+        .status(400)
+        .json({ error: `Tag '${tagName}' is a reserved tag name` });
       return;
     }
 
-    let dupTagCheck = await pool.query(`
-    select exists(select * from tags where lower(name) like lower($1) AND topic_group_id = $2)`, [tagName, topicGroupId]);
+    let dupTagCheck = await pool.query(
+      `
+    select exists(select * from tags where lower(name) like lower($1) AND topic_group_id = $2)`,
+      [tagName, topicGroupId]
+    );
 
     if (dupTagCheck.rows[0].exists) {
       response.status(400).json({
@@ -1231,16 +1294,26 @@ async function postTag(request, response) {
 // Update tag
 async function putTag(request, response) {
   try {
-    let reservedTagCheck = await pool.query(`
-    select exists(select * from reserved_tags where lower(name) like lower($1))`, [request.body.tagName]);
+    let reservedTagCheck = await pool.query(
+      `
+    select exists(select * from reserved_tags where lower(name) like lower($1))`,
+      [request.body.tagName]
+    );
 
     if (reservedTagCheck.rows[0].exists) {
-      response.status(400).json({ error: `Tag '${request.body.tagName}' is a reserved tag name`});
+      response
+        .status(400)
+        .json({
+          error: `Tag '${request.body.tagName}' is a reserved tag name`,
+        });
       return;
     }
 
-    let dupTagCheck = await pool.query(`select exists(select * from tags where lower(name) 
-    like lower($1))`, [request.body.tagName]);
+    let dupTagCheck = await pool.query(
+      `select exists(select * from tags where lower(name) 
+    like lower($1))`,
+      [request.body.tagName]
+    );
 
     if (dupTagCheck.rows[0].exists) {
       response.status(400).json({ error: `Tag '${tagName}' already exists` });
@@ -1342,6 +1415,7 @@ async function putPostUnlike(request, response) {
     response.status(400).send(e);
   }
 }
+
 
 module.exports = {
   getAllForumPosts,

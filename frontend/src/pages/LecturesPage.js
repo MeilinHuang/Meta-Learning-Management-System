@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Box,
   Button,
@@ -11,18 +11,12 @@ import {
   useDisclosure,
 } from "@chakra-ui/react"
 
-import { StoreContext } from '../utils/store'
 import { SearchIcon } from '@chakra-ui/icons'
 import LectureTableContainer from '../components/lecturesTutorials/LectureTableContainer'
-import AddPostModal from '../components/forums/AddPostModal'
+import AddLectureModal from '../components/lecturesTutorials/AddLectureModal'
 import { GrAdd } from 'react-icons/gr'
 
 function LecturesPage ({ match: { params: { code }}}) {
-  const context = useContext(StoreContext)
-  /* const {
-    lectures: [lectures, setLectures]
-  } = context; */
-
   const [lectures, setLectures] = useState()
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -71,14 +65,14 @@ function LecturesPage ({ match: { params: { code }}}) {
     <>
         <Flex justify="center">
             <Center width={{ base: '100%', lg: '80%' }}>
-                <Button onClick={onOpen} leftIcon={buttonIcon} pr={{ base: '8px', md: '16px' }}>{buttonContents}</Button>
-                <AddPostModal isOpen={isOpen} onClose={onClose} isLectures onSubmit={handleAddLectureSubmit} code={code} />
-                <Box as="form" onSubmit={handleSubmit} width="100%" ml={{ base: '16px', md: '24px'}}>
+                <Box as="form" onSubmit={handleSubmit} width="100%" ml={{ base: '16px', md: '24px'}} paddingRight="2%">
                     <InputGroup variant="outline">
                         <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
                         <Input placeholder="Search" onChange={e => setSearchTerm(e.target.value)}></Input>
                     </InputGroup>
                 </Box>
+                <Button onClick={onOpen} leftIcon={buttonIcon} pr={{ base: '8px', md: '16px' }}>{buttonContents}</Button>
+                {/* <AddLectureModal isOpen={isOpen} onClose={onClose} isLectures onSubmit={handleAddLectureSubmit} code={code} /> */}
             </Center>
         </Flex>
         <LectureTableContainer lectures={lectures} code={code} /> 
