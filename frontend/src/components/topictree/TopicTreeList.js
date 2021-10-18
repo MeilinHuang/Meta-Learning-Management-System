@@ -114,7 +114,8 @@ export default function TopicTreeList() {
         },
         "group": "",
         "discipline": "",
-        "creator": ""
+        "creator": "",
+        "tags": [],
     });
 
     useEffect(async function () {
@@ -211,7 +212,8 @@ export default function TopicTreeList() {
                                                                 },
                                                                 "group": "",
                                                                 "discipline": "",
-                                                                "creator": ""
+                                                                "creator": "",
+                                                                "tags": topic.tags
                                                             }
                                                             setListPrereqs(x.prerequisites_list)
                                                             setSelectedNode(tmp)
