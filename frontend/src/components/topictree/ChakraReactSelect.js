@@ -18,14 +18,14 @@ import {
   useStyles,
   useTheme,
   useColorModeValue,
-  createIcon
+  createIcon,
 } from "@chakra-ui/react";
 
 // Taken from the @chakra-ui/icons package to prevent needing it as a dependency
 // https://github.com/chakra-ui/chakra-ui/blob/main/packages/icons/src/ChevronDown.tsx
 const ChevronDown = createIcon({
   displayName: "ChevronDownIcon",
-  d: "M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"
+  d: "M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z",
 });
 
 // Custom styles for components which do not have a chakra equivalent
@@ -33,41 +33,41 @@ const chakraStyles = {
   input: (provided) => ({
     ...provided,
     color: "inherit",
-    lineHeight: 1
+    lineHeight: 1,
   }),
   menu: (provided) => ({
     ...provided,
-    boxShadow: "none"
+    boxShadow: "none",
   }),
   valueContainer: (provided, { selectProps: { size } }) => {
     const px = {
       sm: "0.75rem",
       md: "1rem",
-      lg: "1rem"
+      lg: "1rem",
     };
 
     return {
       ...provided,
-      padding: `0.125rem ${px[size]}`
+      padding: `0.125rem ${px[size]}`,
     };
   },
   loadingMessage: (provided, { selectProps: { size } }) => {
     const fontSizes = {
       sm: "0.875rem",
       md: "1rem",
-      lg: "1.125rem"
+      lg: "1.125rem",
     };
 
     const paddings = {
       sm: "6px 9px",
       md: "8px 12px",
-      lg: "10px 15px"
+      lg: "10px 15px",
     };
 
     return {
       ...provided,
       fontSize: fontSizes[size],
-      padding: paddings[size]
+      padding: paddings[size],
     };
   },
   // Add the chakra style for when a TagCloseButton has focus
@@ -80,7 +80,7 @@ const chakraStyles = {
   option: () => ({}),
   multiValue: () => ({}),
   multiValueLabel: () => ({}),
-  group: () => ({})
+  group: () => ({}),
 };
 
 const chakraComponents = {
@@ -91,14 +91,14 @@ const chakraComponents = {
     innerProps,
     isDisabled,
     isFocused,
-    selectProps: { size }
+    selectProps: { size },
   }) => {
     const inputStyles = useMultiStyleConfig("Input", { size });
 
     const heights = {
       sm: 8,
       md: 10,
-      lg: 12
+      lg: 12,
     };
 
     return (
@@ -110,7 +110,7 @@ const chakraComponents = {
             p: 0,
             overflow: "hidden",
             h: "auto",
-            minH: heights[size]
+            minH: heights[size],
           }}
           {...innerProps}
           {...(isFocused && { "data-focus": true })}
@@ -126,7 +126,7 @@ const chakraComponents = {
     innerRef,
     innerProps,
     data,
-    selectProps
+    selectProps,
   }) => (
     <Tag
       ref={innerRef}
@@ -168,7 +168,7 @@ const chakraComponents = {
     const iconSizes = {
       sm: 4,
       md: 5,
-      lg: 6
+      lg: 6,
     };
     const iconSize = iconSizes[size];
 
@@ -180,7 +180,7 @@ const chakraComponents = {
           h: "100%",
           borderRadius: 0,
           borderWidth: 0,
-          cursor: "pointer"
+          cursor: "pointer",
         }}
       >
         <ChevronDown h={iconSize} w={iconSize} />
@@ -204,7 +204,7 @@ const chakraComponents = {
     const borderRadii = {
       sm: chakraTheme.radii.sm,
       md: chakraTheme.radii.md,
-      lg: chakraTheme.radii.md
+      lg: chakraTheme.radii.md,
     };
 
     return (
@@ -213,7 +213,7 @@ const chakraComponents = {
           ...list,
           maxH: `${maxHeight}px`,
           overflowY: "auto",
-          borderRadius: borderRadii[size]
+          borderRadius: borderRadii[size],
         }}
         ref={innerRef}
       >
@@ -235,7 +235,7 @@ const chakraComponents = {
     children,
     isFocused,
     isDisabled,
-    selectProps: { size }
+    selectProps: { size },
   }) => {
     const { item } = useStyles();
     return (
@@ -247,7 +247,7 @@ const chakraComponents = {
           textAlign: "left",
           bg: isFocused ? item._focus.bg : "transparent",
           fontSize: size,
-          ...(isDisabled && item._disabled)
+          ...(isDisabled && item._disabled),
         }}
         ref={innerRef}
         {...innerProps}
@@ -256,7 +256,7 @@ const chakraComponents = {
         {children}
       </Box>
     );
-  }
+  },
 };
 
 const ChakraReactSelect = ({
@@ -275,7 +275,7 @@ const ChakraReactSelect = ({
     chakraTheme.components.Tag.baseStyle.closeButton._focus;
   const multiValueRemoveFocusStyle = {
     background: closeButtonFocus.bg,
-    boxShadow: chakraTheme.shadows[closeButtonFocus.boxShadow]
+    boxShadow: chakraTheme.shadows[closeButtonFocus.boxShadow],
   };
 
   // The chakra UI global placeholder color
@@ -295,11 +295,11 @@ const ChakraReactSelect = ({
   const select = cloneElement(children, {
     components: {
       ...chakraComponents,
-      ...components
+      ...components,
     },
     styles: {
       ...chakraStyles,
-      ...styles
+      ...styles,
     },
     theme: (baseTheme) => {
       const propTheme = theme(baseTheme);
@@ -311,18 +311,18 @@ const ChakraReactSelect = ({
           ...baseTheme.colors,
           neutral50: placeholderColor, // placeholder text color
           neutral40: placeholderColor, // noOptionsMessage color
-          ...propTheme.colors
+          ...propTheme.colors,
         },
         spacing: {
           ...baseTheme.spacing,
-          ...propTheme.spacing
-        }
+          ...propTheme.spacing,
+        },
       };
     },
     colorScheme,
     size: realSize,
     multiValueRemoveFocusStyle,
-    ...props
+    ...props,
   });
 
   return select;

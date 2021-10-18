@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import Sidebar from "../components/Sidebar.js";
 import WidgetsBar from "../components/WidgetsBar.js";
 import { Switch, Route } from "react-router-dom";
@@ -8,6 +9,7 @@ import { backend_url } from "../Constants.js";
 import { isLoggedIn } from "../utils/helpers.js";
 
 function CoursePage() {
+  const history = useHistory();
   const links = [
     {
       name: "Home",
@@ -45,6 +47,8 @@ function CoursePage() {
       fetch(backend_url + `user/${localStorage.getItem("id")}`, options)
         .then((e) => e.json())
         .then((e) => setUser(e));
+    } else {
+      history.push("/login");
     }
   }, []);
 
