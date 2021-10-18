@@ -1201,6 +1201,8 @@ async function generateCode(request, response) {
 }
 
 /***************************************************************
+<<<<<<< HEAD
+=======
                        Forum Functions
 ***************************************************************/
 
@@ -2662,6 +2664,7 @@ async function putPostUnlike(request, response) {
 }
 
 /***************************************************************
+>>>>>>> 0e62984a95c7179cf1e63e3275db0131caee4541
                        Course Pages Functions
 ***************************************************************/
 
@@ -3718,18 +3721,11 @@ async function getStudentAnswerCount(request, response) {
 }
 
 module.exports = {
-  putTag,
   putAnnouncementComment,
   putAnnouncement,
   getAnnouncementById,
   deleteAnnouncement,
   deleteAnnouncementComment,
-  deletePost,
-  deleteComment,
-  putCommentEndorse,
-  putComment,
-  deletePostReply,
-  deleteTag,
   getStudentAnswerCount,
   putQuestionAnswer,
   deleteAssessmentQuestion,
@@ -3762,22 +3758,6 @@ module.exports = {
   deleteTopicGroup,
   deleteTopic,
   postTopic,
-  getAllForumPosts,
-  getAllPinnedPosts,
-  getSearchPosts,
-  getFilterPosts,
-  postForum,
-  getPostById,
-  putPost,
-  putPostReply,
-  postReply,
-  postComment,
-  putPostPin,
-  getAllTags,
-  postTag,
-  putPostEndorse,
-  putPostLike,
-  putPostUnlike,
   getAnnouncements,
   postAnnouncement,
   postAnnouncementComment,
@@ -3788,7 +3768,6 @@ module.exports = {
   getZIdFromAuthorization,
   generateCode,
   getTopicGroup,
-  getTag,
   getTopicFile,
   putTopicGroup,
   putTopic,
