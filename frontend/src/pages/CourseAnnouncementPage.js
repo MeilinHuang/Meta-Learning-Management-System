@@ -11,10 +11,22 @@ function CourseAnnouncementPage({
   const [post, setPost] = useState({});
 
   useEffect(() => {
-    fetch(`http://localhost:8000/${code}/announcement/${id}`)
+    fetch(`http://localhost:8000/${code}/announcement/${id}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
       .then((r) => r.json())
       .then((data) => {
-        fetch(`http://localhost:8000/user/${data.author}`)
+        fetch(`http://localhost:8000/user/${data.author}`, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
           .then((r) => r.json())
           .then((author) => {
             const withAuthor = { ...data, author: author.user_name };

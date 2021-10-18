@@ -36,12 +36,24 @@ function ForumOverviewPage({
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    fetch(`http://localhost:8000/${code}/forum`)
+    fetch(`http://localhost:8000/${code}/forum`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
       .then((r) => r.json())
       .then((data) => {
         setPosts(data);
       });
-    fetch(`http://localhost:8000/${code}/forum/pinned`)
+    fetch(`http://localhost:8000/${code}/forum/pinned`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
       .then((r) => r.json())
       .then((data) => {
         setPinnedPosts(data);
@@ -57,7 +69,13 @@ function ForumOverviewPage({
     e.preventDefault();
 
     if (searchTerm === "") {
-      fetch(`http://localhost:8000/${code}/forum`)
+      fetch(`http://localhost:8000/${code}/forum`, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
         .then((r) => r.json())
         .then((data) => {
           setPosts(data);
@@ -67,7 +85,14 @@ function ForumOverviewPage({
     }
 
     fetch(
-      `http://localhost:8000/${code}/forum/search/${searchTerm.toLowerCase()}`
+      `http://localhost:8000/${code}/forum/search/${searchTerm.toLowerCase()}`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
     )
       .then((r) => r.json())
       .then((data) => {
@@ -82,6 +107,7 @@ function ForumOverviewPage({
       body: formData,
       headers: {
         Accept: "*/*",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     })
       .then((r) => {

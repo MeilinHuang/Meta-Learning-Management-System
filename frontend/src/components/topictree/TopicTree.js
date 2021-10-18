@@ -423,7 +423,12 @@ export default function TopicTree() {
       .force("center", d3.forceCenter(width / 2, height / 2));
 
     // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
-    fetch(get_all_topics())
+    fetch(get_all_topics(), {
+      headers: {
+        "Content-Type": "application/JSON",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
       .then((res) => {
         return res.json();
       })

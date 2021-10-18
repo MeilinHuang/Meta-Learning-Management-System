@@ -87,19 +87,30 @@ function Announcement({
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     }).then((r) => {
       if (r.status === 200) {
-        fetch(`http://localhost:8000/${course}/announcement`)
+        fetch(`http://localhost:8000/${course}/announcement`, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
           .then((r) => r.json())
           .then((data) => {
             const promises = [];
 
             for (const post of data) {
               promises.push(
-                fetch(`http://localhost:8000/user/${post.author}`).then((r) =>
-                  r.json()
-                )
+                fetch(`http://localhost:8000/user/${post.author}`, {
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                }).then((r) => r.json())
               );
             }
 

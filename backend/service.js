@@ -106,6 +106,13 @@ async function register(request, response) {
 
 async function getAllTopicGroups(request, response) {
   void request;
+  //Validate Token
+  let zId = await getZIdFromAuthorization(request.header("Authorization"));
+  if (zId == null) {
+    response.status(403).send({ error: "Invalid Token" });
+    throw "Invalid Token";
+  }
+
   let resp = await pool.query(
     `SELECT tp_group.id, tp_group.name, tp_group.topic_code,
     array_agg(DISTINCT user_admin.admin_id) as admin_list,
@@ -192,6 +199,12 @@ async function getAllTopicGroups(request, response) {
 // Get topic group data by name
 async function getTopicGroup(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroup = request.params.topicGroupName;
     var tgId = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
@@ -308,6 +321,12 @@ async function getTopicGroup(request, response) {
 // Get topics of topic group
 async function getTopics(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroupName;
     let resp = await pool.query(
       `SELECT array_agg(DISTINCT topics.id) AS topics_list
@@ -373,6 +392,12 @@ async function getTopics(request, response) {
 
 async function getTopicPreReqs(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroupName;
     const topicName = request.params.topicName;
     let resp = await pool.query(
@@ -406,6 +431,12 @@ async function getTopicPreReqs(request, response) {
 
 // Create new pre requisite (Modify for topic name instead of IDs ??)
 async function postPreReq(request, response) {
+  //Validate Token
+  let zId = await getZIdFromAuthorization(request.header("Authorization"));
+  if (zId == null) {
+    response.status(403).send({ error: "Invalid Token" });
+    throw "Invalid Token";
+  }
   const preReqId = parseInt(request.preReqId);
   const topicId = parseInt(request.topicId);
 
@@ -419,6 +450,12 @@ async function postPreReq(request, response) {
 
 // Delete pre-requisite data
 async function deletePreReq(request, response) {
+  //Validate Token
+  let zId = await getZIdFromAuthorization(request.header("Authorization"));
+  if (zId == null) {
+    response.status(403).send({ error: "Invalid Token" });
+    throw "Invalid Token";
+  }
   const preReqId = parseInt(request.preReqId);
   const topicId = parseInt(request.topicId);
 
@@ -433,6 +470,12 @@ async function deletePreReq(request, response) {
 // Create topic group
 async function postTopicGroup(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroupName;
     const topic_code = request.body.topic_code;
     const fileTypeList = request.body.uploadedFileTypes.split(",");
@@ -510,6 +553,12 @@ async function postTopicGroup(request, response) {
 
 async function getAllTopics(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let topicGroupResp = await pool.query(`SELECT name FROM topic_group`);
     // console.log("topicGroupResp", topicGroupResp);
     let result = [];
@@ -586,6 +635,12 @@ async function getAllTopics(request, response) {
 // Update topic group details
 async function putTopicGroup(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const newName = request.body.name;
     const newTopicCode = request.body.topic_code;
     const topicGroupName = request.params.topicGroupName;
@@ -688,6 +743,12 @@ async function putTopicGroup(request, response) {
 // Delete a topic group
 async function deleteTopicGroup(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroupName;
 
     let checkExist = await pool.query(
@@ -725,6 +786,12 @@ async function deleteTopicGroup(request, response) {
 
 // Delete topic
 async function deleteTopic(request, response) {
+  //Validate Token
+  let zId = await getZIdFromAuthorization(request.header("Authorization"));
+  if (zId == null) {
+    response.status(403).send({ error: "Invalid Token" });
+    throw "Invalid Token";
+  }
   const topicGroupName = request.params.topicGroupName;
   const topicName = request.params.topicName;
   const idResp = await pool.query(
@@ -774,6 +841,12 @@ async function deleteTopic(request, response) {
 async function putTopicTag(request, response) {
   // console.log("running inner function");
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicName = request.params.topicName;
     const topicGroupName = request.params.topicGroupName;
 
@@ -817,6 +890,12 @@ async function putTopicTag(request, response) {
 
 async function deleteTopicTag(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicName = request.params.topicName;
     const topicGroupName = request.params.topicGroupName;
 
@@ -870,6 +949,12 @@ async function deleteTopicTag(request, response) {
 // Update topic details
 async function putTopic(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicName = request.params.topicName;
     const newName = request.body.name;
     const topicGroupName = request.params.topicGroupName;
@@ -988,6 +1073,12 @@ async function putTopic(request, response) {
 
 async function postTopic(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroupName;
     const topicName = request.params.topicName;
     const idResp = await pool.query(
@@ -1090,6 +1181,12 @@ async function postTopic(request, response) {
 // Get topic files
 async function getTopicFile(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroupName;
     const topicName = request.params.topicName;
 
@@ -1201,13 +1298,17 @@ async function generateCode(request, response) {
 }
 
 /***************************************************************
-<<<<<<< HEAD
-=======
                        Forum Functions
 ***************************************************************/
 
 async function getAllForumPosts(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
@@ -1295,6 +1396,12 @@ async function getAllForumPosts(request, response) {
 // Get all pinned forum posts
 async function getAllPinnedPosts(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
@@ -1383,6 +1490,12 @@ async function getAllPinnedPosts(request, response) {
 // Get all posts related search term
 async function getSearchPosts(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
@@ -1473,6 +1586,12 @@ async function getSearchPosts(request, response) {
 // Get all posts related tag term
 async function getFilterPosts(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
@@ -1665,6 +1784,12 @@ async function getFilterPosts(request, response) {
 // Create new post on forum (TAGS MUST ALREADY EXIST and USER MUST EXIST)
 async function postForum(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const title = request.body.title;
     const user_id = request.body.user_id;
     const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [
@@ -1778,6 +1903,12 @@ async function postForum(request, response) {
 // Get post details of selected post
 async function getPostById(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const postId = request.params.postId;
 
     let resp = await pool.query(
@@ -1907,6 +2038,12 @@ async function getPostById(request, response) {
 // Update post details
 async function putPost(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const postId = request.params.postId;
     const newDesc = request.body.description;
     const relLink = request.body.related_link;
@@ -1978,6 +2115,12 @@ async function putPost(request, response) {
 // delete forum post
 async function deletePost(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const postId = request.params.postId;
     await pool.query(`DELETE FROM forum_posts WHERE post_id = $1`, [postId]);
     if (fs.existsSync(`../frontend/public/_files/forum_post${postId}`)) {
@@ -2000,6 +2143,12 @@ async function deletePost(request, response) {
 // Create new reply
 async function postReply(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const user_id = request.body.user_id;
     const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [
       user_id,
@@ -2090,6 +2239,12 @@ async function postReply(request, response) {
 // Update post reply with id
 async function putPostReply(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const replyId = request.params.replyId;
     const postId = request.params.postId;
     const newReply = request.body.reply;
@@ -2175,6 +2330,12 @@ async function putPostReply(request, response) {
 // Update post reply with id
 async function deletePostReply(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const replyId = request.params.replyId;
     const postId = request.params.postId;
     await pool.query(`DELETE FROM replies WHERE reply_id = $1`, [replyId]);
@@ -2203,6 +2364,12 @@ async function deletePostReply(request, response) {
 // Post new comment
 async function postComment(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const user_id = request.body.user_id;
     const authReq = await pool.query(`SELECT name FROM users WHERE id = $1`, [
       user_id,
@@ -2291,6 +2458,12 @@ async function postComment(request, response) {
 // Put comment
 async function putComment(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const postId = request.params.postId;
     const commentId = request.params.commentId;
     const commentDescription = request.body.comment;
@@ -2376,6 +2549,12 @@ async function putComment(request, response) {
 // Delete new comment
 async function deleteComment(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const commentId = request.params.commentId;
     const postId = request.params.postId;
     await pool.query(`DELETE FROM comments WHERE comment_id = $1`, [commentId]);
@@ -2404,6 +2583,12 @@ async function deleteComment(request, response) {
 // Endorses or un-endorses forum post comment
 async function putCommentEndorse(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const commentId = request.params.commentId;
     const isEndorsed = request.params.isEndorsed;
     await pool.query(
@@ -2420,6 +2605,12 @@ async function putCommentEndorse(request, response) {
 // Pins or unpins forum post
 async function putPostPin(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const postId = request.params.postId;
     const isPinned = request.params.isPinned;
 
@@ -2437,6 +2628,12 @@ async function putPostPin(request, response) {
 // Gets all tags (topic group or ALL)
 async function getAllTags(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp;
 
     if (request.params.topicGroup) {
@@ -2476,6 +2673,12 @@ async function getAllTags(request, response) {
 // Gets one tag
 async function getTag(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const tagId = request.params.tagId;
     let resp = await pool.query(`SELECT * FROM tags WHERE tag_id = $1`, [
       tagId,
@@ -2490,6 +2693,12 @@ async function getTag(request, response) {
 // Posts tag
 async function postTag(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const tagName = request.body.tagName;
     const topicGroupName = request.params.topicGroup;
 
@@ -2541,6 +2750,12 @@ async function postTag(request, response) {
 // Update tag
 async function putTag(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let reservedTagCheck = await pool.query(
       `
     select exists(select * from reserved_tags where lower(name) like lower($1))`,
@@ -2548,11 +2763,9 @@ async function putTag(request, response) {
     );
 
     if (reservedTagCheck.rows[0].exists) {
-      response
-        .status(400)
-        .json({
-          error: `Tag '${request.body.tagName}' is a reserved tag name`,
-        });
+      response.status(400).json({
+        error: `Tag '${request.body.tagName}' is a reserved tag name`,
+      });
       return;
     }
 
@@ -2580,6 +2793,12 @@ async function putTag(request, response) {
 // Posts tag
 async function deleteTag(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const tagId = request.params.tagId;
     await pool.query(`DELETE FROM tags WHERE tag_id = $1`, [tagId]);
     response.sendStatus(200);
@@ -2591,6 +2810,12 @@ async function deleteTag(request, response) {
 // Endorses or un-endorses forum post
 async function putPostEndorse(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const postId = request.params.postId;
     const isEndorsed = request.params.isEndorsed;
     await pool.query(
@@ -2607,6 +2832,12 @@ async function putPostEndorse(request, response) {
 // Likes a forum post
 async function putPostLike(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const postId = request.params.postId;
     const userId = request.body.userId;
 
@@ -2635,6 +2866,12 @@ async function putPostLike(request, response) {
 // Unlikes a forum post
 async function putPostUnlike(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const postId = request.params.postId;
     const userId = request.body.userId;
 
@@ -2671,6 +2908,12 @@ async function putPostUnlike(request, response) {
 // Get all announcements of topic group / course
 async function getAnnouncements(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
@@ -2730,6 +2973,12 @@ async function getAnnouncements(request, response) {
 // Get announcement by id
 async function getAnnouncementById(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const announcementId = request.params.announcementId;
     let resp = await pool.query(
       `
@@ -2804,6 +3053,12 @@ async function getAnnouncementById(request, response) {
 // Create new announcement for topic group / course
 async function postAnnouncement(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
@@ -2880,6 +3135,12 @@ async function postAnnouncement(request, response) {
 // Update announcement by id
 async function putAnnouncement(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const announcementId = request.params.announcementId;
     const title = request.body.title;
     const content = request.body.content;
@@ -2962,6 +3223,12 @@ async function putAnnouncement(request, response) {
 // Delete announcement by id
 async function deleteAnnouncement(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const announcementId = request.params.announcementId;
     await pool.query(`DELETE FROM announcements WHERE id = $1`, [
       announcementId,
@@ -2988,6 +3255,12 @@ async function deleteAnnouncement(request, response) {
 // Create new comment for announcement
 async function postAnnouncementComment(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const announcementId = request.params.announcementId;
     const author = request.body.author;
     const content = request.body.content;
@@ -3068,6 +3341,12 @@ async function postAnnouncementComment(request, response) {
 // Update announcement comment
 async function putAnnouncementComment(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const commentId = request.params.commentId;
     const announcementId = request.params.announcementId;
     const content = request.body.content;
@@ -3160,6 +3439,12 @@ async function putAnnouncementComment(request, response) {
 // Delete announcement comment by id
 async function deleteAnnouncementComment(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const commentId = request.params.commentId;
     let tmp = await pool.query(
       `SELECT announcement_id FROM announcement_comment WHERE id = $1`,
@@ -3193,6 +3478,12 @@ async function deleteAnnouncementComment(request, response) {
 // Get all announcements related search term
 async function getSearchAnnouncements(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const topicGroupName = request.params.topicGroup;
     const announcementSearchTerm = request.params.announcementSearchTerm;
     const tmpQ = await pool.query(
@@ -3266,6 +3557,12 @@ async function postQuiz(request, response) {
   const timeGiven = request.body.timeGiven;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `INSERT INTO quiz(id, name, due_date, time_given)
       VALUES(default, $1, $2, $3)`,
@@ -3288,6 +3585,12 @@ async function postQuizQuestion(request, response) {
   const description = request.body.description;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `INSERT INTO quiz_question(id, quiz_id, quiz_type, marks_awarded,
        description, related_topic_id) 
@@ -3311,6 +3614,12 @@ async function postQuizQuestion(request, response) {
 async function getQuizQuestions(request, response) {
   const quizId = request.params.quizId;
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `SELECT q.id, q.name, q.due_date, q.time_given, array_agg(qq.id) 
       as questions_list FROM quiz q
@@ -3348,6 +3657,12 @@ async function putQuizById(request, response) {
   const timeGiven = request.body.timeGiven;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `UPDATE quiz SET name = $1, due_date = $2, time_given = $3 WHERE id = $4`,
       [name, dueDate, timeGiven, quizId]
@@ -3364,6 +3679,12 @@ async function deleteQuizById(request, response) {
   const quizId = request.params.quizId;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(`DELETE FROM quiz WHERE id = $1`, [quizId]);
     response.status(200).send("Delete quiz success");
   } catch (e) {
@@ -3377,6 +3698,12 @@ async function getQuestionFromQuiz(request, response) {
   const questionId = request.params.questionId;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `SELECT * FROM quiz_question WHERE quiz_id = $1 AND id = $2`,
       [quizId, questionId]
@@ -3397,6 +3724,12 @@ async function putQuestionFromQuiz(request, response) {
   const description = request.body.description;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `UPDATE quiz_question SET quiz_Type = $1, marks_awarded = $2, 
       description = $3, related_topic_id = $4 WHERE quiz_id = $5 AND id = $6`,
@@ -3420,6 +3753,12 @@ async function getQuestionBankQuestions(request, response) {
   const questionBankId = request.params.questionBankId;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `SELECT * FROM quiz_question
        WHERE question_bank_id = $1`,
@@ -3438,6 +3777,12 @@ async function putQuestionBank(request, response) {
   const name = request.body.name;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `UPDATE quiz_question_bank SET name = $1 WHERE id = $2`,
       [name, questionBankId]
@@ -3454,6 +3799,12 @@ async function deleteQuestionBank(request, response) {
   const questionBankId = request.params.questionBankId;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `DELETE FROM quiz_question_bank WHERE id = $1`,
       [questionBankId]
@@ -3470,6 +3821,12 @@ async function getAllQuestionBankQuestions(request, response) {
   void request;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `SELECT qb.id, qb.name, array_agg(q.id) as questions_list 
       FROM quiz_question_bank qb
@@ -3504,6 +3861,12 @@ async function getAllQuestionBankQuestions(request, response) {
 // Get specific question from question bank
 async function getQuestionFromQuestionBank(request, response) {
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     const questionId = request.params.questionId;
     let resp = await pool.query(`SELECT * FROM quiz_question WHERE id = $1`, [
       questionId,
@@ -3524,6 +3887,12 @@ async function postPoll(request, response) {
   const pollType = request.body.poll_type;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type)
       VALUES(default, $1, $2, $3, $4, $5)`,
@@ -3541,6 +3910,12 @@ async function getPoll(request, response) {
   const pollId = request.params.pollId;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(`SELECT * FROM quiz_poll WHERE id = $1`, [
       pollId,
     ]);
@@ -3561,6 +3936,12 @@ async function putPoll(request, response) {
   const pollType = request.body.poll_type;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `UPDATE quiz_poll SET name = $1, start_time = $2, close_time = $3, 
       is_closed = $4, poll_type = $5
@@ -3579,6 +3960,12 @@ async function deletePoll(request, response) {
   const pollId = request.params.pollId;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(`DELETE FROM quiz_poll WHERE id = $1`, [
       pollId,
     ]);
@@ -3594,6 +3981,12 @@ async function getStudentAnswer(request, response) {
   const studentId = request.params.studentId;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `SELECT * fROM quiz_student_answer WHERE student_id = $1`,
       [studentId]
@@ -3621,6 +4014,12 @@ async function postStudentAnswer(request, response) {
   response.status(200).send("Post student answer success");
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
   } catch (e) {
     response.status(400).send(e);
   }
@@ -3634,6 +4033,12 @@ async function postQuestionAnswer(request, response) {
   const description = request.body.description;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `INSERT INTO quiz_question_answer(id, quiz_id, question_id, is_correct_answer, description)
       VALUES(default, $1, $2, $3, $4)`,
@@ -3652,6 +4057,12 @@ async function deleteQuestionBankQuestion(request, response) {
   const questionId = request.params.questionId;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `DELETE FROM question_bank_question WHERE question_bank_id = $1 AND question_id = $2`,
       [questionBankId, questionId]
@@ -3668,6 +4079,12 @@ async function deleteAssessmentQuestion(request, response) {
   const questionId = request.params.questionId;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(`DELETE FROM quiz_question WHERE id = $1`, [
       questionId,
     ]);
@@ -3687,6 +4104,12 @@ async function putQuestionAnswer(request, response) {
   const description = request.body.description;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `UPDATE quiz_question_answer SET is_correct_answer = $1, description = $2
       WHERE quiz_id = $3 AND question_id = $4 AND id = $5`,
@@ -3704,6 +4127,12 @@ async function getStudentAnswerCount(request, response) {
   const questionId = request.params.questionId;
 
   try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
     let resp = await pool.query(
       `SELECT qqa.id, qqa.quiz_id, qqa.question_id, qqa.is_correct_answer, 
       qqa.description, count(qsa.answer_selected_id) as answer_count FROM quiz_question_answer qqa

@@ -39,7 +39,13 @@ function MainSelection({ user }) {
         setCourses(user.enrolled_courses);
         const topic_groups = await Promise.all(
           user.enrolled_courses.map((course) => {
-            return fetch(backend_url + "topicgroup/" + course.name)
+            return fetch(backend_url + "topicgroup/" + course.name, {
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            })
               .then((e) => e.json())
               .then((e) => {
                 //Need to get most recently accessed
@@ -56,7 +62,13 @@ function MainSelection({ user }) {
                 Date.parse(recent_announce.post_date) >
                   Date.parse(announce.post_date)
               ) {
-                fetch(backend_url + "user/" + announce.author)
+                fetch(backend_url + "user/" + announce.author, {
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                })
                   .then((resp) => resp.json())
                   .then((user) => {
                     announce = { ...announce, author: user.user_name };

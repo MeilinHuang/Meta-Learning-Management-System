@@ -32,16 +32,26 @@ function CourseDashboard({
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    fetch(`http://localhost:8000/${code}/announcement`)
+    fetch(`http://localhost:8000/${code}/announcement`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
       .then((r) => r.json())
       .then((data) => {
         const promises = [];
 
         for (const post of data) {
           promises.push(
-            fetch(`http://localhost:8000/user/${post.author}`).then((r) =>
-              r.json()
-            )
+            fetch(`http://localhost:8000/user/${post.author}`, {
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }).then((r) => r.json())
           );
         }
 
@@ -61,16 +71,26 @@ function CourseDashboard({
     e.preventDefault();
 
     if (searchTerm === "") {
-      fetch(`http://localhost:8000/${code}/announcement`)
+      fetch(`http://localhost:8000/${code}/announcement`, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
         .then((r) => r.json())
         .then((data) => {
           const promises = [];
 
           for (const post of data) {
             promises.push(
-              fetch(`http://localhost:8000/user/${post.author}`).then((r) =>
-                r.json()
-              )
+              fetch(`http://localhost:8000/user/${post.author}`, {
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }).then((r) => r.json())
             );
           }
 
@@ -90,7 +110,14 @@ function CourseDashboard({
     }
 
     fetch(
-      `http://localhost:8000/${code}/announcement/search/${searchTerm.toLowerCase()}`
+      `http://localhost:8000/${code}/announcement/search/${searchTerm.toLowerCase()}`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
     )
       .then((r) => r.json())
       .then((data) => {
@@ -98,9 +125,13 @@ function CourseDashboard({
 
         for (const post of data) {
           promises.push(
-            fetch(`http://localhost:8000/user/${post.author}`).then((r) =>
-              r.json()
-            )
+            fetch(`http://localhost:8000/user/${post.author}`, {
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }).then((r) => r.json())
           );
         }
 
@@ -121,19 +152,30 @@ function CourseDashboard({
       body: formData,
       headers: {
         Accept: "*/*",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     }).then((r) => {
       if (r.status === 200) {
-        fetch(`http://localhost:8000/${code}/announcement`)
+        fetch(`http://localhost:8000/${code}/announcement`, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
           .then((r) => r.json())
           .then((data) => {
             const promises = [];
 
             for (const post of data) {
               promises.push(
-                fetch(`http://localhost:8000/user/${post.author}`).then((r) =>
-                  r.json()
-                )
+                fetch(`http://localhost:8000/user/${post.author}`, {
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                }).then((r) => r.json())
               );
             }
 

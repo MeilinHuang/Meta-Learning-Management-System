@@ -69,6 +69,7 @@ export default function TopicTreeAddTopic({ isOpen, onClose, topicGroups }) {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           uploadedFileTypes: "pdf",
@@ -88,6 +89,7 @@ export default function TopicTreeAddTopic({ isOpen, onClose, topicGroups }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           preReqId: prereq.id,
@@ -109,7 +111,12 @@ export default function TopicTreeAddTopic({ isOpen, onClose, topicGroups }) {
 
   useEffect(() => {
     if (topicGroupName !== "") {
-      fetch(get_topics_url(topicGroupName))
+      fetch(get_topics_url(topicGroupName), {
+        headers: {
+          "Content-Type": "application/JSON",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
         .then((response) => response.json())
         .then(function (data) {
           setTopics(convertToList(data));

@@ -80,6 +80,10 @@ function FormModal({ buttonText, modalName, topicGroup }) {
                 } else if (modalName === "Topic") {
                   fetch(post_new_topic_url(topicGroup, input), {
                     method: "POST",
+                    headers: {
+                      "Content-Type": "application/JSON",
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
                   }).then((e) => {
                     if (e.status === 200) {
                       window.location.reload();
@@ -135,7 +139,12 @@ export default function TopicTreeList() {
   });
 
   useEffect(async function () {
-    fetch(topic_group_url)
+    fetch(topic_group_url, {
+      headers: {
+        "Content-Type": "application/JSON",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
       .then((response) => response.json())
       .then(function (response) {
         setData(response);
@@ -227,7 +236,14 @@ export default function TopicTreeList() {
                               cursor="pointer"
                               _hover={{ bg: "gray.100", fontWeight: "medium" }}
                               onClick={() => {
-                                fetch(get_prereqs(e.name, topic.name))
+                                fetch(get_prereqs(e.name, topic.name), {
+                                  headers: {
+                                    "Content-Type": "application/JSON",
+                                    Authorization: `Bearer ${localStorage.getItem(
+                                      "token"
+                                    )}`,
+                                  },
+                                })
                                   .then((x) => x.json())
                                   .then((x) => {
                                     let matList = {

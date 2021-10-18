@@ -39,7 +39,13 @@ function ForumPostPage({
   const toast = useToast();
 
   useEffect(() => {
-    fetch(`http://localhost:8000/${code}/forum/post/${id}`)
+    fetch(`http://localhost:8000/${code}/forum/post/${id}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
       .then((r) => r.json())
       .then((data) => {
         console.log(data);
@@ -50,6 +56,11 @@ function ForumPostPage({
   const handleDelete = () => {
     fetch(`http://localhost:8000/${code}/forum/post/${id}`, {
       method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     }).then((r) => {
       if (r.status === 200) {
         history.push(`/course-page/${code}/forums`);

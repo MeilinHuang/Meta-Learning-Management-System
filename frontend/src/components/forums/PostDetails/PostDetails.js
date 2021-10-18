@@ -74,10 +74,16 @@ function PostDetails({
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     }).then((r) => {
       if (r.status === 200) {
-        fetch(`http://localhost:8000/${code}/forum/post/${post_id}`)
+        fetch(`http://localhost:8000/${code}/forum/post/${post_id}`, {
+          headers: {
+            "Content-Type": "application/JSON",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
           .then((r) => r.json())
           .then((data) => setPost(data));
       }
@@ -88,10 +94,22 @@ function PostDetails({
   const handleEndorse = () => {
     fetch(
       `http://localhost:8000/${code}/forum/post/endorse/${post_id}/${!isendorsed}`,
-      { method: "PUT" }
+      {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
     ).then((r) => {
       if (r.status === 200) {
-        fetch(`http://localhost:8000/${code}/forum/post/${post_id}`)
+        fetch(`http://localhost:8000/${code}/forum/post/${post_id}`, {
+          headers: {
+            "Content-Type": "application/JSON",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
           .then((r) => r.json())
           .then((data) => setPost(data));
       }

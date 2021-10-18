@@ -44,12 +44,24 @@ function CoursePage() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch(backend_url + "topicGroup/" + name)
+    fetch(backend_url + "topicGroup/" + name, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
       .then((e) => e.json())
       .then((e) => setGroup(e));
     //Need to get user logged in
     if (isLoggedIn()) {
-      fetch(backend_url + `user/${localStorage.getItem("id")}`)
+      fetch(backend_url + `user/${localStorage.getItem("id")}`, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
         .then((e) => e.json())
         .then((e) => setUser(e));
     }

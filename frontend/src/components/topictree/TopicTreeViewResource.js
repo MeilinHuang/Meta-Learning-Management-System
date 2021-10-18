@@ -68,6 +68,7 @@ export default function TopicTreeViewResource({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         tagName: newTag,
@@ -87,6 +88,7 @@ export default function TopicTreeViewResource({
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
 
@@ -103,6 +105,7 @@ export default function TopicTreeViewResource({
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         tagName: tagToDelete.name,
@@ -127,6 +130,7 @@ export default function TopicTreeViewResource({
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         preReqId: prereqToDelete.id,
@@ -154,6 +158,10 @@ export default function TopicTreeViewResource({
     await fetch(update_topic(topicGroupName, data.title), {
       method: "PUT",
       body: formData,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     });
     window.location.reload();
   };
@@ -213,6 +221,7 @@ export default function TopicTreeViewResource({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         preReqId: newPrereq.value,

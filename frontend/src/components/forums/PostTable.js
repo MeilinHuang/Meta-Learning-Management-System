@@ -49,13 +49,29 @@ function PostTable({ isAdmin, posts: postData, code }) {
           const handlePinUnpin = () => {
             fetch(
               `http://localhost:8000/${code}/forum/post/pin/${post_id}/${!value}`,
-              { method: "PUT" }
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/JSON",
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
             ).then((r) => {
               if (r.status === 200) {
-                fetch(`http://localhost:8000/${code}/forum`)
+                fetch(`http://localhost:8000/${code}/forum`, {
+                  headers: {
+                    "Content-Type": "application/JSON",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                })
                   .then((r) => r.json())
                   .then((data) => setPosts(data));
-                fetch(`http://localhost:8000/${code}/forum/pinned`)
+                fetch(`http://localhost:8000/${code}/forum/pinned`, {
+                  headers: {
+                    "Content-Type": "application/JSON",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                })
                   .then((r) => r.json())
                   .then((data) => {
                     setPinnedPosts(data);

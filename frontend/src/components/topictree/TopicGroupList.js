@@ -24,7 +24,12 @@ export default function TopicGroupList() {
   }
 
   useEffect(async function () {
-    fetch(topic_group_url)
+    fetch(topic_group_url, {
+      headers: {
+        "Content-Type": "application/JSON",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
       .then((response) => response.json())
       .then(function (response) {
         setData(response);

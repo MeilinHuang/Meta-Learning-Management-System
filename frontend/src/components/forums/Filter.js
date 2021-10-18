@@ -26,12 +26,22 @@ function Filter({ code }) {
 
   useEffect(() => {
     if (!filteredTags.length) {
-      fetch(`http://localhost:8000/${code}/forum`)
+      fetch(`http://localhost:8000/${code}/forum`, {
+        headers: {
+          "Content-Type": "application/JSON",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
         .then((r) => r.json())
         .then((data) => {
           setPosts(data);
         });
-      fetch(`http://localhost:8000/${code}/forum/pinned`)
+      fetch(`http://localhost:8000/${code}/forum/pinned`, {
+        headers: {
+          "Content-Type": "application/JSON",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
         .then((r) => r.json())
         .then((data) => {
           setPinnedPosts(data);
@@ -44,7 +54,12 @@ function Filter({ code }) {
     setShowPinned(false);
     const filteredPosts = [];
     tagNames.forEach((t) => {
-      fetch(`http://localhost:8000/${code}/forum/${t}`)
+      fetch(`http://localhost:8000/${code}/forum/${t}`, {
+        headers: {
+          "Content-Type": "application/JSON",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
         .then((r) => r.json())
         .then((data) => {
           console.log(data);

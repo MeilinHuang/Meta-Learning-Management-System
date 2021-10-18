@@ -16,7 +16,7 @@ export async function getUser(id) {
     method: "GET",
     headers: {
       "Content-Type": "application/JSON",
-      Authorisation: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
   };
   return await fetch(backend_url + `user/${id}`, options)
