@@ -47,7 +47,7 @@ const NavLink = ({ onClick, children, openUrl=true }) => (
 );
 
 
-  
+
 export default function TopicTreeHeader({id,  topicGroups, view}) {
     const history = useHistory();
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -73,16 +73,16 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         "discipline": "",
         "creator": ""
     });
-    const { 
-        isOpen: isOpenViewModal, 
-        onOpen: onOpenViewModal, 
-        onClose: onCloseViewModal 
+    const {
+        isOpen: isOpenViewModal,
+        onOpen: onOpenViewModal,
+        onClose: onCloseViewModal
     } = useDisclosure();
 
-    const { 
-        isOpen:isOpenModal, 
-        onOpen: onOpenModal, 
-        onClose: onCloseModal 
+    const {
+        isOpen:isOpenModal,
+        onOpen: onOpenModal,
+        onClose: onCloseModal
     } = useDisclosure();
 
     const convertToList = (jsonData) => {
@@ -90,35 +90,48 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         let tempActualTopics = [];
         for (let topicGroup of jsonData.result) {
             for (let topic of topicGroup.topics_list) {
+                console.log('topic', topic);
                 topic['value'] = topic.name;
                 topic['label'] = topic.name;
                 topic['id'] = topic.id;
                 topic['name'] = topic.name;
                 topic['group'] = topicGroup.name;
+                topic['groupId'] = topicGroup.id;
                 tempTopics.push(topic);
                 tempActualTopics.push(topic);
                 if (topic.tags !== undefined) {
                     for (let tag of topic.tags) {
-                        tempTopics.push({'value': topic.name, 'label': tag.name, 'id': topic.id, 'name': topic.name});
+                        tempTopics.push({'value': topic.name, 'label': tag.name, 'id': topic.id, 'name': topic.name, 'course_materials': topic.course_materials,
+                            'tags': topic.tags});
                     }
                 }
-    
+
             }
         }
 
-        
-        
+
+        console.log('tempActualTopics', tempActualTopics);
         setActualTopics(tempActualTopics);
         return tempTopics;
     };
 
     const onChangeSearch = async (value, action) => {
-        
         value['materials_strings'] = {};
         value.materials_strings['content'] = [];
         value.materials_strings['practice'] = [];
         value.materials_strings['preparation'] = [];
         value.materials_strings['assessments'] = [];
+
+        for (let fileObj of value.course_materials) {
+            if (fileObj.type == 'assessment') {
+                value.materials_strings['assessments'].push(fileObj.name);
+            } else {
+                value.materials_strings[fileObj.type].push(fileObj.name);
+            }
+        }
+        value.course_materials = [];
+        console.log('selectedValue', value);
+
         value['title'] = value.name;
         setSelectedNode(value);
 
@@ -146,26 +159,25 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         setNotListPrereqs(notPrereqs);
         setTopicGroupName(value.group);
 
-        
-        
-        
+
+
+
         onOpenViewModal();
     }
 
     useEffect(() => {
-        
-
         fetch(get_all_topics())
         .then(response => response.json())
         .then(function (data) {
+            console.log('data5', data);
             setTopics(convertToList(data));
         });
-        
+
 
     }, []);
 
     function setView() {
-        
+
         if (tempView == 'Graph View') {
             setTempView('List View');
             history.push('/topictreelist');
@@ -178,7 +190,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
     function isChecked() {
         return tempView == "Graph View";
     }
-  
+
     return (
         <div id={id}>
             <Box bg={useColorModeValue('blue.400', 'blue.400')} px={4}>
@@ -196,7 +208,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                         as={'nav'}
                         spacing={4}
                         display={{ base: 'none', md: 'flex' }}>
-                        
+
                         <Link mt={1} px={2} py={1} color={'white'} rounded={'md'}
                             onClick={onOpenModal}>Add a Topic</Link>
                         <Box bg='white'  w={200}>
@@ -212,7 +224,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                                 />
                             </FormControl>
                         </Box>
-                        
+
                     </HStack>
                 </HStack>
                 <Flex alignItems={'center'} height="100%">
@@ -220,7 +232,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                         <FormLabel htmlFor="topic-tree-view" color="white">
                             {view}
                         </FormLabel>
-                        <Switch id="topic-tree-view" onChange={e => { if (e.target.checked) { setView("Graph View")} else setView("List View")}} 
+                        <Switch id="topic-tree-view" onChange={e => { if (e.target.checked) { setView("Graph View")} else setView("List View")}}
                             isChecked={isChecked()}/>
                     </FormControl>
                     <Divider orientation="vertical"></Divider>
@@ -247,7 +259,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                     </Menu>
                 </Flex>
             </Flex>
-    
+
             {isOpen ? (
                 <Box pb={4} display={{ md: 'none' }}>
                 <Stack as={'nav'} spacing={4}>

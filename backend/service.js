@@ -22,7 +22,7 @@ async function getZIdFromAuthorization(auth) {
 
     return zId;
   } catch (e) {
-    console.log(e);
+    
   }
 }
 
@@ -53,7 +53,7 @@ async function login(request, response) {
     let staff = resp.rows[0].staff;
     response.status(200).send({ token: token, staff: staff });
   } catch (e) {
-    console.log(e);
+    
   }
 }
 
@@ -96,7 +96,7 @@ async function register(request, response) {
     let token = jwt.sign({ zid }, JWT_SECRET, { algorithm: "HS256" });
     response.status(200).send({ token: token, staff: staff });
   } catch (e) {
-    console.log(e);
+    
   }
 }
 
@@ -388,7 +388,7 @@ async function getTopicPreReqs(request, response) {
 
     var preReqsArr = [];
 
-    console.log(resp.rows[0]);
+    
     if (resp.rows[0].prerequisites_list !== null) {
       for (var prereq_id of resp.rows[0].prerequisites_list) {
         let tmp = await pool.query(`SELECT * from topics WHERE id = $1`, [
@@ -503,7 +503,7 @@ async function postTopicGroup(request, response) {
 
     response.sendStatus(200);
   } catch (e) {
-    console.log(e);
+    
     response.status(400).send(e);
   }
 }
@@ -511,10 +511,10 @@ async function postTopicGroup(request, response) {
 async function getAllTopics (request, response) { 
   try {
     let topicGroupResp = await pool.query(`SELECT name, id FROM topic_group`);
-    console.log('topicGroupResp', topicGroupResp);
+    
     let result = [];
     for (let topicGroupName of topicGroupResp.rows) {
-      console.log('topicGroupName', topicGroupName.name);
+      
       let resp = await pool.query(
         `SELECT array_agg(DISTINCT topics.id) AS topics_list
         FROM topic_group tp_group 
@@ -565,7 +565,7 @@ async function getAllTopics (request, response) {
       }
       result.push(resp.rows[0]);
     }
-    console.log('result', result);
+    
     response.status(200).json({'result': result});
   } catch(e) {
     response.status(400).send(e);
@@ -761,15 +761,15 @@ async function deleteTopic(request, response) {
 }
 
 async function putTopicTag(request, response) {
-  console.log('running inner function');
+  
   try {
     const topicName = request.params.topicName;
     const topicGroupName = request.params.topicGroupName;
 
     const tagName = request.body.tagName;
-    console.log('tagName', tagName);
-    console.log('topicName', topicName);
-    console.log('topicGroupName', topicGroupName);
+    
+    
+    
     let tgReq = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
       [topicGroupName]
@@ -800,7 +800,7 @@ async function putTopicTag(request, response) {
     response.sendStatus(200);
 
   } catch (e) {
-    console.log(e);
+    
     response.status(400).json({ error: e });
   }
 }
@@ -811,9 +811,9 @@ async function deleteTopicTag(request, response) {
     const topicGroupName = request.params.topicGroupName;
 
     const tagName = request.body.tagName;
-    console.log('tagName', tagName);
-    console.log('topicName', topicName);
-    console.log('topicGroupName', topicGroupName);
+    
+    
+    
     let tgReq = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
       [topicGroupName]
@@ -851,13 +851,14 @@ async function deleteTopicTag(request, response) {
     response.sendStatus(200);
 
   } catch (e) {
-    console.log(e);
+    
     response.status(400).json({ error: e });
   }
 }
 
 // Update topic details
 async function putTopic(request, response) {
+  console.log('putting topic');
   try {
     const topicName = request.params.topicName;
     const newName = request.body.name;
@@ -889,10 +890,11 @@ async function putTopic(request, response) {
       const fileDeleteList = request.body.fileDeleteList.split(",");
       if (fileDeleteList.length) {
         // Deletes files specified in delete list
-        for (const fileId of fileDeleteList) {
+        for (const fileName of fileDeleteList) {
+          
           let tmpQ = await pool.query(
-            `DELETE FROM topic_files WHERE id = $1 RETURNING file`,
-            [fileId]
+            `DELETE FROM topic_files WHERE name = $1 AND topic_id = $2 RETURNING file`,
+            [fileName, topicId]
           );
           fs.unlinkSync("../frontend/public" + tmpQ.rows[0].file);
         }
@@ -971,6 +973,7 @@ async function putTopic(request, response) {
 
     response.status(200).json({ success: true, topic: topicId });
   } catch (e) {
+    console.log('error', e);
     response.status(400).json({ error: e });
   }
 }
@@ -1071,7 +1074,7 @@ async function postTopic(request, response) {
 
     response.status(200).json({ success: true, topic: topicId });
   } catch (e) {
-    console.log(e);
+    
     response.status(400).send(e);
   }
 }
@@ -1185,7 +1188,7 @@ async function generateCode(request, response) {
     //return the code
     response.status(200).send(code);
   } catch (e) {
-    console.log(e);
+    
   }
 }
 
@@ -1272,10 +1275,10 @@ async function getAllForumPosts(request, response) {
       object.comments = commentsArr;
       object.attachments = fileArr;
     }
-    console.log(resp.rows);
+    
     response.status(200).json(resp.rows);
   } catch (e) {
-    console.log(e);
+    
     response.status(400).send(e.detail);
   }
 }
@@ -1655,7 +1658,7 @@ async function postForum(request, response) {
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
-    console.log(e);
+    
     response.status(400).send(e);
   }
 }
@@ -1784,7 +1787,7 @@ async function getPostById(request, response) {
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
-    console.log(e);
+    
     response.status(400).send(e.detail);
   }
 }
@@ -2344,7 +2347,7 @@ async function getAllTags(request, response) {
 
     response.status(200).json(resp);
   } catch(e) {
-    console.log(e)
+    
     response.status(400).send(e);
   }
 }
@@ -2600,7 +2603,7 @@ async function getAnnouncementById(request, response) {
     var fileArr = [];
     var commArr = [];
 
-    console.log(resp.rows);
+    
 
     if (resp.rows[0].comments.length && resp.rows[0].comments[0] !== null) {
       for (const commId of resp.rows[0].comments) {
@@ -2649,7 +2652,7 @@ async function getAnnouncementById(request, response) {
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
-    console.log(e);
+    
     response.status(400).send(e);
   }
 }
@@ -3067,7 +3070,7 @@ async function getSearchAnnouncements(request, response) {
       [topicGroupId, `%${announcementSearchTerm}%`]
     );
 
-    console.log(resp);
+    
 
     for (const object of resp.rows) {
       var fileArr = [];

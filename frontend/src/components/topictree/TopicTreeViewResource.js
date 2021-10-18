@@ -162,6 +162,29 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
 
   }
 
+  const deleteFile = async (e, typeOfFile, name) => {
+    e.preventDefault();
+    console.log('copyFiles', tempFiles);
+    let copyFiles = JSON.parse(JSON.stringify(tempFiles));
+    const index = tempFiles[typeOfFile.toLowerCase()].indexOf(name);
+    
+    if (index > -1) {
+      copyFiles[typeOfFile.toLowerCase()].splice(index, 1);
+    }
+    console.log('tempFiles', tempFiles);
+    console.log('name', name);
+
+    setTempFiles(copyFiles);
+    const formData = new FormData();
+    formData.append('name', data.title);
+    formData.append('fileDeleteList', name);
+    formData.append('uploadedFileTypes', '');
+    await fetch(update_topic(topicGroupName, data.title), {
+      method: 'PUT',
+      body: formData
+    });
+  }
+
   const closeModal = () => {
     if (hasDeleted) {
       window.location.reload();
@@ -318,6 +341,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                       <Tr key={file_string}>
                         <Td>{file_string}</Td>
                         <Td><Button colorScheme="green" mr={3} onClick={(e) => downloadFile(e, file_string)}>Download file</Button></Td>
+                        <Td><Button colorScheme="red" onClick={(e) => {deleteFile(e, typeOfFile, file_string)}}>Delete</Button></Td>
                       </Tr>
                     );
                   })}
