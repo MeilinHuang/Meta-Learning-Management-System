@@ -92,9 +92,16 @@ async function register(request, response) {
       [name, email, password, zid, staff]
     );
 
+    resp = await pool.query(
+      `SELECT id, zId, email, password, staff FROM users
+      where email = '${email}'`
+    );
+
+    const id = resp.rows[0].id;
+
     //Do login
     let token = jwt.sign({ zid }, JWT_SECRET, { algorithm: "HS256" });
-    response.status(200).send({ token: token, staff: staff });
+    response.status(200).send({ token: token, staff: staff, id:id });
   } catch (e) {
     console.error(e);
   }
