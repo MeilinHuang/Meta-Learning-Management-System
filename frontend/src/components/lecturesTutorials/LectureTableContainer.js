@@ -10,29 +10,26 @@ import {
 import LectureTable from './LectureTable'
 
 function LectureTableContainer({ lectures, code }) {
-
-  /* const lectureItems = Object.keys(lectures).map(key => 
-    <div value={key}>{console.log(lectures[key])}</div>
-  ) */
-
   return (
-      <Accordion allowMultiple defaultIndex={[0, 1]} mx="auto" width={{ base: '100%', lg: '80%' }} height="50%" borderColor="white">
+      <Accordion allowMultiple defaultIndex={[0, 1]} mx="auto" width={{ base: '100%', lg: '80%' }} height="50%" borderColor="white" paddingTop="2%">
           <AccordionItem>
               <h2>
               {/* Loop through array for week buttons */}
               {lectures ? 
               lectures.map( lecture => (
-                <h1>
-                  {console.log(lecture)}
-                </h1>
+                <AccordionItem>
+                  <AccordionButton>
+                    <Box flex="1" textAlign="left" fontWeight="bold">
+                        Week {lecture.week}
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton> 
+                  <AccordionPanel pb={4} px={0} overflowX={{ base: 'scroll', md: 'initial' }}>
+                  <LectureTable lecture={lecture} code={code} />
+                  </AccordionPanel>
+                </AccordionItem>
               ))
               : console.log("error")}
-              <AccordionButton>
-                  <Box flex="1" textAlign="left" fontWeight="bold">
-                      Week 1
-                  </Box>
-                  <AccordionIcon />
-              </AccordionButton> 
               </h2>
               <AccordionPanel pb={4} px={0} overflowX={{ base: 'scroll', md: 'initial' }}>
                 <LectureTable lectures={lectures} code={code} />

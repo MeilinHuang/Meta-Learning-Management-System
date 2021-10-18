@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import React, { useEffect, useState, useContext } from "react";
 import {
+=======
+import React, { useEffect, useState } from 'react';
+import { 
+>>>>>>> backend
   Box,
   Button,
   Center,
@@ -11,6 +16,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
+<<<<<<< HEAD
 import { StoreContext } from "../utils/store";
 import { SearchIcon } from "@chakra-ui/icons";
 import LectureTableContainer from "../components/lecturesTutorials/LectureTableContainer";
@@ -29,6 +35,16 @@ function LecturesPage({
 
   const [lectures, setLectures] = useState();
   const [searchTerm, setSearchTerm] = useState("");
+=======
+import { SearchIcon } from '@chakra-ui/icons'
+import LectureTableContainer from '../components/lecturesTutorials/LectureTableContainer'
+import AddLectureModal from '../components/lecturesTutorials/AddLectureModal'
+import { GrAdd } from 'react-icons/gr'
+
+function LecturesPage ({ match: { params: { code }}}) {
+  const [lectures, setLectures] = useState()
+  const [searchTerm, setSearchTerm] = useState('')
+>>>>>>> backend
 
   const buttonContents = useBreakpointValue({ base: "", md: "Add lecture" });
   const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null });
@@ -109,6 +125,7 @@ function LecturesPage({
 
   return (
     <>
+<<<<<<< HEAD
       <Flex justify="center">
         <Center width={{ base: "100%", lg: "80%" }}>
           <Button
@@ -145,6 +162,21 @@ function LecturesPage({
         </Center>
       </Flex>
       <LectureTableContainer lectures={lectures} code={code} />
+=======
+        <Flex justify="center">
+            <Center width={{ base: '100%', lg: '80%' }}>
+                <Box as="form" onSubmit={handleSubmit} width="100%" ml={{ base: '16px', md: '24px'}} paddingRight="2%">
+                    <InputGroup variant="outline">
+                        <InputLeftElement pointerEvents="none" children={<SearchIcon color="gray.300" />}/>
+                        <Input placeholder="Search" onChange={e => setSearchTerm(e.target.value)}></Input>
+                    </InputGroup>
+                </Box>
+                <Button onClick={onOpen} leftIcon={buttonIcon} pr={{ base: '8px', md: '16px' }}>{buttonContents}</Button>
+                {/* <AddLectureModal isOpen={isOpen} onClose={onClose} isLectures onSubmit={handleAddLectureSubmit} code={code} /> */}
+            </Center>
+        </Flex>
+        <LectureTableContainer lectures={lectures} code={code} /> 
+>>>>>>> backend
     </>
   );
 }
