@@ -295,9 +295,9 @@ app.get(
   }
 );
 
-app.get("/:topicGroup/forum/:forumFilterTerm", async (request, response) => {
+app.get("/:topicGroup/forum/:forumFilterTerms", async (request, response) => {
   console.log(
-    `GET /${request.params.topicGroup}/forum/${request.params.forumFilterTerm}`
+    `GET /${request.params.topicGroup}/forum/${request.query.forumFilterTerms}`
   );
   await forums.getFilterPosts(request, response);
 });

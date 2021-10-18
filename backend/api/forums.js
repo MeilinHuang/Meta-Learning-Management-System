@@ -291,7 +291,7 @@ async function getFilterPosts(request, response) {
     const filterTerms = filterArr.filter((str) => str.toLowerCase());
 
     let query = (`SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-    fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+    fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
     array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
     array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
     array_agg(DISTINCT comments.comment_id) as comments
