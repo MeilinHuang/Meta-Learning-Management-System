@@ -2549,7 +2549,7 @@
         }
       }
     },
-    "/{topicGroup}/forum/{forumFilterTerm}": {
+    "/{topicGroup}/forum/filter": {
       "get": {
         "tags": [
           "Forums"

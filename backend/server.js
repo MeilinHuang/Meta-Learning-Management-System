@@ -289,7 +289,7 @@ app.get(
   }
 );
 
-app.get("/:topicGroup/forum/:forumFilterTerm", async (request, response) => {
+app.get("/:topicGroup/forum/filter", async (request, response) => {
   console.log(
     `GET /${request.params.topicGroup}/forum/${request.params.forumFilterTerm}`
   );
