@@ -108,14 +108,18 @@ app.put("/user/calendar/:calendarId", async (request, response) => {
 });
 
 app.get("/user/:userId/progress/:topicId", async (request, response) => {
-  console.log(`GET /user/${request.params.userId}/progress/${request.params.topicId}`);
+  console.log(
+    `GET /user/${request.params.userId}/progress/${request.params.topicId}`
+  );
   await users.getUserContentProgress(request, response);
-})
+});
 
 app.put("/user/:userId/progress/:topicId", async (request, response) => {
-  console.log(`PUT /user/${request.params.userId}/progress/${request.params.topicId}`);
+  console.log(
+    `PUT /user/${request.params.userId}/progress/${request.params.topicId}`
+  );
   await users.putUserContentProgress(request, response);
-})
+});
 
 /***************************************************************
                        Topic Group Functions
@@ -250,11 +254,11 @@ app.delete(
 
 app.get("/topic/:fileId", async (request, response) => {
   await topics.getTopicFileById(request, response);
-})
+});
 
 app.put("/topic/:fileId", async (request, response) => {
   await topics.putTopicFileDueDate(request, response);
-})
+});
 
 /***************************************************************
                     Enrollment Functions
@@ -660,62 +664,72 @@ app.put("/quiz/:quizId/question/:questionId", async (request, response) => {
 });
 
 app.get("/questionBank/:questionBankId", async (request, response) => {
-  console.log(
-    `GET /questionBank/${request.params.questionBankId}`
-  );
+  console.log(`GET /questionBank/${request.params.questionBankId}`);
   await database.getQuestionBankQuestions(request, response);
 });
 
 app.put("/questionBank/:questionBankId", async (request, response) => {
+  console.log(`PUT /questionBank/${request.params.questionBankId}`);
   await database.putQuestionBank(request, response);
 });
 
 app.delete("/questionBank/:questionBankId", async (request, response) => {
+  console.log(`DELETE /questionBank/${request.params.questionBankId}`);
   await database.deleteQuestionBank(request, response);
 });
 
 app.get("/questionBank", async (request, response) => {
+  console.log(`GET /questionBank`);
   await database.getAllQuestionBankQuestions(request, response);
 });
 
 app.get("/questionBank/question/:questionId", async (request, response) => {
+  console.log(`GET /questionBank/question/${request.params.questionId}`);
   await database.getQuestionFromQuestionBank(request, response);
 });
 
 app.post("/poll", async (request, response) => {
+  console.log(`POST /poll`);
   await database.postPoll(request, response);
 });
 
 app.get("/poll/:pollId", async (request, response) => {
+  console.log(`GET /poll/${request.params.pollId}`);
   await database.getPoll(request, response);
 });
 
 app.put("/poll/:pollId", async (request, response) => {
+  console.log(`PUT /poll/${request.params.pollId}`);
   await database.putPoll(request, response);
 });
 
 app.delete("/poll/:pollId", async (request, response) => {
+  console.log(`DELETE /poll/${request.params.pollId}`);
   await database.deletePoll(request, response);
 });
 
 app.get(
   "/quiz/studentAnswers/student/:studentId",
   async (request, response) => {
+    console.log(`GET /quiz/studentAnswers/student/${request.params.studentId}`);
     await database.getStudentAnswer(request, response);
   }
 );
 
 app.post("/student_answer", async (request, response) => {
+  console.log(`POST /student_answer`);
   await database.postStudentAnswer(request, response);
 });
 
 app.post("/quiz_question_answer", async (request, response) => {
+  console.log(`POST /quiz_question_answer`);
   await database.postQuestionAnswer(request, response);
 });
 
 app.post(
   "/questionBank/:questionBankId/question",
   async (request, response) => {
+    console.log(`POST /questionBank/${request.params.questionBankId}/question`);
     await database.postQuizQuestion(request, response);
   }
 );
@@ -723,17 +737,24 @@ app.post(
 app.delete(
   "/questionBank/:questionBankId/question/:questionId",
   async (request, response) => {
+    console.log(
+      `DELETE /questionBank/${request.params.questionBankId}/question/${request.params.questionId}`
+    );
     await database.deleteQuestionBankQuestion(request, response);
   }
 );
 
 app.delete("/question/:questionId/delete", async (request, response) => {
+  console.log(`DELETE /question/${request.params.questionId}/delete`);
   await database.deleteAssessmentQuestion(request, response);
 });
 
 app.put(
   "/quiz/:quizId/question/:questionId/answer/:quizQuestionAnswerId",
   async (request, response) => {
+    console.log(
+      `PUT /quiz/${request.params.quizId}/question/${request.params.questionId}/answer/${request.params.quizQuestionAnswerId}`
+    );
     await database.putQuestionAnswer(request, response);
   }
 );
@@ -741,6 +762,9 @@ app.put(
 app.get(
   "/quiz/results/question/:questionId/answerCount",
   async (request, response) => {
+    console.log(
+      `GET /quiz/results/question/${request.params.questionId}/answerCount`
+    );
     await database.getStudentAnswerCount(request, response);
   }
 );
@@ -750,57 +774,82 @@ app.get(
 ***************************************************************/
 
 app.post("/file/:targetId", async (request, response) => {
+  console.log(`POST /file/${request.params.targetId}`);
   await lectureTutorial.postLectureTutorialFile(request, response);
 });
 
 app.delete("/file/:targetId", async (request, response) => {
+  console.log(`DELETE /file/${request.params.targetId}`);
   await lectureTutorial.deleteLectureTutorialFile(request, response);
 });
 
 app.get("/:topicGroupName", async (request, response) => {
+  console.log(`GET ${request.params.topicGroupName}`);
   await lectureTutorial.getWeeks(request, response);
 });
 
 app.get("/:topicGroupName/lectures", async (request, response) => {
+  console.log(`GET ${request.params.topicGroupName}/lectures`);
   await lectureTutorial.getAllLectures(request, response);
 });
 
 app.get("/:topicGroupName/lecture/:lectureId", async (request, response) => {
+  console.log(
+    `GET ${request.params.topicGroupName}/lectures/${request.params.lectureId}`
+  );
   await lectureTutorial.getLectureById(request, response);
 });
 
 app.put("/:topicGroupName/lecture/:lectureId", async (request, response) => {
+  console.log(
+    `PUT ${request.params.topicGroupName}/lectures/${request.params.lectureId}`
+  );
   await lectureTutorial.putLecture(request, response);
 });
 
 app.delete("/:topicGroupName/lecture/:lectureId", async (request, response) => {
+  console.log(
+    `DELETE ${request.params.topicGroupName}/lectures/${request.params.lectureId}`
+  );
   await lectureTutorial.deleteLecture(request, response);
 });
 
 app.post("/:topicGroupName/lecture", async (request, response) => {
+  console.log(`POST ${request.params.topicGroupName}/lecture`);
   await lectureTutorial.postLecture(request, response);
 });
 
 app.get("/:topicGroupName/tutorials", async (request, response) => {
+  console.log(`GET ${request.params.topicGroupName}/tutorials`);
   await lectureTutorial.getAllTutorials(request, response);
 });
 
 app.get("/:topicGroupName/tutorial/:tutorialId", async (request, response) => {
+  console.log(
+    `GET ${request.params.topicGroupName}/tutorial/${request.params.tutorialId}`
+  );
   await lectureTutorial.getTutorialById(request, response);
 });
 
 app.put("/:topicGroupName/tutorial/:tutorialId", async (request, response) => {
+  console.log(
+    `PUT ${request.params.topicGroupName}/tutorial/${request.params.tutorialId}`
+  );
   await lectureTutorial.putTutorial(request, response);
 });
 
 app.delete(
   "/:topicGroupName/tutorial/:tutorialId",
   async (request, response) => {
+    console.log(
+      `DELETE ${request.params.topicGroupName}/tutorial/${request.params.tutorialId}`
+    );
     await lectureTutorial.deleteTutorial(request, response);
   }
 );
 
 app.post("/:topicGroupName/tutorial", async (request, response) => {
+  console.log(`POST ${request.params.topicGroupName}/tutorial`);
   await lectureTutorial.postTutorial(request, response);
 });
 
