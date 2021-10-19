@@ -23,6 +23,7 @@ import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { RiPushpin2Fill, RiPushpin2Line } from "react-icons/ri";
 import { TiArrowUpOutline, TiArrowUpThick } from "react-icons/ti";
 import { FaCheckCircle } from "react-icons/fa";
+import UpvoteButton from "./UpvoteButton"
 import { StoreContext } from "../../utils/store";
 import { isStaff } from "../../utils/helpers"
 
@@ -188,13 +189,17 @@ function PostTable({ posts: postData, code }) {
       {
         Header: "Upvotes",
         accessor: "num_of_upvotes",
-        Cell: ({ cell: { value } }) => {
+        Cell: ({ cell: 
+          { 
+            row: {
+              original: { post_id },
+            },
+            value
+          } }) => {
           // {/* if user is in upvoters list, show filled icon */}
           // {/* TODO: handle upvote click */}
           return (
-            <Button leftIcon={<TiArrowUpOutline />} backgroundColor="white">
-              {value}
-            </Button>
+            <UpvoteButton value={value} code={code} postId={post_id} />
           );
         },
       },

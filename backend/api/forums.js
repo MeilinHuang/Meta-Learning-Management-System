@@ -1361,6 +1361,7 @@ async function putPostLike(request, response) {
   try {
     const postId = request.params.postId;
     const userId = request.body.userId;
+    console.log(userId)
 
     const upvotesResp = await pool.query(
       `SELECT num_of_upvotes FROM forum_posts WHERE post_id = $1`,
@@ -1380,6 +1381,30 @@ async function putPostLike(request, response) {
 
     response.sendStatus(200);
   } catch (e) {
+    console.log(e)
+    response.status(400).send(e.detail);
+  }
+}
+
+// Gets forum post likes
+async function getPostLikes(request, response) {
+  try {
+    const postId = request.params.postId;
+
+    const upvotesResp = await pool.query(
+      `SELECT fp.num_of_upvotes,
+      array_agg(DISTINCT uv.user_id) as upvoters
+      FROM forum_posts fp
+      LEFT JOIN upvotes uv ON uv.post_id = fp.post_id
+      WHERE fp.post_id = $1
+      GROUP BY fp.num_of_upvotes`,
+      [postId]
+    );
+
+    console.log(upvotesResp.rows)
+    response.status(200).json(upvotesResp.rows[0]);
+  } catch (e) {
+    console.log(e)
     response.status(400).send(e.detail);
   }
 }
@@ -1431,6 +1456,7 @@ module.exports = {
   getAllTags,
   postTag,
   putPostEndorse,
+  getPostLikes,
   putPostLike,
   putPostUnlike,
   getTag,

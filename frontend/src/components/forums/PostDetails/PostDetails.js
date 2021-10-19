@@ -12,10 +12,10 @@ import {
 import { GrEdit, GrShare } from "react-icons/gr";
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai";
 import { FaRegCheckCircle, FaCheckCircle } from "react-icons/fa";
-import { TiArrowUpOutline, TiArrowUpThick } from "react-icons/ti";
 import { ContentState, EditorState } from "draft-js";
 import AuthorDetails from "../AuthorDetails";
 import DraftEditor from "../DraftEditor/DraftEditor";
+import UpvoteButton from '../UpvoteButton'
 import htmlToDraft from "html-to-draftjs";
 import styles from "./PostDetails.module.css";
 import { isLoggedInUser, isStaff } from "../../../utils/helpers"
@@ -29,7 +29,6 @@ function PostDetails({
     description,
     isendorsed,
     num_of_upvotes,
-    upvoters,
     user_id,
   },
   setPost,
@@ -167,7 +166,7 @@ function PostDetails({
           <Divider my="16px" />
           <Flex justifyContent="space-between">
             <Flex>
-              <Button leftIcon={<TiArrowUpOutline />}>{num_of_upvotes}</Button>
+              <UpvoteButton value={num_of_upvotes} code={code} postId={post_id} isPostPage />
               {isStaff() && <Button
                 pr="8px"
                 ml="8px"
