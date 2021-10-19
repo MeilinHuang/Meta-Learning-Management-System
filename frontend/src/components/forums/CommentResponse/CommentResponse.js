@@ -26,9 +26,8 @@ import { FaRegCheckCircle, FaCheckCircle } from "react-icons/fa";
 import { BsTrash } from "react-icons/bs";
 import { GrEdit } from "react-icons/gr";
 import DraftEditor from "../DraftEditor/DraftEditor";
+import { isLoggedInUser, isStaff } from '../../../utils/helpers'
 import styles from "./CommentResponse.module.css";
-
-const dummyUser = 3;
 
 function CommentResponse({
   author,
@@ -220,7 +219,7 @@ function CommentResponse({
           />
           {/* show author controls if user is author */}
           <Flex mt="8px" justifyContent="flex-end">
-            {!!comment_id && (
+            {!!comment_id && isStaff() && (
               <Button
                 pr="8px"
                 ml="8px"
@@ -228,7 +227,7 @@ function CommentResponse({
                 onClick={handleEndorse}
               />
             )}
-            {user_id === dummyUser && (
+            {isLoggedInUser(user_id) && (
               <>
                 <Button
                   ml="8px"

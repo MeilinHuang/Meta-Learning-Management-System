@@ -18,9 +18,7 @@ import AuthorDetails from "../AuthorDetails";
 import DraftEditor from "../DraftEditor/DraftEditor";
 import htmlToDraft from "html-to-draftjs";
 import styles from "./PostDetails.module.css";
-import { isStaff } from "../../../utils/helpers"
-
-const dummyUser = 2;
+import { isLoggedInUser, isStaff } from "../../../utils/helpers"
 
 function PostDetails({
   post: {
@@ -183,7 +181,7 @@ function PostDetails({
                 ml="8px"
               />
             </Flex>
-            {user_id === dummyUser && (
+            {isLoggedInUser(user_id) && (
               <Flex>
                 <Button
                   ml="8px"

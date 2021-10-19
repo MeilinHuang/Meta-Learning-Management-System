@@ -80,7 +80,6 @@ function Filter({ code }) {
       width={{ base: "100%", lg: "80%" }}
       justifyContent="space-between"
     >
-      {/* 100% width if not admin */}
       <Box width="100%" mr={isStaff() ? "24px" : "0"}>
         {!!Object.keys(tags).length && (
           <TagSelect isFilter setSelectedTags={setFilteredTags} tags={tags} />

@@ -13,8 +13,6 @@ import DraftEditor from "../DraftEditor/DraftEditor";
 import styles from "./CommentsResponses.module.css";
 import { isStaff } from "../../../utils/helpers"
 
-const dummyAuthor = 3;
-
 function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
   const [editorState, setEditorState] = useState("");
   const [showEditor, setShowEditor] = useState(false);
@@ -27,12 +25,12 @@ function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
 
     const body = isComments
       ? {
-          user_id: dummyAuthor,
+          user_id: localStorage.getItem("id"),
           published_date: date,
           comment: details,
         }
       : {
-          user_id: dummyAuthor,
+          user_id: localStorage.getItem("id"),
           published_date: date,
           reply: details,
         };

@@ -26,8 +26,7 @@ import PostDetails from "../components/forums/PostDetails/PostDetails";
 import CommentsResponses from "../components/forums/CommentsResponses/CommentsResponses";
 import { BsTrash } from "react-icons/bs";
 import { FaCheckCircle } from "react-icons/fa";
-
-const dummyUser = 3;
+import { isLoggedInUser } from "../utils/helpers"
 
 function ForumPostPage({
   match: {
@@ -116,7 +115,7 @@ function ForumPostPage({
             </Tooltip>
           )}
         </Flex>
-        {post.user_id === dummyUser && (
+        {isLoggedInUser(post.user_id) && (
           <Popover placement="bottom-end">
             <PopoverTrigger>
               <Button

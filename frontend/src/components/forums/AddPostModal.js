@@ -16,8 +16,6 @@ import {
 import DraftEditor from "./DraftEditor/DraftEditor";
 import TagSelect from "./TagSelect/TagSelect";
 
-const dummyAuthor = 2;
-
 function AddPostModal({
   isOpen,
   onClose,
@@ -62,7 +60,7 @@ function AddPostModal({
     const date = new Date(Date.now() - timeZoneOffset).toISOString();
 
     const formData = new FormData();
-    formData.append("user_id", dummyAuthor);
+    formData.append("user_id", localStorage.getItem("id"));
     formData.append("uploadFile", images);
     formData.append("title", title);
     formData.append("description", details);
