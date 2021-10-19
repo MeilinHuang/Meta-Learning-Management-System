@@ -11,16 +11,15 @@ export function logOut() {
   localStorage.removeItem("id");
 }
 
-
 export async function getUser(id) {
   const options = {
     method: "GET",
     headers: {
       "Content-Type": "application/JSON",
-      "Authorisation": `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
   };
-  return await fetch(backend_url + `user/${localStorage.getItem("id")}`, options)
+  return await fetch(backend_url + `user/${id}`, options)
     .then((r) => r.json())
     .then((r) => {
       return r;

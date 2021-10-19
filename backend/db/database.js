@@ -8,7 +8,7 @@ const pool = new Pool({
   database: "metalms",
   idleTimeoutMillis: 100,
   connectionTimeoutMillis: 1000,
-})
+}) */
 
 // const pool = new Pool({
 //   host: "db.metalms.tech",

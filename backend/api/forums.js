@@ -275,6 +275,7 @@ async function getSearchPosts(request, response) {
 // Get all posts related tag term
 async function getFilterPosts(request, response) {
   try {
+    const caseArr = ["announcement", "answered", "unanswered", "endorsed"];
     const topicGroupName = request.params.topicGroup;
     const tmpQ = await pool.query(
       `SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`,
@@ -284,11 +285,13 @@ async function getFilterPosts(request, response) {
     if (tmpQ.rows.length == 0) throw new Error (`Topic Group with name ${topicGroupName} does not exist`);
 
     const topicGroupId = tmpQ.rows[0].id;
-    const filterTerms = request.query.forumFilterTerms.split(",");
-    console.log(filterTerms)
+
+    // Make array case insensitive
+    let filterArr = request.query.forumFilterTerms.split(",");
+    const filterTerms = filterArr.filter((str) => str.toLowerCase());
 
     let query = (`SELECT fp.post_id, fp.title, fp.user_id, fp.author, fp.published_date, fp.description, 
-    fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, 
+    fp.isPinned, fp.related_link, fp.isEndorsed, fp.num_of_upvotes, fp.fromAnnouncement,
     array_agg(DISTINCT uv.user_id) as upvoters, array_agg(DISTINCT file.id) as attachments, 
     array_agg(DISTINCT t.tag_id) as tags, array_agg(DISTINCT r.reply_id) as replies, 
     array_agg(DISTINCT comments.comment_id) as comments
@@ -303,22 +306,55 @@ async function getFilterPosts(request, response) {
     LEFT JOIN upvotes uv ON uv.post_id = fp.post_id 
     WHERE fp.topic_group = ${topicGroupId}`);
 
+    let answered = false, unanswered = false;
+
+    for (const x of caseArr) {
+      if (filterTerms.includes(x)) {
+        var index = filterTerms.indexOf(x);
+        switch (x) {
+          case "announcement": 
+            if (index !== -1) filterTerms.splice(index, 1);
+            query += ` AND fp.fromAnnouncement = true`
+            break;
+
+          case "answered": 
+            if (index !== -1) filterTerms.splice(index, 1);
+            answered = true;
+            break;
+
+          case "unanswered":
+            if (index !== -1) filterTerms.splice(index, 1);
+            unanswered = true;
+            break;
+          
+          case "endorsed": 
+            if (index !== -1) filterTerms.splice(index, 1);
+            query += ` AND fp.isEndorsed = true`
+            break
+
+          default:
+            resp = [];
+        }
+      }
+    }
+
+    // Tags
     if (filterTerms.length) {
       query += ` AND (`
-      for (var i = 0; i <= filterTerms.length; i++) {
+      for (var i = 0; i < filterTerms.length; i++) {
         query += `LOWER(t.name) LIKE LOWER('${filterTerms[i]}')`;
-        if (i+1 <= filterTerms.length) query += ` OR `;
+        if (i+1 < filterTerms.length) query += ` OR `;
       }
       query += `) `;
     }
-    
-    query += `GROUP BY fp.post_id`;
 
-    console.log(query)
+    // Append final query parts
+    query += ` GROUP BY fp.post_id`;
+    if (answered) query += ` HAVING Count(r.reply_id) > 0 OR Count(comments.comment_id) > 0`;
+    else if (unanswered) query += ` HAVING Count(r.reply_id) = 0 AND Count(comments.comment_id) = 0`;
 
     let resp = await pool.query(query);
-    
-    console.log(resp.rows)
+  
 
     for (var object of resp.rows) {
       var tagsArr = [];
@@ -372,8 +408,6 @@ async function getFilterPosts(request, response) {
       object.attachments = fileArr;
     }
 
-    if (resp.rows.length == 0) throw (`Error: No posts found with filter`);
- 
     response.status(200).json(resp.rows);
   } catch (e) {
     response.send(e);
@@ -1380,6 +1414,7 @@ async function putPostUnlike(request, response) {
     response.status(400).send(e);
   }
 }
+
 
 module.exports = {
   getAllForumPosts,

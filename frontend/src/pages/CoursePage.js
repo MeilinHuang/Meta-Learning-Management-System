@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar.js";
 import WidgetsBar from "../components/WidgetsBar.js";
+
 import CourseContentPage from "../pages/CourseContentPage.js";
 import CourseDashboard from "../pages/CourseDashboard.js";
 import ForumOverviewPage from "../pages/ForumOverviewPage.js";
 import ForumPostPage from "../pages/ForumPostPage";
 import CourseAnnouncementPage from "../pages/CourseAnnouncementPage";
+import LecturesPage from "./LecturesPage.js";
+
 import { Switch, Route } from "react-router-dom";
 import { backend_url } from "../Constants.js";
 import { useBreakpointValue, Flex, Container, Box } from "@chakra-ui/react";
@@ -31,6 +34,10 @@ function CoursePage() {
       name: "Forums",
       url: "/forums",
     },
+    {
+        name: "Lectures",
+        url: "/lectures"
+    }
   ];
   const smVariant = "drawer";
   const mdVariant = "sidebar";
@@ -44,12 +51,24 @@ function CoursePage() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch(backend_url + "topicGroup/" + name)
+    fetch(backend_url + "topicGroup/" + name, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
       .then((e) => e.json())
       .then((e) => setGroup(e));
     //Need to get user logged in
     if (isLoggedIn()) {
-      fetch(backend_url + `user/${localStorage.getItem("id")}`)
+      fetch(backend_url + `user/${localStorage.getItem("id")}`, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
         .then((e) => e.json())
         .then((e) => setUser(e));
     }
@@ -81,6 +100,11 @@ function CoursePage() {
         >
           <Switch>
             {/* Add your page as a Route here */}
+            <Route
+              exact
+              path="/course-page/:code/lectures"
+              component={LecturesPage}
+            />
             <Route
               exact
               path="/course-page/:code/forums"
