@@ -15,6 +15,7 @@ import { GrAdd } from "react-icons/gr";
 import { SearchIcon } from "@chakra-ui/icons";
 import Announcement from "../components/dashboard/Announcement/Announcement";
 import AddPostModal from "../components/forums/AddPostModal";
+import { isStaff } from "../utils/helpers"
 
 // DUMMY VALUES
 const dummyAuthor = 3;
@@ -58,7 +59,7 @@ function CourseDashboard({
         Promise.all(promises).then((authorData) => {
           const newPosts = [];
           for (const i in authorData) {
-            const withAuthor = { ...data[i], author: authorData[i].user_name };
+            const withAuthor = { ...data[i], username: authorData[i].user_name };
             newPosts.push(withAuthor);
           }
           setAnnouncements(newPosts.reverse());
@@ -99,7 +100,7 @@ function CourseDashboard({
             for (const i in authorData) {
               const withAuthor = {
                 ...data[i],
-                author: authorData[i].user_name,
+                username: authorData[i].user_name,
               };
               newPosts.push(withAuthor);
             }
@@ -138,7 +139,7 @@ function CourseDashboard({
         Promise.all(promises).then((authorData) => {
           const newPosts = [];
           for (const i in authorData) {
-            const withAuthor = { ...data[i], author: authorData[i].user_name };
+            const withAuthor = { ...data[i], username: authorData[i].user_name };
             newPosts.push(withAuthor);
           }
           setAnnouncements(newPosts.reverse());
@@ -184,7 +185,7 @@ function CourseDashboard({
               for (const i in authorData) {
                 const withAuthor = {
                   ...data[i],
-                  author: authorData[i].user_name,
+                  username: authorData[i].user_name,
                 };
                 newPosts.push(withAuthor);
               }
@@ -198,18 +199,20 @@ function CourseDashboard({
     });
   };
 
+  console.log(announcements)
+
   return (
     <>
       <Flex justify="center">
         <Center width={{ base: "100%", lg: "80%" }}>
           {/* Only show for admin/staff */}
-          <Button
+          {isStaff() && <Button
             onClick={onOpen}
             leftIcon={buttonIcon}
             pr={{ base: "8px", md: "16px" }}
           >
             {buttonContents}
-          </Button>
+          </Button>}
           <AddPostModal
             isOpen={isOpen}
             onClose={onClose}
@@ -219,7 +222,7 @@ function CourseDashboard({
             as="form"
             onSubmit={handleSubmit}
             width="100%"
-            ml={{ base: "16px", md: "24px" }}
+            ml={isStaff() ? { base: "16px", md: "24px" } : "0" }
           >
             <InputGroup variant="outline">
               <InputLeftElement

@@ -32,10 +32,11 @@ import DraftEditor from "../../forums/DraftEditor/DraftEditor";
 import AuthorDetails from "../../forums/AuthorDetails";
 import AddPostModal from "../../forums/AddPostModal";
 import { StoreContext } from "../../../utils/store";
+import { isLoggedInUser } from "../../../utils/helpers"
 import styles from "./Announcement.module.css";
 
 function Announcement({
-  announcement: { attachments, author, id, title, content, post_date },
+  announcement: { attachments, author, id, title, content, post_date, username },
   course,
   setAnnouncements,
   isAnnouncementPage,
@@ -119,7 +120,7 @@ function Announcement({
               for (const i in authorData) {
                 const withAuthor = {
                   ...data[i],
-                  author: authorData[i].user_name,
+                  username: authorData[i].user_name,
                 };
                 newPosts.push(withAuthor);
               }
@@ -162,7 +163,7 @@ function Announcement({
               for (const i in authorData) {
                 const withAuthor = {
                   ...data[i],
-                  author: authorData[i].user_name,
+                  username: authorData[i].user_name,
                 };
                 newPosts.push(withAuthor);
               }
@@ -198,14 +199,6 @@ function Announcement({
       })
       .then((data) => {
         history.push(`/course-page/${course}/forums/${data.post_id}`);
-        // toast({
-        //     render: () => (
-        //         <Link as={RouterLink} color="blue.500" lineHeight="18px" to={`/course-page/${course}`}>Return to announcements</Link>
-        //     ),
-        //     status: 'success',
-        //     duration: 3000,
-        //     isClosable: true,
-        // })
       });
   };
 
@@ -226,7 +219,7 @@ function Announcement({
     >
       <Heading size="md">{title}</Heading>
       <Divider my="16px" />
-      <AuthorDetails author={author} date={post_date} />
+      <AuthorDetails author={username} date={post_date} />
       {!!editorState ? (
         <form id="editPost" onSubmit={handleSubmit}>
           <Flex>
@@ -272,7 +265,7 @@ function Announcement({
                 </Tooltip>
               )}
             </Flex>
-            {!isAnnouncementPage && (
+            {!isAnnouncementPage && isLoggedInUser(author) && (
               <Flex>
                 <Button
                   ml="8px"
