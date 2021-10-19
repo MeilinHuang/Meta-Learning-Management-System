@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Box, Button, Flex, useDisclosure } from "@chakra-ui/react";
 import TagSelect from "./TagSelect/TagSelect";
 import ManageTagsModal from "./ManageTagsModal";
+import { isStaff } from "../../utils/helpers"
 import { StoreContext } from "../../utils/store";
 
 function Filter({ code }) {
@@ -80,13 +81,13 @@ function Filter({ code }) {
       justifyContent="space-between"
     >
       {/* 100% width if not admin */}
-      <Box width="100%" mr="24px">
+      <Box width="100%" mr={isStaff() ? "24px" : "0"}>
         {!!Object.keys(tags).length && (
           <TagSelect isFilter setSelectedTags={setFilteredTags} tags={tags} />
         )}
       </Box>
       {/* Show if staff */}
-      <Button onClick={onOpen}>Manage Tags</Button>
+      {isStaff() && <Button onClick={onOpen}>Manage Tags</Button>}
       {!!Object.keys(tags).length && (
         <ManageTagsModal
           isOpen={isOpen}

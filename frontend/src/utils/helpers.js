@@ -5,6 +5,10 @@ export function isLoggedIn() {
   return localStorage.getItem("token") !== null;
 }
 
+export function isStaff() {
+  return !!Number(localStorage.getItem("staff"))
+}
+
 export function logOut() {
   localStorage.removeItem("token");
   localStorage.removeItem("staff");

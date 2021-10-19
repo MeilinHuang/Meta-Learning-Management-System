@@ -10,7 +10,6 @@ import {
 import PostTable from "./PostTable";
 
 function PostTableContainer({ pinnedPosts, posts, showPinned, code }) {
-  // if isAdmin then show pin/unpin logo next to each post
   return (
     <Accordion
       allowMultiple

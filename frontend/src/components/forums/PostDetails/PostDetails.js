@@ -18,6 +18,7 @@ import AuthorDetails from "../AuthorDetails";
 import DraftEditor from "../DraftEditor/DraftEditor";
 import htmlToDraft from "html-to-draftjs";
 import styles from "./PostDetails.module.css";
+import { isStaff } from "../../../utils/helpers"
 
 const dummyUser = 2;
 
@@ -169,13 +170,12 @@ function PostDetails({
           <Flex justifyContent="space-between">
             <Flex>
               <Button leftIcon={<TiArrowUpOutline />}>{num_of_upvotes}</Button>
-              {/* ONLY SHOW IF USER IS STAFF */}
-              <Button
+              {isStaff() && <Button
                 pr="8px"
                 ml="8px"
                 leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />}
                 onClick={handleEndorse}
-              />
+              />}
               <Button
                 pr="8px"
                 leftIcon={<GrShare />}

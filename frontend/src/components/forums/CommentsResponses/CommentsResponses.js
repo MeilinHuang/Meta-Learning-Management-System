@@ -11,9 +11,9 @@ import { AiOutlineSend, AiOutlineClose } from "react-icons/ai";
 import CommentResponse from "../CommentResponse/CommentResponse";
 import DraftEditor from "../DraftEditor/DraftEditor";
 import styles from "./CommentsResponses.module.css";
+import { isStaff } from "../../../utils/helpers"
 
 const dummyAuthor = 3;
-const isAdmin = true;
 
 function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
   const [editorState, setEditorState] = useState("");
@@ -140,7 +140,7 @@ function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
           </Flex>
         </form>
       )}
-      {!isComments && isAdmin && (
+      {!isComments && isStaff() && (
         <form
           id={`create${isComments ? "Comment" : "Response"}`}
           onSubmit={handleSubmit}

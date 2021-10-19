@@ -50,7 +50,7 @@ function ForumPostPage({
       .then((data) => {
         setPost(data);
       });
-  }, [id]);
+  }, [code, id]);
 
   const handleDelete = () => {
     fetch(`http://localhost:8000/${code}/forum/post/${id}`, {
@@ -74,8 +74,6 @@ function ForumPostPage({
       }
     });
   };
-
-  console.log(post);
 
   return (
     <>

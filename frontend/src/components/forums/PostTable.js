@@ -24,8 +24,9 @@ import { RiPushpin2Fill, RiPushpin2Line } from "react-icons/ri";
 import { TiArrowUpOutline, TiArrowUpThick } from "react-icons/ti";
 import { FaCheckCircle } from "react-icons/fa";
 import { StoreContext } from "../../utils/store";
+import { isStaff } from "../../utils/helpers"
 
-function PostTable({ isAdmin, posts: postData, code }) {
+function PostTable({ posts: postData, code }) {
   const context = useContext(StoreContext);
   const {
     posts: [, setPosts],
@@ -81,14 +82,14 @@ function PostTable({ isAdmin, posts: postData, code }) {
             });
           };
 
-          return (
+          return isStaff() ? (
             <IconButton
               aria-label={value ? "Unpin post" : "Pin post"}
               icon={value ? <RiPushpin2Fill /> : <RiPushpin2Line />}
               backgroundColor="white"
               onClick={handlePinUnpin}
             />
-          );
+          ) : null;
         },
         width: "10%",
       },
