@@ -96,6 +96,14 @@ function LecturesPage ({ match: { params: { code }}}) {
     });
   };
 
+  // Put Lecture
+
+  // Delete Lecture
+
+  // Add lecture file
+
+  // delete lecture file
+
   return (
     <>
         <Flex justify="center">

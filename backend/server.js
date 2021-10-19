@@ -860,6 +860,16 @@ app.post("/:topicGroupName/tutorial", async (request, response) => {
   await lectureTutorial.postTutorial(request, response);
 });
 
+app.get("/:topicGroupName/lectures/search/", async (request, response) => {
+  console.log(`GET /${request.params.topicGroup}/lectures/search/${request.params.searchTerm}`);
+  await lectureTutorial.getSearchFile(request, response);
+})
+
+app.get("/:topicGroupName/tutorials/search/", async (request, response) => {
+  console.log(`GET /${request.params.topicGroup}/tutorials/search/${request.params.searchTerm}`);
+  await lectureTutorial.getSearchFile(request, response);
+})
+
 app.listen(8000, () => {
   console.log("Server listening on http://localhost:8000/\n");
 });

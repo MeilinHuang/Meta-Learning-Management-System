@@ -86,6 +86,44 @@ async function deleteLectureTutorialFile (request, response) {
   }
 }
 
+// Search file 
+async function getSearchFile (request, response) {
+  try {
+    const searchTerm = request.params.searchTerm;
+    const topicGroup = request.params.topicGroupName;
+    const specifyTerm = request.query.specify;
+
+    console.log(topicGroup);
+    console.log(specifyTerm);
+
+    const idReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroup]);
+    if (!idReq.rows.length) throw (`Failed: Topic group {${topicGroup}} does not exist`);
+
+    const topicGroupId = idReq.rows[0].id;
+    let resp;
+
+    if (specifyTerm == 'lecture') {
+      resp = await pool.query(`
+      SELECT lf.id, lf.name, lf.file, lf.lecture_id FROM lecture_files lf
+      JOIN lectures l ON l.id = lf.id
+      WHERE l.topic_group_id = $1 AND LOWER(lf.name) ~ LOWER($2)
+      GROUP BY lf.id
+      ORDER BY lf.id`, [topicGroupId, searchTerm]);
+    } else {
+      resp = await pool.query(`
+      SELECT tf.id, tf.name, tf.file, tf.tutorial_id FROM tutorial_files tf
+      JOIN tutorials t ON t.id = tf.id
+      WHERE t.topic_group_id = $1 AND LOWER(tf.name) ~ LOWER($2)
+      GROUP BY tf.id
+      ORDER BY tf.id`, [topicGroupId, searchTerm]);
+    }
+    
+    response.status(200).json(resp.rows);
+  } catch (e) {
+    response.status(400).send(e);
+  }
+}
+
 /***************************************************************
                        Lectures Functions
 ***************************************************************/
@@ -428,5 +466,6 @@ module.exports = {
   postTutorial,
   putTutorial,
   deleteTutorial,
-  getSearchLectures
+  getSearchLectures,
+  getSearchFile
 };
