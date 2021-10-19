@@ -194,16 +194,16 @@ function CommentResponse({
             <InputGroup variant="filled" mr="8px" width="100%">
               <DraftEditor content={editorState} setDetails={setDetails} />
             </InputGroup>
-            <Flex flexDirection="column" justifyContent="space-between">
+            <Flex flexDirection="column">
               <Button
                 pr="8px"
+                mb="8px"
                 leftIcon={<AiOutlineClose />}
                 onClick={() => setEditorState("")}
               />
               <Button
                 pr="8px"
                 mb="16px"
-                height="160px"
                 leftIcon={<AiOutlineSend />}
                 form="editPost"
                 type="submit"
