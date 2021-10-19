@@ -25,7 +25,7 @@ import {
 import { useHistory } from "react-router-dom";
 import { GrEdit, GrShare } from "react-icons/gr";
 import { BiTrash } from "react-icons/bi";
-import { AiOutlineSend, AiOutlineQuestionCircle } from "react-icons/ai";
+import { AiOutlineSend, AiOutlineQuestionCircle, AiOutlineClose } from "react-icons/ai";
 import { ContentState, EditorState } from "draft-js";
 import htmlToDraft from "html-to-draftjs";
 import DraftEditor from "../../forums/DraftEditor/DraftEditor";
@@ -226,12 +226,24 @@ function Announcement({
             <InputGroup variant="filled" mr="8px" width="100%">
               <DraftEditor content={editorState} setDetails={setDetails} />
             </InputGroup>
-            <Button
-              pr="8px"
-              leftIcon={<AiOutlineSend />}
-              form="editPost"
-              type="submit"
-            />
+            <Flex flexDirection="column">
+              <Button
+                pr="8px"
+                mb="8px"
+                leftIcon={<AiOutlineClose />}
+                onClick={() => {
+                  setEditorState("")
+                  setDetails(content)
+                }}
+              />
+              <Button
+                pr="8px"
+                mb="16px"
+                leftIcon={<AiOutlineSend />}
+                form="editPost"
+                type="submit"
+              />
+            </Flex>
           </Flex>
         </form>
       ) : (

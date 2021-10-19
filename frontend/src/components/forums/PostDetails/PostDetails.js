@@ -140,7 +140,10 @@ function PostDetails({
               <Button
                 pr="8px"
                 leftIcon={<AiOutlineClose />}
-                onClick={() => setEditorState("")}
+                onClick={() => {
+                  setEditorState("")
+                  setDetails(description)
+                }}
               />
               <Button
                 pr="8px"

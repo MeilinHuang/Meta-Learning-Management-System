@@ -199,7 +199,10 @@ function CommentResponse({
                 pr="8px"
                 mb="8px"
                 leftIcon={<AiOutlineClose />}
-                onClick={() => setEditorState("")}
+                onClick={() => {
+                  setEditorState("")
+                  setDetails(comment || reply)
+                }}
               />
               <Button
                 pr="8px"
