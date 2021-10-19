@@ -5608,6 +5608,128 @@
         }
       }
     },
+    "/{topicGroupName}/lectures/search/": {
+      "get": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Gets list of lecture files related to search term",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "searchTerm",
+            "in": "path",
+            "description": "Search term",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+          ,
+          {
+            "name": "Specify",
+            "in": "query",
+            "description": "Search term",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["lecture", "tutorial"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroupName}/tutorials/search/": {
+      "get": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Gets list of tutorial files related to search term",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "searchTerm",
+            "in": "path",
+            "description": "Search term",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+          ,
+          {
+            "name": "Specify",
+            "in": "query",
+            "description": "Search term",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["lecture", "tutorial"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/{topicGroupName}": {
       "get": {
         "tags": ["Lectures and Tutorials"],

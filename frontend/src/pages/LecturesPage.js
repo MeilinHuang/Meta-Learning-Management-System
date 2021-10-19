@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-import React, { useEffect, useState, useContext } from "react";
-import {
-=======
 import React, { useEffect, useState } from 'react';
 import { 
->>>>>>> backend
   Box,
   Button,
   Center,
@@ -16,26 +11,6 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
-<<<<<<< HEAD
-import { StoreContext } from "../utils/store";
-import { SearchIcon } from "@chakra-ui/icons";
-import LectureTableContainer from "../components/lecturesTutorials/LectureTableContainer";
-import AddPostModal from "../components/forums/AddPostModal";
-import { GrAdd } from "react-icons/gr";
-
-function LecturesPage({
-  match: {
-    params: { code },
-  },
-}) {
-  const context = useContext(StoreContext);
-  /* const {
-    lectures: [lectures, setLectures]
-  } = context; */
-
-  const [lectures, setLectures] = useState();
-  const [searchTerm, setSearchTerm] = useState("");
-=======
 import { SearchIcon } from '@chakra-ui/icons'
 import LectureTableContainer from '../components/lecturesTutorials/LectureTableContainer'
 import AddLectureModal from '../components/lecturesTutorials/AddLectureModal'
@@ -44,7 +19,6 @@ import { GrAdd } from 'react-icons/gr'
 function LecturesPage ({ match: { params: { code }}}) {
   const [lectures, setLectures] = useState()
   const [searchTerm, setSearchTerm] = useState('')
->>>>>>> backend
 
   const buttonContents = useBreakpointValue({ base: "", md: "Add lecture" });
   const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null });
@@ -123,46 +97,16 @@ function LecturesPage ({ match: { params: { code }}}) {
     });
   };
 
+  // Put Lecture
+
+  // Delete Lecture
+
+  // Add lecture file
+
+  // delete lecture file
+
   return (
     <>
-<<<<<<< HEAD
-      <Flex justify="center">
-        <Center width={{ base: "100%", lg: "80%" }}>
-          <Button
-            onClick={onOpen}
-            leftIcon={buttonIcon}
-            pr={{ base: "8px", md: "16px" }}
-          >
-            {buttonContents}
-          </Button>
-          <AddPostModal
-            isOpen={isOpen}
-            onClose={onClose}
-            isLectures
-            onSubmit={handleAddLectureSubmit}
-            code={code}
-          />
-          <Box
-            as="form"
-            onSubmit={handleSubmit}
-            width="100%"
-            ml={{ base: "16px", md: "24px" }}
-          >
-            <InputGroup variant="outline">
-              <InputLeftElement
-                pointerEvents="none"
-                children={<SearchIcon color="gray.300" />}
-              />
-              <Input
-                placeholder="Search"
-                onChange={(e) => setSearchTerm(e.target.value)}
-              ></Input>
-            </InputGroup>
-          </Box>
-        </Center>
-      </Flex>
-      <LectureTableContainer lectures={lectures} code={code} />
-=======
         <Flex justify="center">
             <Center width={{ base: '100%', lg: '80%' }}>
                 <Box as="form" onSubmit={handleSubmit} width="100%" ml={{ base: '16px', md: '24px'}} paddingRight="2%">
@@ -176,7 +120,6 @@ function LecturesPage ({ match: { params: { code }}}) {
             </Center>
         </Flex>
         <LectureTableContainer lectures={lectures} code={code} /> 
->>>>>>> backend
     </>
   );
 }
