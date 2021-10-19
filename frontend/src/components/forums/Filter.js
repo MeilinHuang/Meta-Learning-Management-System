@@ -52,9 +52,8 @@ function Filter({ code }) {
 
     const tagNames = filteredTags.map((t) => t.name.toLowerCase());
     setShowPinned(false);
-    const filteredPosts = [];
     tagNames.forEach((t) => {
-      fetch(`http://localhost:8000/${code}/forum/${t}`, {
+      fetch(`http://localhost:8000/${code}/forum/filter?forumFilterTerms=${tagNames}`, {
         headers: {
           "Content-Type": "application/JSON",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -62,9 +61,12 @@ function Filter({ code }) {
       })
         .then((r) => r.json())
         .then((data) => {
-          console.log(data);
-          filteredPosts.push(...data);
-          setPosts(filteredPosts);
+          console.log(data)
+          if (data === []) {
+              setPosts([])
+          } else { 
+              setPosts(data)
+          }
         });
     });
   }, [setPosts, setShowPinned, filteredTags, code, setPinnedPosts]);

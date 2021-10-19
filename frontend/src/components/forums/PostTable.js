@@ -155,15 +155,16 @@ function PostTable({ isAdmin, posts: postData, code }) {
             </>
           );
         },
-        {
-            Header: 'Date Created',
-            accessor: 'published_date',
-            Cell: (({ cell: { value } }) => {
-                const date = new Date(value)
-                const dateString = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
-                return String(dateString)
-            })
-        },
+        width: '70%',
+      },
+      {
+          Header: 'Date Created',
+          accessor: 'published_date',
+          Cell: (({ cell: { value } }) => {
+              const date = new Date(value)
+              const dateString = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+              return String(dateString)
+          })
       },
       {
         Header: "Replies",

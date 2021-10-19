@@ -110,6 +110,7 @@ function Sidebar({
       let code = groupState["object"].topic_code;
 
       let enrolled = [];
+      console.log(user)
       user.enrolled_courses.map((course) => {
         if (course.name === groupState["object"].name) {
           enrolled.unshift(course);

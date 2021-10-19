@@ -48,7 +48,6 @@ function ForumPostPage({
     })
       .then((r) => r.json())
       .then((data) => {
-        console.log(data);
         setPost(data);
       });
   }, [id]);
