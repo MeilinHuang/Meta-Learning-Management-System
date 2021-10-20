@@ -90,7 +90,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         let tempActualTopics = [];
         for (let topicGroup of jsonData.result) {
             for (let topic of topicGroup.topics_list) {
-                console.log('topic', topic);
+                
                 topic['value'] = topic.name;
                 topic['label'] = topic.name;
                 topic['id'] = topic.id;
@@ -110,7 +110,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         }
 
 
-        console.log('tempActualTopics', tempActualTopics);
+        
         setActualTopics(tempActualTopics);
         return tempTopics;
     };
@@ -130,7 +130,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
             }
         }
         value.course_materials = [];
-        console.log('selectedValue', value);
+        
 
         value['title'] = value.name;
         setSelectedNode(value);
@@ -169,7 +169,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         fetch(get_all_topics())
         .then(response => response.json())
         .then(function (data) {
-            console.log('data5', data);
+            
             setTopics(convertToList(data));
         });
 

@@ -82,7 +82,7 @@ export default function TopicTree() {
                         node.materials_strings.content.push(course_material.name);
                     }
                 }
-                console.log('tags', topic.tags);
+                
                 node['tags'] = topic.tags;
                 
                 newJson.nodes.push(node);
@@ -95,22 +95,22 @@ export default function TopicTree() {
             }
         }
         setTopicGroups(tempTopicGroups);
-        console.log('topicGroups', tempTopicGroups);
+        
         
         return newJson;
     }
 
 
     const getListOfPrerequisites = (id, data) => {
-        console.log('id', id);
-        console.log('data', data);
+        
+        
         let linksArray = [];
         for (let i = 0; i < data.links.length; i++) {
             if (data.links[i].target === id) {
                 linksArray.push(data.links[i].source);
             }
         }
-        console.log('linksArray', linksArray);
+        
         
         let prereqs = [];
         let nodes = [];
@@ -128,7 +128,7 @@ export default function TopicTree() {
                 nodes.push({'value': data.nodes[i].id.toString(), 'label': data.nodes[i].title});
             }
         }
-        console.log('prereqs', prereqs);
+        
         
         setListPrereqs(prereqs);
         setNotListPrereqs(nodes);
@@ -148,11 +148,11 @@ export default function TopicTree() {
             // lables && lables.remove();
         }
 
-        console.log('data nodes', data.nodes);
+        
         
         tempNodes = new Array(emptyNodes).fill({}); // temporary fix
         emptyNodes += 1;
-        console.log('tempNodes', tempNodes);
+        
         let seenGroups = {};
         let nodeDict = {};
         let i = 76754;
@@ -167,25 +167,11 @@ export default function TopicTree() {
                         'title': node.group,
                         'type': 'group',
                     });
-                    console.log({
-                        'id': i,
-                        'name': node.group,
-                        'title': node.group,
-                        'type': 'group'
-                    });
+
                 }
             } else if (node.hasOwnProperty('id')) {
                 node.type = 'topic';
-                console.log({
-                    'id': node.id,
-                    'name': node.title,
-                    'title': node.title,
-                    'type': 'topic',
-                    'materials_strings': node.materials_strings,
-                    'group': node.group,
-                    'groupId': node.groupId,
-                    'tags': node.tags
-                });
+                
                 tempNodes.push({
                     'id': node.id,
                     'name': node.title,
@@ -200,7 +186,7 @@ export default function TopicTree() {
             nodeDict[node.id] = node;
             i += 1;
         }
-        console.log('nodes', tempNodes);
+        
         
 
         tempLinks = [];
@@ -229,7 +215,7 @@ export default function TopicTree() {
             }   
         }
 
-        console.log('')
+        
         
         let preprocessedData = {};
         // make it easier to access instead of having to traverse data.nodes each time
@@ -289,10 +275,10 @@ export default function TopicTree() {
                         return dataValue.title === topicName;
                     });
                     
-                    console.log('node', nodeData[0]);
+                    
                     setSelectedNode(nodeData[0]);
-                    console.log('group', nodeData[0].group);
-                    console.log('groupId', nodeData[0].groupId);
+                    
+                    
                     setSelectedTopicGroup(nodeData[0].group);
                     getListOfPrerequisites(nodeData[0].id, data);
                 }
@@ -300,7 +286,8 @@ export default function TopicTree() {
         let radius = 30;
         circles = node.append("circle")
         .attr("r", function (r) {
-            return r.type == 'group' ? radius * 2 : radius;
+            // return r.type == 'group' ? radius * 2 : radius;
+            return radius;
         })
         .attr("fill", function(r) {
             

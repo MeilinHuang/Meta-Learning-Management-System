@@ -49,13 +49,15 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
   const [tempTags, setTempTags] = useState([]);
 
   useEffect(() => {
-    console.log('data', data);
+    
+    
     setTempPrereqs(prereqs);
     setTempTags(data.tags);
     setTempFiles(data.materials_strings);
   }, [prereqs]);
 
   useEffect(() => {
+    
     setNotPrereqs(nodes);
   }, [nodes]);
 
@@ -86,14 +88,14 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
       }
     });
     
-    window.location.reload();
+    // window.location.reload();
   };
 
   const deleteTag = async (tagToDelete) => {
-    console.log('tag to delete', tagToDelete);
+    
     let copyTags = JSON.parse(JSON.stringify(tempTags));
     const result = copyTags.filter(tag => tag.name != tagToDelete.name);
-    console.log('temp tags after delete', result);
+    
     setTempTags(result);
     await fetch(post_topic_tag(topicGroupName, data.title), {
       method: 'DELETE',
@@ -105,7 +107,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
       })
     });
 
-    window.location.reload();
+    // window.location.reload();
   }
 
   const deletePrerequisite = async (prereqToDelete) => {
@@ -136,13 +138,13 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     let tempFiles = JSON.parse(JSON.stringify(files));
     tempFiles[typeOfFile] = e.target.files[0];
     setFiles(tempFiles);
-    console.log(e.target.files[0]);
+    
   }
 
   const uploadFile = async (e, typeOfFile) => {
     e.preventDefault();
+    e.stopPropagation();
     const formData = new FormData();
-    console.log('uploadFile', files[typeOfFile]);
     formData.append('name', data.title);
     formData.append('uploadFile', files[typeOfFile]);
     if (typeOfFile == 'Assessments') {
@@ -150,35 +152,41 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     } else {
       formData.append('uploadedFileTypes', typeOfFile.toLowerCase());
     }
+    let copyFiles = JSON.parse(JSON.stringify(tempFiles));
+    console.log('copyFiles', copyFiles['practice']);
+    if (typeOfFile == 'Assessments') {
+      copyFiles['assessments'].push(files[typeOfFile].name); 
+    } else {
+      copyFiles[typeOfFile.toLowerCase()].push(files[typeOfFile].name);
+    }
+    console.log(files[typeOfFile]);
 
-
+    setTempFiles(copyFiles);
     await fetch(update_topic(topicGroupName, data.title), {
       method: 'PUT',
       body: formData
     });
-    let copyFiles = JSON.stringify(JSON.parse(tempFiles));
-    copyFiles[typeOfFile].push(files[typeOfFile]);
-    setTempFiles(copyFiles);
-
+    return false;
   }
 
   const deleteFile = async (e, typeOfFile, name) => {
     e.preventDefault();
-    console.log('copyFiles', tempFiles);
+    
     let copyFiles = JSON.parse(JSON.stringify(tempFiles));
     const index = tempFiles[typeOfFile.toLowerCase()].indexOf(name);
     
     if (index > -1) {
       copyFiles[typeOfFile.toLowerCase()].splice(index, 1);
     }
-    console.log('tempFiles', tempFiles);
-    console.log('name', name);
+    
+    
 
     setTempFiles(copyFiles);
     const formData = new FormData();
     formData.append('name', data.title);
     formData.append('fileDeleteList', name);
     formData.append('uploadedFileTypes', '');
+    
     await fetch(update_topic(topicGroupName, data.title), {
       method: 'PUT',
       body: formData
@@ -187,7 +195,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
 
   const closeModal = () => {
     if (hasDeleted) {
-      window.location.reload();
+      // window.location.reload();
     } else {
       onClose();
     }
@@ -262,7 +270,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
       <Modal isOpen={isOpen} onClose={() => closeModal()} size={"xl"}>
         <ModalOverlay />
         <ModalContent>
-        <ModalHeader>Topic Resources - {data.title}</ModalHeader>
+        <ModalHeader>{data.title} - {data.group} Group</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Box>
@@ -348,9 +356,9 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                 </Tbody>
               </Table>
               {tempFiles[typeOfFile.toLowerCase()].length == 0 ? <h6>No files here!</h6> : <></>}
-              <Flex flexDirection="column" mb="16px">
+              <Flex flexDirection="column" mb="16px" onSubmit={(e) => e.preventDefault()}>
                   <input type="file" name="images" onChange={(e) => handleUpload(e, typeOfFile)} />
-                  <Button colorScheme="blue" mt={3} onClick={(e) => uploadFile(e, typeOfFile)}>Upload file</Button>
+                  <Button colorScheme="blue" mt={3} type="button" onClick={(e) => uploadFile(e, typeOfFile)}>Upload file</Button>
               </Flex>
               
               </Box>

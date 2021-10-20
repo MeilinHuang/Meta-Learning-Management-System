@@ -37,7 +37,7 @@ function ForumPostPage({ match: { params: { code, id }}}) {
 
     useEffect(() => {
         fetch(`http://localhost:8000/${code}/forum/post/${id}`).then(r => r.json()).then(data => {
-            console.log(data)
+            
             setPost(data)
         })
     }, [id])
@@ -60,7 +60,7 @@ function ForumPostPage({ match: { params: { code, id }}}) {
         })
     }
 
-    console.log(post)
+    
 
     return (
         <>

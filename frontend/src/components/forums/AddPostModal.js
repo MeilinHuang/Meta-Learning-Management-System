@@ -37,7 +37,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit, code, fromAnnouncem
     const handleSubmit = e => {
         e.preventDefault()
         e.target.reset()
-        console.log(details)
+        
 
         if (title === '' || details.replace(/<[^>]+>/g, '') === '') {
             toast({
@@ -76,7 +76,7 @@ function AddPostModal({ isOpen, onClose, isForums, onSubmit, code, fromAnnouncem
 
     const handleUpload = e => {
         setImages(e.target.files[0])
-        console.log(e.target.files[0])
+        
     }
 
     return (

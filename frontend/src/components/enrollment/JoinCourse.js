@@ -17,7 +17,7 @@ export default function CourseInvite() {
   const [invite, setInvite] = useState(code);
   const history = useHistory();
 
-  console.log(invite);
+  
 
   useEffect(() => {
     if (isLoggedIn()) {
