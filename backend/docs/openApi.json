@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "https://api.metalms.tech/"
+      "url": "http://localhost:8000/"
     }
   ],
   "tags": [
@@ -47,9 +47,7 @@
   "paths": {
     "/quiz": {
       "post": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Create new quiz",
         "requestBody": {
           "content": {
@@ -90,11 +88,19 @@
     },
     "/quiz/{quizId}": {
       "get": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Get quiz containing questions from specified quiz id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "quizId",
             "in": "path",
@@ -137,11 +143,19 @@
         }
       },
       "put": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Update quiz details from quiz id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "quizId",
             "in": "path",
@@ -189,11 +203,19 @@
         "x-codegen-request-body-name": "quizBody"
       },
       "delete": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Delete quiz",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "quizId",
             "in": "path",
@@ -232,11 +254,19 @@
     },
     "/quiz/{quizId}/question/{questionId}": {
       "get": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Get specific question from specified quiz",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "quizId",
             "in": "path",
@@ -288,11 +318,19 @@
         }
       },
       "put": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Update question details from quiz id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "quizId",
             "in": "path",
@@ -351,11 +389,19 @@
     },
     "/questionBank/{questionBankId}": {
       "get": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Get list of questions with matching question bank id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "questionBankId",
             "in": "path",
@@ -398,11 +444,19 @@
         }
       },
       "put": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Update name of question bank",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "questionBankId",
             "in": "path",
@@ -450,11 +504,19 @@
         "x-codegen-request-body-name": "questionBankName"
       },
       "delete": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Delete question bank",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "questionBankId",
             "in": "path",
@@ -493,9 +555,7 @@
     },
     "/questionBank": {
       "get": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Get list questions from question banks",
         "responses": {
           "200": {
@@ -531,11 +591,19 @@
     },
     "/questionBank/question/{questionId}": {
       "get": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Get question from question bank with specified question id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "questionId",
             "in": "path",
@@ -580,9 +648,7 @@
     },
     "/poll": {
       "post": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Create new poll",
         "requestBody": {
           "content": {
@@ -623,11 +689,19 @@
     },
     "/poll/{pollId}": {
       "get": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Get poll from specified poll id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "pollId",
             "in": "path",
@@ -670,11 +744,19 @@
         }
       },
       "put": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Change data of poll",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "pollId",
             "in": "path",
@@ -722,11 +804,19 @@
         "x-codegen-request-body-name": "pollBody"
       },
       "delete": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Delete Poll",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "pollId",
             "in": "path",
@@ -765,11 +855,19 @@
     },
     "/quiz/studentAnswers/student/{studentId}": {
       "get": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Get list of student_answer matching the student ID",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "studentId",
             "in": "path",
@@ -814,11 +912,19 @@
     },
     "/quiz/results/question/{questionId}/answerCount": {
       "get": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Get number of students that selected each answer for a question",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "questionId",
             "in": "path",
@@ -863,11 +969,19 @@
     },
     "/questionBank/{questionBankId}/question": {
       "post": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Create new question for question bank",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "questionBankId",
             "in": "path",
@@ -917,9 +1031,7 @@
     },
     "/quiz_question_answer": {
       "post": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Create new quiz question answer",
         "requestBody": {
           "content": {
@@ -960,9 +1072,7 @@
     },
     "/student_answer": {
       "post": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Create new student answer",
         "requestBody": {
           "content": {
@@ -1003,11 +1113,19 @@
     },
     "/quiz/{quizId}/question/{questionId}/answer/{quizQuestionAnswerId}": {
       "put": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Update quiz question answer",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "quizId",
             "in": "path",
@@ -1075,11 +1193,19 @@
     },
     "/question/{questionId}/delete": {
       "delete": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Delete question from id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "questionId",
             "in": "path",
@@ -1118,11 +1244,19 @@
     },
     "/questionBank/{questionBankId}/question/{questionId}": {
       "delete": {
-        "tags": [
-          "Assessment"
-        ],
+        "tags": ["Assessment"],
         "summary": "Delete question from question bank",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "questionBankId",
             "in": "path",
@@ -1170,9 +1304,7 @@
     },
     "/login": {
       "post": {
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "summary": "Logs in the user",
         "requestBody": {
           "description": "Login body",
@@ -1214,11 +1346,19 @@
     },
     "/user/{userId}": {
       "get": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "summary": "Get user from id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "userId",
             "in": "path",
@@ -1261,11 +1401,19 @@
         }
       },
       "delete": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "summary": "Delete user from id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "userId",
             "in": "path",
@@ -1300,15 +1448,83 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Update users recently accessed topic",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user we want",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Put user progress body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutRecentTopic"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/user/{userId}/{topicGroupId}": {
       "post": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "summary": "Make user an admin for a topic group",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "userId",
             "in": "path",
@@ -1354,11 +1570,19 @@
         }
       },
       "delete": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "summary": "Delete admin user from id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "userId",
             "in": "path",
@@ -1406,9 +1630,19 @@
     },
     "/user/{userId}/progress": {
       "put": {
-        "tags": [ "User" ],
+        "tags": ["User"],
         "summary": "Update user progress for topic group",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "userId",
             "in": "path",
@@ -1456,13 +1690,433 @@
         }
       }
     },
+    "/user/calendar/{calendarId}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get calendar by id",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "calendarId",
+            "in": "path",
+            "description": "Id of calendar",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarReminder"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Update calendar reminder for user",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "calendarId",
+            "in": "path",
+            "description": "Id of calendar reminder",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Calendar Reminder Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCalendarReminder"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["User"],
+        "summary": "Delete calendar for user",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "calendarId",
+            "in": "path",
+            "description": "Id of calendar",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{userId}/calendar": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get calendar for user",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Create calendar reminder for user",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Calendar Reminder Body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCalendarReminder"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{userId}/progress/{topicId}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get topic content progress for user",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user",
+            "required": true,
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "topicId",
+            "in": "path",
+            "description": "Id of topic",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserContentProgress"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Put topic content progress for user",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user",
+            "required": true,
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "topicId",
+            "in": "path",
+            "description": "Id of topic",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "topicFileId": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "completion": {
+                    "type": "boolean",
+                    "example": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/{topicGroup}/announcement": {
       "get": {
-        "tags": [
-          "Course Pages"
-        ],
+        "tags": ["Course Pages"],
         "summary": "Get all announcements",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroup",
             "in": "path",
@@ -1507,11 +2161,19 @@
     },
     "/{topicGroup}/announcement/new": {
       "post": {
-        "tags": [
-          "Course Pages"
-        ],
+        "tags": ["Course Pages"],
         "summary": "Create new announcement",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroup",
             "in": "path",
@@ -1578,14 +2240,22 @@
         },
         "x-codegen-request-body-name": "announcementBody"
       }
-    }, 
+    },
     "/{topicGroup}/announcement/{announcementId}": {
       "get": {
-        "tags": [
-          "Course Pages"
-        ],
+        "tags": ["Course Pages"],
         "summary": "Get announcement by id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "announcementId",
             "in": "path",
@@ -1628,11 +2298,19 @@
         }
       },
       "put": {
-        "tags": [
-          "Course Pages"
-        ],
+        "tags": ["Course Pages"],
         "summary": "Update announcement details",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "announcementId",
             "in": "path",
@@ -1704,11 +2382,19 @@
         "x-codegen-request-body-name": "announcementBody"
       },
       "delete": {
-        "tags": [
-          "Course Pages"
-        ],
+        "tags": ["Course Pages"],
         "summary": "Delete announcement",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroup",
             "in": "path",
@@ -1756,11 +2442,19 @@
     },
     "/{topicGroup}/announcement/{announcementId}/comment": {
       "post": {
-        "tags": [
-          "Course Pages"
-        ],
+        "tags": ["Course Pages"],
         "summary": "Create new announcement comment",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "announcementId",
             "in": "path",
@@ -1826,9 +2520,19 @@
     },
     "/{topicGroup}/announcement/{announcementId}/comment/{commentId}": {
       "put": {
-        "tags": [ "Course Pages" ],
+        "tags": ["Course Pages"],
         "summary": "Update announcement comment",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "announcementId",
             "in": "path",
@@ -1900,11 +2604,19 @@
         "x-codegen-request-body-name": "commentBody"
       },
       "delete": {
-        "tags": [
-          "Course Pages"
-        ],
+        "tags": ["Course Pages"],
         "summary": "Delete announcement comment",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "commentId",
             "in": "path",
@@ -1943,11 +2655,19 @@
     },
     "/{topicGroup}/announcement/search/{announcementSearchTerm}": {
       "get": {
-        "tags": [
-          "Course Pages"
-        ],
+        "tags": ["Course Pages"],
         "summary": "Get all announcements related to the search query",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroup",
             "in": "path",
@@ -2001,11 +2721,19 @@
     },
     "/{topicGroup}/forum": {
       "get": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Get all forum posts",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroup",
             "in": "path",
@@ -2050,11 +2778,19 @@
     },
     "/{topicGroup}/forum/pinned": {
       "get": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Get all pinned forum posts",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroup",
             "in": "path",
@@ -2099,11 +2835,19 @@
     },
     "/{topicGroup}/forum/search/{forumSearchTerm}": {
       "get": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Get all forum posts related to the search query",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "forumSearchTerm",
             "in": "path",
@@ -2155,20 +2899,19 @@
         }
       }
     },
-    "/{topicGroup}/forum/{forumFilterTerm}": {
+    "/{topicGroup}/forum/filter": {
       "get": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Get all forum posts related to the filter term",
         "parameters": [
           {
-            "name": "forumFilterTerm",
-            "in": "path",
-            "description": "Filter term to include all posts with the filter term",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "default": "Bearer <Token>"
             }
           },
           {
@@ -2179,6 +2922,21 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "forumFilterTerms",
+            "in": "query",
+            "description": "Array of filter terms",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "example": "Ass1"
+              }
+            },
+            "style": "form",
+            "explode": false
           }
         ],
         "responses": {
@@ -2215,11 +2973,19 @@
     },
     "/{topicGroup}/forum/post": {
       "post": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Make new post",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroup",
             "in": "path",
@@ -2316,11 +3082,19 @@
     },
     "/{topicGroup}/forum/post/{postId}": {
       "get": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Get post details of post associated with post id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -2372,11 +3146,19 @@
         }
       },
       "put": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Edit post details with post id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -2456,11 +3238,19 @@
         "x-codegen-request-body-name": "editPost"
       },
       "delete": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Delete forum post by id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -2508,11 +3298,19 @@
     },
     "/{topicGroup}/forum/post/{postId}/reply": {
       "post": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Create a reply on post by postId",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -2587,11 +3385,19 @@
     },
     "/{topicGroup}/forum/post/{postId}/reply/{replyId}": {
       "put": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Update reply on a post with id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "replyId",
             "in": "path",
@@ -2675,11 +3481,19 @@
         "x-codegen-request-body-name": "replyDetails"
       },
       "delete": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Delete forum post reply",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "replyId",
             "in": "path",
@@ -2736,11 +3550,19 @@
     },
     "/{topicGroup}/forum/post/{postId}/comment": {
       "post": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Create comment on post",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -2815,11 +3637,19 @@
     },
     "/{topicGroup}/forum/post/{postId}/comment/{commentId}": {
       "put": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Updates post comment",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -2903,11 +3733,19 @@
         "x-codegen-request-body-name": "commentBody"
       },
       "delete": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Deletes forum comment",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -2964,11 +3802,19 @@
     },
     "/{topicGroup}/forum/post/{postId}/comment/{commentId}/endorse/{isEndorsed}": {
       "put": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Endorses or un-endorses comment associated with comment id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -3034,11 +3880,19 @@
     },
     "/{topicGroup}/forum/post/pin/{postId}/{isPinned}": {
       "put": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Pins or unpins post associated with post id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -3095,11 +3949,19 @@
     },
     "/{topicGroup}/forum/tags": {
       "put": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Get list of all tags",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroup",
             "in": "path",
@@ -3143,11 +4005,19 @@
         "x-codegen-request-body-name": "tagName"
       },
       "post": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Create new tag",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroup",
             "in": "path",
@@ -3198,9 +4068,19 @@
     },
     "/{topicGroup}/forum/tags/{tagId}": {
       "get": {
-        "tags": [ "Forums" ],
+        "tags": ["Forums"],
         "summary": "Get tag from id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "tagId",
             "in": "path",
@@ -3250,11 +4130,19 @@
         }
       },
       "put": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Update forum tag",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "tagId",
             "in": "path",
@@ -3312,11 +4200,19 @@
         "x-codegen-request-body-name": "tagBody"
       },
       "delete": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Delete forum tag",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "tagId",
             "in": "path",
@@ -3364,11 +4260,19 @@
     },
     "/{topicGroup}/forum/post/endorse/{postId}/{isEndorsed}": {
       "put": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Endorses or un-endorses post associated with post id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -3425,11 +4329,19 @@
     },
     "/{topicGroup}/forum/post/like/{postId}": {
       "put": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Adds upvote for post associated with post id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -3494,11 +4406,19 @@
     },
     "/{topicGroup}/forum/post/unlike/{postId}": {
       "put": {
-        "tags": [
-          "Forums"
-        ],
+        "tags": ["Forums"],
         "summary": "Removes upvote for post associated with post id",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "postId",
             "in": "path",
@@ -3563,9 +4483,7 @@
     },
     "/topicGroup": {
       "get": {
-        "tags": [
-          "Topic Tree"
-        ],
+        "tags": ["Topic Tree"],
         "summary": "Get a list of topic groups, their information (tutorial times, course outline) and the Topic they contain",
         "responses": {
           "200": {
@@ -3601,11 +4519,19 @@
     },
     "/topicGroup/{topicGroupName}/topic": {
       "get": {
-        "tags": [
-          "Topic Tree"
-        ],
+        "tags": ["Topic Tree"],
         "summary": "Get list of Topics",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -3650,11 +4576,19 @@
     },
     "/topicGroup/{topicGroupName}/topic/{topicName}/topic": {
       "get": {
-        "tags": [
-          "Topic Tree"
-        ],
+        "tags": ["Topic Tree"],
         "summary": "Get list of files associated with topic",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -3702,11 +4636,19 @@
     },
     "/topicGroup/{topicGroupName}/topic/{topicName}/prerequisite": {
       "get": {
-        "tags": [
-          "Topic Tree"
-        ],
+        "tags": ["Topic Tree"],
         "summary": "Get prerequisites of topic",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -3758,11 +4700,19 @@
         }
       },
       "post": {
-        "tags": [
-          "Topic Tree"
-        ],
+        "tags": ["Topic Tree"],
         "summary": "Create a new prerequisite with prerequisite in POST body",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -3820,11 +4770,19 @@
         "x-codegen-request-body-name": "Pre-Requisite"
       },
       "delete": {
-        "tags": [
-          "Topic Tree"
-        ],
+        "tags": ["Topic Tree"],
         "summary": "Delete prerequisites",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -3884,9 +4842,19 @@
     },
     "/topicGroup/{topicGroupName}": {
       "get": {
-        "tags": [ "Topic Tree" ],
+        "tags": ["Topic Tree"],
         "summary": "Get topic group data from name",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -3926,11 +4894,19 @@
         "x-codegen-request-body-name": "TopicGroup"
       },
       "post": {
-        "tags": [
-          "Topic Tree"
-        ],
+        "tags": ["Topic Tree"],
         "summary": "Create a topic group",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -3998,9 +4974,19 @@
         "x-codegen-request-body-name": "TopicGroup"
       },
       "put": {
-        "tags": [ "Topic Tree" ],
+        "tags": ["Topic Tree"],
         "summary": "Update topic group details",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -4080,11 +5066,19 @@
         "x-codegen-request-body-name": "announcementBody"
       },
       "delete": {
-        "tags": [
-          "Topic Tree"
-        ],
+        "tags": ["Topic Tree"],
         "summary": "Delete a topic group",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -4123,11 +5117,19 @@
     },
     "/topicGroup/{topicGroupName}/topic/{topicName}": {
       "post": {
-        "tags": [
-          "Topic Tree"
-        ],
+        "tags": ["Topic Tree"],
         "summary": "Create a new topic",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -4199,9 +5201,19 @@
         }
       },
       "put": {
-        "tags": [ "Topic Tree" ],
+        "tags": ["Topic Tree"],
         "summary": "Update topic details",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -4286,9 +5298,19 @@
         "x-codegen-request-body-name": "announcementBody"
       },
       "delete": {
-        "tags": [ "Topic Tree" ],
+        "tags": ["Topic Tree"],
         "summary": "Deletes topic",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "in": "path",
@@ -4334,11 +5356,137 @@
         }
       }
     },
+    "/topic/{fileId}": {
+      "get": {
+        "tags": ["Topic Tree"],
+        "summary": "Get topic file data by id",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "fileId",
+            "in": "path",
+            "description": "Id of file",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetTopicFile" }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "TopicGroup"
+      },
+      "put": {
+        "tags": ["Topic Tree"],
+        "summary": "Put topic file data by id",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "fileId",
+            "in": "path",
+            "description": "Id of file",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutTopicFileDueDate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "TopicGroup"
+      }
+    },
     "/file/{targetId}": {
       "post": {
         "tags": ["Lectures and Tutorials"],
         "summary": "Upload lecture or tutorial file",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "target",
             "in": "query",
@@ -4405,6 +5553,16 @@
         "summary": "Delete file from lecture or tutorial",
         "parameters": [
           {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
             "name": "target",
             "in": "query",
             "description": "Target type",
@@ -4450,11 +5608,143 @@
         }
       }
     },
+    "/{topicGroupName}/lectures/search/": {
+      "get": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Gets list of lecture files related to search term",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "searchTerm",
+            "in": "path",
+            "description": "Search term",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+          ,
+          {
+            "name": "Specify",
+            "in": "query",
+            "description": "Search term",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["lecture", "tutorial"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroupName}/tutorials/search/": {
+      "get": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Gets list of tutorial files related to search term",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "searchTerm",
+            "in": "path",
+            "description": "Search term",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+          ,
+          {
+            "name": "Specify",
+            "in": "query",
+            "description": "Search term",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["lecture", "tutorial"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/{topicGroupName}": {
       "get": {
         "tags": ["Lectures and Tutorials"],
         "summary": "Gets list of weeks",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "required": false,
@@ -4501,6 +5791,16 @@
         "summary": "Gets list of lectures for specified topic group",
         "parameters": [
           {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
             "name": "topicGroupName",
             "required": true,
             "in": "path",
@@ -4546,6 +5846,16 @@
         "summary": "Get lecture by id",
         "parameters": [
           {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
             "name": "topicGroupName",
             "required": true,
             "in": "path",
@@ -4566,7 +5876,7 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": { }
+            "content": {}
           },
           "400": {
             "content": {
@@ -4592,6 +5902,16 @@
         "tags": ["Lectures and Tutorials"],
         "summary": "Update lecture details",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "required": true,
@@ -4651,6 +5971,16 @@
         "summary": "Delete lecture",
         "parameters": [
           {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
             "name": "topicGroupName",
             "required": true,
             "in": "path",
@@ -4700,6 +6030,16 @@
         "tags": ["Lectures and Tutorials"],
         "summary": "Create new lecture",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "required": true,
@@ -4752,6 +6092,16 @@
         "summary": "Gets list of tutorials for specified topic group",
         "parameters": [
           {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
             "name": "topicGroupName",
             "required": true,
             "in": "path",
@@ -4797,6 +6147,16 @@
         "summary": "Get tutorial by id",
         "parameters": [
           {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
             "name": "topicGroupName",
             "required": true,
             "in": "path",
@@ -4817,7 +6177,7 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": { }
+            "content": {}
           },
           "400": {
             "content": {
@@ -4843,6 +6203,16 @@
         "tags": ["Lectures and Tutorials"],
         "summary": "Update tutorial details",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "required": true,
@@ -4902,6 +6272,16 @@
         "summary": "Delete tutorial",
         "parameters": [
           {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
             "name": "topicGroupName",
             "required": true,
             "in": "path",
@@ -4950,6 +6330,16 @@
         "tags": ["Lectures and Tutorials"],
         "summary": "Create new tutorial",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
           {
             "name": "topicGroupName",
             "required": true,
@@ -5021,6 +6411,35 @@
         },
         "description": "Forbidden"
       },
+      "GetTopicFile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "while_loops.pdf"
+          },
+          "file": {
+            "type": "string",
+            "example": "while_loops_path"
+          },
+          "type": {
+            "type": "string",
+            "example": "content"
+          },
+          "topicId": {
+            "type": "integer",
+            "example": 1
+          },
+          "dueDate": {
+            "type": "string",
+            "example": "2021-08-08 22:52:35.388924"
+          }
+        }
+      },
       "PutUserProgress": {
         "type": "object",
         "properties": {
@@ -5075,11 +6494,11 @@
       "GetTutorials": {
         "type": "object",
         "properties": {
-        "tutorials": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
+          "tutorials": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
                 "id": {
                   "type": "integer",
                   "example": 1
@@ -5188,7 +6607,7 @@
                   "example": 4
                 },
                 "timeslot": {
-                  "type": "timestamp",
+                  "type": "string",
                   "example": "2021-08-08 22:52:35.388924"
                 },
                 "curr_capacity": {
@@ -5543,6 +6962,23 @@
           }
         }
       },
+      "CalendarReminder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "remind_date": {
+            "type": "string",
+            "example": "2021-08-08 22:52:35.388924"
+          },
+          "description": {
+            "type": "string",
+            "example": "Reminder for assignmetn 2"
+          }
+        }
+      },
       "PreRequisite": {
         "type": "object",
         "properties": {
@@ -5731,6 +7167,15 @@
           }
         }
       },
+      "PutRecentTopic": {
+        "type": "object",
+        "properties": {
+          "lastTopic": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
       "GetAllForumTags": {
         "type": "object",
         "properties": {
@@ -5750,6 +7195,19 @@
                 }
               }
             }
+          }
+        }
+      },
+      "PostCalendarReminder": {
+        "type": "object",
+        "properties": {
+          "remind_date": {
+            "type": "string",
+            "example": "2021-08-08 22:52:35.388924"
+          },
+          "description": {
+            "type": "string",
+            "example": "Reminder for assignmetn 2"
           }
         }
       },
@@ -6552,6 +8010,36 @@
                 }
               }
             }
+          }
+        }
+      },
+      "PutTopicFileDueDate": {
+        "type": "object",
+        "properties": {
+          "newDate": {
+            "type": "string",
+            "example": "2021-08-08 22:52:35.388924"
+          }
+        }
+      },
+      "GetUserContentProgress": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "example": 1
+          },
+          "topicFileId": {
+            "type": "integer",
+            "example": 1
+          },
+          "topicId": {
+            "type": "integer",
+            "example": 1
+          },
+          "completed": {
+            "type": "boolean",
+            "example": true
           }
         }
       }

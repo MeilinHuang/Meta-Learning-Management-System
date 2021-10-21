@@ -214,10 +214,11 @@ export default function LoginForm() {
                     if (r.hasOwnProperty("error")) {
                       setError(r.error);
                     } else {
-                      sessionStorage.setItem("token", r.token);
+                      localStorage.setItem("token", r.token);
                       r.staff === true
-                        ? sessionStorage.setItem("staff", 1)
-                        : sessionStorage.setItem("staff", 0);
+                        ? localStorage.setItem("staff", 1)
+                        : localStorage.setItem("staff", 0);
+                      localStorage.setItem("id", r.id);
                       history.push("/");
                     }
                   });
@@ -228,10 +229,11 @@ export default function LoginForm() {
                     if (r.hasOwnProperty("error")) {
                       setError(r.error);
                     } else {
-                      sessionStorage.setItem("token", r.token);
+                      localStorage.setItem("token", r.token);
                       r.staff === true
-                        ? sessionStorage.setItem("staff", 1)
-                        : sessionStorage.setItem("staff", 0);
+                        ? localStorage.setItem("staff", 1)
+                        : localStorage.setItem("staff", 0);
+                      localStorage.setItem("id", r.id);
                       history.push("/");
                     }
                   });
