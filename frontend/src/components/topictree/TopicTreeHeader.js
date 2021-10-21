@@ -27,6 +27,7 @@ import { get_topics_url, get_prereqs, get_all_topics} from "../../Constants.js";
 import TopicTreeViewResource from "./TopicTreeViewResource.js";
 
 import TopicTreeAddTopic from './TopicTreeAddTopic.js';
+import TopicTreeAddGroup from "./TopicTreeAddGroup.js";
 
 const NavLink = ({ onClick, children, openUrl=true }) => (
     <Link
@@ -83,6 +84,12 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         isOpen:isOpenModal,
         onOpen: onOpenModal,
         onClose: onCloseModal
+    } = useDisclosure();
+
+    const {
+        isOpen: isOpenGroupModal,
+        onOpen: onOpenGroupModal,
+        onClose: onCloseGroupModal
     } = useDisclosure();
 
     const convertToList = (jsonData) => {
@@ -208,7 +215,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                         as={'nav'}
                         spacing={4}
                         display={{ base: 'none', md: 'flex' }}>
-
+                        <Link mt={1} mb={1} px={2} py={1} color={'white'} rounded={'md'} onClick={onOpenGroupModal}>Add a Topic Group</Link>
                         <Link mt={1} px={2} py={1} color={'white'} rounded={'md'}
                             onClick={onOpenModal}>Add a Topic</Link>
                         <Box bg='white'  w={200}>
@@ -270,6 +277,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
             ) : null}
             </Box>
             <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} topicGroups={topicGroups}/>
+            <TopicTreeAddGroup isOpen={isOpenGroupModal} onClose={onCloseGroupModal} />
             <TopicTreeViewResource data={selectedNode} isOpen={isOpenViewModal} onClose={onCloseViewModal} prereqs={listPrereqs} topicGroupName={topicGroupName} nodes={notListPrereqs} />
         </div>
     );
