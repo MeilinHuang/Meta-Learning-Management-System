@@ -41,7 +41,7 @@ function CoursePage() {
         method: "GET",
         headers: {
           "Content-Type": "application/JSON",
-          Authorisation: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       };
       fetch(backend_url + `user/${localStorage.getItem("id")}`, options)

@@ -142,7 +142,12 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         value['title'] = value.name;
         setSelectedNode(value);
 
-        let response = await fetch(get_prereqs(value.group, value.name));
+        let response = await fetch(get_prereqs(value.group, value.name),
+        {
+            'headers': {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
+            }
+        });
         let responseJson = await response.json();
         let prereqList = [];
         for (let prereq of responseJson.prerequisites_list) {
@@ -173,7 +178,11 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
     }
 
     useEffect(() => {
-        fetch(get_all_topics())
+        fetch(get_all_topics(), {
+            'headers': {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
+            }
+        })
         .then(response => response.json())
         .then(function (data) {
             

@@ -55,13 +55,17 @@ export default function TopicTreeAddGroup({isOpen, onClose}) {
         await fetch(new_topic_group(newTopicGroupName),
         {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
+            },
             body: formData
         });
         await fetch(post_new_topic_url(newTopicGroupName, firstTopicName), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({
                 'uploadedFileTypes': "pdf"
