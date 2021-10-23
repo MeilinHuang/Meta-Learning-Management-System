@@ -5,6 +5,7 @@ import EditQuiz from '../components/edit-quiz/EditQuiz';
 import QuestionCreation from '../components/question-creation/QuestionCreation';
 import QuizCreation from '../components/quiz-creation/QuizCreation';
 import QuizUsage from '../components/quiz-usage/QuizUsage';
+import QuizViewSubmission from '../components/quiz-view-submission/QuizViewSubmission';
 
 export default function Assessments() {
   // const [id, setId] = useState(0);
@@ -38,10 +39,11 @@ export default function Assessments() {
 
   return (
     <div>
-      <EditQuiz />
+      {/* <EditQuiz /> */}
       {/* <QuizCreation /> */}
       {/* <QuestionCreation /> */}
       {/* <QuizUsage /> */}
+      <QuizViewSubmission />
     </div>
   );
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { SmallCloseIcon, WarningIcon } from '@chakra-ui/icons'
+import { WarningIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -8,7 +8,6 @@ import {
   CheckboxGroup,
   Flex,
   FormControl,
-  Heading,
   HStack,
   Input,
   InputGroup,
@@ -25,7 +24,6 @@ import {
   Stack,
   Text,
   Textarea,
-  VStack
 } from "@chakra-ui/react"
 import { AddIcon, QuestionOutlineIcon } from "@chakra-ui/icons"
 
