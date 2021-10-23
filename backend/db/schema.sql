@@ -1,4 +1,4 @@
--- \i 'C:/Users/Dave/Desktop/COMP4962 - Thesis B/metalms/backend/db/schema.sql';
+-- \i 'C:/Users/Dave/Desktop/COMP4973 - Thesis C/metalms/backend/db/schema.sql';
 
 -- Reset Schema
 DROP SCHEMA public cascade;
@@ -9,7 +9,10 @@ DROP TABLE IF EXISTS "users" CASCADE;
 CREATE TABLE IF NOT EXISTS "users" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  zId TEXT NOT NULL
+  email TEXT NOT NULL,
+  password TEXT NOT NULL,
+  zId TEXT NOT NULL,
+  staff BOOLEAN NOT NULL
 );
 
 DROP TABLE IF EXISTS "topic_group" CASCADE;
@@ -31,10 +34,25 @@ DROP TABLE IF EXISTS "user_enrolled" CASCADE;
 CREATE TABLE IF NOT EXISTS "user_enrolled" (
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
   user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  progress DECIMAL NOT NULL,
   PRIMARY KEY(user_id, topic_group_id)
 );
 
--- TOPIC GROUPSS
+DROP TABLE IF EXISTS "calendar_reminders" CASCADE;
+CREATE TABLE IF NOT EXISTS "calendar_reminders" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  remind_date TIMESTAMP,
+  description TEXT
+);
+
+DROP TABLE IF EXISTS "user_calendar_reminders" CASCADE;
+CREATE TABLE IF NOT EXISTS "user_calendar_reminders" (
+  reminder_id INTEGER NOT NULL REFERENCES calendar_reminders(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  PRIMARY KEY (reminder_id, user_id)
+);
+
+-- TOPIC GROUPS
 DROP TABLE IF EXISTS "topics" CASCADE;
 CREATE TABLE IF NOT EXISTS "topics" (
   id SERIAL NOT NULL PRIMARY KEY,
@@ -68,6 +86,15 @@ CREATE TABLE IF NOT EXISTS "topic_files" (
   due_date TIMESTAMP
 );
 
+DROP TABLE IF EXISTS "enroll_codes" CASCADE;
+CREATE TABLE IF NOT EXISTS "enroll_codes" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  code TEXT NOT NULL,
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
+  uses INTEGER,
+  expiration INTEGER
+);
+
 CREATE INDEX prereq_idx ON prerequisites(prereq);
 CREATE INDEX topic_idx ON prerequisites(topic);
 
@@ -83,11 +110,28 @@ CREATE TABLE IF NOT EXISTS "forum_posts" (
   isPinned BOOLEAN NOT NULL,
   related_link TEXT,
   num_of_upvotes INTEGER NOT NULL,
-  isEndorsed BOOLEAN NOT NULL
+  isEndorsed BOOLEAN NOT NULL,
+  topic_group INTEGER NOT NULL REFERENCES topic_group(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  fromAnnouncement BOOLEAN NOT NULL
 );
 
+-- Can combine tags/topic_tags
 DROP TABLE IF EXISTS "tags" CASCADE;
 CREATE TABLE IF NOT EXISTS "tags" (
+  tag_id SERIAL NOT NULL PRIMARY KEY,
+  topic_group_id INTEGER NOT NULL REFERENCES topic_group(id),
+  name TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS "topic_tags" CASCADE;
+CREATE TABLE IF NOT EXISTS "topic_tags"(
+  topic_id INT NOT NULL REFERENCES topics(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  tag_id INT NOT NULL REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  PRIMARY KEY(topic_id, tag_id)
+);
+
+DROP TABLE IF EXISTS "reserved_tags" CASCADE;
+CREATE TABLE IF NOT EXISTS "reserved_tags" (
   tag_id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL
 );
@@ -187,20 +231,13 @@ CREATE TABLE IF NOT EXISTS "post_tags"(
   PRIMARY KEY(post_id, tag_id)
 );
 
-DROP TABLE IF EXISTS "topic_tags" CASCADE;
-CREATE TABLE IF NOT EXISTS "topic_tags"(
-  topic_id INT NOT NULL REFERENCES topics(id) ON UPDATE CASCADE ON DELETE CASCADE,
-  tag_id INT NOT NULL REFERENCES tags(tag_id) ON UPDATE CASCADE ON DELETE CASCADE,
-  PRIMARY KEY(topic_id, tag_id)
-);
-
 -- Course Pages
 DROP TABLE IF EXISTS "user_content_progress" CASCADE;
 CREATE TABLE "user_content_progress" (
   user_id INTEGER NOT NULL REFERENCES users(id),
   topic_file_id INTEGER NOT NULL REFERENCES topic_files(id),
   topic_id INTEGER NOT NULL REFERENCES topics(id),
-  course_progression INTEGER NOT NULL 
+  completed BOOLEAN NOT NULL
 );
 
 DROP TABLE IF EXISTS "announcements" CASCADE;
@@ -298,6 +335,8 @@ CREATE TABLE "quiz_poll" (
 );
 
 -- Lectures and Tutorials
+
+-- not used
 DROP TABLE IF EXISTS "weeks" CASCADE;
 CREATE TABLE "weeks" (
   id SERIAL NOT NULL PRIMARY KEY,
@@ -384,3 +423,7 @@ CREATE TABLE "enrol_lectures" (
   curr_capacity INTEGER NOT NULL,
   max_capacity INTEGER NOT NULL
 );
+
+-- Alter Users
+ALTER TABLE users
+ADD last_accessed_topic INTEGER REFERENCES topics(id);

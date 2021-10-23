@@ -1,6 +1,5 @@
 const pool = require('../db/database');
 var fs = require('fs');
-const { start } = require('repl');
 
 /***************************************************************
                        Week Functions
@@ -9,7 +8,7 @@ const { start } = require('repl');
 // Gets weeks
 async function getWeeks (request, response) {
   try {
-    void request;
+    void (request);
     const resp = await pool.query(`SELECT * FROM weeks`);
     response.status(200).json(resp.rows);
   } catch (e) {
@@ -23,7 +22,8 @@ async function getWeeks (request, response) {
 
 // Post file for lecture or tutorial
 async function postLectureTutorialFile (request, response) {
-  if (request.files == null) throw ("Failed: No file specified for upload");
+  try {
+    if (request.files == null) throw ("Failed: No file specified for upload");
     if (!request.query.target == "lecture" && !request.query.target == "tutorial") {
       throw ("Failed: file target incorrect choose (lecture or tutorial)");
     }
@@ -44,8 +44,6 @@ async function postLectureTutorialFile (request, response) {
     function (err) { if (err) throw err; });
 
     response.status(200).json({success: true, file: fileName, filePath: filePath});
-  try {
-    
   } catch (e) {
     response.status(400).json({error: e});
   }
@@ -85,6 +83,44 @@ async function deleteLectureTutorialFile (request, response) {
     response.status(200).json({success: true});
   } catch (e) {
     response.status(400).json({error: e});
+  }
+}
+
+// Search file 
+async function getSearchFile (request, response) {
+  try {
+    const searchTerm = request.params.searchTerm;
+    const topicGroup = request.params.topicGroupName;
+    const specifyTerm = request.query.specify;
+
+    console.log(topicGroup);
+    console.log(specifyTerm);
+
+    const idReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroup]);
+    if (!idReq.rows.length) throw (`Failed: Topic group {${topicGroup}} does not exist`);
+
+    const topicGroupId = idReq.rows[0].id;
+    let resp;
+
+    if (specifyTerm == 'lecture') {
+      resp = await pool.query(`
+      SELECT lf.id, lf.name, lf.file, lf.lecture_id FROM lecture_files lf
+      JOIN lectures l ON l.id = lf.id
+      WHERE l.topic_group_id = $1 AND LOWER(lf.name) ~ LOWER($2)
+      GROUP BY lf.id
+      ORDER BY lf.id`, [topicGroupId, searchTerm]);
+    } else {
+      resp = await pool.query(`
+      SELECT tf.id, tf.name, tf.file, tf.tutorial_id FROM tutorial_files tf
+      JOIN tutorials t ON t.id = tf.id
+      WHERE t.topic_group_id = $1 AND LOWER(tf.name) ~ LOWER($2)
+      GROUP BY tf.id
+      ORDER BY tf.id`, [topicGroupId, searchTerm]);
+    }
+    
+    response.status(200).json(resp.rows);
+  } catch (e) {
+    response.status(400).send(e);
   }
 }
 
@@ -130,6 +166,47 @@ async function getAllLectures (request, response) {
   }
 }
 
+// Get lectures by search term
+async function getSearchLectures (request, response) {
+  try {
+    const searchTerm = request.params.searchTerm.toLowerCase();
+    const topicGroup = request.params.topicGroupName;
+    const idReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroup]);
+    if (!idReq.rows.length) throw (`Failed: Topic group {${topicGroup}} does not exist`);
+    const topicGroupId = idReq.rows[0].id;
+
+    // Convert searchTerm to topicReference id
+    
+    const resp = await pool.query(
+      `SELECT l.id, l.week, l.topic_group_id, l.topic_reference, l.lecturer_id, 
+      l.start_time, l.end_time, l.lecture_video, array_agg(lf.id) as lecture_files
+      FROM lectures l
+      LEFT JOIN lecture_files lf ON lf.lecture_id = l.id
+      WHERE l.topic_group_id = $1 AND (l.week = $2 OR l.topic_reference = $2) 
+      GROUP BY l.id`, [topicGroupId, searchTerm, `%${searchTerm}%`]);
+  
+      for (const object of resp.rows) {
+        var fileArr = [];
+        
+        for (const attachment of object.lecture_files) {
+          if (attachment != null) { 
+            const fileResp = await pool.query(
+            `SELECT * FROM lecture_files 
+            WHERE id = $1 AND lecture_id = $2`,
+            [object.id, attachment])
+            fileArr.push(fileResp.rows[0]);
+          }
+        }
+  
+        object.lecture_files = fileArr;
+      }
+
+    response.status(200).json(resp.rows);
+  } catch (e) {
+    response.status(400).json({error: e});
+  }
+}
+
 // Get lecture by id
 async function getLectureById (request, response) {
   try {
@@ -153,7 +230,7 @@ async function getLectureById (request, response) {
   }
 }
 
-// Get lecture by id
+// Create new lecture
 async function postLecture (request, response) {
   try {
     const topicGroupName = request.params.topicGroupName;
@@ -388,5 +465,7 @@ module.exports = {
   getTutorialById,
   postTutorial,
   putTutorial,
-  deleteTutorial
+  deleteTutorial,
+  getSearchLectures,
+  getSearchFile
 };

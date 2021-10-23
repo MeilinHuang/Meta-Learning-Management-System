@@ -10,7 +10,8 @@ import {
     Route,
 } from "react-router-dom"
 import TopicTree from "./components/topictree/TopicTree.js"
-import TopicGroupList from "./components/topictree/TopicGroupList.js";
+import LoginForm from "./components/login/LoginForm";
+import CourseInvite from "./components/enrollment/JoinCourse";
 import TopicTreeList from "./components/topictree/TopicTreeList.js";
 
 function App() {
@@ -18,8 +19,9 @@ function App() {
         <ChakraProvider>
             <Router>
                 <Switch>
-                    <Route exact path="/topictree"><TopicGroupList /></Route>
-                    <Route exact path="/topictree/:topicGroup" component={TopicTree} />
+                    <Route exact path="/topictree"><TopicTree /></Route>
+                    <Route exact path="/login"><LoginForm /></Route>
+                    <Route path="/invite/:code?"><CourseInvite/></Route>
                     <Route exact path="/topictreelist"><TopicTreeList /></Route>
                     <Route path="/course-page/:code" ><CoursePage /></Route>
                     <Route exact path="/assessments"><Assessments /></Route>

@@ -1,3 +1,6 @@
+.description {
+    line-height: 26px;
+}
 .description blockquote,
 .description li {
     margin-left: 32px;
@@ -17,8 +20,23 @@
 
 .description code {
     background-color: #eee;
-    padding: 4px;
+    padding: 0 4px;
     border-radius: 8px;
+}
+
+.description pre {
+    background-color: #eee;
+    padding: 4px 8px;
+    border-radius: 8px;
+    margin: 8px;
+}
+
+.description a {
+    color: #0e5ea8;
+}
+
+.description a:hover {
+    text-decoration: underline;
 }
 
 .attachment {
