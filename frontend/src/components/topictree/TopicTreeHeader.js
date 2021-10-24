@@ -207,6 +207,10 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         return tempView == "Graph View";
     }
 
+    function goHome() {
+        history.push('/');
+    }
+
     return (
         <div id={id}>
             <Box bg={useColorModeValue('blue.400', 'blue.400')} px={4}>
@@ -219,7 +223,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                 onClick={isOpen ? onClose : onOpen}
                 />
                 <HStack spacing={8} alignItems={'center'}>
-                    <Box color='white' fontSize={'1.2rem'} >Meta LMS  &nbsp;| &nbsp;<b>Topic Tree</b></Box>
+                    <Box color='white' fontSize={'1.2rem'} onClick={goHome} style={{cursor: "pointer"}}>Meta LMS  &nbsp;| &nbsp;<b>Topic Tree</b></Box>
                     <HStack
                         as={'nav'}
                         spacing={4}

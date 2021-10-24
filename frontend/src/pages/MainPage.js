@@ -10,14 +10,10 @@ import { isLoggedIn } from "../utils/helpers.js";
 
 function CoursePage() {
   const history = useHistory();
-  const links = [
+  const [links, setLinks] = useState([
     {
       name: "Home",
       url: "/",
-    },
-    {
-      name: "Topic Tree",
-      url: "/topictree",
     },
     {
       name: "Enrolments",
@@ -27,7 +23,7 @@ function CoursePage() {
       name: "Gamification",
       url: "/gamification",
     },
-  ];
+  ]);
   const smVariant = "drawer";
   const mdVariant = "sidebar";
   const variants = useBreakpointValue({ base: smVariant, md: mdVariant });
@@ -49,6 +45,14 @@ function CoursePage() {
         .then((e) => setUser(e));
     } else {
       history.push("/login");
+    }
+    if (parseInt(localStorage.getItem('staff')) !== 0) {
+      let copyLinks = JSON.parse(JSON.stringify(links));
+      copyLinks.push({
+        name: "Topic Tree",
+        url: "/topictree"
+      }); 
+      setLinks(copyLinks);
     }
   }, []);
 
