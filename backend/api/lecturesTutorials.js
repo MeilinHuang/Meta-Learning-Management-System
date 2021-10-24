@@ -91,10 +91,7 @@ async function getSearchFile (request, response) {
   try {
     const searchTerm = request.params.searchTerm;
     const topicGroup = request.params.topicGroupName;
-    const specifyTerm = request.query.specify;
-
-    console.log(topicGroup);
-    console.log(specifyTerm);
+    const type = request.param.type;
 
     const idReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroup]);
     if (!idReq.rows.length) throw (`Failed: Topic group {${topicGroup}} does not exist`);
@@ -102,7 +99,7 @@ async function getSearchFile (request, response) {
     const topicGroupId = idReq.rows[0].id;
     let resp;
 
-    if (specifyTerm == 'lecture') {
+    if (type == 'lecture') {
       resp = await pool.query(`
       SELECT lf.id, lf.name, lf.file, lf.lecture_id FROM lecture_files lf
       JOIN lectures l ON l.id = lf.id

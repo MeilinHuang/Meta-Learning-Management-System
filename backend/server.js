@@ -29,6 +29,7 @@ const lectureTutorial = require("./api/lecturesTutorials");
 const users = require("./api/user");
 const topics = require("./api/topics");
 const forums = require("./api/forums");
+const assessment = require("./api/assessment")
 
 /***************************************************************
                        Auth Functions
@@ -545,229 +546,98 @@ app.get(
 );
 
 /***************************************************************
-                       Gamification Functions
-***************************************************************/
-
-app.get("/questions", async (request, response) => {
-  console.log(`GET /questions`);
-  await database.getQuestions(request, response);
-});
-
-app.post("/questions/new", async (request, response) => {
-  console.log(`POST /questions/new`);
-  await database.postQuestion(request, response);
-});
-
-app.get("/questions/:questionId", async (request, response) => {
-  console.log(`GET /questions/${request.params.questionId}`);
-  await database.getLevelFromQuestion(request, response);
-});
-
-app.put("/questions/:questionId", async (request, response) => {
-  console.log(`PUT /questions/${request.params.questionId}`);
-  await database.putQuestion(request, response);
-});
-
-app.delete("/questions/:questionId", async (request, response) => {
-  console.log(`DELETE /questions/${request.params.questionId}`);
-  await database.deleteQuestion(request, response);
-});
-
-app.get("/levels", async (request, response) => {
-  console.log(`GET /levels`);
-  await database.getAllLevels(request, response);
-});
-
-app.get("/levels/:levelId", async (request, response) => {
-  console.log(`GET /levels/${request.params.levelId}`);
-  await database.getLevelById(request, response);
-});
-
-app.put("/levels/:levelId", async (request, response) => {
-  console.log(`PUT /levels/${request.params.levelId}`);
-  await database.putLevel(request, response);
-});
-
-app.delete("/levels/:levelId", async (request, response) => {
-  console.log(`DELETE /levels/${request.params.levelId}`);
-  await database.deleteLevel(request, response);
-});
-
-app.post("/levels/new", async (request, response) => {
-  console.log(`POST /levels/new`);
-  await database.postLevel(request, response);
-});
-
-app.get("/:level/questions", async (request, response) => {
-  console.log(`GET /${request.params.levelId}/questions`);
-  await database.getLevelQuestions(request, response);
-});
-
-// Delete entire level or just remove level from topic group??
-app.delete("/:topicGroup/remove-level/:level", async (request, response) => {
-  console.log(
-    `DELETE /${request.params.topicGroup}/remove-level/${request.params.level}`
-  );
-  await database.removeTGLevel(request, response);
-});
-
-app.post("/topicGroup/:topicGroupId/newLevel", async (request, response) => {
-  console.log(`POST /topicGroup/${request.params.topicGroup}/newLevel`);
-  await database.postTGLevel(request, response);
-});
-
-app.get("/topicGroup/:topicGroupId/levels", async (request, response) => {
-  console.log(`POST /topicGroup/${request.params.topicGroup}/levels`);
-  await database.getTGLevels(request, response);
-});
-
-/***************************************************************
                        Assessment Functions
 ***************************************************************/
 
-app.post("/quiz", async (request, response) => {
-  console.log(`POST /quiz`);
-  await database.postQuiz(request, response);
+app.get("/topicGroup/:topicGroupId/quizzes", async (request, response) => {
+  console.log(`GET /topicGroup/${request.params.topicGroupId}/quizzes`);
+  await assessment.getAllQuizzes(request, response);
 });
 
-/* app.post('/quiz_question', async(request, response) => {
-  await database.postQuizQuestion(request, response);
-}) */
-
-app.get("/quiz/:quizId", async (request, response) => {
-  console.log(`GET /quiz/${request.params.quizId}`);
-  await database.getQuizQuestions(request, response);
+app.get("/topicGroup/:topicGroupId/quizzes/:quizId", async (request, response) => {
+  console.log(`GET /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}`);
+  await assessment.getQuizById(request, response);
 });
 
-app.put("/quiz/:quizId", async (request, response) => {
-  console.log(`PUT /quiz/${request.params.quizId}`);
-  await database.putQuizById(request, response);
+app.post("/topicGroup/:topicGroupId/quizzes", async (request, response) => {
+  console.log(`POST /topicGroup/${request.params.topicGroupId}/quizzes`);
+  await assessment.postQuiz(request, response);
 });
 
-app.delete("/quiz/:quizId", async (request, response) => {
-  console.log(`DELETE /quiz/${request.params.quizId}`);
-  await database.deleteQuizById(request, response);
+app.put("/topicGroup/:topicGroupId/quizzes/:quizId", async (request, response) => {
+  console.log(`PUT /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}`);
+  await assessment.putQuizById(request, response);
 });
 
-app.get("/quiz/:quizId/question/:questionId", async (request, response) => {
-  console.log(
-    `GET /quiz/${request.params.quizId}/question/${request.params.questionId}`
-  );
-  await database.getQuestionFromQuiz(request, response);
+app.delete("/topicGroup/:topicGroupId/quizzes/:quizId", async (request, response) => {
+  console.log(`DELETE /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}`);
+  await assessment.deleteQuizById(request, response);
 });
 
-app.put("/quiz/:quizId/question/:questionId", async (request, response) => {
-  console.log(
-    `PUT /quiz/${request.params.quizId}/question/${request.params.questionId}`
-  );
-  await database.putQuestionFromQuiz(request, response);
+app.put("/topicGroup/:topicGroupId/quizzes/:quizId/questions/:questionId", async (request, response) => {
+  console.log(`PUT /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/questions/${request.params.questionId}`);
+  await assessment.putQuestionById(request, response);
 });
 
-app.get("/questionBank/:questionBankId", async (request, response) => {
-  console.log(`GET /questionBank/${request.params.questionBankId}`);
-  await database.getQuestionBankQuestions(request, response);
+app.get("/questionBank/questions", async (request, response) => {
+  console.log(`GET /questionBank/questions`);
+  await assessment.getQuestionBankQuestions(request, response);
 });
 
-app.put("/questionBank/:questionBankId", async (request, response) => {
-  console.log(`PUT /questionBank/${request.params.questionBankId}`);
-  await database.putQuestionBank(request, response);
+app.get("/questionBank/questions/:questionId", async (request, response) => {
+  console.log(`GET /questionBank/questions/${request.params.questionId}`);
+  await assessment.getQuestionFromQuestionBank(request, response);
 });
 
-app.delete("/questionBank/:questionBankId", async (request, response) => {
-  console.log(`DELETE /questionBank/${request.params.questionBankId}`);
-  await database.deleteQuestionBank(request, response);
+app.delete("/questionBank/questions/:questionId", async (request, response) => {
+  console.log(`DELETE /questionBank/questions/${request.params.questionId}`);
+  await assessment.deleteQuestionBankQuestion(request, response);
 });
 
-app.get("/questionBank", async (request, response) => {
-  console.log(`GET /questionBank`);
-  await database.getAllQuestionBankQuestions(request, response);
+app.get("/questionBank/questions/start/:questionStartId/limit/:limit", async (request, response) => {
+  console.log(`GET /questionBank/questions/start/${request.params.questionStartId}/limit/${request.params.limit}`);
+  await assessment.getLimitedQuestions(request, response);
 });
 
-app.get("/questionBank/question/:questionId", async (request, response) => {
-  console.log(`GET /questionBank/question/${request.params.questionId}`);
-  await database.getQuestionFromQuestionBank(request, response);
+app.get("/questionBank/questions/start/:questionStartId/limit/:limit/sortBy/:sortTerm", async (request, response) => {
+  console.log(`GET /questionBank/questions/start/${request.params.questionStartId}/limit/${request.params.limit}/sortBy/${request.params.sortTerm}`);
+  await assessment.getLimitSortQuestions(request, response);
 });
 
-app.post("/poll", async (request, response) => {
-  console.log(`POST /poll`);
-  await database.postPoll(request, response);
+app.get("/questionBank/questions/filter/:filterTopic", async (request, response) => {
+  console.log(`GET /questionBank/questions/filter/${request.params.filterTopic}`);
+  await assessment.getFilterQuestions(request, response);
 });
 
-app.get("/poll/:pollId", async (request, response) => {
-  console.log(`GET /poll/${request.params.pollId}`);
-  await database.getPoll(request, response);
+app.get("/topicGroup/:topicGroupId/quizzes/:quizId/studentAttempt", async (request, response) => {
+  console.log(`GET /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/studentAttempt`);
+  await assessment.getStudentAttempts(request, response);
 });
 
-app.put("/poll/:pollId", async (request, response) => {
-  console.log(`PUT /poll/${request.params.pollId}`);
-  await database.putPoll(request, response);
+app.get("/topicGroup/:topicGroupId/quizzes/:quizId/studentAttempt/:studentId", async (request, response) => {
+  console.log(`GET /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/studentAttempt/${request.params.studentId}`);
+  await assessment.getStudentAttemptById(request, response);
 });
 
-app.delete("/poll/:pollId", async (request, response) => {
-  console.log(`DELETE /poll/${request.params.pollId}`);
-  await database.deletePoll(request, response);
+app.post("/topicGroup/:topicGroupId/quizzes/:quizId/studentAttempt/:studentId", async (request, response) => {
+  console.log(`POST /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/studentAttempt/${request.params.studentId}`);
+  await assessment.postStudentAttempt(request, response);
 });
 
-app.get(
-  "/quiz/studentAnswers/student/:studentId",
-  async (request, response) => {
-    console.log(`GET /quiz/studentAnswers/student/${request.params.studentId}`);
-    await database.getStudentAnswer(request, response);
-  }
-);
-
-app.post("/student_answer", async (request, response) => {
-  console.log(`POST /student_answer`);
-  await database.postStudentAnswer(request, response);
+app.delete("/topicGroup/:topicGroupId/quizzes/:quizId/studentAttempt/:studentId", async (request, response) => {
+  console.log(`DELETE /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/studentAttempt/${request.params.studentId}`);
+  await assessment.deleteStudentAttemptByid(request, response);
 });
 
-app.post("/quiz_question_answer", async (request, response) => {
-  console.log(`POST /quiz_question_answer`);
-  await database.postQuestionAnswer(request, response);
+app.post("/topicGroup/:topicGroupId/quizzes/:quizId/:questionId/:studentId", async (request, response) => {
+  console.log(`POST /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/${request.params.questionId}/${request.params.studentId}`);
+  await assessment.postStudentAnswer(request, response);
 });
 
-app.post(
-  "/questionBank/:questionBankId/question",
-  async (request, response) => {
-    console.log(`POST /questionBank/${request.params.questionBankId}/question`);
-    await database.postQuizQuestion(request, response);
-  }
-);
-
-app.delete(
-  "/questionBank/:questionBankId/question/:questionId",
-  async (request, response) => {
-    console.log(
-      `DELETE /questionBank/${request.params.questionBankId}/question/${request.params.questionId}`
-    );
-    await database.deleteQuestionBankQuestion(request, response);
-  }
-);
-
-app.delete("/question/:questionId/delete", async (request, response) => {
-  console.log(`DELETE /question/${request.params.questionId}/delete`);
-  await database.deleteAssessmentQuestion(request, response);
+app.put("/topicGroup/:topicGroupId/quizzes/:quizId/:questionId/:studentId", async (request, response) => {
+  console.log(`PUT /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/${request.params.questionId}/${request.params.studentId}`);
+  await assessment.putStudentAnswer(request, response);
 });
-
-app.put(
-  "/quiz/:quizId/question/:questionId/answer/:quizQuestionAnswerId",
-  async (request, response) => {
-    console.log(
-      `PUT /quiz/${request.params.quizId}/question/${request.params.questionId}/answer/${request.params.quizQuestionAnswerId}`
-    );
-    await database.putQuestionAnswer(request, response);
-  }
-);
-
-app.get(
-  "/quiz/results/question/:questionId/answerCount",
-  async (request, response) => {
-    console.log(
-      `GET /quiz/results/question/${request.params.questionId}/answerCount`
-    );
-    await database.getStudentAnswerCount(request, response);
-  }
-);
 
 /***************************************************************
                        Lecture and Tutorial Functions
@@ -841,9 +711,7 @@ app.put("/:topicGroupName/tutorial/:tutorialId", async (request, response) => {
 app.delete(
   "/:topicGroupName/tutorial/:tutorialId",
   async (request, response) => {
-    console.log(
-      `DELETE ${request.params.topicGroupName}/tutorial/${request.params.tutorialId}`
-    );
+    console.log(`DELETE ${request.params.topicGroupName}/tutorial/${request.params.tutorialId}`);
     await lectureTutorial.deleteTutorial(request, response);
   }
 );
@@ -853,13 +721,8 @@ app.post("/:topicGroupName/tutorial", async (request, response) => {
   await lectureTutorial.postTutorial(request, response);
 });
 
-app.get("/:topicGroupName/lectures/search/", async (request, response) => {
-  console.log(`GET /${request.params.topicGroup}/lectures/search/${request.params.searchTerm}`);
-  await lectureTutorial.getSearchFile(request, response);
-})
-
-app.get("/:topicGroupName/tutorials/search/", async (request, response) => {
-  console.log(`GET /${request.params.topicGroup}/tutorials/search/${request.params.searchTerm}`);
+app.get("/:topicGroupName/:type/search/:searchTerm", async (request, response) => {
+  console.log(`GET /${request.params.topicGroupName}/${request.params.type}/search/${request.params.searchTerm}`);
   await lectureTutorial.getSearchFile(request, response);
 })
 
