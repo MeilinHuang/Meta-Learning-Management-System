@@ -19,7 +19,6 @@ import { GrAdd } from 'react-icons/gr'
 function LecturesPage ({ match: { params: { code }}}) {
   const [lectures, setLectures] = useState()
   const [searchTerm, setSearchTerm] = useState('')
-
   const buttonContents = useBreakpointValue({ base: "", md: "Add lecture" });
   const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null });
   const { isOpen, onOpen, onClose } = useDisclosure();

@@ -26,9 +26,8 @@ import { FaRegCheckCircle, FaCheckCircle } from "react-icons/fa";
 import { BsTrash } from "react-icons/bs";
 import { GrEdit } from "react-icons/gr";
 import DraftEditor from "../DraftEditor/DraftEditor";
+import { isLoggedInUser, isStaff } from '../../../utils/helpers'
 import styles from "./CommentResponse.module.css";
-
-const dummyUser = 3;
 
 function CommentResponse({
   author,
@@ -195,16 +194,19 @@ function CommentResponse({
             <InputGroup variant="filled" mr="8px" width="100%">
               <DraftEditor content={editorState} setDetails={setDetails} />
             </InputGroup>
-            <Flex flexDirection="column" justifyContent="space-between">
+            <Flex flexDirection="column">
               <Button
                 pr="8px"
+                mb="8px"
                 leftIcon={<AiOutlineClose />}
-                onClick={() => setEditorState("")}
+                onClick={() => {
+                  setEditorState("")
+                  setDetails(comment || reply)
+                }}
               />
               <Button
                 pr="8px"
                 mb="16px"
-                height="160px"
                 leftIcon={<AiOutlineSend />}
                 form="editPost"
                 type="submit"
@@ -220,7 +222,7 @@ function CommentResponse({
           />
           {/* show author controls if user is author */}
           <Flex mt="8px" justifyContent="flex-end">
-            {!!comment_id && (
+            {!!comment_id && isStaff() && (
               <Button
                 pr="8px"
                 ml="8px"
@@ -228,7 +230,7 @@ function CommentResponse({
                 onClick={handleEndorse}
               />
             )}
-            {user_id === dummyUser && (
+            {isLoggedInUser(user_id) && (
               <>
                 <Button
                   ml="8px"

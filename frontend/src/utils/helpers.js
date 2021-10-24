@@ -5,6 +5,17 @@ export function isLoggedIn() {
   return localStorage.getItem("token") !== null;
 }
 
+// Checks if logged in user is staff
+export function isStaff() {
+  return !!Number(localStorage.getItem("staff"))
+}
+
+// Checks if logged in user matches the given userId
+export function isLoggedInUser(userId) {
+  return Number(localStorage.getItem("id")) === userId
+
+}
+
 export function logOut() {
   localStorage.removeItem("token");
   localStorage.removeItem("staff");

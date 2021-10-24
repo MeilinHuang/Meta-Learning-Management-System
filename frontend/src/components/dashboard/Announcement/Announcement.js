@@ -25,17 +25,18 @@ import {
 import { useHistory } from "react-router-dom";
 import { GrEdit, GrShare } from "react-icons/gr";
 import { BiTrash } from "react-icons/bi";
-import { AiOutlineSend, AiOutlineQuestionCircle } from "react-icons/ai";
+import { AiOutlineSend, AiOutlineQuestionCircle, AiOutlineClose } from "react-icons/ai";
 import { ContentState, EditorState } from "draft-js";
 import htmlToDraft from "html-to-draftjs";
 import DraftEditor from "../../forums/DraftEditor/DraftEditor";
 import AuthorDetails from "../../forums/AuthorDetails";
 import AddPostModal from "../../forums/AddPostModal";
 import { StoreContext } from "../../../utils/store";
+import { isLoggedInUser } from "../../../utils/helpers"
 import styles from "./Announcement.module.css";
 
 function Announcement({
-  announcement: { attachments, author, id, title, content, post_date },
+  announcement: { attachments, author, id, title, content, post_date, username },
   course,
   setAnnouncements,
   isAnnouncementPage,
@@ -119,7 +120,7 @@ function Announcement({
               for (const i in authorData) {
                 const withAuthor = {
                   ...data[i],
-                  author: authorData[i].user_name,
+                  username: authorData[i].user_name,
                 };
                 newPosts.push(withAuthor);
               }
@@ -162,7 +163,7 @@ function Announcement({
               for (const i in authorData) {
                 const withAuthor = {
                   ...data[i],
-                  author: authorData[i].user_name,
+                  username: authorData[i].user_name,
                 };
                 newPosts.push(withAuthor);
               }
@@ -198,14 +199,6 @@ function Announcement({
       })
       .then((data) => {
         history.push(`/course-page/${course}/forums/${data.post_id}`);
-        // toast({
-        //     render: () => (
-        //         <Link as={RouterLink} color="blue.500" lineHeight="18px" to={`/course-page/${course}`}>Return to announcements</Link>
-        //     ),
-        //     status: 'success',
-        //     duration: 3000,
-        //     isClosable: true,
-        // })
       });
   };
 
@@ -226,19 +219,31 @@ function Announcement({
     >
       <Heading size="md">{title}</Heading>
       <Divider my="16px" />
-      <AuthorDetails author={author} date={post_date} />
+      <AuthorDetails author={username} date={post_date} />
       {!!editorState ? (
         <form id="editPost" onSubmit={handleSubmit}>
           <Flex>
             <InputGroup variant="filled" mr="8px" width="100%">
               <DraftEditor content={editorState} setDetails={setDetails} />
             </InputGroup>
-            <Button
-              pr="8px"
-              leftIcon={<AiOutlineSend />}
-              form="editPost"
-              type="submit"
-            />
+            <Flex flexDirection="column">
+              <Button
+                pr="8px"
+                mb="8px"
+                leftIcon={<AiOutlineClose />}
+                onClick={() => {
+                  setEditorState("")
+                  setDetails(content)
+                }}
+              />
+              <Button
+                pr="8px"
+                mb="16px"
+                leftIcon={<AiOutlineSend />}
+                form="editPost"
+                type="submit"
+              />
+            </Flex>
           </Flex>
         </form>
       ) : (
@@ -272,7 +277,7 @@ function Announcement({
                 </Tooltip>
               )}
             </Flex>
-            {!isAnnouncementPage && (
+            {!isAnnouncementPage && isLoggedInUser(author) && (
               <Flex>
                 <Button
                   ml="8px"

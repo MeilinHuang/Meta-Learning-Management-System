@@ -18,9 +18,6 @@ import AddPostModal from "../components/forums/AddPostModal";
 import { GrAdd } from "react-icons/gr";
 import { StoreContext } from "../utils/store";
 
-// DUMMY VALUES
-const dummyAuthor = 3;
-
 function ForumOverviewPage({
   match: {
     params: { code },

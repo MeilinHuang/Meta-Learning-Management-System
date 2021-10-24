@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Box, Button, Flex, useDisclosure } from "@chakra-ui/react";
 import TagSelect from "./TagSelect/TagSelect";
 import ManageTagsModal from "./ManageTagsModal";
+import { isStaff } from "../../utils/helpers"
 import { StoreContext } from "../../utils/store";
 
 function Filter({ code }) {
@@ -52,9 +53,8 @@ function Filter({ code }) {
 
     const tagNames = filteredTags.map((t) => t.name.toLowerCase());
     setShowPinned(false);
-    const filteredPosts = [];
     tagNames.forEach((t) => {
-      fetch(`http://localhost:8000/${code}/forum/${t}`, {
+      fetch(`http://localhost:8000/${code}/forum/filter?forumFilterTerms=${tagNames}`, {
         headers: {
           "Content-Type": "application/JSON",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -62,9 +62,12 @@ function Filter({ code }) {
       })
         .then((r) => r.json())
         .then((data) => {
-          console.log(data);
-          filteredPosts.push(...data);
-          setPosts(filteredPosts);
+          console.log(data)
+          if (data === []) {
+              setPosts([])
+          } else { 
+              setPosts(data)
+          }
         });
     });
   }, [setPosts, setShowPinned, filteredTags, code, setPinnedPosts]);
@@ -77,14 +80,13 @@ function Filter({ code }) {
       width={{ base: "100%", lg: "80%" }}
       justifyContent="space-between"
     >
-      {/* 100% width if not admin */}
-      <Box width="100%" mr="24px">
+      <Box width="100%" mr={isStaff() ? "24px" : "0"}>
         {!!Object.keys(tags).length && (
           <TagSelect isFilter setSelectedTags={setFilteredTags} tags={tags} />
         )}
       </Box>
       {/* Show if staff */}
-      <Button onClick={onOpen}>Manage Tags</Button>
+      {isStaff() && <Button onClick={onOpen}>Manage Tags</Button>}
       {!!Object.keys(tags).length && (
         <ManageTagsModal
           isOpen={isOpen}

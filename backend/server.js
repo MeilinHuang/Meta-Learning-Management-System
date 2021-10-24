@@ -296,7 +296,7 @@ app.get(
   }
 );
 
-app.get("/:topicGroup/forum/:forumFilterTerms", async (request, response) => {
+app.get("/:topicGroup/forum/filter", async (request, response) => {
   console.log(
     `GET /${request.params.topicGroup}/forum/${request.query.forumFilterTerms}`
   );
@@ -452,6 +452,13 @@ app.put("/:topicGroup/forum/post/like/:postId", async (request, response) => {
     `PUT /${request.params.topicGroup}/forum/post/like/${request.params.postId}`
   );
   await forums.putPostLike(request, response);
+});
+
+app.get("/:topicGroup/forum/post/like/:postId", async (request, response) => {
+  console.log(
+    `GET /${request.params.topicGroup}/forum/post/like/${request.params.postId}`
+  );
+  await forums.getPostLikes(request, response);
 });
 
 app.put("/:topicGroup/forum/post/unlike/:postId", async (request, response) => {

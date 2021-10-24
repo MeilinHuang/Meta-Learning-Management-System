@@ -12,14 +12,13 @@ import {
 import { GrEdit, GrShare } from "react-icons/gr";
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai";
 import { FaRegCheckCircle, FaCheckCircle } from "react-icons/fa";
-import { TiArrowUpOutline, TiArrowUpThick } from "react-icons/ti";
 import { ContentState, EditorState } from "draft-js";
 import AuthorDetails from "../AuthorDetails";
 import DraftEditor from "../DraftEditor/DraftEditor";
+import UpvoteButton from '../UpvoteButton'
 import htmlToDraft from "html-to-draftjs";
 import styles from "./PostDetails.module.css";
-
-const dummyUser = 2;
+import { isLoggedInUser, isStaff } from "../../../utils/helpers"
 
 function PostDetails({
   post: {
@@ -30,7 +29,6 @@ function PostDetails({
     description,
     isendorsed,
     num_of_upvotes,
-    upvoters,
     user_id,
   },
   setPost,
@@ -142,7 +140,10 @@ function PostDetails({
               <Button
                 pr="8px"
                 leftIcon={<AiOutlineClose />}
-                onClick={() => setEditorState("")}
+                onClick={() => {
+                  setEditorState("")
+                  setDetails(description)
+                }}
               />
               <Button
                 pr="8px"
@@ -168,14 +169,13 @@ function PostDetails({
           <Divider my="16px" />
           <Flex justifyContent="space-between">
             <Flex>
-              <Button leftIcon={<TiArrowUpOutline />}>{num_of_upvotes}</Button>
-              {/* ONLY SHOW IF USER IS STAFF */}
-              <Button
+              <UpvoteButton value={num_of_upvotes} code={code} postId={post_id} isPostPage />
+              {isStaff() && <Button
                 pr="8px"
                 ml="8px"
                 leftIcon={isendorsed ? <FaCheckCircle /> : <FaRegCheckCircle />}
                 onClick={handleEndorse}
-              />
+              />}
               <Button
                 pr="8px"
                 leftIcon={<GrShare />}
@@ -183,7 +183,7 @@ function PostDetails({
                 ml="8px"
               />
             </Flex>
-            {user_id === dummyUser && (
+            {isLoggedInUser(user_id) && (
               <Flex>
                 <Button
                   ml="8px"

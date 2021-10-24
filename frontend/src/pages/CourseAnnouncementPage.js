@@ -29,7 +29,7 @@ function CourseAnnouncementPage({
         })
           .then((r) => r.json())
           .then((author) => {
-            const withAuthor = { ...data, author: author.user_name };
+            const withAuthor = { ...data, username: author.user_name };
             setPost(withAuthor);
           });
       });

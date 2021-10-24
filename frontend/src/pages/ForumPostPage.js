@@ -26,8 +26,7 @@ import PostDetails from "../components/forums/PostDetails/PostDetails";
 import CommentsResponses from "../components/forums/CommentsResponses/CommentsResponses";
 import { BsTrash } from "react-icons/bs";
 import { FaCheckCircle } from "react-icons/fa";
-
-const dummyUser = 3;
+import { isLoggedInUser } from "../utils/helpers"
 
 function ForumPostPage({
   match: {
@@ -48,10 +47,9 @@ function ForumPostPage({
     })
       .then((r) => r.json())
       .then((data) => {
-        console.log(data);
         setPost(data);
       });
-  }, [id]);
+  }, [code, id]);
 
   const handleDelete = () => {
     fetch(`http://localhost:8000/${code}/forum/post/${id}`, {
@@ -75,8 +73,6 @@ function ForumPostPage({
       }
     });
   };
-
-  console.log(post);
 
   return (
     <>
@@ -119,7 +115,7 @@ function ForumPostPage({
             </Tooltip>
           )}
         </Flex>
-        {post.user_id === dummyUser && (
+        {isLoggedInUser(post.user_id) && (
           <Popover placement="bottom-end">
             <PopoverTrigger>
               <Button

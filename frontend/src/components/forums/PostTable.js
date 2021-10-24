@@ -23,9 +23,11 @@ import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { RiPushpin2Fill, RiPushpin2Line } from "react-icons/ri";
 import { TiArrowUpOutline, TiArrowUpThick } from "react-icons/ti";
 import { FaCheckCircle } from "react-icons/fa";
+import UpvoteButton from "./UpvoteButton"
 import { StoreContext } from "../../utils/store";
+import { isStaff } from "../../utils/helpers"
 
-function PostTable({ isAdmin, posts: postData, code }) {
+function PostTable({ posts: postData, code }) {
   const context = useContext(StoreContext);
   const {
     posts: [, setPosts],
@@ -81,14 +83,14 @@ function PostTable({ isAdmin, posts: postData, code }) {
             });
           };
 
-          return (
+          return isStaff() ? (
             <IconButton
               aria-label={value ? "Unpin post" : "Pin post"}
               icon={value ? <RiPushpin2Fill /> : <RiPushpin2Line />}
               backgroundColor="white"
               onClick={handlePinUnpin}
             />
-          );
+          ) : null;
         },
         width: "10%",
       },
@@ -155,16 +157,16 @@ function PostTable({ isAdmin, posts: postData, code }) {
             </>
           );
         },
-        width: "70%",
+        width: '70%',
       },
       {
-        Header: "Date Created",
-        accessor: "published_date",
-        Cell: ({ cell: { value } }) => {
-          const date = new Date(value);
-          const dateString = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
-          return String(dateString);
-        },
+          Header: 'Date Created',
+          accessor: 'published_date',
+          Cell: (({ cell: { value } }) => {
+              const date = new Date(value)
+              const dateString = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+              return String(dateString)
+          })
       },
       {
         Header: "Replies",
@@ -187,13 +189,17 @@ function PostTable({ isAdmin, posts: postData, code }) {
       {
         Header: "Upvotes",
         accessor: "num_of_upvotes",
-        Cell: ({ cell: { value } }) => {
+        Cell: ({ cell: 
+          { 
+            row: {
+              original: { post_id },
+            },
+            value
+          } }) => {
           // {/* if user is in upvoters list, show filled icon */}
           // {/* TODO: handle upvote click */}
           return (
-            <Button leftIcon={<TiArrowUpOutline />} backgroundColor="white">
-              {value}
-            </Button>
+            <UpvoteButton value={value} code={code} postId={post_id} />
           );
         },
       },

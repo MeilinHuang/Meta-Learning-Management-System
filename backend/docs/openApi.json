@@ -2846,7 +2846,7 @@
         }
       }
     },
-    "/{topicGroup}/forum/{forumFilterTerms}": {
+    "/{topicGroup}/forum/filter": {
       "get": {
         "tags": ["Forums"],
         "summary": "Get all forum posts related to the filter term",
