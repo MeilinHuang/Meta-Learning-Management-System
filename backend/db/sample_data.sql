@@ -184,10 +184,18 @@ INSERT INTO weeks(id, num) VALUES(default, 3);
 -- Create NonEnrol-Lectures
 INSERT INTO lectures(id, lecturer_id, topic_group_id, topic_reference, week, start_time, end_time)
 VALUES(default, 4, 1, 1, 1, '10:00', '11:00');
+INSERT INTO lectures(id, lecturer_id, topic_group_id, topic_reference, week, start_time, end_time)
+VALUES(default, 4, 1, 1, 2, '12:00', '14:00');
+INSERT INTO lectures(id, lecturer_id, topic_group_id, topic_reference, week, start_time, end_time)
+VALUES(default, 4, 1, 1, 3, '15:00', '17:00');
 
 -- Lecture files
 INSERT INTO lecture_files(id, name, file, type, lecture_id) 
-VALUES(default, 'lecture1-slides.pdf', '/_files/lecture1/lecture1-slides.pdf', 'lecture', 1);
+VALUES(default, 'intro-slides.pdf', '/_files/lecture1/intro-slides.pdf', 'lecture', 1);
+INSERT INTO lecture_files(id, name, file, type, lecture_id) 
+VALUES(default, 'loops.pdf', '/_files/lecture1/loops.pdf', 'lecture', 2);
+INSERT INTO lecture_files(id, name, file, type, lecture_id) 
+VALUES(default, 'arrays.pdf', '/_files/lecture1/arrays.pdf', 'lecture', 3);
 
 -- Create NonEnrol-Tutorials
 INSERT INTO tutorials(id, tutor_id, topic_group_id, week, start_time, end_time, topic_reference) 

@@ -28,7 +28,7 @@ async function postLectureTutorialFile (request, response) {
       throw ("Failed: file target incorrect choose (lecture or tutorial)");
     }
     const destId = request.params.targetId;
-    const fileTarget = request.query.target;
+    const fileTarget = request.params.target;
     const fileName = request.files.uploadFile.name;
     const filePath = `/_files/${fileTarget}${destId}/${fileName}`;
 
@@ -38,9 +38,9 @@ async function postLectureTutorialFile (request, response) {
     }
 
     await pool.query(
-    `INSERT INTO ${fileTarget}_files (id, name, file, ${fileTarget}_id) 
-    VALUES(default, $1, $2, $3)`, [fileName, filePath, destId]);
-    fs.writeFile(`../frontend/public/_files/${fileTarget}${destId}/${fileName}`, fileName, "binary", 
+    `INSERT INTO ${fileTarget}_files (id, name, file, type, ${fileTarget}_id) 
+    VALUES(default, $1, $2, $3, $4)`, [fileName, filePath, fileTarget, destId]);
+    fs.writeFileSync(`../frontend/public/_files/${fileTarget}${destId}/${fileName}`, request.files.uploadFile.data, "binary", 
     function (err) { if (err) throw err; });
 
     response.status(200).json({success: true, file: fileName, filePath: filePath});
@@ -69,7 +69,7 @@ async function postLectureTutorialFile (request, response) {
 async function deleteLectureTutorialFile (request, response) {
   try {
     if (!request.query.target == "lecture" && !request.query.target == "tutorial") {
-      throw ("Failed: file target incorrect choose (lecture or tutorial)");
+      throw ("file target incorrect choose (lecture or tutorial)");
     }
     const fileTarget = request.query.target;
     const fileId = request.params.targetId;
@@ -91,7 +91,7 @@ async function getSearchFile (request, response) {
   try {
     const searchTerm = request.params.searchTerm;
     const topicGroup = request.params.topicGroupName;
-    const type = request.param.type;
+    const type = request.params.type;
 
     const idReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroup]);
     if (!idReq.rows.length) throw (`Failed: Topic group {${topicGroup}} does not exist`);
@@ -139,7 +139,8 @@ async function getAllLectures (request, response) {
     FROM lectures l
     LEFT JOIN lecture_files lf ON lf.lecture_id = l.id
     WHERE l.topic_group_id = $1
-    GROUP BY l.id`, [topicGroupId]);
+    GROUP BY l.id
+    ORDER BY l.id`, [topicGroupId]);
 
     for (const object of resp.rows) {
       var fileArr = [];
@@ -149,7 +150,7 @@ async function getAllLectures (request, response) {
           const fileResp = await pool.query(
           `SELECT * FROM lecture_files 
           WHERE id = $1 AND lecture_id = $2`,
-          [object.id, attachment])
+          [attachment, object.id]);
           fileArr.push(fileResp.rows[0]);
         }
       }
@@ -229,33 +230,42 @@ async function getLectureById (request, response) {
 
 // Create new lecture
 async function postLecture (request, response) {
-  try {
-    const topicGroupName = request.params.topicGroupName;
+  const topicGroupName = request.params.topicGroupName;
     const lecturerId = request.body.lecturerId;
     const week = request.body.week;
-    const startTime = request.body.startTime;
-    const endTime = request.body.endTime;
-    const topicRef = request.body.topicReference;
+    const startTime = request.body.startTime ? request.body.startTime : null;
+    const endTime = request.body.endTime ? request.body.endTime : null;
+    //const topicRef = request.body.topicReference ? request.body.topicReference : null;
     const lectureVideo = request.body.lectureVideo ? request.body.lectureVideo : null;
 
-    const topicReq = await pool.query(`SELECT id FROM topics WHERE LOWER(name) = LOWER($1)`, [topicRef]);
+    /* const topicReq = await pool.query(`SELECT id FROM topics WHERE LOWER(name) = LOWER($1)`, [topicRef]);
     if (!topicReq.rows.length) throw (`Failed: Topic {${topicRef}} does not exist`);
-    const topicId = topicReq.rows[0].id;
+    const topicId = topicReq.rows[0].id; */
 
     const tgReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
     if(!tgReq.rows.length) throw (`Failed: Topic group {${topicGroupName}} does not exist`);
     const topicGroupId = tgReq.rows[0].id;
 
+    // Check week
+    let tmp = await pool.query(`SELECT * FROM lectures WHERE week = $1`, [week]);
+    if (tmp.rows.length) {
+      const id = tmp.rows[0].id;
+      response.status(200).json({success: true, lectureId: id});
+      return;
+    }
+
     let resp = await pool.query(
       `INSERT INTO lectures(id, topic_group_id, lecturer_id, week, start_time, 
-      end_time, lecture_video, topic_reference)
-      VALUES(default, $1, $2, $3, $4, $5, $6, $7) RETURNING id`, 
-      [topicGroupId, lecturerId, week, startTime, endTime, lectureVideo, topicId]);
+      end_time, lecture_video)
+      VALUES(default, $1, $2, $3, $4, $5, $6) RETURNING id`, 
+      [topicGroupId, lecturerId, week, startTime, endTime, lectureVideo]);
     if (!resp.rows.length) throw (`Failed: Lecture creation unsuccessful`);
 
-    response.status(200).json({success: true});
+    response.status(200).json({success: true, lectureId: resp.rows[0].id});
+  try {
+    
   } catch (e) {
-    response.status(400).json({error: e});
+    response.status(400).json(e);
   }
 }
 
@@ -296,9 +306,18 @@ async function putLecture (request, response) {
 // Get lecture by id
 async function deleteLecture (request, response) {
   try {
+    // deletes by week
     const lectureId = request.params.lectureId;
-    const req = await pool.query(`DELETE FROM lectures WHERE id = $1 RETURNING id`, [lectureId]);
-    if (!req.rows.length) throw (`Failed: Lecture with id {${lectureId}} does not exist`);
+    const topicGroupName = request.params.topicGroupName;
+
+    const tgReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
+    if(!tgReq.rows.length) throw (`Failed: Topic group {${topicGroupName}} does not exist`);
+    const topicGroupId = tgReq.rows[0].id;
+
+    const req = await pool.query(`DELETE FROM lectures WHERE week = $1 AND topic_group_id = $2 RETURNING id`, [lectureId, topicGroupId]);
+    if (!req.rows.length) throw (`Week with id {${lectureId}} does not exist`);
+
+    // Delete all files related as well
 
     response.status(200).json({success: true});
   } catch (e) {

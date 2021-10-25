@@ -30,6 +30,7 @@ const users = require("./api/user");
 const topics = require("./api/topics");
 const forums = require("./api/forums");
 const assessment = require("./api/assessment")
+const auth = require("./api/authentication")
 
 /***************************************************************
                        Auth Functions
@@ -37,12 +38,12 @@ const assessment = require("./api/assessment")
 
 app.post("/auth/login", async (request, response) => {
   console.log("POST /auth/login");
-  await database.login(request, response);
+  await auth.login(request, response);
 });
 
 app.post("/auth/register", async (request, response) => {
   console.log("POST /auth/register");
-  await database.register(request, response);
+  await auth.register(request, response);
 });
 
 /***************************************************************
@@ -650,7 +651,7 @@ app.put("/topicGroup/:topicGroupId/quizzes/:quizId/:questionId/:studentId", asyn
                        Lecture and Tutorial Functions
 ***************************************************************/
 
-app.post("/file/:targetId", async (request, response) => {
+app.post("/:target/file/:targetId", async (request, response) => {
   console.log(`POST /file/${request.params.targetId}`);
   await lectureTutorial.postLectureTutorialFile(request, response);
 });

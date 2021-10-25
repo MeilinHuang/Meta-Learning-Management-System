@@ -372,8 +372,8 @@ CREATE TABLE "lectures" (
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
   lecturer_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   week INTEGER,
-  start_time TIME NOT NULL,
-  end_time TIME NOT NULL,
+  start_time TIME,
+  end_time TIME,
   topic_reference INTEGER REFERENCES topics(id),
   lecture_video TEXT
 );

@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const pool = require("../db/database");
-var fs = require("fs");
 
 const JWT_SECRET = "metalms";
 
