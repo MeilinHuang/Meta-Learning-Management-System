@@ -44,7 +44,6 @@ function AddPostModal({
   const handleSubmit = (e) => {
     e.preventDefault();
     e.target.reset();
-    console.log(details);
 
     if (title === "" || details.replace(/<[^>]+>/g, "") === "") {
       toast({

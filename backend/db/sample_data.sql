@@ -22,8 +22,8 @@ INSERT INTO topic_group(id, name, topic_code) values(default, 'C++ Programming',
 INSERT INTO topic_group(id, name, topic_code) values(default, 'Database Systems', 'COMP3331');
 
 -- Create Topic Groups invite codes
-INSERT INTO enroll_codes(id, code, topic_group_id) VALUES(default, 'aABc7J06', 1);
-INSERT INTO enroll_codes(id, code, topic_group_id, uses) VALUES(default, 'sJD873Na', 1, 5);
+INSERT INTO enroll_codes(id, code, topic_group_id, searchable) VALUES(default, 'aABc7J06', 1, false);
+INSERT INTO enroll_codes(id, code, topic_group_id, uses, searchable) VALUES(default, 'sJD873Na', 1, 5, false);
 
 -- Create Topics
 INSERT INTO topics(id, topic_group_id, name) values(default, 1, 'Loops');
