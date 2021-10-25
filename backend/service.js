@@ -220,7 +220,7 @@ async function getTopicGroup(request, response) {
     const topicGroupId = tgId.rows[0].id;
 
     let resp = await pool.query(
-      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, 
+      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.searchable,
       array_agg(DISTINCT user_admin.admin_id) as admin_list, array_agg(DISTINCT tgf.id) as attachments,
       array_agg(DISTINCT topics.id) as topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
       array_agg(DISTINCT announcements.id) as announcements_list
@@ -322,6 +322,40 @@ async function getTopicGroup(request, response) {
     response.status(200).json(resp.rows[0]);
   } catch (e) {
     response.status(400).send(e);
+  }
+}
+
+async function setSearchable(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const searchable = request.params.searchable;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+
+    const topicGroupId = resp.rows[0].id;
+
+    resp = await pool.query(
+      `UPDATE topic_group SET searchable = $1 WHERE id = $2`,
+      [searchable, topicGroupId]
+    );
+
+    //return the codes
+    response.status(200).send({ success: true });
+  } catch (e) {
+    console.error(e);
   }
 }
 
@@ -2808,4 +2842,5 @@ module.exports = {
   getEnrollments,
   unenrollUser,
   enrollUser,
+  setSearchable,
 };

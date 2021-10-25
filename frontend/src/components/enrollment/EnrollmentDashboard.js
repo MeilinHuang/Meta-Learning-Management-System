@@ -116,7 +116,7 @@ async function getEnrollments(name) {
       progress: i.progress,
     };
 
-    await fetch(`http://localhost:8000/user/${i.user_id}`, {
+    await fetch(`${backend_url}user/${i.user_id}`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -127,7 +127,45 @@ async function getEnrollments(name) {
       .then((r) => {
         student.name = r.user_name;
         student.zid = r.zid;
-        if (String(r.id) !== localStorage.getItem("id")) students.push(student);
+        if (!r.staff) students.push(student);
+      });
+  }
+  return students;
+}
+
+async function getStaff(name) {
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/JSON",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  };
+
+  const r = await fetch(`${backend_url}enrollments/${name}`, options);
+  if (r.status !== 200) {
+    return { error: "Unable to get enrollments" };
+  }
+  const ret = await r.json();
+  const students = [];
+  for (const i of ret) {
+    const student = {
+      id: i.user_id,
+      progress: i.progress,
+    };
+
+    await fetch(`${backend_url}user/${i.user_id}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((r) => r.json())
+      .then((r) => {
+        student.name = r.user_name;
+        student.zid = r.zid;
+        if (r.staff) students.push(student);
       });
   }
   return students;
@@ -170,6 +208,43 @@ async function doUnenroll(name, id) {
   return ret;
 }
 
+async function getTopicGroup(name) {
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/JSON",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  };
+
+  const r = await fetch(`${backend_url}topicGroup/${name}`, options);
+  if (r.status !== 200) {
+    return { error: "Unable to getTopicGroup" };
+  }
+  const ret = await r.json();
+  return ret;
+}
+
+async function doToggleSearchable(name, searchable) {
+  const options = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/JSON",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  };
+
+  const r = await fetch(
+    `${backend_url}topicGroup/${name}/searchable/${searchable}`,
+    options
+  );
+  if (r.status !== 200) {
+    return { error: "Unable to set searchable" };
+  }
+  const ret = await r.json();
+  return ret;
+}
+
 export default function EnrollmentDashboard() {
   let { code } = useParams();
   const [invite, setInvite] = useState();
@@ -178,9 +253,11 @@ export default function EnrollmentDashboard() {
   const [codes, setCodes] = useState([]);
   const [update, setUpdate] = useState(false);
   const [enrollments, setEnrollments] = useState([]);
+  const [staff, setStaff] = useState([]);
   const [studentName, setStudentName] = useState();
   const [studentId, setStudentId] = useState();
   const [zId, setZId] = useState();
+  const [searchable, setSearchable] = useState(false);
   const history = useHistory();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -204,8 +281,15 @@ export default function EnrollmentDashboard() {
     getEnrollments(code).then((r) => {
       setEnrollments(r);
     });
+    getStaff(code).then((r) => {
+      setStaff(r);
+    });
+    getTopicGroup(code).then((r) => {
+      setSearchable(r.searchable);
+    });
   }, [update]);
 
+  console.log(searchable);
   //check login by session storage
   return (
     <Flex width="Full" align="center" justifyContent="center">
@@ -408,10 +492,19 @@ export default function EnrollmentDashboard() {
                   <FormLabel htmlFor="email-alerts" mb="0">
                     Make this course searchable (public)?
                   </FormLabel>
-                  <Switch id="email-alerts" />
+                  <Switch
+                    id="email-alerts"
+                    isChecked={searchable}
+                    onChange={() => {
+                      doToggleSearchable(code, !searchable).then((r) => {
+                        if (r.success) setUpdate((prev) => !prev);
+                      });
+                      setSearchable((prev) => !prev);
+                    }}
+                  />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Enroll Student by zID</FormLabel>
+                  <FormLabel>Enroll student or invite staff by zID</FormLabel>
                   <Input
                     type="text"
                     placeholder="z#######"
@@ -445,12 +538,34 @@ export default function EnrollmentDashboard() {
                 </Button>
               </Box>
               <Box width="40%">
+                <FormLabel>Current Staff</FormLabel>
+                <Table variant="simple" mb={4}>
+                  <Thead>
+                    <Tr>
+                      <Th>Name</Th>
+                      <Th>zID</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {staff &&
+                      staff.length !== 0 &&
+                      staff.map((k) => {
+                        return (
+                          <Tr>
+                            <Td>{k.name}</Td>
+                            <Td>{k.zid}</Td>
+                          </Tr>
+                        );
+                      })}
+                  </Tbody>
+                </Table>
                 <FormLabel>Currently Enrolled Students</FormLabel>
                 <Table variant="simple">
                   <Thead>
                     <Tr>
                       <Th>Name</Th>
                       <Th>zID</Th>
+                      <Th>Progress</Th>
                       <Th>Actions</Th>
                     </Tr>
                   </Thead>
@@ -462,6 +577,7 @@ export default function EnrollmentDashboard() {
                           <Tr>
                             <Td>{k.name}</Td>
                             <Td>{k.zid}</Td>
+                            <Td>{k.progress}%</Td>
                             <Td>
                               <>
                                 <Tooltip label="Unenroll Student">
