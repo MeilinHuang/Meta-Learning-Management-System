@@ -17,10 +17,8 @@ export default function CourseInvite() {
   const [invite, setInvite] = useState(code);
   const history = useHistory();
 
-  console.log(invite);
-
   useEffect(() => {
-    if (isLoggedIn()) {
+    if (!isLoggedIn()) {
       history.push("/login");
     }
   }, []);
@@ -28,39 +26,59 @@ export default function CourseInvite() {
   //check login by session storage
   return (
     <Flex width="Full" align="center" justifyContent="center">
-      <Box
-        p={8}
-        maxWidth="500px"
-        borderWidth={1}
-        borderRadius={8}
-        boxShadow="lg"
-      >
+      <Box width="100%">
         <Box textAlign="center">
-          <Heading>Join a course with an invite code!</Heading>
+          <Heading>Join a course!</Heading>
         </Box>
-        <Box my={4} textAlign="left">
-          <FormControl isRequired>
-            <FormLabel>Invite Code</FormLabel>
-            <Input
-              type="text"
-              defaultValue={code}
-              placeholder="Enter a course invite code"
-              size="lg"
-              onChange={(e) => setInvite(e.currentTarget.value)}
-            />
-          </FormControl>
-          <Button
-            variant="outline"
-            width="full"
-            mt={4}
-            type="submit"
-            onClick={(e) => {
-              e.preventDefault();
-            }}
-          >
-            Join Course!
-          </Button>
-        </Box>
+        <Flex width="Full" align="center" justifyContent="space-around">
+          <Box my={4} textAlign="center" width="40%">
+            <FormControl isRequired>
+              <FormLabel>Join with an invite code</FormLabel>
+              <Input
+                type="text"
+                defaultValue={code}
+                placeholder="Enter a course invite code"
+                size="lg"
+                onChange={(e) => setInvite(e.currentTarget.value)}
+              />
+            </FormControl>
+            <Button
+              variant="outline"
+              width="full"
+              mt={4}
+              type="submit"
+              maxWidth="200px"
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+            >
+              Join Course!
+            </Button>
+          </Box>
+          <Box my={4} textAlign="center" width="40%">
+            <FormControl isRequired>
+              <FormLabel>Search for a course</FormLabel>
+              <Input
+                type="text"
+                placeholder="Enter a course name"
+                size="lg"
+                onChange={(e) => setInvite(e.currentTarget.value)}
+              />
+            </FormControl>
+            <Button
+              variant="outline"
+              width="full"
+              mt={4}
+              type="submit"
+              maxWidth="200px"
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+            >
+              Search
+            </Button>
+          </Box>
+        </Flex>
       </Box>
     </Flex>
   );

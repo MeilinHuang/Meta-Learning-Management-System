@@ -97,7 +97,14 @@ function Sidebar({
       textAlign="left"
       justifyContent="center"
     >
-      <Box marginLeft={1} padding={4} fontSize="x-large">
+      <Box
+        marginLeft={1}
+        padding={4}
+        fontSize="x-large"
+        onClick={() => {
+          history.push("/");
+        }}
+      >
         <Text fontWeight="medium" letterSpacing="wider">
           MetaLMS
         </Text>
@@ -110,7 +117,6 @@ function Sidebar({
       let code = groupState["object"].topic_code;
 
       let enrolled = [];
-      console.log(user)
       user.enrolled_courses.map((course) => {
         if (course.name === groupState["object"].name) {
           enrolled.unshift(course);

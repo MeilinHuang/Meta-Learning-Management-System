@@ -48,6 +48,7 @@ function MainSelection({ user }) {
             })
               .then((e) => e.json())
               .then((e) => {
+                console.log(e);
                 //Need to get most recently accessed
                 setContent(e);
                 return e;
@@ -57,24 +58,26 @@ function MainSelection({ user }) {
         Promise.all(
           topic_groups.map((e) => {
             e.announcements_list.map((announce) => {
-              if (
-                recent_announce === null ||
-                Date.parse(recent_announce.post_date) >
-                  Date.parse(announce.post_date)
-              ) {
-                fetch(backend_url + "user/" + announce.author, {
-                  headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                })
-                  .then((resp) => resp.json())
-                  .then((user) => {
-                    announce = { ...announce, author: user.user_name };
-                    setRecent(announce);
-                    setCode(e.topic_code);
-                  });
+              if (announce) {
+                if (
+                  recent_announce === null ||
+                  Date.parse(recent_announce.post_date) >
+                    Date.parse(announce.post_date)
+                ) {
+                  fetch(backend_url + "user/" + announce.author, {
+                    headers: {
+                      Accept: "application/json",
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                  })
+                    .then((resp) => resp.json())
+                    .then((user) => {
+                      announce = { ...announce, author: user.user_name };
+                      setRecent(announce);
+                      setCode(e.topic_code);
+                    });
+                }
               }
             });
           })
@@ -349,9 +352,15 @@ function MainSelection({ user }) {
             {/* Use most recently accessed topic here */}
             {content ? (
               <Flex flexDirection="column">
-                <Text fontSize="lg" letterSpacing="wide">
-                  {content.topic_code + " " + content.topics_list[0].name}
-                </Text>
+                {content.topics_list.length > 0 ? (
+                  <Text fontSize="lg" letterSpacing="wide">
+                    {content.topic_code + " " + content.topics_list[0].name}
+                  </Text>
+                ) : (
+                  <Text fontSize="lg" letterSpacing="wide">
+                    This topic group has no content...
+                  </Text>
+                )}
                 <Accordion allowMultiple>
                   <CategoriesList
                     topic={content.topics_list[0]}
