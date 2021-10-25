@@ -8,7 +8,7 @@ import { useBreakpointValue, Flex, Container, Box } from "@chakra-ui/react";
 import { backend_url } from "../Constants.js";
 import { isLoggedIn } from "../utils/helpers.js";
 
-function CoursePage() {
+function MainPage() {
   const history = useHistory();
   const links = [
     {
@@ -54,7 +54,7 @@ function CoursePage() {
 
   return (
     <div>
-      <Box position="sticky" width="100%" top={0} zIndex={100}>
+      <Box position="sticky" width="100%" top={0} zIndex={5}>
         <Box position="fixed" left={0}>
           <Sidebar
             links={links}
@@ -86,4 +86,4 @@ function CoursePage() {
   );
 }
 
-export default CoursePage;
+export default MainPage;
