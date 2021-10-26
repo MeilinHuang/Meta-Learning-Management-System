@@ -23,7 +23,7 @@ function CourseContentPage({ topicGroup }) {
   let history = useHistory();
   let course = history.location.pathname.split("/").filter((e) => e !== "")[1];
   useEffect(() => {
-    if (topicGroup) {
+    if (topicGroup && topicGroup.topics_list.length > 0) {
       setData(topicGroup.topics_list);
       setDisplay(topicGroup.topics_list);
     }

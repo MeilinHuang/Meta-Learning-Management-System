@@ -12,7 +12,8 @@ import LecturesPage from "./LecturesPage.js";
 import { Switch, Route } from "react-router-dom";
 import { backend_url } from "../Constants.js";
 import { useBreakpointValue, Flex, Container, Box } from "@chakra-ui/react";
-import { isLoggedIn } from "../utils/helpers.js";
+import { isLoggedIn, isStaff } from "../utils/helpers.js";
+import EnrollmentDashboard from "../components/enrollment/EnrollmentDashboard.js";
 
 function CoursePage() {
   //currently hardcoded sidebar content
@@ -35,10 +36,16 @@ function CoursePage() {
       url: "/forums",
     },
     {
-        name: "Lectures",
-        url: "/lectures"
-    }
+      name: "Lectures",
+      url: "/lectures",
+    },
   ];
+  if (isStaff()) {
+    links.push({
+      name: "Enrollment",
+      url: "/enrollment",
+    });
+  }
   const smVariant = "drawer";
   const mdVariant = "sidebar";
   const variants = useBreakpointValue({ base: smVariant, md: mdVariant });
@@ -124,6 +131,11 @@ function CoursePage() {
               exact
               path="/course-page/:code/announcement/:id"
               component={CourseAnnouncementPage}
+            />
+            <Route
+              exact
+              path="/course-page/:code/enrollment"
+              component={EnrollmentDashboard}
             />
             <Route path="/course-page/:code" component={CourseDashboard} />
           </Switch>

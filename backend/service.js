@@ -220,7 +220,7 @@ async function getTopicGroup(request, response) {
     const topicGroupId = tgId.rows[0].id;
 
     let resp = await pool.query(
-      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, 
+      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.searchable,
       array_agg(DISTINCT user_admin.admin_id) as admin_list, array_agg(DISTINCT tgf.id) as attachments,
       array_agg(DISTINCT topics.id) as topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
       array_agg(DISTINCT announcements.id) as announcements_list
@@ -322,6 +322,40 @@ async function getTopicGroup(request, response) {
     response.status(200).json(resp.rows[0]);
   } catch (e) {
     response.status(400).send(e);
+  }
+}
+
+async function setSearchable(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const searchable = request.params.searchable;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+
+    const topicGroupId = resp.rows[0].id;
+
+    resp = await pool.query(
+      `UPDATE topic_group SET searchable = $1 WHERE id = $2`,
+      [searchable, topicGroupId]
+    );
+
+    //return the codes
+    response.status(200).send({ success: true });
+  } catch (e) {
+    console.error(e);
   }
 }
 
@@ -1302,7 +1336,204 @@ async function generateCode(request, response) {
       }
     }
     //return the code
-    response.status(200).send(code);
+    response.status(200).send({ code: code });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function getCourseCodes(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+
+    const topicGroupId = resp.rows[0].id;
+    resp = await pool.query(
+      `SELECT * FROM enroll_codes WHERE topic_group_id = $1`,
+      [topicGroupId]
+    );
+
+    //return the codes
+    response.status(200).send(resp.rows);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function getCourseCode(request, response) {
+  const courseCode = request.params.inviteCode;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    let resp = await pool.query(`SELECT * FROM enroll_codes WHERE code = $1`, [
+      courseCode,
+    ]);
+
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No invite code ${courseCode}`);
+      throw `No invite code ${courseCode}`;
+    }
+
+    const ret = resp.rows[0];
+
+    //return the codes
+    response.status(200).send(ret);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function deleteCourseCode(request, response) {
+  const courseCode = request.params.inviteCode;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    let resp = await pool.query(`SELECT id FROM enroll_codes WHERE code = $1`, [
+      courseCode,
+    ]);
+
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No invite code ${courseCode}`);
+      throw `No invite code ${courseCode}`;
+    }
+
+    const codeId = resp.rows[0].id;
+    resp = await pool.query(`DELETE FROM enroll_codes WHERE id = $1`, [codeId]);
+
+    //return the codes
+    response.status(200).send({ success: "true" });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function getEnrollments(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+    //TODO check if zid is admin
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+    const topicGroupId = resp.rows[0].id;
+
+    resp = await pool.query(
+      `SELECT * FROM user_enrolled WHERE topic_group_id = $1`,
+      [topicGroupId]
+    );
+
+    //return the codes
+    response.status(200).send(resp.rows);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function enrollUser(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const userZId = request.params.zId;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+    //TODO check if zid is admin
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+    const topicGroupId = resp.rows[0].id;
+
+    resp = await pool.query(`SELECT id FROM users WHERE zid = $1`, [userZId]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with zid ${userZId}`);
+      throw `No topic group with name ${userZId}`;
+    }
+    const userId = resp.rows[0].id;
+
+    resp = await pool.query(
+      `INSERT INTO user_enrolled(topic_group_id, user_id, progress) VALUES($1, $2, $3)`,
+      [topicGroupId, userId, 0]
+    );
+
+    //return the codes
+    response.status(200).send({ success: "true" });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function unenrollUser(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const userId = request.params.userId;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+    //TODO check if zid is admin
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+    const topicGroupId = resp.rows[0].id;
+
+    resp = await pool.query(
+      `DELETE FROM user_enrolled WHERE topic_group_id = $1 AND user_id = $2`,
+      [topicGroupId, userId]
+    );
+
+    //return the codes
+    response.status(200).send({ success: "true" });
   } catch (e) {
     console.error(e);
   }
@@ -2588,6 +2819,7 @@ module.exports = {
   getAllTopicGroups,
   getTopics,
   getTopicPreReqs,
+  getCourseCodes,
   postPreReq,
   deletePreReq,
   postTopicGroup,
@@ -2608,5 +2840,11 @@ module.exports = {
   putTopicGroup,
   putTopic,
   putTopicTag,
+  getCourseCode,
+  deleteCourseCode,
   deleteTopicTag,
+  getEnrollments,
+  unenrollUser,
+  enrollUser,
+  setSearchable,
 };
