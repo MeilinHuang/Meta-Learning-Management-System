@@ -4,6 +4,7 @@ import TagSelect from "./TagSelect/TagSelect";
 import ManageTagsModal from "./ManageTagsModal";
 import { isStaff } from "../../utils/helpers"
 import { StoreContext } from "../../utils/store";
+import { backend_url } from "../../Constants"
 
 function Filter({ code }) {
   const [tags, setTags] = useState({});
@@ -18,7 +19,7 @@ function Filter({ code }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    fetch(`http://localhost:8000/${code}/forum/tags`, { method: "PUT" })
+    fetch(`${backend_url}${code}/forum/tags`, { method: "PUT" })
       .then((r) => r.json())
       .then((data) => {
         setTags(data);
@@ -27,7 +28,7 @@ function Filter({ code }) {
 
   useEffect(() => {
     if (!filteredTags.length) {
-      fetch(`http://localhost:8000/${code}/forum`, {
+      fetch(`${backend_url}${code}/forum`, {
         headers: {
           "Content-Type": "application/JSON",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -37,7 +38,7 @@ function Filter({ code }) {
         .then((data) => {
           setPosts(data);
         });
-      fetch(`http://localhost:8000/${code}/forum/pinned`, {
+      fetch(`${backend_url}${code}/forum/pinned`, {
         headers: {
           "Content-Type": "application/JSON",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -54,7 +55,7 @@ function Filter({ code }) {
     const tagNames = filteredTags.map((t) => t.name.toLowerCase());
     setShowPinned(false);
     tagNames.forEach((t) => {
-      fetch(`http://localhost:8000/${code}/forum/filter?forumFilterTerms=${tagNames}`, {
+      fetch(`${backend_url}${code}/forum/filter?forumFilterTerms=${tagNames}`, {
         headers: {
           "Content-Type": "application/JSON",
           Authorization: `Bearer ${localStorage.getItem("token")}`,

@@ -27,6 +27,7 @@ import CommentsResponses from "../components/forums/CommentsResponses/CommentsRe
 import { BsTrash } from "react-icons/bs";
 import { FaCheckCircle } from "react-icons/fa";
 import { isLoggedInUser } from "../utils/helpers"
+import { backend_url } from "../Constants"
 
 function ForumPostPage({
   match: {
@@ -38,7 +39,7 @@ function ForumPostPage({
   const toast = useToast();
 
   useEffect(() => {
-    fetch(`http://localhost:8000/${code}/forum/post/${id}`, {
+    fetch(`${backend_url}${code}/forum/post/${id}`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -52,7 +53,7 @@ function ForumPostPage({
   }, [code, id]);
 
   const handleDelete = () => {
-    fetch(`http://localhost:8000/${code}/forum/post/${id}`, {
+    fetch(`${backend_url}${code}/forum/post/${id}`, {
       method: "DELETE",
       headers: {
         Accept: "application/json",
