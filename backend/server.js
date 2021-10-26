@@ -1,13 +1,20 @@
 const express = require("express");
-var cors = require("cors");
 const app = express();
 const fileUpload = require("express-fileupload");
 
-app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 app.use(fileUpload());
 app.use("/static", express.static("public"));
 app.use("/_files", express.static("public/_files"));
+
+const cors = require("cors");
+const corsOptions = {
+  origin: '*',
+  Credentials: true,
+  optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 
 /***************************************************************
                        Open API / Swagger
