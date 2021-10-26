@@ -12,8 +12,8 @@ import { set } from 'draft-js/lib/DefaultDraftBlockRenderMap';
 var g;
 var svg;
 var expand = {};
-var circles, link, node, lables, simulation, tempNodes, linkNodes, tempLinks, arrows, groupPath;
-var emptyNodes = 1; //fix later
+var circles, link, node, lables, simulation, tempNodes, linkNodes, tempLinks, arrows, groupPath, convexHull, genCH;
+var emptyNodes = 2; //fix later
 
 function zoomed() {
     g.attr("transform", d3.event.transform);
@@ -145,6 +145,8 @@ export default function TopicTree() {
             node && node.remove();
             // arrows && arrows.remove();
             link && link.remove();
+            genCH && genCH.remove();
+            convexHull && convexHull.remove();
             // lables && lables.remove();
         }
 
@@ -224,7 +226,49 @@ export default function TopicTree() {
                 preprocessedData[node.id.toString()] = node;
             }
         }
+        var color = d3.scaleOrdinal(d3.schemeSet3);
+        var groupFill = function (d, i) { return color(d.key); };
         
+        let groups = d3.nest().key(function (d) { return d.group; }).entries(tempNodes);
+        let offset = 0;
+
+        groupPath = function (d) { // important for claultaing the hull
+            // console.log('dddd', d);
+            // takes the number of nodes to work out how to draw thw hull
+            // null when trying to make a hull with two nodes only - so need to a way around it
+            // https://stackoverflow.com/questions/45912361/d3-how-to-draw-multiple-convex-hulls-on-groups-of-force-layout-nodes
+            if (d.values.length === 1 && expand[d.values[0].group] == true) { // when group value and id value is the same - it means this is a group node
+                var fakePoints = [];
+                // if (d.length == 1 || d.length == 2) {
+                fakePoints = [[d.values[0].x + 0.001, d.values[0].y - 0.001],
+                [d.values[0].x - 0.001, d.values[0].y + 0.001],
+                [d.values[0].x - 0.001, d.values[0].y + 0.001]];
+                // fakePoints = [[d.values[0].x + offset, d.values[0].y - offset],
+                // [d.values[0].x - offset, d.values[0].y + offset],
+                // [d.values[0].x - offset, d.values[0].y + offset]];
+                // }
+                return "M" + d3.polygonHull(d.values.map(function (i) { return [i.x, i.y]; })
+                    .concat(fakePoints))  //do not forget to append the fakePoints to the group data
+                    .join("L") + "Z";
+                // return "M0,0L0,0L0,0Z"; // does not create a hull
+            } else if (d.values.length > 0 && expand[d.values[0].group] == false) {
+                // do nothing don't want hull for group node
+            } else if (d.values.length === 2) {
+                var arr = d.values.map(function (i) {
+                    return [i.x + offset, i.y + offset];
+                })
+                arr.push([arr[0][0], arr[0][1]]);
+                return "M" + d3.polygonHull(arr).join("L") + "Z";
+            } else if (expand[d.values[0].group] == true) {
+                return "M" +
+                    d3.polygonHull(d.values.map(function (i) {
+                        return [i.x + offset, i.y + offset];
+                    }))
+                        .join("L") + "Z";
+            }
+    
+        };
+        convexHull = g.append('g').attr('class', 'hull');
         
         // arrow heads
         arrows = svg.append("svg:defs").selectAll("marker")
@@ -322,25 +366,58 @@ export default function TopicTree() {
             .nodes(tempNodes.concat(linkNodes))
             .on("tick", ticked);
         simulation.force("link")
-            .links(tempLinks.concat(linkNodes));
-        
+            .links(tempLinks.concat(linkNodes))
+            .distance(function (d) {
+                if (d.source.group == d.target.group) return 85;
+                else return 280;
+                // if(d.type=='resource') return 300;
+                // else return 150;
+                // return d.distance;
+            });  
 
         // This function is run at each iteration of the force algorithm, updating the nodes position.
         function ticked() {
-            link.attr('d', function (d) {
-                var dx = d.target.x - d.source.x,
-                    dy = d.target.y - d.source.y,
-                    dr = Math.sqrt(dx * dx + dy * dy);
+            genCH = convexHull.selectAll("path")
+            .data(groups)
+            .attr("d", groupPath)
+            .enter().insert("path", "circle")
+            .style("fill", groupFill)
+            .style("stroke", groupFill)
+            .style("stroke-width", 140)
+            .style("stroke-linejoin", "round")
+            .style("opacity", .5)
+            .attr("d", groupPath);
 
-                var val2 = 'M' + d.source.x + ',' + d.source.y + 'L' + (d.target.x) + ',' + (d.target.y);
-                return val2;
-            });
+            node
+            .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; })
+
+            link
+                .attr('d', function (d) {
+                    var dx = d.target.x - d.source.x,
+                        dy = d.target.y - d.source.y,
+                        dr = Math.sqrt(dx * dx + dy * dy);
+
+                    var val2 = 'M' + d.source.x + ',' + d.source.y + 'L' + (d.target.x) + ',' + (d.target.y);
+                    return val2;
+
+                });
+
+            // link.attr('d', function (d) {
+            //     var dx = d.target.x - d.source.x,
+            //         dy = d.target.y - d.source.y,
+            //         dr = Math.sqrt(dx * dx + dy * dy);
+
+            //     var val2 = 'M' + d.source.x + ',' + d.source.y + 'L' + (d.target.x) + ',' + (d.target.y);
+            //     return val2;
+            // });
         
-            node.attr("transform", function(d) {
-                    return "translate(" + d.x + "," + d.y + ")";
-                })
+            // node.attr("transform", function(d) {
+            //         return "translate(" + d.x + "," + d.y + ")";
+            //     })
                 
         }
+
+        
     }
 
     useEffect(() => {
@@ -359,7 +436,38 @@ export default function TopicTree() {
                         .attr("width", width)
                         .attr("height", height)
                         .call(zoom);
-        g = svg.append("g")
+        g = svg.append("g").append('g');
+        let linkForce = d3
+            .forceLink()
+            .id(function (link) { return link.id });
+        var inpos = [], counterX = 1, inposY = [], counterY = 1;
+        // simulation = d3
+        //     .forceSimulation()
+        //     .force('link', linkForce)
+        //     .force('forceX', d3.forceX(function (d) {
+        //         console.log('d', d);
+        //         if (inpos[d.title]) {
+        //             // console.log(inpos);
+        //             return inpos[d.group];
+        //         } else {
+        //             inpos[d.group] = width / counterX;
+        //             // console.log(inpos);
+        //             counterX++;
+        //             return inpos[d.group];
+        //         }
+        //     }))
+        //     .force('forceY', d3.forceY(function (d) {
+        //         console.log('d', d);
+        //         if (inposY[d.group]) {
+        //             // console.log(inposY);
+        //             return inposY[d.group];
+        //         } else {
+        //             inposY[d.group] = height / (Math.random() * (d.group.length - 0 + 1) + 1);
+        //             // console.log(inposY);
+        //             return inposY[d.group];
+        //         }
+        //     }));
+
         simulation = d3.forceSimulation()
             .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(400))
             .force("charge", d3.forceManyBody().strength(-70))
