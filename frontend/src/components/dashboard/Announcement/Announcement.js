@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import {
   ButtonGroup,
   Button,
@@ -8,7 +7,6 @@ import {
   Flex,
   Heading,
   InputGroup,
-  Link,
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -31,8 +29,8 @@ import htmlToDraft from "html-to-draftjs";
 import DraftEditor from "../../forums/DraftEditor/DraftEditor";
 import AuthorDetails from "../../forums/AuthorDetails";
 import AddPostModal from "../../forums/AddPostModal";
-import { StoreContext } from "../../../utils/store";
 import { isLoggedInUser } from "../../../utils/helpers"
+import { backend_url } from "../../../Constants"
 import styles from "./Announcement.module.css";
 
 function Announcement({
@@ -44,11 +42,7 @@ function Announcement({
   const [editorState, setEditorState] = useState("");
   const [details, setDetails] = useState();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const context = useContext(StoreContext);
   const history = useHistory();
-  const {
-    posts: [, setPosts],
-  } = context;
   const toast = useToast();
 
   useEffect(() => {
@@ -79,7 +73,7 @@ function Announcement({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch(`http://localhost:8000/${course}/announcement/${id}`, {
+    fetch(`${backend_url}${course}/announcement/${id}`, {
       method: "PUT",
       body: JSON.stringify({
         title,
@@ -92,7 +86,7 @@ function Announcement({
       },
     }).then((r) => {
       if (r.status === 200) {
-        fetch(`http://localhost:8000/${course}/announcement`, {
+        fetch(`${backend_url}${course}/announcement`, {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -105,7 +99,7 @@ function Announcement({
 
             for (const post of data) {
               promises.push(
-                fetch(`http://localhost:8000/user/${post.author}`, {
+                fetch(`${backend_url}user/${post.author}`, {
                   headers: {
                     Accept: "application/json",
                     "Content-Type": "application/json",
@@ -141,18 +135,18 @@ function Announcement({
   };
 
   const handleDelete = (onClose) => {
-    fetch(`http://localhost:8000/${course}/announcement/${id}`, {
+    fetch(`${backend_url}${course}/announcement/${id}`, {
       method: "DELETE",
     }).then((r) => {
       if (r.status === 200) {
-        fetch(`http://localhost:8000/${course}/announcement`)
+        fetch(`${backend_url}${course}/announcement`)
           .then((r) => r.json())
           .then((data) => {
             const promises = [];
 
             for (const post of data) {
               promises.push(
-                fetch(`http://localhost:8000/user/${post.author}`).then((r) =>
+                fetch(`${backend_url}user/${post.author}`).then((r) =>
                   r.json()
                 )
               );
@@ -184,7 +178,7 @@ function Announcement({
   };
 
   const handleAddPostSubmit = (formData) => {
-    fetch(`http://localhost:8000/${course}/forum/post`, {
+    fetch(`${backend_url}${course}/forum/post`, {
       method: "POST",
       body: formData,
       headers: {

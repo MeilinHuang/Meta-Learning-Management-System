@@ -21,11 +21,11 @@ import {
 } from "@chakra-ui/react";
 import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { RiPushpin2Fill, RiPushpin2Line } from "react-icons/ri";
-import { TiArrowUpOutline, TiArrowUpThick } from "react-icons/ti";
 import { FaCheckCircle } from "react-icons/fa";
 import UpvoteButton from "./UpvoteButton"
 import { StoreContext } from "../../utils/store";
 import { isStaff } from "../../utils/helpers"
+import { backend_url } from "../../Constants"
 
 function PostTable({ posts: postData, code }) {
   const context = useContext(StoreContext);
@@ -50,7 +50,7 @@ function PostTable({ posts: postData, code }) {
         }) => {
           const handlePinUnpin = () => {
             fetch(
-              `http://localhost:8000/${code}/forum/post/pin/${post_id}/${!value}`,
+              `${backend_url}${code}/forum/post/pin/${post_id}/${!value}`,
               {
                 method: "PUT",
                 headers: {
@@ -60,7 +60,7 @@ function PostTable({ posts: postData, code }) {
               }
             ).then((r) => {
               if (r.status === 200) {
-                fetch(`http://localhost:8000/${code}/forum`, {
+                fetch(`${backend_url}${code}/forum`, {
                   headers: {
                     "Content-Type": "application/JSON",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -68,7 +68,7 @@ function PostTable({ posts: postData, code }) {
                 })
                   .then((r) => r.json())
                   .then((data) => setPosts(data));
-                fetch(`http://localhost:8000/${code}/forum/pinned`, {
+                fetch(`${backend_url}${code}/forum/pinned`, {
                   headers: {
                     "Content-Type": "application/JSON",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
