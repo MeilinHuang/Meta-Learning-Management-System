@@ -50,3 +50,7 @@ export function update_topic(topicGroupName, topicName) {
     return backend_url + "topicGroup/" + topicGroupName + "/topic/" + topicName;
 
 }
+
+export function new_topic_group(topicGroupName) {
+    return backend_url + "topicGroup/" + topicGroupName;
+}

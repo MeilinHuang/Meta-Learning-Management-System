@@ -600,7 +600,7 @@ async function getAllTopics(request, response) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
     }
-    let topicGroupResp = await pool.query(`SELECT name FROM topic_group`);
+    let topicGroupResp = await pool.query(`SELECT name, id FROM topic_group`);
     // console.log("topicGroupResp", topicGroupResp);
     let result = [];
     for (let topicGroupName of topicGroupResp.rows) {
@@ -663,6 +663,7 @@ async function getAllTopics(request, response) {
         }
         object.topics_list = topicArr;
         object.name = topicGroupName.name;
+        object.id = topicGroupName.id;
       }
       result.push(resp.rows[0]);
     }
@@ -989,6 +990,7 @@ async function deleteTopicTag(request, response) {
 
 // Update topic details
 async function putTopic(request, response) {
+  console.log('putting topic');
   try {
     //Validate Token
     let zId = await getZIdFromAuthorization(request.header("Authorization"));
@@ -1026,10 +1028,11 @@ async function putTopic(request, response) {
       const fileDeleteList = request.body.fileDeleteList.split(",");
       if (fileDeleteList.length) {
         // Deletes files specified in delete list
-        for (const fileId of fileDeleteList) {
+        for (const fileName of fileDeleteList) {
+          
           let tmpQ = await pool.query(
-            `DELETE FROM topic_files WHERE id = $1 RETURNING file`,
-            [fileId]
+            `DELETE FROM topic_files WHERE name = $1 AND topic_id = $2 RETURNING file`,
+            [fileName, topicId]
           );
           fs.unlinkSync("../frontend/public" + tmpQ.rows[0].file);
         }
@@ -1108,6 +1111,7 @@ async function putTopic(request, response) {
 
     response.status(200).json({ success: true, topic: topicId });
   } catch (e) {
+    console.log('error', e);
     response.status(400).json({ error: e });
   }
 }

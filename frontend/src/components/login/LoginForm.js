@@ -209,7 +209,7 @@ export default function LoginForm() {
                 setIsLoading(true);
                 if (login) {
                   doLogin(email, password).then((r) => {
-                    console.log(r);
+                    
                     setIsLoading(false);
                     if (r.hasOwnProperty("error")) {
                       setError(r.error);
@@ -224,7 +224,7 @@ export default function LoginForm() {
                   });
                 } else {
                   doRegister(name, email, zId, password, confirm).then((r) => {
-                    console.log(r);
+                    
                     setIsLoading(false);
                     if (r.hasOwnProperty("error")) {
                       setError(r.error);
