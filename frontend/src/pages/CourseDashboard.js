@@ -195,8 +195,6 @@ function CourseDashboard({
     });
   };
 
-  console.log(announcements.length)
-
   return (
     <>
       <Flex justify="center">

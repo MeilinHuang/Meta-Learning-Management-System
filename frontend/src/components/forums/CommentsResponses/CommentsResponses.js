@@ -68,6 +68,8 @@ function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
     });
   };
 
+  console.log(posts)
+
   return (
     <Box
       width={{ base: "100%", lg: "80%" }}
@@ -82,8 +84,8 @@ function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
       <Heading size="md" mb="12px">
         {isComments ? "Comments" : "Responses"}
       </Heading>
-      {posts &&
-        posts[0] !== null &&
+      {posts && posts.length &&
+        posts[0] !== null ?
         posts.map(
           (post) =>
             post !== null && (
@@ -94,6 +96,8 @@ function CommentsResponses({ code, isComments, posts, post_id, setPost }) {
                 code={code}
               />
             )
+        ) : (
+          <Box mb="8px">No {isComments ? "comments" : "responses"} yet</Box>
         )}
       {isComments && (
         <form
