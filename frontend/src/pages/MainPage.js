@@ -11,20 +11,16 @@ import CourseInvite from "../components/enrollment/JoinCourse";
 
 function MainPage() {
   const history = useHistory();
-  const links = [
+  const [links, setLinks] = useState([
     {
       name: "Home",
       url: "/",
     },
     {
-      name: "Topic Tree",
-      url: "/topictree",
-    },
-    {
       name: "Gamification",
       url: "/gamification",
     },
-  ];
+  ]);
   const smVariant = "drawer";
   const mdVariant = "sidebar";
   const variants = useBreakpointValue({ base: smVariant, md: mdVariant });
@@ -34,22 +30,26 @@ function MainPage() {
   useEffect(() => {
     //Need to get user logged in
     if (isLoggedIn()) {
-        const options = {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/JSON",
-                Authorisation: `Bearer ${localStorage.getItem("token")}`,
-            },
-        };
-        fetch(backend_url + `user/${localStorage.getItem("id")}`, options)
-            .then((e) => e.json())
-            .then((e) => {
-                console.log(e)
-                setUser(e)
-            });
-    } 
-    else {
-        history.push("/login");
+      const options = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/JSON",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      };
+      fetch(backend_url + `user/${localStorage.getItem("id")}`, options)
+        .then((e) => e.json())
+        .then((e) => setUser(e));
+    } else {
+      history.push("/login");
+    }
+    if (parseInt(localStorage.getItem('staff')) !== 0) {
+      let copyLinks = JSON.parse(JSON.stringify(links));
+      copyLinks.push({
+        name: "Topic Tree",
+        url: "/topictree"
+      }); 
+      setLinks(copyLinks);
     }
   }, []);
 

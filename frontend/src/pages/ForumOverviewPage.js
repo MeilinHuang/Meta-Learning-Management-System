@@ -17,6 +17,7 @@ import PostTableContainer from "../components/forums/PostTableContainer";
 import AddPostModal from "../components/forums/AddPostModal";
 import { GrAdd } from "react-icons/gr";
 import { StoreContext } from "../utils/store";
+import { backend_url } from "../Constants"
 
 function ForumOverviewPage({
   match: {
@@ -33,7 +34,7 @@ function ForumOverviewPage({
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    fetch(`http://localhost:8000/${code}/forum`, {
+    fetch(`${backend_url}${code}/forum`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -44,7 +45,7 @@ function ForumOverviewPage({
       .then((data) => {
         setPosts(data);
       });
-    fetch(`http://localhost:8000/${code}/forum/pinned`, {
+    fetch(`${backend_url}${code}/forum/pinned`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -66,7 +67,7 @@ function ForumOverviewPage({
     e.preventDefault();
 
     if (searchTerm === "") {
-      fetch(`http://localhost:8000/${code}/forum`, {
+      fetch(`${backend_url}${code}/forum`, {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
@@ -82,7 +83,7 @@ function ForumOverviewPage({
     }
 
     fetch(
-      `http://localhost:8000/${code}/forum/search/${searchTerm.toLowerCase()}`,
+      `${backend_url}${code}/forum/search/${searchTerm.toLowerCase()}`,
       {
         headers: {
           Accept: "application/json",
@@ -99,7 +100,7 @@ function ForumOverviewPage({
   };
 
   const handleAddPostSubmit = (formData) => {
-    fetch(`http://localhost:8000/${code}/forum/post`, {
+    fetch(`${backend_url}${code}/forum/post`, {
       method: "POST",
       body: formData,
       headers: {

@@ -72,6 +72,7 @@ function WidgetsBar({ page, user }) {
                 {isLoggedIn() ? (
                   <MenuItem
                     onClick={(e) => {
+                      
                       logOut();
                       history.go(0);
                     }}

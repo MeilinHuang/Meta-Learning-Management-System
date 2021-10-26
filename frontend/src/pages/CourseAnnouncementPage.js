@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 import Announcement from "../components/dashboard/Announcement/Announcement";
+import { backend_url } from "../Constants"
 
 function CourseAnnouncementPage({
   match: {
@@ -11,7 +12,7 @@ function CourseAnnouncementPage({
   const [post, setPost] = useState({});
 
   useEffect(() => {
-    fetch(`http://localhost:8000/${code}/announcement/${id}`, {
+    fetch(`${backend_url}${code}/announcement/${id}`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -20,7 +21,7 @@ function CourseAnnouncementPage({
     })
       .then((r) => r.json())
       .then((data) => {
-        fetch(`http://localhost:8000/user/${data.author}`, {
+        fetch(`${backend_url}user/${data.author}`, {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
