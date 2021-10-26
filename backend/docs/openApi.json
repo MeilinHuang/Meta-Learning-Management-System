@@ -487,6 +487,362 @@
         }
       }
     },
+    "/questionBank/question": {
+      "post": {
+        "tags": ["Assessment"],
+        "summary": "Create new question",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "questionType",
+            "in": "query",
+            "description": "Type of Question",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["mc", "sa", "cb", "la"]
+            },
+            "style": "form",
+            "explode": false
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostQuestion"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      }
+    },
+    "/questionBank/question/edit/{questionId}": {
+      "put": {
+        "tags": ["Assessment"],
+        "summary": "Update question",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question to edit",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "questionType",
+            "in": "query",
+            "description": "Type of Question",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["mc", "sa", "cb", "la"]
+            },
+            "style": "form",
+            "explode": false
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutQuestion"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      }
+    },
+    "/questionBank/question/delete/{questionId}": {
+      "delete": {
+        "tags": ["Assessment"],
+        "summary": "Delete question by id",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question to delete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      }
+    },
+    "/topicGroup/quizzes/question/answer": {
+      "post": {
+        "tags": ["Assessment"],
+        "summary": "Create new question possible answer",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostQuestionAnswer"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      }
+    },
+    "/topicGroup/quizzes/question/answer/{answerId}": {
+      "put": {
+        "tags": ["Assessment"],
+        "summary": "Update question possible answer",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "answerId",
+            "in": "path",
+            "description": "Id of answer to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutQuestionAnswer"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      },
+      "delete": {
+        "tags": ["Assessment"],
+        "summary": "Delete question possible answer",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "answerId",
+            "in": "path",
+            "description": "Id of answer to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      }
+    },
     "/questionBank/questions/{questionId}": {
       "get": {
         "tags": ["Assessment"],
@@ -1248,7 +1604,8 @@
         },
         "x-codegen-request-body-name": "questionBody"
       }
-    },
+    }
+,
     "/login": {
       "post": {
         "tags": ["Authentication"],
@@ -1300,7 +1657,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -5419,7 +5776,7 @@
         "x-codegen-request-body-name": "TopicGroup"
       }
     },
-    "/{target}/file/{targetId}": {
+    "/file/{targetId}": {
       "post": {
         "tags": ["Lectures and Tutorials"],
         "summary": "Upload lecture or tutorial file",
@@ -5428,7 +5785,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -5436,7 +5793,7 @@
           },
           {
             "name": "target",
-            "in": "path",
+            "in": "query",
             "description": "Target type",
             "required": true,
             "schema": {
@@ -5555,10 +5912,10 @@
         }
       }
     },
-    "/{topicGroupName}/{type}/search/{searchTerm}": {
+    "/{topicGroupName}/lectures/search/": {
       "get": {
         "tags": ["Lectures and Tutorials"],
-        "summary": "Gets list of lecture/tutorial files related to search term",
+        "summary": "Gets list of lecture files related to search term",
         "parameters": [
           {
             "name": "topicGroupName",
@@ -5577,11 +5934,73 @@
             "schema": {
               "type": "string"
             }
+          }
+          ,
+          {
+            "name": "Specify",
+            "in": "query",
+            "description": "Search term",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["lecture", "tutorial"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{topicGroupName}/tutorials/search/": {
+      "get": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Gets list of tutorial files related to search term",
+        "parameters": [
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "Name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           },
           {
-            "name": "type",
+            "name": "searchTerm",
             "in": "path",
-            "description": "Type of class",
+            "description": "Search term",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+          ,
+          {
+            "name": "Specify",
+            "in": "query",
+            "description": "Search term",
             "required": true,
             "schema": {
               "type": "string",
@@ -5679,7 +6098,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -5859,7 +6278,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -5919,7 +6338,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -6590,11 +7009,15 @@
       "PutQuizQuestion": {
         "type": "object",
         "properties": {
-          "questionText": {
+          "quiz_type": {
+            "type": "string",
+            "example": "mpc | sa | la"
+          },
+          "description": {
             "type": "string",
             "example": "What is 2 + 2?"
           },
-          "marksAwarded": {
+          "related_topic_id": {
             "type": "integer",
             "example": 1
           }
@@ -6840,15 +7263,6 @@
                 }
               }
             }
-          }
-        }
-      },
-      "PostStudentAttempt": {
-        "type": "object",
-        "properties": {
-          "startTime": {
-            "type": "string",
-            "example": "2021-08-08 22:52:35.388924"
           }
         }
       },
@@ -7372,75 +7786,41 @@
           }
         }
       },
-      "GetAllLevels": {
+      "PostQuestionAnswer": {
         "type": "object",
         "properties": {
-          "levels": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "_id": {
-                  "type": "integer"
-                },
-                "title": {
-                  "type": "string",
-                  "example": "Level"
-                },
-                "topicGroupId": {
-                  "type": "integer"
-                },
-                "levelType": {
-                  "type": "string"
-                },
-                "questionNumbers": {
-                  "type": "integer",
-                  "example": 3
-                },
-                "estimatedTimeRequired": {
-                  "type": "integer",
-                  "example": 15
-                }
-              },
-              "description": "List of levels"
-            }
+          "questionId": {
+            "type": "integer",
+            "example": 1
+          },
+          "answerText": {
+            "type": "string",
+            "example": "This is the answer"
+          },
+          "isCorrect": {
+            "type": "boolean",
+            "example": false
+          },
+          "explanation": {
+            "type": "string",
+            "example": "This is the explanation"
           }
         }
       },
-      "GetAllLevelQuestions": {
+      "PutQuestionAnswer": {
         "type": "object",
         "properties": {
-          "levelQuestions": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "_id": {
-                  "type": "integer"
-                },
-                "title": {
-                  "type": "string",
-                  "example": "What is the day today?"
-                },
-                "questionType": {
-                  "type": "string",
-                  "example": "Multiple Choice"
-                },
-                "correctAnswer": {
-                  "type": "string",
-                  "example": "Friday"
-                },
-                "mediaLink": {
-                  "type": "string",
-                  "example": "123.png"
-                },
-                "estimatedTimeRequired": {
-                  "type": "integer",
-                  "example": 1
-                }
-              },
-              "description": "List of questions for level"
-            }
+          "answerText": {
+            "type": "string",
+            "example": "This is the answer"
+          },
+          "isCorrect": {
+            "type": "boolean",
+            "example": false
+          },
+          "explanation": {
+            "type": "string",
+            "example": "This is the explanation"
           }
         }
       },
@@ -7507,26 +7887,20 @@
           }
         }
       },
-      "PutLevel": {
+      "PutQuestion": {
         "type": "object",
         "properties": {
-          "title": {
+          "topicId": {
+            "type": "integer",
+            "example": 1
+          },
+          "questionText": {
             "type": "string",
-            "example": "Level"
+            "example": "What is 5 x 5"
           },
-          "topicGroupId": {
-            "type": "integer"
-          },
-          "levelType": {
-            "type": "string"
-          },
-          "questionNumbers": {
+          "marksAwarded": {
             "type": "integer",
-            "example": 3
-          },
-          "estimatedTimeRequired": {
-            "type": "integer",
-            "example": 15
+            "example": 10
           }
         }
       },
@@ -7592,14 +7966,6 @@
             "type": "string",
             "example": "Mid Sem Quiz"
           },
-          "openDate": {
-            "type": "string",
-            "example": "2021-08-08 22:52:35.388924"
-          },
-          "closeDate": {
-            "type": "string",
-            "example": "2021-08-08 22:52:35.388924"
-          },
           "timeGiven": {
             "type": "integer",
             "example": 30
@@ -7659,27 +8025,6 @@
           }
         }
       },
-      "PostQuizQuestionAnswer": {
-        "type": "object",
-        "properties": {
-          "quizId": {
-            "type": "integer",
-            "example": 2
-          },
-          "questionId": {
-            "type": "integer",
-            "example": 4
-          },
-          "isCorrectAnswer": {
-            "type": "boolean",
-            "example": false
-          },
-          "description": {
-            "type": "string",
-            "example": "2 + 2 = 4"
-          }
-        }
-      },
       "QuizQuestionAnswer": {
         "type": "object",
         "properties": {
@@ -7705,74 +8050,24 @@
           }
         }
       },
-      "QuizStudentAnswer": {
+      "PostQuestion": {
         "type": "object",
         "properties": {
-          "studentId": {
+          "questionBankId": {
             "type": "integer",
             "example": 1
           },
-          "quizId": {
+          "topicId": {
             "type": "integer",
             "example": 2
           },
-          "questionId": {
-            "type": "integer",
-            "example": 5
+          "questionText": {
+            "type": "string",
+            "example": "What is 1 + 1"
           },
-          "answerSelectedId": {
+          "marksAwarded": {
             "type": "integer",
             "example": 3
-          }
-        }
-      },
-      "QuestionBank": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "integer",
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "example": "Question Bank 1"
-          }
-        }
-      },
-      "GetAnswerCount": {
-        "type": "object",
-        "properties": {
-          "QuizQuestionAnswer": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "example": 1
-                },
-                "quiz_id": {
-                  "type": "integer",
-                  "example": 1
-                },
-                "question_id": {
-                  "type": "integer",
-                  "example": 1
-                },
-                "is_correct_answer": {
-                  "type": "boolean",
-                  "example": true
-                },
-                "description": {
-                  "type": "string",
-                  "example": "5 x 5 = 12"
-                },
-                "answer_count": {
-                  "type": "integer",
-                  "example": 30
-                }
-              }
-            }
           }
         }
       },

@@ -18,12 +18,12 @@ INSERT INTO user_calendar_reminders(reminder_id, user_id) VALUES(2, 1);
 INSERT INTO user_calendar_reminders(reminder_id, user_id) VALUES(3, 1);
 
 -- Create Topic Groups
-INSERT INTO topic_group(id, name, topic_code) values(default, 'C++ Programming', 'COMP6771');
-INSERT INTO topic_group(id, name, topic_code) values(default, 'Database Systems', 'COMP3331');
+INSERT INTO topic_group(id, name, topic_code, searchable) values(default, 'C++ Programming', 'COMP6771', true);
+INSERT INTO topic_group(id, name, topic_code, searchable) values(default, 'Database Systems', 'COMP3331', true);
 
 -- Create Topic Groups invite codes
-INSERT INTO enroll_codes(id, code, topic_group_id, searchable) VALUES(default, 'aABc7J06', 1, false);
-INSERT INTO enroll_codes(id, code, topic_group_id, uses, searchable) VALUES(default, 'sJD873Na', 1, 5, false);
+INSERT INTO enroll_codes(id, code, topic_group_id) VALUES(default, 'aABc7J06', 1);
+INSERT INTO enroll_codes(id, code, topic_group_id, uses) VALUES(default, 'sJD873Na', 1, 5);
 
 -- Create Topics
 INSERT INTO topics(id, topic_group_id, name) values(default, 1, 'Loops');
@@ -150,6 +150,20 @@ INSERT INTO questions(id, topicId, questionBankId, questionText, questionType, m
 VALUES(default, 2, 1, 'Which one is a pointer', 'mc', 1);
 INSERT INTO questions(id, topicId, questionBankId, questionText, questionType, marksAwarded) 
 VALUES(default, 3, 1, 'How do you declare an array', 'sa', 1);
+
+-- Create question possible answers
+INSERT INTO question_possible_answers(id, questionId, answertext, iscorrect, explanation)
+VALUES(default, 1, 'A loop iterates X times executing whatever is inside', true, 'It is the correct definition');
+INSERT INTO question_possible_answers(id, questionId, answertext, iscorrect, explanation)
+VALUES(default, 1, 'A data structure', false, 'A loop is not a data structure');
+INSERT INTO question_possible_answers(id, questionId, answertext, iscorrect, explanation)
+VALUES(default, 2, '*', true, 'Pointer');
+INSERT INTO question_possible_answers(id, questionId, answertext, iscorrect, explanation)
+VALUES(default, 2, '+=', false, 'Incrementer false');
+INSERT INTO question_possible_answers(id, questionId, answertext, iscorrect, explanation)
+VALUES(default, 3, 'var x = []', true, 'Javascript array');
+INSERT INTO question_possible_answers(id, questionId, answertext, iscorrect, explanation)
+VALUES(default, 3, '[]', false, 'No variable declaration');
 
 -- Link question to quiz
 INSERT INTO quiz_questions(quizId, questionId) VALUES(1, 1);

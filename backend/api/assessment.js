@@ -38,6 +38,8 @@ async function getQuizById(request, response) {
       throw "Invalid Token";
     } */
 
+    // TODO: Append quiz questions as well
+
     const quizId = request.params.quizId;
     const topicGroupId = request.params.topicGroupId;
     const topicGroupReq = await pool.query(`SELECT id FROM topic_group WHERE id = $1`, [topicGroupId]);
@@ -476,7 +478,6 @@ async function postStudentAnswer(request, response) {
 
 // Get list of student answers by student id
 async function putStudentAnswer(request, response) {
-  
   try {
     /* let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
@@ -502,6 +503,142 @@ async function putStudentAnswer(request, response) {
   }
 }
 
+// Make possible question answers
+async function postQuestionAnswer(request, response) {
+  try {
+
+    /* let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    } */
+    const questionId = request.body.questionId;
+    const answerText = request.body.answerText;
+    const isCorrect = request.body.isCorrect;
+    const explanation = request.body.explanation;
+
+    await pool.query(`
+    INSERT INTO question_possible_answers(id, questionId, answertext, iscorrect, explanation)
+    VALUES(default, $1, $2, $3, $4)`, [questionId, answerText, isCorrect, explanation]);
+
+    response.status(200).json({success: true});
+  } catch(e) {
+    response.status(400).json({e});
+  }
+}
+
+// Update question answers
+async function putQuestionAnswer(request, response) {
+  try {
+    /* let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    } */
+    const answerId = request.params.answerId;
+    const answerText = request.body.answerText;
+    const isCorrect = request.body.isCorrect;
+    const explanation = request.body.explanation;
+
+    await pool.query(`
+    UPDATE question_possible_answers 
+    SET answerText = $1, isCorrect = $2, explanation = $3
+    WHERE id = $4`, [answerText, isCorrect, explanation, answerId]);
+
+    response.status(200).json({success: true});
+  } catch (e) {
+    response.status(400).json({e});
+  }
+}
+
+// Delete question answers
+async function deleteQuestionAnswer(request, response) {
+  try {
+    /* let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    } */
+
+    const answerId = request.params.answerId;
+    await pool.query(`DELETE FROM question_possible_answers WHERE id = $1`, [answerId]);
+
+    response.status(200).json({success: true});
+  } catch (e) {
+    response.status(400).json({e});
+  }
+}
+
+// Post question
+async function postQuestion(request, response) {
+  try {
+    /* let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    } */
+
+    const questionBankId = request.body.questionBankId;
+    const topicId = request.body.topicId;
+    const questionText = request.body.questionText;
+    const marksAwarded = request.body.marksAwarded;
+    
+    const questionType = request.query.questionType;
+
+    await pool.query(`
+    INSERT INTO questions(id, topicId, questionBankId, questionText, questionType, marksAwarded) 
+    VALUES(default, $1, $2, $3, $4, $5)`, [topicId, questionBankId, questionText, questionType, marksAwarded])
+
+    response.status(200).json({sucess: true});
+  } catch(e) {
+    response.status(400).json({e});
+  }
+}
+
+// Put Question
+async function putQuestion(request, response) {
+  try {
+    /* let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    } */
+
+    const questionId = request.params.questionId;
+    const topicId = request.body.topicId;
+    const questionText = request.body.questionText;
+    const marksAwarded = request.body.marksAwarded;
+    const questionType = request.query.questionType;
+
+    await pool.query(`
+    UPDATE questions 
+    SET topicId = $1, questionText = $2, questionType = $3, marksAwarded = $4
+    WHERE id = $5`, [topicId, questionText, questionType, marksAwarded, questionId])
+
+    response.status(200).json({sucess: true});
+  } catch (e) {
+    response.status(400).json({e});
+  }
+}
+
+// Delete Question
+async function deleteQuestion(request, response) {
+  try {
+    /* let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    } */
+
+    const questionId = request.params.questionId;
+    await pool.query(`DELETE FROM questions WHERE id = $1`, [questionId]);
+
+    response.status(200).json({success:true});
+  } catch (e) {
+    response.status(400).json({e});
+  }
+}
+
 module.exports = {
   getQuizById,
   getAllQuizzes,
@@ -520,5 +657,11 @@ module.exports = {
   deleteStudentAttemptByid,
   postStudentAnswer,
   putStudentAnswer,
-  postStudentAttempt
+  postStudentAttempt,
+  postQuestionAnswer,
+  putQuestionAnswer,
+  deleteQuestionAnswer,
+  postQuestion,
+  deleteQuestion,
+  putQuestion
 };

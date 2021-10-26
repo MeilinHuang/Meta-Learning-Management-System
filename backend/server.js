@@ -686,6 +686,36 @@ app.put("/topicGroup/:topicGroupId/quizzes/:quizId/:questionId/:studentId", asyn
   await assessment.putStudentAnswer(request, response);
 });
 
+app.post("/topicGroup/quizzes/question/answer", async (request, response) => {
+  console.log(`POST /topicGroup/quizzes/question/answer`);
+  await assessment.postQuestionAnswer(request, response);
+});
+
+app.put("/topicGroup/quizzes/question/answer/:answerId", async (request, response) => {
+  console.log(`PUT /topicGroup/quizzes/question/answer/${request.params.answerId}`);
+  await assessment.putQuestionAnswer(request, response);
+});
+
+app.delete("/topicGroup/quizzes/question/answer/:answerId", async (request, response) => {
+  console.log(`DELETE /topicGroup/quizzes/question/answer/${request.params.answerId}`);
+  await assessment.deleteQuestionAnswer(request, response);
+});
+
+app.post("/questionBank/question", async (request, response) => {
+  console.log(`POST /questionBank/question/new`);
+  await assessment.postQuestion(request, response);
+});
+
+app.put("/questionBank/question/edit/:questionId", async (request, response) => {
+  console.log(`PUT /questionBank/question/edit/${request.params.questionId}`);
+  await assessment.putQuestion(request, response);
+});
+
+app.delete("/questionBank/question/delete/:questionId", async (request, response) => {
+  console.log(`DELETE /questionBank/question/delete/${request.params.questionId}`);
+  await assessment.deleteQuestion(request, response);
+});
+
 /***************************************************************
                        Lecture and Tutorial Functions
 ***************************************************************/
