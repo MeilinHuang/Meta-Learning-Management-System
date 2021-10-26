@@ -136,6 +136,7 @@ export default function TopicTreeList() {
     group: "",
     discipline: "",
     creator: "",
+    tags: [],
   });
 
   useEffect(async function () {
@@ -257,6 +258,7 @@ export default function TopicTreeList() {
                                         matList[mat.type].push(mat.name);
                                       }
                                     });
+                                    console.log('tags', display);
                                     let tmp = {
                                       id: topic.id,
                                       title: topic.name,
@@ -268,9 +270,10 @@ export default function TopicTreeList() {
                                         practice: matList.practice,
                                         assessments: matList.assessment,
                                       },
-                                      group: "",
+                                      group: topic.group,
                                       discipline: "",
                                       creator: "",
+                                      tags: topic.tags
                                     };
                                     setListPrereqs(x.prerequisites_list);
                                     setSelectedNode(tmp);
