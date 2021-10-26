@@ -14,6 +14,7 @@ import {
 import CategoriesList from "./CategoriesList.js";
 
 function TopicAccordion({ topic, course }) {
+    
   return (
     <AccordionItem id={"topic-" + topic.name}>
       <Flex width="100%">

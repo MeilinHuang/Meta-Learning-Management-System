@@ -9,7 +9,7 @@ import { backend_url } from "../Constants.js";
 import { isLoggedIn } from "../utils/helpers.js";
 import CourseInvite from "../components/enrollment/JoinCourse";
 
-function CoursePage() {
+function MainPage() {
   const history = useHistory();
   const links = [
     {
@@ -34,24 +34,28 @@ function CoursePage() {
   useEffect(() => {
     //Need to get user logged in
     if (isLoggedIn()) {
-      const options = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/JSON",
-          Authorisation: `Bearer ${localStorage.getItem("token")}`,
-        },
-      };
-      fetch(backend_url + `user/${localStorage.getItem("id")}`, options)
-        .then((e) => e.json())
-        .then((e) => setUser(e));
-    } else {
-      history.push("/login");
+        const options = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/JSON",
+                Authorisation: `Bearer ${localStorage.getItem("token")}`,
+            },
+        };
+        fetch(backend_url + `user/${localStorage.getItem("id")}`, options)
+            .then((e) => e.json())
+            .then((e) => {
+                console.log(e)
+                setUser(e)
+            });
+    } 
+    else {
+        history.push("/login");
     }
   }, []);
 
   return (
     <div>
-      <Box position="sticky" width="100%" top={0} zIndex={100}>
+      <Box position="sticky" width="100%" top={0} zIndex={5}>
         <Box position="fixed" left={0}>
           <Sidebar
             links={links}
@@ -86,4 +90,4 @@ function CoursePage() {
   );
 }
 
-export default CoursePage;
+export default MainPage;

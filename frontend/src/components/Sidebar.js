@@ -184,7 +184,7 @@ function Sidebar({
           </MenuButton>
           <Portal>
             <MenuList
-              zIndex={100}
+              zIndex={5}
               placement="right"
               onClick={(e) => {
                 let tmp = window.location.pathname
@@ -245,7 +245,7 @@ function Sidebar({
                 </Flex>
               </MenuButton>
               <Portal>
-                <MenuList zIndex={100}>
+                <MenuList zIndex={5}>
                   <MenuItem>Profile</MenuItem>
                   <MenuItem>Settings</MenuItem>
                   <MenuItem>Logout</MenuItem>

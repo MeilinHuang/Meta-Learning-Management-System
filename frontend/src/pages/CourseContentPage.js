@@ -14,6 +14,7 @@ import { GrTree } from "react-icons/gr";
 import { SearchIcon } from "@chakra-ui/icons";
 import { useHistory } from "react-router-dom";
 import TopicAccordion from "../components/content/TopicAccordion.js";
+import { backend_url } from "../Constants.js"
 
 function CourseContentPage({ topicGroup }) {
   const [data, setData] = useState(null);
@@ -21,7 +22,6 @@ function CourseContentPage({ topicGroup }) {
   const treeButton = useBreakpointValue({ base: <GrTree />, md: "TOPIC TREE" });
 
   let history = useHistory();
-  let course = history.location.pathname.split("/").filter((e) => e !== "")[1];
   useEffect(() => {
     if (topicGroup && topicGroup.topics_list.length > 0) {
       setData(topicGroup.topics_list);
@@ -69,15 +69,19 @@ function CourseContentPage({ topicGroup }) {
       });
     }
   });
+
   return (
     <>
       <Flex justify="center" marginBottom={10}>
         <Flex alignItems="center" width={["100%", "100%", "80%"]}>
-          {/* TODO ONLY FOR ADMIN TO EDIT TOPIC TREE*/}
-          <Button onClick={() => history.push("/topictree")}>
-            {treeButton}
-          </Button>
-          <InputGroup marginLeft={5}>
+          {/* Check if user is staff */}
+          { localStorage.getItem("staff") === "1" ?
+            <Button marginRight={5} onClick={() => history.push("/topictree")}>
+                {treeButton}
+            </Button>
+            : null
+          }
+          <InputGroup>
             <InputLeftElement
               pointerEvents="none"
               children={<SearchIcon color="gray.300" />}
