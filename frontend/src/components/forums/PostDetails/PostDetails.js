@@ -4,7 +4,6 @@ import {
   Box,
   Divider,
   Flex,
-  Icon,
   InputGroup,
   Text,
   useToast,

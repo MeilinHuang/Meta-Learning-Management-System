@@ -45,10 +45,75 @@
     }
   ],
   "paths": {
-    "/quiz": {
+    "/topicGroup/{topicGroupId}/quizzes": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Gets all quizzes for topic group",
+        "parameters": [
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "summary": "Id of topic group",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": ["Assessment"],
         "summary": "Create new quiz",
+        "parameters": [
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "summary": "Id of topic group",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "questions",
+            "in": "query",
+            "description": "Array of question ids",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "example": 1
+              }
+            },
+            "style": "form",
+            "explode": false
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -86,25 +151,24 @@
         "x-codegen-request-body-name": "quizBody"
       }
     },
-    "/quiz/{quizId}": {
+    "/topicGroup/{topicGroupId}/quizzes/{quizId}": {
       "get": {
         "tags": ["Assessment"],
         "summary": "Get quiz containing questions from specified quiz id",
         "parameters": [
           {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Auth token",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "Bearer <Token>"
-            }
-          },
-          {
             "name": "quizId",
             "in": "path",
             "description": "Id of quiz we want to get",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "summary": "Id of topic group",
             "required": true,
             "schema": {
               "type": "integer"
@@ -150,7 +214,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -164,13 +228,37 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "summary": "Id of topic group",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "unlinkQuestions",
+            "in": "query",
+            "description": "Array of question ids to remove from quiz",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "example": 1
+              }
+            },
+            "style": "form",
+            "explode": false
           }
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Quiz"
+                "$ref": "#/components/schemas/PostQuiz"
               }
             }
           },
@@ -210,10 +298,19 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "summary": "Id of topic group",
+            "required": false,
+            "schema": {
+              "type": "integer"
             }
           },
           {
@@ -252,71 +349,7 @@
         }
       }
     },
-    "/quiz/{quizId}/question/{questionId}": {
-      "get": {
-        "tags": ["Assessment"],
-        "summary": "Get specific question from specified quiz",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Auth token",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "Bearer <Token>"
-            }
-          },
-          {
-            "name": "quizId",
-            "in": "path",
-            "description": "Id of quiz we want to get",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "questionId",
-            "in": "path",
-            "description": "Id of question we want",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/QuizQuestion"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/topicGroup/{topicGroupId}/quizzes/{quizId}/questions/{questionId}": {
       "put": {
         "tags": ["Assessment"],
         "summary": "Update question details from quiz id",
@@ -325,7 +358,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -335,7 +368,7 @@
             "name": "quizId",
             "in": "path",
             "description": "Id of quiz we want to get",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -347,6 +380,25 @@
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "summary": "Id of topic group",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "questionType",
+            "in": "query",
+            "description": "question type",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["mc", "sa", "cb"]
             }
           }
         ],
@@ -387,28 +439,19 @@
         "x-codegen-request-body-name": "questionBody"
       }
     },
-    "/questionBank/{questionBankId}": {
+    "/questionBank/questions": {
       "get": {
         "tags": ["Assessment"],
-        "summary": "Get list of questions with matching question bank id",
+        "summary": "Get questions from question bank",
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
-            }
-          },
-          {
-            "name": "questionBankId",
-            "in": "path",
-            "description": "Question bank Id",
-            "required": true,
-            "schema": {
-              "type": "integer"
             }
           }
         ],
@@ -442,36 +485,41 @@
             }
           }
         }
-      },
-      "put": {
+      }
+    },
+    "/questionBank/question": {
+      "post": {
         "tags": ["Assessment"],
-        "summary": "Update name of question bank",
+        "summary": "Create new question",
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
             }
           },
           {
-            "name": "questionBankId",
-            "in": "path",
-            "description": "Question bank Id",
+            "name": "questionType",
+            "in": "query",
+            "description": "Type of Question",
             "required": true,
             "schema": {
-              "type": "integer"
-            }
+              "type": "string",
+              "enum": ["mc", "sa", "cb", "la"]
+            },
+            "style": "form",
+            "explode": false
           }
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PutQuestionBank"
+                "$ref": "#/components/schemas/PostQuestion"
               }
             }
           },
@@ -501,26 +549,102 @@
             }
           }
         },
-        "x-codegen-request-body-name": "questionBankName"
-      },
-      "delete": {
+        "x-codegen-request-body-name": "questionBody"
+      }
+    },
+    "/questionBank/question/edit/{questionId}": {
+      "put": {
         "tags": ["Assessment"],
-        "summary": "Delete question bank",
+        "summary": "Update question",
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
             }
           },
           {
-            "name": "questionBankId",
+            "name": "questionId",
             "in": "path",
-            "description": "Question bank Id",
+            "description": "Id of question to edit",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "questionType",
+            "in": "query",
+            "description": "Type of Question",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["mc", "sa", "cb", "la"]
+            },
+            "style": "form",
+            "explode": false
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutQuestion"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      }
+    },
+    "/questionBank/question/delete/{questionId}": {
+      "delete": {
+        "tags": ["Assessment"],
+        "summary": "Delete question by id",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of question to delete",
             "required": true,
             "schema": {
               "type": "integer"
@@ -550,23 +674,40 @@
               }
             }
           }
-        }
+        },
+        "x-codegen-request-body-name": "questionBody"
       }
     },
-    "/questionBank": {
-      "get": {
+    "/topicGroup/quizzes/question/answer": {
+      "post": {
         "tags": ["Assessment"],
-        "summary": "Get list questions from question banks",
+        "summary": "Create new question possible answer",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostQuestionAnswer"
+              }
+            }
+          },
+          "required": false
+        },
         "responses": {
           "200": {
             "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetQuestionBankQuestions"
-                }
-              }
-            }
+            "content": {}
           },
           "400": {
             "content": {
@@ -586,10 +727,123 @@
               }
             }
           }
-        }
+        },
+        "x-codegen-request-body-name": "questionBody"
       }
     },
-    "/questionBank/question/{questionId}": {
+    "/topicGroup/quizzes/question/answer/{answerId}": {
+      "put": {
+        "tags": ["Assessment"],
+        "summary": "Update question possible answer",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "answerId",
+            "in": "path",
+            "description": "Id of answer to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutQuestionAnswer"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      },
+      "delete": {
+        "tags": ["Assessment"],
+        "summary": "Delete question possible answer",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "answerId",
+            "in": "path",
+            "description": "Id of answer to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      }
+    },
+    "/questionBank/questions/{questionId}": {
       "get": {
         "tags": ["Assessment"],
         "summary": "Get question from question bank with specified question id",
@@ -598,7 +852,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -644,282 +898,16 @@
             }
           }
         }
-      }
-    },
-    "/poll": {
-      "post": {
-        "tags": ["Assessment"],
-        "summary": "Create new poll",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostPoll"
-              }
-            }
-          },
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "pollBody"
-      }
-    },
-    "/poll/{pollId}": {
-      "get": {
-        "tags": ["Assessment"],
-        "summary": "Get poll from specified poll id",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Auth token",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "Bearer <Token>"
-            }
-          },
-          {
-            "name": "pollId",
-            "in": "path",
-            "description": "Id of poll",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Poll"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": ["Assessment"],
-        "summary": "Change data of poll",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Auth token",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "Bearer <Token>"
-            }
-          },
-          {
-            "name": "pollId",
-            "in": "path",
-            "description": "Id of poll we want",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostPoll"
-              }
-            }
-          },
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "pollBody"
       },
       "delete": {
         "tags": ["Assessment"],
-        "summary": "Delete Poll",
+        "summary": "Delete question from question bank",
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "Bearer <Token>"
-            }
-          },
-          {
-            "name": "pollId",
-            "in": "path",
-            "description": "Id of poll we want",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/quiz/studentAnswers/student/{studentId}": {
-      "get": {
-        "tags": ["Assessment"],
-        "summary": "Get list of student_answer matching the student ID",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Auth token",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "Bearer <Token>"
-            }
-          },
-          {
-            "name": "studentId",
-            "in": "path",
-            "description": "Id of student we want",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetStudentAnswer"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/quiz/results/question/{questionId}/answerCount": {
-      "get": {
-        "tags": ["Assessment"],
-        "summary": "Get number of students that selected each answer for a question",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -938,13 +926,7 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetAnswerCount"
-                }
-              }
-            }
+            "content": { }
           },
           "400": {
             "content": {
@@ -967,25 +949,520 @@
         }
       }
     },
-    "/questionBank/{questionBankId}/question": {
-      "post": {
+    "/questionBank/questions/start/{questionStartId}/limit/{limit}": {
+      "get": {
         "tags": ["Assessment"],
-        "summary": "Create new question for question bank",
+        "summary": "Get questions from start id and with max limit",
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
             }
           },
           {
-            "name": "questionBankId",
+            "name": "questionStartId",
             "in": "path",
-            "description": "Id of questionBank we want",
+            "description": "Id of question we want to start at",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "path",
+            "description": "Number of questions we want to see",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questionBank/questions/start/{questionStartId}/limit/{limit}/sortBy/{sortTerm}": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get questions with limit, start id and sorted by type or topic group",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "questionStartId",
+            "in": "path",
+            "description": "Id of question we want to start at",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "path",
+            "description": "Number of questions we want to see",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sortTerm",
+            "in": "path",
+            "description": "Sort by [topic group name, question type]",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questionBank/questions/filter/{filterTopic}": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get questions with limit, start id and sorted by type or topic group",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "filterTopic",
+            "in": "path",
+            "description": "Topic id filter",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{topicGroupId}/quizzes/{quizId}/studentAttempt": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get student attempts for quiz",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "description": "Topic group id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{topicGroupId}/quizzes/{quizId}/studentAttempt/{studentId}": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "Get student attempt by id",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "description": "Topic group id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "description": "Id of student",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Assessment"],
+        "summary": "Post student attempt",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "description": "Topic group id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "description": "Id of student",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "answers",
+            "in": "query",
+            "description": "Array of answer ids",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "example": "a"
+              }
+            },
+            "style": "form",
+            "explode": false
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostStudentAttempt"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Assessment"],
+        "summary": "Delete student attempt",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "description": "Topic group id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "description": "Id of student",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topicGroup/{topicGroupId}/quizzes/{quizId}/{questionId}/{studentId}": {
+      "post": {
+        "tags": ["Assessment"],
+        "summary": "Post student answer",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "description": "Topic group id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "description": "Id of student",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of quuestion",
             "required": true,
             "schema": {
               "type": "integer"
@@ -996,7 +1473,106 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PostQuizQuestion"
+                "type": "object",
+                "properties": {
+                  "answer": {
+                    "type": "string",
+                    "example": "d"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "questionBody"
+      }, 
+      "put": {
+        "tags": ["Assessment"],
+        "summary": "Update student answer",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "topicGroupId",
+            "in": "path",
+            "description": "Topic group id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "quizId",
+            "in": "path",
+            "description": "Id of quiz",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "description": "Id of student",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "questionId",
+            "in": "path",
+            "description": "Id of quuestion",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "answer": {
+                    "type": "string",
+                    "example": "d"
+                  }
+                }
               }
             }
           },
@@ -1028,280 +1604,8 @@
         },
         "x-codegen-request-body-name": "questionBody"
       }
-    },
-    "/quiz_question_answer": {
-      "post": {
-        "tags": ["Assessment"],
-        "summary": "Create new quiz question answer",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostQuizQuestionAnswer"
-              }
-            }
-          },
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "quizQuestionAnswerBody"
-      }
-    },
-    "/student_answer": {
-      "post": {
-        "tags": ["Assessment"],
-        "summary": "Create new student answer",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/QuizStudentAnswer"
-              }
-            }
-          },
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "studentAnswerBody"
-      }
-    },
-    "/quiz/{quizId}/question/{questionId}/answer/{quizQuestionAnswerId}": {
-      "put": {
-        "tags": ["Assessment"],
-        "summary": "Update quiz question answer",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Auth token",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "Bearer <Token>"
-            }
-          },
-          {
-            "name": "quizId",
-            "in": "path",
-            "description": "Id of quiz we want",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "questionId",
-            "in": "path",
-            "description": "Id of question we want",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "quizQuestionAnswerId",
-            "in": "path",
-            "description": "Id of quiz question answer we want",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PutQuizQuestionAnswer"
-              }
-            }
-          },
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "quizQuestionAnswerBody"
-      }
-    },
-    "/question/{questionId}/delete": {
-      "delete": {
-        "tags": ["Assessment"],
-        "summary": "Delete question from id",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Auth token",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "Bearer <Token>"
-            }
-          },
-          {
-            "name": "questionId",
-            "in": "path",
-            "description": "Id of question",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/questionBank/{questionBankId}/question/{questionId}": {
-      "delete": {
-        "tags": ["Assessment"],
-        "summary": "Delete question from question bank",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Auth token",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "Bearer <Token>"
-            }
-          },
-          {
-            "name": "questionBankId",
-            "in": "path",
-            "description": "Id of questionBank we want",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "questionId",
-            "in": "path",
-            "description": "Id of question",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
+    }
+,
     "/login": {
       "post": {
         "tags": ["Authentication"],
@@ -7482,75 +7786,41 @@
           }
         }
       },
-      "GetAllLevels": {
+      "PostQuestionAnswer": {
         "type": "object",
         "properties": {
-          "levels": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "_id": {
-                  "type": "integer"
-                },
-                "title": {
-                  "type": "string",
-                  "example": "Level"
-                },
-                "topicGroupId": {
-                  "type": "integer"
-                },
-                "levelType": {
-                  "type": "string"
-                },
-                "questionNumbers": {
-                  "type": "integer",
-                  "example": 3
-                },
-                "estimatedTimeRequired": {
-                  "type": "integer",
-                  "example": 15
-                }
-              },
-              "description": "List of levels"
-            }
+          "questionId": {
+            "type": "integer",
+            "example": 1
+          },
+          "answerText": {
+            "type": "string",
+            "example": "This is the answer"
+          },
+          "isCorrect": {
+            "type": "boolean",
+            "example": false
+          },
+          "explanation": {
+            "type": "string",
+            "example": "This is the explanation"
           }
         }
       },
-      "GetAllLevelQuestions": {
+      "PutQuestionAnswer": {
         "type": "object",
         "properties": {
-          "levelQuestions": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "_id": {
-                  "type": "integer"
-                },
-                "title": {
-                  "type": "string",
-                  "example": "What is the day today?"
-                },
-                "questionType": {
-                  "type": "string",
-                  "example": "Multiple Choice"
-                },
-                "correctAnswer": {
-                  "type": "string",
-                  "example": "Friday"
-                },
-                "mediaLink": {
-                  "type": "string",
-                  "example": "123.png"
-                },
-                "estimatedTimeRequired": {
-                  "type": "integer",
-                  "example": 1
-                }
-              },
-              "description": "List of questions for level"
-            }
+          "answerText": {
+            "type": "string",
+            "example": "This is the answer"
+          },
+          "isCorrect": {
+            "type": "boolean",
+            "example": false
+          },
+          "explanation": {
+            "type": "string",
+            "example": "This is the explanation"
           }
         }
       },
@@ -7617,26 +7887,20 @@
           }
         }
       },
-      "PutLevel": {
+      "PutQuestion": {
         "type": "object",
         "properties": {
-          "title": {
+          "topicId": {
+            "type": "integer",
+            "example": 1
+          },
+          "questionText": {
             "type": "string",
-            "example": "Level"
+            "example": "What is 5 x 5"
           },
-          "topicGroupId": {
-            "type": "integer"
-          },
-          "levelType": {
-            "type": "string"
-          },
-          "questionNumbers": {
+          "marksAwarded": {
             "type": "integer",
-            "example": 3
-          },
-          "estimatedTimeRequired": {
-            "type": "integer",
-            "example": 15
+            "example": 10
           }
         }
       },
@@ -7761,27 +8025,6 @@
           }
         }
       },
-      "PostQuizQuestionAnswer": {
-        "type": "object",
-        "properties": {
-          "quizId": {
-            "type": "integer",
-            "example": 2
-          },
-          "questionId": {
-            "type": "integer",
-            "example": 4
-          },
-          "isCorrectAnswer": {
-            "type": "boolean",
-            "example": false
-          },
-          "description": {
-            "type": "string",
-            "example": "2 + 2 = 4"
-          }
-        }
-      },
       "QuizQuestionAnswer": {
         "type": "object",
         "properties": {
@@ -7807,74 +8050,24 @@
           }
         }
       },
-      "QuizStudentAnswer": {
+      "PostQuestion": {
         "type": "object",
         "properties": {
-          "studentId": {
+          "questionBankId": {
             "type": "integer",
             "example": 1
           },
-          "quizId": {
+          "topicId": {
             "type": "integer",
             "example": 2
           },
-          "questionId": {
-            "type": "integer",
-            "example": 5
+          "questionText": {
+            "type": "string",
+            "example": "What is 1 + 1"
           },
-          "answerSelectedId": {
+          "marksAwarded": {
             "type": "integer",
             "example": 3
-          }
-        }
-      },
-      "QuestionBank": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "integer",
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "example": "Question Bank 1"
-          }
-        }
-      },
-      "GetAnswerCount": {
-        "type": "object",
-        "properties": {
-          "QuizQuestionAnswer": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "example": 1
-                },
-                "quiz_id": {
-                  "type": "integer",
-                  "example": 1
-                },
-                "question_id": {
-                  "type": "integer",
-                  "example": 1
-                },
-                "is_correct_answer": {
-                  "type": "boolean",
-                  "example": true
-                },
-                "description": {
-                  "type": "string",
-                  "example": "5 x 5 = 12"
-                },
-                "answer_count": {
-                  "type": "integer",
-                  "example": 30
-                }
-              }
-            }
           }
         }
       },
