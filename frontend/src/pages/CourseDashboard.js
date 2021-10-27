@@ -237,7 +237,7 @@ function CourseDashboard({
             <Spinner />
           </Flex>
         )}
-        {announcements.length === 0 ?
+        {announcements.length === 0 && !loading ?
           <Box my="24px" textAlign="center">There are no announcements yet</Box>
           :
           announcements.map((announcement) => (
