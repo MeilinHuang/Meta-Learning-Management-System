@@ -130,6 +130,7 @@ app.get("/topicGroup", async (request, response) => {
   await database.getAllTopicGroups(request, response);
 });
 
+
 app.get("/topicGroup/all", async (request, response) => {
   await database.getAllTopics(request, response);
 });
@@ -138,6 +139,12 @@ app.get("/topicGroup/:topicGroupName", async (request, response) => {
   console.log(`GET /topicGroup/${request.params.topicGroupName}`);
   await database.getTopicGroup(request, response);
 });
+
+app.put("/topicGroup/:topicGroupName/searchable/:searchable", async (request, response) => {
+  console.log(`PUT /topicGroup/${request.params.topicGroupName}/searchable/${request.params.searchable}`);
+  await database.setSearchable(request, response);
+});
+
 
 app.get("/topicGroup/:topicGroupName/topic", async (request, response) => {
   console.log(`GET /topicGroup/${request.params.topicGroupName}/topic`);
@@ -265,11 +272,43 @@ app.put("/topic/:fileId", async (request, response) => {
 ***************************************************************/
 
 app.post("/enroll/code/:topicGroupName", async (request, response) => {
-  console.log(`POST enroll/code/${request.params.topicGroupName}`);
+  console.log(`POST /enroll/code/${request.params.topicGroupName}`);
   await database.generateCode(request, response);
 });
 
 // app.put("/enroll/code/:inviteCode");
+
+// Gets all codes for a topic group
+app.get("/enroll/codes/:topicGroupName", async (request, response) => {
+  console.log(`GET /enroll/codes/${request.params.topicGroupName}`);
+  await database.getCourseCodes(request, response);
+});
+
+// Gets a specific code
+app.get("/enroll/code/:inviteCode", async (request, response) => {
+  console.log(`GET /enroll/code/${request.params.inviteCode}`);
+  await database.getCourseCode(request, response);
+});
+// Gets a specific code
+app.delete("/enroll/code/:inviteCode", async (request, response) => {
+  console.log(`DELETE /enroll/code/${request.params.inviteCode}`);
+  await database.deleteCourseCode(request, response);
+});
+
+app.get("/enrollments/:topicGroupName", async (request, response) => {
+  console.log(`GET /enrollments/${request.params.topicGroupName}`);
+  await database.getEnrollments(request, response);
+});
+
+app.put("/enroll/:topicGroupName/:zId", async (request, response) => {
+  console.log(`PUT /enroll/${request.params.topicGroupName}/${request.params.zId}`);
+  await database.enrollUser(request, response);
+});
+
+app.put("/unenroll/:topicGroupName/:userId", async (request, response) => {
+  console.log(`PUT /unenroll/${request.params.topicGroupName}/${request.params.userId}`);
+  await database.unenrollUser(request, response);
+});
 
 /***************************************************************
                        Forum Functions
