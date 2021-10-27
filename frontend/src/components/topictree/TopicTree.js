@@ -42,14 +42,14 @@ export default function TopicTree() {
         "creator": "",
         'tags': []
     });
-    const { 
-        isOpen: isOpenModal, 
-        onOpen: onOpenModal, 
-        onClose: onCloseModal 
+    const {
+        isOpen: isOpenModal,
+        onOpen: onOpenModal,
+        onClose: onCloseModal
     } = useDisclosure();
 
     const treeStructure = (jsonData) => {
-        
+
         expand = {};
 
         let newJson = {
@@ -82,9 +82,9 @@ export default function TopicTree() {
                         node.materials_strings.content.push(course_material.name);
                     }
                 }
-                
+
                 node['tags'] = topic.tags;
-                
+
                 newJson.nodes.push(node);
                 for (let prereq of topic.prereqs) {
                     newJson.links.push({
@@ -95,26 +95,26 @@ export default function TopicTree() {
             }
         }
         setTopicGroups(tempTopicGroups);
-        
-        
+
+
         return newJson;
     }
 
 
     const getListOfPrerequisites = (id, data) => {
-        
-        
+
+
         let linksArray = [];
         for (let i = 0; i < data.links.length; i++) {
             if (data.links[i].target === id) {
                 linksArray.push(data.links[i].source);
             }
         }
-        
-        
+
+
         let prereqs = [];
         let nodes = [];
-        
+
         for (let i = 0; i < data.nodes.length; i++) {
             let found = false;
             for (let j = 0; j < linksArray.length; j++) {
@@ -128,15 +128,15 @@ export default function TopicTree() {
                 nodes.push({'value': data.nodes[i].id.toString(), 'label': data.nodes[i].title});
             }
         }
-        
-        
+
+
         setListPrereqs(prereqs);
         setNotListPrereqs(nodes);
         onOpenModal();
     }
 
     function init(data) {
-        
+
 
         if (simulation) {
             // clear graph
@@ -150,11 +150,11 @@ export default function TopicTree() {
             // lables && lables.remove();
         }
 
-        
-        
+
+
         tempNodes = new Array(emptyNodes).fill({}); // temporary fix
         emptyNodes += 1;
-        
+
         let seenGroups = {};
         let nodeDict = {};
         let i = 76754;
@@ -173,7 +173,7 @@ export default function TopicTree() {
                 }
             } else if (node.hasOwnProperty('id')) {
                 node.type = 'topic';
-                
+
                 tempNodes.push({
                     'id': node.id,
                     'name': node.title,
@@ -188,17 +188,17 @@ export default function TopicTree() {
             nodeDict[node.id] = node;
             i += 1;
         }
-        
-        
+
+
 
         tempLinks = [];
         let linkDict = {};
         for (let link of data.links) {
             let linkToAppend = {};
-            
+
             if (expand[nodeDict[link.source].group] == false) {
                 linkToAppend['source'] = seenGroups[nodeDict[link.source].group];
-                
+
             } else {
                 linkToAppend['source'] = link.source;
             }
@@ -209,16 +209,16 @@ export default function TopicTree() {
                 linkToAppend['target'] = link.target;
             }
             let linkStr = linkToAppend['source'] + ',' + linkToAppend['target'];
-            
+
             if (!linkDict.hasOwnProperty(linkStr) && linkToAppend['source'] != linkToAppend['target']) {
-                
+
                 linkDict[linkStr] = true;
                 tempLinks.push(JSON.parse(JSON.stringify(linkToAppend)));
-            }   
+            }
         }
 
-        
-        
+
+
         let preprocessedData = {};
         // make it easier to access instead of having to traverse data.nodes each time
         for (let node of tempNodes) {
@@ -228,12 +228,11 @@ export default function TopicTree() {
         }
         var color = d3.scaleOrdinal(d3.schemeSet3);
         var groupFill = function (d, i) { return color(d.key); };
-        
+
         let groups = d3.nest().key(function (d) { return d.group; }).entries(tempNodes);
-        let offset = 0;
+        let offset = 10;
 
         groupPath = function (d) { // important for claultaing the hull
-            // console.log('dddd', d);
             // takes the number of nodes to work out how to draw thw hull
             // null when trying to make a hull with two nodes only - so need to a way around it
             // https://stackoverflow.com/questions/45912361/d3-how-to-draw-multiple-convex-hulls-on-groups-of-force-layout-nodes
@@ -254,22 +253,32 @@ export default function TopicTree() {
             } else if (d.values.length > 0 && expand[d.values[0].group] == false) {
                 // do nothing don't want hull for group node
             } else if (d.values.length === 2) {
+                console.log('2');
                 var arr = d.values.map(function (i) {
                     return [i.x + offset, i.y + offset];
                 })
                 arr.push([arr[0][0], arr[0][1]]);
-                return "M" + d3.polygonHull(arr).join("L") + "Z";
+                var poly = d3.polygonHull(arr);
+                if (poly) {
+                    return "M" + poly.join("L") + "Z";
+                }
+                // return "M" + d3.polygonHull(arr).join("L") + "Z";
             } else if (expand[d.values[0].group] == true) {
-                return "M" +
-                    d3.polygonHull(d.values.map(function (i) {
-                        return [i.x + offset, i.y + offset];
-                    }))
-                        .join("L") + "Z";
+                console.log('last if')
+                var poly = d3.polygonHull(d.values.map(function(i) { return [i.x, i.y]; }));
+                if (poly){
+                return "M" + poly.join("L") + "Z";
+                }
+                // return "M" +
+                //     d3.polygonHull(d.values.map(function (i) {
+                //         return [i.x + offset, i.y + offset];
+                //     }))
+                //         .join("L") + "Z";
             }
-    
+
         };
         convexHull = g.append('g').attr('class', 'hull');
-        
+
         // arrow heads
         arrows = svg.append("svg:defs").selectAll("marker")
             .data(["end"])
@@ -283,7 +292,7 @@ export default function TopicTree() {
             .attr("orient", "auto")
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
-        
+
         // Initialize the links
         link = g.append('g')
             .attr('class', 'links')
@@ -297,8 +306,8 @@ export default function TopicTree() {
             .style("stroke", "#666")
             .style("stroke-width", "1.5px")
             .style("opacity", 0.8);
-            
-        
+
+
         // Initialize the nodes
         node = g
             .attr("class", "nodes")
@@ -306,23 +315,23 @@ export default function TopicTree() {
             .data(tempNodes)
             .enter().append("g")
             .on("click", function() {
-                
+
                 let topicName = d3.select(this).text();
                 if (seenGroups.hasOwnProperty(topicName)) {
                     expand[topicName] = true;
                     init(data);
                 } else {
                     let topicName = d3.select(this).text();
-                    
+
                     let nodeData = tempNodes.filter(function (dataValue) {
-                        
+
                         return dataValue.title === topicName;
                     });
-                    
-                    
+
+
                     setSelectedNode(nodeData[0]);
-                    
-                    
+
+
                     setSelectedTopicGroup(nodeData[0].group);
                     getListOfPrerequisites(nodeData[0].id, data);
                 }
@@ -334,7 +343,7 @@ export default function TopicTree() {
             return radius;
         })
         .attr("fill", function(r) {
-            
+
             if (r.type == 'group') {
                 return '#68b559';
             }
@@ -344,7 +353,7 @@ export default function TopicTree() {
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended))
-            
+
         lables = node.append("text")
             .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'middle')
@@ -353,7 +362,7 @@ export default function TopicTree() {
             .text(function(d) {
               return d.title;
             })
-        
+
         linkNodes = [];
         tempLinks.forEach(function(link) {
             linkNodes.push({
@@ -361,7 +370,7 @@ export default function TopicTree() {
                 target: preprocessedData[link.target]
             });
         });
-        
+
         simulation
             .nodes(tempNodes.concat(linkNodes))
             .on("tick", ticked);
@@ -373,57 +382,43 @@ export default function TopicTree() {
                 // if(d.type=='resource') return 300;
                 // else return 150;
                 // return d.distance;
-            });  
+            });
 
         // This function is run at each iteration of the force algorithm, updating the nodes position.
         function ticked() {
             genCH = convexHull.selectAll("path")
             .data(groups)
             .attr("d", groupPath)
+            .attr('pointer-events', 'none')
             .enter().insert("path", "circle")
             .style("fill", groupFill)
             .style("stroke", groupFill)
             .style("stroke-width", 140)
             .style("stroke-linejoin", "round")
-            .style("opacity", .5)
-            .attr("d", groupPath);
+            .style("opacity", .5);
 
-            node
-            .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; })
+            link.attr('d', function (d) {
+                var dx = d.target.x - d.source.x,
+                    dy = d.target.y - d.source.y,
+                    dr = Math.sqrt(dx * dx + dy * dy);
 
-            link
-                .attr('d', function (d) {
-                    var dx = d.target.x - d.source.x,
-                        dy = d.target.y - d.source.y,
-                        dr = Math.sqrt(dx * dx + dy * dy);
+                var val2 = 'M' + d.source.x + ',' + d.source.y + 'L' + (d.target.x) + ',' + (d.target.y);
+                return val2;
+            });
 
-                    var val2 = 'M' + d.source.x + ',' + d.source.y + 'L' + (d.target.x) + ',' + (d.target.y);
-                    return val2;
+            node.attr("transform", function(d) {
+                    return "translate(" + d.x + "," + d.y + ")";
+                })
 
-                });
-
-            // link.attr('d', function (d) {
-            //     var dx = d.target.x - d.source.x,
-            //         dy = d.target.y - d.source.y,
-            //         dr = Math.sqrt(dx * dx + dy * dy);
-
-            //     var val2 = 'M' + d.source.x + ',' + d.source.y + 'L' + (d.target.x) + ',' + (d.target.y);
-            //     return val2;
-            // });
-        
-            // node.attr("transform", function(d) {
-            //         return "translate(" + d.x + "," + d.y + ")";
-            //     })
-                
         }
 
-        
+
     }
 
     useEffect(() => {
 
-        
-        
+
+
         let size = 500;
 
         let width = window.innerWidth;
@@ -441,37 +436,65 @@ export default function TopicTree() {
             .forceLink()
             .id(function (link) { return link.id });
         var inpos = [], counterX = 1, inposY = [], counterY = 1;
-        // simulation = d3
-        //     .forceSimulation()
-        //     .force('link', linkForce)
-        //     .force('forceX', d3.forceX(function (d) {
-        //         console.log('d', d);
-        //         if (inpos[d.title]) {
-        //             // console.log(inpos);
-        //             return inpos[d.group];
-        //         } else {
-        //             inpos[d.group] = width / counterX;
-        //             // console.log(inpos);
-        //             counterX++;
-        //             return inpos[d.group];
-        //         }
-        //     }))
-        //     .force('forceY', d3.forceY(function (d) {
-        //         console.log('d', d);
-        //         if (inposY[d.group]) {
-        //             // console.log(inposY);
-        //             return inposY[d.group];
-        //         } else {
-        //             inposY[d.group] = height / (Math.random() * (d.group.length - 0 + 1) + 1);
-        //             // console.log(inposY);
-        //             return inposY[d.group];
-        //         }
-        //     }));
+        simulation = d3
+            .forceSimulation()
+            .force('link', linkForce)
+            .force('forceX', d3.forceX(function (d) {
+                console.log('d', d);
+                if (!d.hasOwnProperty('title'))  {// is fake node
+                    return 0;
+                }
+                if (inpos[d.title]) { // is a node?
+                    // console.log(inpos);
+                    if (d.type == 'group') {
+                        return inpos[d.title];
+                    } else {
+                        return inpos[d.group];
+                    }
 
-        simulation = d3.forceSimulation()
-            .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(400))
-            .force("charge", d3.forceManyBody().strength(-70))
-            .force("center", d3.forceCenter(width / 2, height / 2));
+                } else {
+                    if (d.type == 'group') {
+                        inpos[d.title] = width / counterX;
+                    } else {
+                        inpos[d.group] = width / counterX;
+                    }
+                    // console.log(inpos);
+                    counterX++;
+                    if (d.type == 'group') {
+                        return inpos[d.title];
+                    }
+                    return inpos[d.group];
+                }
+            }))
+            .force('forceY', d3.forceY(function (d) {
+                console.log('d', d);
+                if (!d.hasOwnProperty('title')) {
+                    return 0;
+                }
+                if (d.hasOwnProperty('group') && inposY[d.group]) {
+                    // console.log(inposY);
+                    return inposY[d.group];
+                } else if (inposY[d.title]) {
+                    return inposY[d.title];  
+                } else {
+                    if (d.hasOwnProperty('group')) {
+                        inposY[d.group] = height / (Math.random() * (3) + 1); 
+                        return inposY[d.group];
+                    } else {
+                        inposY[d.title] = height / (Math.random() * (3) + 1);
+                        return inposY[d.title];
+                    }
+                    
+                    // console.log(inposY);
+                    
+                    
+                }
+            }));
+
+        // simulation = d3.forceSimulation()
+        //     .force("link", d3.forceLink().id(function(d) { console.log('d', d); return d.id; }).distance(1000))
+            // .force("charge", d3.forceManyBody().strength(-70))
+            //  .force("center", d3.forceCenter(width / 2, height / 2));
 
         // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
         fetch(get_all_topics(),
@@ -485,27 +508,27 @@ export default function TopicTree() {
             return res.json();
         })
         .then((res) => {
-            
+
             return treeStructure(res.result);
         })
         .then( function(data) {
             init(data);
 
         });
-        
+
     }, []);
 
     function dragstarted(d) {
-        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+        if (!d3.event.active) simulation.alphaTarget(0.05).restart();
         d.fx = d.x;
         d.fy = d.y;
     }
-      
+
     function dragged(d) {
         d.fx = d3.event.x;
         d.fy = d3.event.y;
     }
-      
+
     function dragended(d) {
         if (!d3.event.active) simulation.alphaTarget(0);
         d.fx = null;
@@ -519,5 +542,5 @@ export default function TopicTree() {
             <TopicTreeViewResource data={selectedNode} isOpen={isOpenModal} onClose={onCloseModal} prereqs={listPrereqs} topicGroupName={selectedTopicGroup} nodes={notListPrereqs} />
         </div>
     );
-    
+
 }
