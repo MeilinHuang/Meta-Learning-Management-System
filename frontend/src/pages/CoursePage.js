@@ -66,9 +66,9 @@ function CoursePage() {
             //Need to get user logged in
             fetch(backend_url + `user/${localStorage.getItem("id")}`, {
                 headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             })
             .then((e) => e.json())
