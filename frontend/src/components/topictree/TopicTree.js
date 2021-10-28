@@ -58,6 +58,9 @@ export default function TopicTree() {
         };
         let tempTopicGroups = [];
         for (let topicGroup of jsonData) {
+            if (topicGroup === null) {
+                continue;
+            }
             tempTopicGroups.push({'label': topicGroup.name, 'value': topicGroup.name});
             expand[topicGroup.name] = false;
             for (let topic of topicGroup.topics_list) {
