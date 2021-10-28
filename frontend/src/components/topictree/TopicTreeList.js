@@ -237,6 +237,7 @@ export default function TopicTreeList() {
                               cursor="pointer"
                               _hover={{ bg: "gray.100", fontWeight: "medium" }}
                               onClick={() => {
+                                let topicTags = topic.tags;
                                 fetch(get_prereqs(e.name, topic.name), {
                                   headers: {
                                     "Content-Type": "application/JSON",
@@ -273,7 +274,7 @@ export default function TopicTreeList() {
                                       group: topic.group,
                                       discipline: "",
                                       creator: "",
-                                      tags: topic.tags
+                                      tags: topicTags
                                     };
                                     setListPrereqs(x.prerequisites_list);
                                     setSelectedNode(tmp);
