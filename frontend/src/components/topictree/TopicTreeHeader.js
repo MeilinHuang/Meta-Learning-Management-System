@@ -96,6 +96,9 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         let tempTopics = [];
         let tempActualTopics = [];
         for (let topicGroup of jsonData.result) {
+            if (topicGroup === null) {
+                continue;
+            }
             for (let topic of topicGroup.topics_list) {
                 
                 topic['value'] = topic.name;
