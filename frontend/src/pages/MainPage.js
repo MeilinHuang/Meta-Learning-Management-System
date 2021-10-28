@@ -7,21 +7,14 @@ import MainSelection from "./MainSelection.js";
 import { useBreakpointValue, Flex, Container, Box } from "@chakra-ui/react";
 import { backend_url } from "../Constants.js";
 import { isLoggedIn } from "../utils/helpers.js";
+import CourseInvite from "../components/enrollment/JoinCourse";
 
-function CoursePage() {
+function MainPage() {
   const history = useHistory();
-  const links = [
+  const [links, setLinks] = useState([
     {
       name: "Home",
       url: "/",
-    },
-    {
-      name: "Topic Tree",
-      url: "/topictree",
-    },
-    {
-      name: "Enrolments",
-      url: "/enrolments",
     },
     {
       name: "Gamification",
@@ -31,7 +24,7 @@ function CoursePage() {
       name: 'Assessments',
       url: '/assessments',
     },
-  ];
+  ]);
   const smVariant = "drawer";
   const mdVariant = "sidebar";
   const variants = useBreakpointValue({ base: smVariant, md: mdVariant });
@@ -45,7 +38,7 @@ function CoursePage() {
         method: "GET",
         headers: {
           "Content-Type": "application/JSON",
-          Authorisation: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       };
       fetch(backend_url + `user/${localStorage.getItem("id")}`, options)
@@ -54,11 +47,19 @@ function CoursePage() {
     } else {
       history.push("/login");
     }
+    if (parseInt(localStorage.getItem('staff')) !== 0) {
+      let copyLinks = JSON.parse(JSON.stringify(links));
+      copyLinks.push({
+        name: "Topic Tree",
+        url: "/topictree"
+      }); 
+      setLinks(copyLinks);
+    }
   }, []);
 
   return (
     <div>
-      <Box position="sticky" width="100%" top={0} zIndex={100}>
+      <Box position="sticky" width="100%" top={0} zIndex={5}>
         <Box position="fixed" left={0}>
           <Sidebar
             links={links}
@@ -80,6 +81,9 @@ function CoursePage() {
         >
           <Switch>
             {/* Add your page as a Route here */}
+            <Route path="/invite/:code?">
+              <CourseInvite />
+            </Route>
             <Route path="/">
               <MainSelection user={user} />
             </Route>
@@ -90,4 +94,4 @@ function CoursePage() {
   );
 }
 
-export default CoursePage;
+export default MainPage;

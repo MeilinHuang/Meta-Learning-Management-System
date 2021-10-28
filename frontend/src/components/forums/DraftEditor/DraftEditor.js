@@ -29,7 +29,6 @@ export default class DraftEditor extends Component {
   componentDidMount() {
     // fixing issue with SSR https://github.com/facebook/draft-js/issues/2332#issuecomment-761573306
     // eslint-disable-next-line react/no-did-mount-set-state
-    console.log(this.props.content);
     this.setState({
       editorState: this.props.content || EditorState.createEmpty(),
     });

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@chakra-ui/react";
 import { TiArrowUpOutline, TiArrowUpThick } from "react-icons/ti";
+import { backend_url } from "../../Constants"
 
 function UpvoteButton({ value, code, postId, isPostPage }) {
     const [ isLiked, setIsLiked ] = useState(false)
@@ -11,7 +12,7 @@ function UpvoteButton({ value, code, postId, isPostPage }) {
     useEffect(() => {
         if (postId) {
             fetch(
-                `http://localhost:8000/${code}/forum/post/like/${postId}`,
+                `${backend_url}${code}/forum/post/like/${postId}`,
                 {
                   method: "GET",
                   headers: {
@@ -31,7 +32,7 @@ function UpvoteButton({ value, code, postId, isPostPage }) {
 
     const handleLike = () => {
         fetch(
-            `http://localhost:8000/${code}/forum/post/like/${postId}`,
+            `${backend_url}${code}/forum/post/like/${postId}`,
             {
               method: "PUT",
               body: JSON.stringify({
@@ -45,7 +46,7 @@ function UpvoteButton({ value, code, postId, isPostPage }) {
             }
           ).then((r) => {
             fetch(
-                `http://localhost:8000/${code}/forum/post/like/${postId}`,
+                `${backend_url}${code}/forum/post/like/${postId}`,
                 {
                     method: "GET",
                     headers: {
@@ -62,7 +63,7 @@ function UpvoteButton({ value, code, postId, isPostPage }) {
 
     const handleUnlike = () => {
         fetch(
-            `http://localhost:8000/${code}/forum/post/unlike/${postId}`,
+            `${backend_url}${code}/forum/post/unlike/${postId}`,
             {
               method: "PUT",
               body: JSON.stringify({
@@ -76,7 +77,7 @@ function UpvoteButton({ value, code, postId, isPostPage }) {
             }
           ).then((r) => {
             fetch(
-                `http://localhost:8000/${code}/forum/post/like/${postId}`,
+                `${backend_url}${code}/forum/post/like/${postId}`,
                 {
                     method: "GET",
                     headers: {

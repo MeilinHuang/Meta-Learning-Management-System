@@ -1,111 +1,7 @@
-const jwt = require("jsonwebtoken");
 const pool = require("./db/database");
 var fs = require("fs");
 
-const JWT_SECRET = "metalms";
-
-/***************************************************************
-                       Auth Functions
-***************************************************************/
-async function getZIdFromAuthorization(auth) {
-  try {
-    const token = auth.replace("Bearer ", "");
-    const zId = jwt.verify(token, JWT_SECRET).zid;
-
-    resp = await pool.query(
-      `SELECT zId, email, password FROM users
-      where zId = '${zId}'`
-    );
-    if (resp.rows.length === 0) {
-      throw "Invalid Token";
-    }
-
-    return zId;
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-async function login(request, response) {
-  let email = request.body.email;
-  let password = request.body.password;
-  try {
-    resp = await pool.query(
-      `SELECT id, zId, email, password, staff FROM users
-      where email = '${email}'`
-    );
-    //If no matching email
-    if (resp.rows.length != 1) {
-      response.status(400).send("Incorrect Login Details");
-      throw "Incorrect Login Details";
-    }
-    //If password incorrect
-    if (password !== resp.rows[0].password) {
-      response.status(400).send("Incorrect Login Details");
-      throw "Incorrect Login Details";
-    }
-
-    //Do login
-    let zid = resp.rows[0].zid;
-    let token = jwt.sign({ zid }, JWT_SECRET, { algorithm: "HS256" });
-
-    let staff = resp.rows[0].staff;
-    let id = resp.rows[0].id;
-    response.status(200).send({ token: token, staff: staff, id: id });
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-async function register(request, response) {
-  let name = request.body.name;
-  let email = request.body.email;
-  let zid = request.body.zid;
-  let password = request.body.password;
-  let staffBool = request.body.staff;
-
-  try {
-    resp = await pool.query(
-      `SELECT zId, email, password FROM users
-      where email = '${email}'`
-    );
-    //If an existing email
-    if (resp.rows.length > 0) {
-      response.status(400).send("An account already exists with this email");
-      throw "an account already exists with this email";
-    }
-
-    resp = await pool.query(
-      `SELECT zId, email, password FROM users
-      where zId = '${zid}'`
-    );
-    //If an existing zid
-    if (resp.rows.length > 0) {
-      response.status(400).send("An account already exists with this zId");
-      throw "an account already exists with this zId";
-    }
-
-    let staff = staffBool === "1" ? true : false;
-
-    resp = await pool.query(
-      `INSERT INTO users VALUES(default, $1, $2, $3, $4, $5)`,
-      [name, email, password, zid, staff]
-    );
-
-    resp = await pool.query(
-      `SELECT id, zId, email, password, staff FROM users
-      where email = '${email}'`
-    );
-
-    const id = resp.rows[0].id;
-
-    //Do login
-    let token = jwt.sign({ zid }, JWT_SECRET, { algorithm: "HS256" });
-    response.status(200).send({ token: token, staff: staff, id: id });
-  } catch (e) {
-    console.error(e);
-  }
-}
+const auth = require("./api/authentication.js")
 
 /***************************************************************
                        Topic Group Functions
@@ -114,7 +10,7 @@ async function register(request, response) {
 async function getAllTopicGroups(request, response) {
   void request;
   //Validate Token
-  let zId = await getZIdFromAuthorization(request.header("Authorization"));
+  let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
   if (zId == null) {
     response.status(403).send({ error: "Invalid Token" });
     throw "Invalid Token";
@@ -164,6 +60,11 @@ async function getAllTopicGroups(request, response) {
           }
           tmp.rows[0].course_materials = topicFilesArr;
         }
+        let temp3 = await pool.query(
+          `SELECT tags.name from tags JOIN topic_tags ON topic_tags.tag_id = tags.tag_id WHERE topic_id = $1 GROUP BY tags.tag_id`,
+          [topic_id]
+        );
+        tmp.rows[0].tags = temp3.rows;
       }
 
       topicArr.push(tmp.rows[0]);
@@ -207,7 +108,7 @@ async function getAllTopicGroups(request, response) {
 async function getTopicGroup(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -220,7 +121,7 @@ async function getTopicGroup(request, response) {
     const topicGroupId = tgId.rows[0].id;
 
     let resp = await pool.query(
-      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, 
+      `SELECT tp_group.id, tp_group.name, tp_group.topic_code, tp_group.searchable,
       array_agg(DISTINCT user_admin.admin_id) as admin_list, array_agg(DISTINCT tgf.id) as attachments,
       array_agg(DISTINCT topics.id) as topics_list, array_agg(DISTINCT tutorials.id) as tutorial_list,
       array_agg(DISTINCT announcements.id) as announcements_list
@@ -325,11 +226,45 @@ async function getTopicGroup(request, response) {
   }
 }
 
+async function setSearchable(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const searchable = request.params.searchable;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+
+    const topicGroupId = resp.rows[0].id;
+
+    resp = await pool.query(
+      `UPDATE topic_group SET searchable = $1 WHERE id = $2`,
+      [searchable, topicGroupId]
+    );
+
+    //return the codes
+    response.status(200).send({ success: true });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 // Get topics of topic group
 async function getTopics(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -400,7 +335,7 @@ async function getTopics(request, response) {
 async function getTopicPreReqs(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -439,7 +374,7 @@ async function getTopicPreReqs(request, response) {
 // Create new pre requisite (Modify for topic name instead of IDs ??)
 async function postPreReq(request, response) {
   //Validate Token
-  let zId = await getZIdFromAuthorization(request.header("Authorization"));
+  let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
   if (zId == null) {
     response.status(403).send({ error: "Invalid Token" });
     throw "Invalid Token";
@@ -458,7 +393,7 @@ async function postPreReq(request, response) {
 // Delete pre-requisite data
 async function deletePreReq(request, response) {
   //Validate Token
-  let zId = await getZIdFromAuthorization(request.header("Authorization"));
+  let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
   if (zId == null) {
     response.status(403).send({ error: "Invalid Token" });
     throw "Invalid Token";
@@ -478,7 +413,7 @@ async function deletePreReq(request, response) {
 async function postTopicGroup(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -561,12 +496,12 @@ async function postTopicGroup(request, response) {
 async function getAllTopics(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
     }
-    let topicGroupResp = await pool.query(`SELECT name FROM topic_group`);
+    let topicGroupResp = await pool.query(`SELECT name, id FROM topic_group`);
     // console.log("topicGroupResp", topicGroupResp);
     let result = [];
     for (let topicGroupName of topicGroupResp.rows) {
@@ -629,6 +564,7 @@ async function getAllTopics(request, response) {
         }
         object.topics_list = topicArr;
         object.name = topicGroupName.name;
+        object.id = topicGroupName.id;
       }
       result.push(resp.rows[0]);
     }
@@ -643,7 +579,7 @@ async function getAllTopics(request, response) {
 async function putTopicGroup(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -751,7 +687,7 @@ async function putTopicGroup(request, response) {
 async function deleteTopicGroup(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -794,7 +730,7 @@ async function deleteTopicGroup(request, response) {
 // Delete topic
 async function deleteTopic(request, response) {
   //Validate Token
-  let zId = await getZIdFromAuthorization(request.header("Authorization"));
+  let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
   if (zId == null) {
     response.status(403).send({ error: "Invalid Token" });
     throw "Invalid Token";
@@ -849,7 +785,7 @@ async function putTopicTag(request, response) {
   // console.log("running inner function");
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -898,7 +834,7 @@ async function putTopicTag(request, response) {
 async function deleteTopicTag(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -955,9 +891,10 @@ async function deleteTopicTag(request, response) {
 
 // Update topic details
 async function putTopic(request, response) {
+  console.log('putting topic');
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -992,10 +929,11 @@ async function putTopic(request, response) {
       const fileDeleteList = request.body.fileDeleteList.split(",");
       if (fileDeleteList.length) {
         // Deletes files specified in delete list
-        for (const fileId of fileDeleteList) {
+        for (const fileName of fileDeleteList) {
+          
           let tmpQ = await pool.query(
-            `DELETE FROM topic_files WHERE id = $1 RETURNING file`,
-            [fileId]
+            `DELETE FROM topic_files WHERE name = $1 AND topic_id = $2 RETURNING file`,
+            [fileName, topicId]
           );
           fs.unlinkSync("../frontend/public" + tmpQ.rows[0].file);
         }
@@ -1074,6 +1012,7 @@ async function putTopic(request, response) {
 
     response.status(200).json({ success: true, topic: topicId });
   } catch (e) {
+    console.log('error', e);
     response.status(400).json({ error: e });
   }
 }
@@ -1081,7 +1020,7 @@ async function putTopic(request, response) {
 async function postTopic(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1189,7 +1128,7 @@ async function postTopic(request, response) {
 async function getTopicFile(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1247,7 +1186,7 @@ async function generateCode(request, response) {
   const topicGroupName = request.params.topicGroupName;
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1298,7 +1237,204 @@ async function generateCode(request, response) {
       }
     }
     //return the code
-    response.status(200).send(code);
+    response.status(200).send({ code: code });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function getCourseCodes(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+
+    const topicGroupId = resp.rows[0].id;
+    resp = await pool.query(
+      `SELECT * FROM enroll_codes WHERE topic_group_id = $1`,
+      [topicGroupId]
+    );
+
+    //return the codes
+    response.status(200).send(resp.rows);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function getCourseCode(request, response) {
+  const courseCode = request.params.inviteCode;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    let resp = await pool.query(`SELECT * FROM enroll_codes WHERE code = $1`, [
+      courseCode,
+    ]);
+
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No invite code ${courseCode}`);
+      throw `No invite code ${courseCode}`;
+    }
+
+    const ret = resp.rows[0];
+
+    //return the codes
+    response.status(200).send(ret);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function deleteCourseCode(request, response) {
+  const courseCode = request.params.inviteCode;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    let resp = await pool.query(`SELECT id FROM enroll_codes WHERE code = $1`, [
+      courseCode,
+    ]);
+
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No invite code ${courseCode}`);
+      throw `No invite code ${courseCode}`;
+    }
+
+    const codeId = resp.rows[0].id;
+    resp = await pool.query(`DELETE FROM enroll_codes WHERE id = $1`, [codeId]);
+
+    //return the codes
+    response.status(200).send({ success: "true" });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function getEnrollments(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+    //TODO check if zid is admin
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+    const topicGroupId = resp.rows[0].id;
+
+    resp = await pool.query(
+      `SELECT * FROM user_enrolled WHERE topic_group_id = $1`,
+      [topicGroupId]
+    );
+
+    //return the codes
+    response.status(200).send(resp.rows);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function enrollUser(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const userZId = request.params.zId;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+    //TODO check if zid is admin
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+    const topicGroupId = resp.rows[0].id;
+
+    resp = await pool.query(`SELECT id FROM users WHERE zid = $1`, [userZId]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with zid ${userZId}`);
+      throw `No topic group with name ${userZId}`;
+    }
+    const userId = resp.rows[0].id;
+
+    resp = await pool.query(
+      `INSERT INTO user_enrolled(topic_group_id, user_id, progress) VALUES($1, $2, $3)`,
+      [topicGroupId, userId, 0]
+    );
+
+    //return the codes
+    response.status(200).send({ success: "true" });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function unenrollUser(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const userId = request.params.userId;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+    //TODO check if zid is admin
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+    const topicGroupId = resp.rows[0].id;
+
+    resp = await pool.query(
+      `DELETE FROM user_enrolled WHERE topic_group_id = $1 AND user_id = $2`,
+      [topicGroupId, userId]
+    );
+
+    //return the codes
+    response.status(200).send({ success: "true" });
   } catch (e) {
     console.error(e);
   }
@@ -1312,7 +1448,7 @@ async function generateCode(request, response) {
 async function getAnnouncements(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1377,7 +1513,7 @@ async function getAnnouncements(request, response) {
 async function getAnnouncementById(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1457,7 +1593,7 @@ async function getAnnouncementById(request, response) {
 async function postAnnouncement(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1539,7 +1675,7 @@ async function postAnnouncement(request, response) {
 async function putAnnouncement(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1627,7 +1763,7 @@ async function putAnnouncement(request, response) {
 async function deleteAnnouncement(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1659,7 +1795,7 @@ async function deleteAnnouncement(request, response) {
 async function postAnnouncementComment(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1745,7 +1881,7 @@ async function postAnnouncementComment(request, response) {
 async function putAnnouncementComment(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1843,7 +1979,7 @@ async function putAnnouncementComment(request, response) {
 async function deleteAnnouncementComment(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1882,7 +2018,7 @@ async function deleteAnnouncementComment(request, response) {
 async function getSearchAnnouncements(request, response) {
   try {
     //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1949,641 +2085,17 @@ async function getSearchAnnouncements(request, response) {
   }
 }
 
-/***************************************************************
-                       Assessment Functions
-***************************************************************/
-
-// Post new assessment quiz
-async function postQuiz(request, response) {
-  const name = request.body.name;
-  const dueDate = request.body.dueDate;
-  const timeGiven = request.body.timeGiven;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `INSERT INTO quiz(id, name, due_date, time_given)
-      VALUES(default, $1, $2, $3)`,
-      [name, dueDate, timeGiven]
-    );
-
-    response.status(200).send("Post new quiz success");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Post new assessment quiz
-async function postQuizQuestion(request, response) {
-  const questionBankId = request.params.questionBankId;
-  const quiz_id = request.body.quiz_id;
-  const quiz_type = request.body.quiz_type;
-  const marks_awarded = request.body.marks_awarded;
-  const related_topic_id = request.body.related_topic_id;
-  const description = request.body.description;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `INSERT INTO quiz_question(id, quiz_id, quiz_type, marks_awarded,
-       description, related_topic_id) 
-      VALUES(default, $1, $2, $3, $4, $5) RETURNING id`,
-      [quiz_id, quiz_type, marks_awarded, description, related_topic_id]
-    );
-
-    let link = await pool.query(
-      `INSERT INTO question_bank_question(question_bank_id, question_id)
-    VALUES($1, $2)`,
-      [questionBankId, resp.rows[0].id]
-    );
-
-    response.status(200).send("Post new quiz question success");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get quiz from id and questions related to quiz
-async function getQuizQuestions(request, response) {
-  const quizId = request.params.quizId;
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `SELECT q.id, q.name, q.due_date, q.time_given, array_agg(qq.id) 
-      as questions_list FROM quiz q
-      LEFT JOIN quiz_question qq ON qq.quiz_id = q.id 
-      WHERE q.id = $1 GROUP BY q.id;`,
-      [quizId]
-    );
-
-    // Check if questions_list exists
-    if (resp.rows[0].questions_list) {
-      var finalQuery = resp.rows[0];
-      var questionArr = [];
-
-      for (const questionId of resp.rows[0].questions_list) {
-        let qResp = await pool.query(
-          `SELECT * FROM quiz_question WHERE id = $1`,
-          [questionId]
-        );
-        questionArr.push(qResp.rows[0]);
-      }
-      finalQuery.questions_list = questionArr;
-    }
-
-    response.status(200).json(finalQuery);
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Change quiz details by id
-async function putQuizById(request, response) {
-  const quizId = request.params.quizId;
-  const name = request.body.name;
-  const dueDate = request.body.dueDate;
-  const timeGiven = request.body.timeGiven;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `UPDATE quiz SET name = $1, due_date = $2, time_given = $3 WHERE id = $4`,
-      [name, dueDate, timeGiven, quizId]
-    );
-
-    response.status(200).send("Update quiz success");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Delete quiz by id
-async function deleteQuizById(request, response) {
-  const quizId = request.params.quizId;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(`DELETE FROM quiz WHERE id = $1`, [quizId]);
-    response.status(200).send("Delete quiz success");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get specific question from quiz
-async function getQuestionFromQuiz(request, response) {
-  const quizId = request.params.quizId;
-  const questionId = request.params.questionId;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `SELECT * FROM quiz_question WHERE quiz_id = $1 AND id = $2`,
-      [quizId, questionId]
-    );
-    response.status(200).json(resp.rows[0]);
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Put question from quiz
-async function putQuestionFromQuiz(request, response) {
-  const quizId = request.params.quizId;
-  const questionId = request.params.questionId;
-  const quiz_type = request.body.quiz_type;
-  const marks_awarded = request.body.marks_awarded;
-  const related_topic_id = request.body.related_topic_id;
-  const description = request.body.description;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `UPDATE quiz_question SET quiz_Type = $1, marks_awarded = $2, 
-      description = $3, related_topic_id = $4 WHERE quiz_id = $5 AND id = $6`,
-      [
-        quiz_type,
-        marks_awarded,
-        description,
-        related_topic_id,
-        quizId,
-        questionId,
-      ]
-    );
-    response.status(200).send("Update quiz question success");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get questions from question bank
-async function getQuestionBankQuestions(request, response) {
-  const questionBankId = request.params.questionBankId;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `SELECT * FROM quiz_question
-       WHERE question_bank_id = $1`,
-      [questionBankId]
-    );
-
-    response.status(200).json(resp.rows[0]);
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Update name of question bank
-async function putQuestionBank(request, response) {
-  const questionBankId = request.params.questionBankId;
-  const name = request.body.name;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `UPDATE quiz_question_bank SET name = $1 WHERE id = $2`,
-      [name, questionBankId]
-    );
-
-    response.status(200).send("Question Bank name updated");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Delete question bank
-async function deleteQuestionBank(request, response) {
-  const questionBankId = request.params.questionBankId;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `DELETE FROM quiz_question_bank WHERE id = $1`,
-      [questionBankId]
-    );
-
-    response.status(200).send("Question Bank deleted");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get questions from all question banks
-async function getAllQuestionBankQuestions(request, response) {
-  void request;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `SELECT qb.id, qb.name, array_agg(q.id) as questions_list 
-      FROM quiz_question_bank qb
-      LEFT JOIN question_bank_question qbq ON qbq.question_bank_id = qb.id
-      LEFT JOIN quiz_question q ON q.id = qbq.question_id
-      GROUP BY qb.id`
-    );
-
-    if (resp.rows) {
-      var finalQuery = resp.rows;
-
-      for (const row of resp.rows) {
-        var questionArr = [];
-        for (const questionId of row.questions_list) {
-          let qResp = await pool.query(
-            `SELECT * FROM quiz_question WHERE id = $1`,
-            [questionId]
-          );
-          questionArr.push(qResp.rows[0]);
-        }
-        row.questions_list = questionArr;
-      }
-      response.status(200).json(finalQuery);
-    } else {
-      response.status(200).json(resp.rows);
-    }
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get specific question from question bank
-async function getQuestionFromQuestionBank(request, response) {
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    const questionId = request.params.questionId;
-    let resp = await pool.query(`SELECT * FROM quiz_question WHERE id = $1`, [
-      questionId,
-    ]);
-
-    response.status(200).json(resp.rows[0]);
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get specific question from question bank
-async function postPoll(request, response) {
-  const name = request.body.name;
-  const startTime = request.body.start_time;
-  const closeTime = request.body.close_time;
-  const isClosed = request.body.is_closed;
-  const pollType = request.body.poll_type;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `INSERT INTO quiz_poll(id, name, start_time, close_time, is_closed, poll_type)
-      VALUES(default, $1, $2, $3, $4, $5)`,
-      [name, startTime, closeTime, isClosed, pollType]
-    );
-
-    response.status(200).send("Post poll success");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get specific poll from id
-async function getPoll(request, response) {
-  const pollId = request.params.pollId;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(`SELECT * FROM quiz_poll WHERE id = $1`, [
-      pollId,
-    ]);
-
-    response.status(200).json(resp.rows[0]);
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Update poll details
-async function putPoll(request, response) {
-  const pollId = request.params.pollId;
-  const name = request.body.name;
-  const startTime = request.body.start_time;
-  const closeTime = request.body.close_time;
-  const isClosed = request.body.is_closed;
-  const pollType = request.body.poll_type;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `UPDATE quiz_poll SET name = $1, start_time = $2, close_time = $3, 
-      is_closed = $4, poll_type = $5
-      WHERE id = $6`,
-      [name, startTime, closeTime, isClosed, pollType, pollId]
-    );
-
-    response.status(200).send("Poll update success");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Update poll details
-async function deletePoll(request, response) {
-  const pollId = request.params.pollId;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(`DELETE FROM quiz_poll WHERE id = $1`, [
-      pollId,
-    ]);
-
-    response.status(200).send("Poll delete success");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get list of student answers by student id
-async function getStudentAnswer(request, response) {
-  const studentId = request.params.studentId;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `SELECT * fROM quiz_student_answer WHERE student_id = $1`,
-      [studentId]
-    );
-
-    response.status(200).json(resp.rows);
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get list of student answers by student id
-async function postStudentAnswer(request, response) {
-  const studentId = request.body.studentId;
-  const quizId = request.body.quizId;
-  const questionId = request.body.questionId;
-  const answerId = request.body.answerSelectedId;
-
-  let resp = await pool.query(
-    `INSERT INTO quiz_student_answer(student_id, quiz_id, question_id, answer_selected_id)
-    VALUES($1, $2, $3, $4)`,
-    [studentId, quizId, questionId, answerId]
-  );
-
-  response.status(200).send("Post student answer success");
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get list of student answers by student id
-async function postQuestionAnswer(request, response) {
-  const quizId = request.body.quizId;
-  const questionId = request.body.questionId;
-  const isCorrectAnswer = request.body.isCorrectAnswer;
-  const description = request.body.description;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `INSERT INTO quiz_question_answer(id, quiz_id, question_id, is_correct_answer, description)
-      VALUES(default, $1, $2, $3, $4)`,
-      [quizId, questionId, isCorrectAnswer, description]
-    );
-
-    response.status(200).send("Post quiz question answer success");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Delete question from question bank
-async function deleteQuestionBankQuestion(request, response) {
-  const questionBankId = request.params.questionBankId;
-  const questionId = request.params.questionId;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `DELETE FROM question_bank_question WHERE question_bank_id = $1 AND question_id = $2`,
-      [questionBankId, questionId]
-    );
-
-    response.status(200).send("Question deleted from question bank");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Delete question from question bank
-async function deleteAssessmentQuestion(request, response) {
-  const questionId = request.params.questionId;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(`DELETE FROM quiz_question WHERE id = $1`, [
-      questionId,
-    ]);
-
-    response.status(200).send("Question delete success");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Update quiz question answer
-async function putQuestionAnswer(request, response) {
-  const quizId = request.params.quizId;
-  const questionId = request.params.questionId;
-  const quizQuestionAnswerId = request.params.quizQuestionAnswerId;
-  const isCorrectAnswer = request.body.isCorrectAnswer;
-  const description = request.body.description;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `UPDATE quiz_question_answer SET is_correct_answer = $1, description = $2
-      WHERE quiz_id = $3 AND question_id = $4 AND id = $5`,
-      [isCorrectAnswer, description, quizId, questionId, quizQuestionAnswerId]
-    );
-
-    response.status(200).send("Quiz question answer update success");
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
-// Get number of students that selected each answer for a question (MPC only)
-async function getStudentAnswerCount(request, response) {
-  const questionId = request.params.questionId;
-
-  try {
-    //Validate Token
-    let zId = await getZIdFromAuthorization(request.header("Authorization"));
-    if (zId == null) {
-      response.status(403).send({ error: "Invalid Token" });
-      throw "Invalid Token";
-    }
-    let resp = await pool.query(
-      `SELECT qqa.id, qqa.quiz_id, qqa.question_id, qqa.is_correct_answer, 
-      qqa.description, count(qsa.answer_selected_id) as answer_count FROM quiz_question_answer qqa
-      LEFT JOIN quiz_student_answer qsa ON qsa.question_id = qqa.question_id 
-      AND qsa.quiz_id = qqa.quiz_id AND qsa.answer_selected_id = qqa.id
-      WHERE qqa.question_id = $1
-      GROUP BY qqa.id`,
-      [questionId]
-    );
-
-    response.status(200).json(resp.rows);
-  } catch (e) {
-    response.status(400).send(e);
-  }
-}
-
 module.exports = {
   putAnnouncementComment,
   putAnnouncement,
   getAnnouncementById,
   deleteAnnouncement,
   deleteAnnouncementComment,
-  getStudentAnswerCount,
-  putQuestionAnswer,
-  deleteAssessmentQuestion,
-  deleteQuestionBankQuestion,
-  postQuestionAnswer,
-  postStudentAnswer,
-  getStudentAnswer,
-  deletePoll,
-  putPoll,
-  getPoll,
-  postPoll,
-  getQuestionFromQuestionBank,
-  getAllQuestionBankQuestions,
-  deleteQuestionBank,
-  putQuestionBank,
-  getQuestionBankQuestions,
-  putQuestionFromQuiz,
-  getQuestionFromQuiz,
-  deleteQuizById,
-  putQuizById,
-  getQuizQuestions,
-  postQuiz,
   getAllTopics,
   getAllTopicGroups,
   getTopics,
   getTopicPreReqs,
+  getCourseCodes,
   postPreReq,
   deletePreReq,
   postTopicGroup,
@@ -2594,15 +2106,17 @@ module.exports = {
   postAnnouncement,
   postAnnouncementComment,
   getSearchAnnouncements,
-  postQuizQuestion,
-  login,
-  register,
-  getZIdFromAuthorization,
   generateCode,
   getTopicGroup,
   getTopicFile,
   putTopicGroup,
   putTopic,
   putTopicTag,
+  getCourseCode,
+  deleteCourseCode,
   deleteTopicTag,
+  getEnrollments,
+  unenrollUser,
+  enrollUser,
+  setSearchable,
 };

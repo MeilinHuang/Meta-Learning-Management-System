@@ -66,12 +66,13 @@ function WidgetsBar({ page, user }) {
               )}
             </MenuButton>
             <Portal>
-              <MenuList zIndex={100}>
+              <MenuList zIndex={5}>
                 <MenuItem>Profile</MenuItem>
                 <MenuItem>Settings</MenuItem>
                 {isLoggedIn() ? (
                   <MenuItem
                     onClick={(e) => {
+                      
                       logOut();
                       history.go(0);
                     }}

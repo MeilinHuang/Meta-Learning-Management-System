@@ -27,6 +27,7 @@ import { BsTrash } from "react-icons/bs";
 import { GrEdit } from "react-icons/gr";
 import DraftEditor from "../DraftEditor/DraftEditor";
 import { isLoggedInUser, isStaff } from '../../../utils/helpers'
+import { backend_url } from '../../../Constants'
 import styles from "./CommentResponse.module.css";
 
 function CommentResponse({
@@ -65,7 +66,7 @@ function CommentResponse({
 
     if (isComments) {
       fetch(
-        `http://localhost:8000/${code}/forum/post/${post_id}/comment/${comment_id}`,
+        `${backend_url}${code}/forum/post/${post_id}/comment/${comment_id}`,
         {
           method: "PUT",
           body: JSON.stringify({
@@ -91,7 +92,7 @@ function CommentResponse({
       });
     } else {
       fetch(
-        `http://localhost:8000/${code}/forum/post/${post_id}/reply/${reply_id}`,
+        `${backend_url}${code}/forum/post/${post_id}/reply/${reply_id}`,
         {
           method: "PUT",
           body: JSON.stringify({
@@ -122,11 +123,11 @@ function CommentResponse({
     const isComments = !!comment && !reply;
     if (isComments) {
       fetch(
-        `http://localhost:8000/${code}/forum/post/${post_id}/comment/${comment_id}`,
+        `${backend_url}${code}/forum/post/${post_id}/comment/${comment_id}`,
         { method: "DELETE" }
       ).then((r) => {
         if (r.status === 200) {
-          fetch(`http://localhost:8000/${code}/forum/post/${post_id}`)
+          fetch(`${backend_url}${code}/forum/post/${post_id}`)
             .then((r) => r.json())
             .then((data) => {
               setPost(data);
@@ -144,11 +145,11 @@ function CommentResponse({
       });
     } else {
       fetch(
-        `http://localhost:8000/${code}/forum/post/${post_id}/reply/${reply_id}`,
+        `${backend_url}${code}/forum/post/${post_id}/reply/${reply_id}`,
         { method: "DELETE" }
       ).then((r) => {
         if (r.status === 200) {
-          fetch(`http://localhost:8000/${code}/forum/post/${post_id}`)
+          fetch(`${backend_url}${code}/forum/post/${post_id}`)
             .then((r) => r.json())
             .then((data) => {
               setPost(data);
@@ -169,11 +170,11 @@ function CommentResponse({
 
   const handleEndorse = () => {
     fetch(
-      `http://localhost:8000/${code}/forum/post/${post_id}/comment/${comment_id}/endorse/${!isendorsed}`,
+      `${backend_url}${code}/forum/post/${post_id}/comment/${comment_id}/endorse/${!isendorsed}`,
       { method: "PUT" }
     ).then((r) => {
       if (r.status === 200) {
-        fetch(`http://localhost:8000/${code}/forum/post/${post_id}`)
+        fetch(`${backend_url}${code}/forum/post/${post_id}`)
           .then((r) => r.json())
           .then((data) => setPost(data));
       }

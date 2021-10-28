@@ -97,7 +97,14 @@ function Sidebar({
       textAlign="left"
       justifyContent="center"
     >
-      <Box marginLeft={1} padding={4} fontSize="x-large">
+      <Box
+        marginLeft={1}
+        padding={4}
+        fontSize="x-large"
+        onClick={() => {
+          history.push("/");
+        }}
+      >
         <Text fontWeight="medium" letterSpacing="wider">
           MetaLMS
         </Text>
@@ -110,7 +117,6 @@ function Sidebar({
       let code = groupState["object"].topic_code;
 
       let enrolled = [];
-      console.log(user)
       user.enrolled_courses.map((course) => {
         if (course.name === groupState["object"].name) {
           enrolled.unshift(course);
@@ -178,7 +184,7 @@ function Sidebar({
           </MenuButton>
           <Portal>
             <MenuList
-              zIndex={100}
+              zIndex={5}
               placement="right"
               onClick={(e) => {
                 let tmp = window.location.pathname
@@ -239,7 +245,7 @@ function Sidebar({
                 </Flex>
               </MenuButton>
               <Portal>
-                <MenuList zIndex={100}>
+                <MenuList zIndex={5}>
                   <MenuItem>Profile</MenuItem>
                   <MenuItem>Settings</MenuItem>
                   <MenuItem>Logout</MenuItem>

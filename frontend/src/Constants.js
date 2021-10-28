@@ -1,4 +1,4 @@
-export const backend_url = "http://localhost:8000/";
+export const backend_url = "https://api.metalms.tech/";
 
 export const topic_group_url = backend_url + "topicGroup";
 
@@ -49,4 +49,8 @@ export function get_topic_groups() {
 export function update_topic(topicGroupName, topicName) {
     return backend_url + "topicGroup/" + topicGroupName + "/topic/" + topicName;
 
+}
+
+export function new_topic_group(topicGroupName) {
+    return backend_url + "topicGroup/" + topicGroupName;
 }

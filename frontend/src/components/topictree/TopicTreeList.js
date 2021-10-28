@@ -136,6 +136,7 @@ export default function TopicTreeList() {
     group: "",
     discipline: "",
     creator: "",
+    tags: [],
   });
 
   useEffect(async function () {
@@ -236,6 +237,7 @@ export default function TopicTreeList() {
                               cursor="pointer"
                               _hover={{ bg: "gray.100", fontWeight: "medium" }}
                               onClick={() => {
+                                let topicTags = topic.tags;
                                 fetch(get_prereqs(e.name, topic.name), {
                                   headers: {
                                     "Content-Type": "application/JSON",
@@ -257,6 +259,7 @@ export default function TopicTreeList() {
                                         matList[mat.type].push(mat.name);
                                       }
                                     });
+                                    console.log('tags', display);
                                     let tmp = {
                                       id: topic.id,
                                       title: topic.name,
@@ -268,9 +271,10 @@ export default function TopicTreeList() {
                                         practice: matList.practice,
                                         assessments: matList.assessment,
                                       },
-                                      group: "",
+                                      group: topic.group,
                                       discipline: "",
                                       creator: "",
+                                      tags: topicTags
                                     };
                                     setListPrereqs(x.prerequisites_list);
                                     setSelectedNode(tmp);
