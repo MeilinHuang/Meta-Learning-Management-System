@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import Sidebar from "../components/Sidebar.js";
-import WidgetsBar from "../components/WidgetsBar.js";
+import WidgetsBar from "../components/widgets/WidgetsBar.js";
 import { Switch, Route } from "react-router-dom";
 import MainSelection from "./MainSelection.js";
 import { useBreakpointValue, Flex, Container, Box } from "@chakra-ui/react";
@@ -39,7 +39,14 @@ function MainPage() {
       };
       fetch(backend_url + `user/${localStorage.getItem("id")}`, options)
         .then((e) => e.json())
-        .then((e) => setUser(e));
+        .then((e) => {
+            if (e === {} || e === null || e.error) {
+                history.push("/login");
+            }
+            else {
+                setUser(e)
+            }
+        });
     } else {
       history.push("/login");
     }
