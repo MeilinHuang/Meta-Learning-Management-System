@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar.js";
-import WidgetsBar from "../components/WidgetsBar.js";
+import WidgetsBar from "../components/widgets/WidgetsBar.js";
 
 import CourseContentPage from "../pages/CourseContentPage.js";
 import CourseDashboard from "../pages/CourseDashboard.js";
@@ -22,10 +22,6 @@ function CoursePage() {
     {
       name: "Home",
       url: "/",
-    },
-    {
-      name: "Course Outline",
-      url: "/course-outline",
     },
     {
       name: "Content",

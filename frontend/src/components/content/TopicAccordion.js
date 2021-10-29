@@ -12,11 +12,10 @@ import {
     Text,
 } from "@chakra-ui/react";
 import CategoriesList from "./CategoriesList.js";
+import { backend_url } from "../../Constants.js";
 
 function TopicAccordion({ topic, course }) {
     const [allCompleted, setAll] = useState(false)
-
-
 
     useEffect(() => {
         if (topic) {
@@ -35,13 +34,29 @@ function TopicAccordion({ topic, course }) {
     return (
         <AccordionItem id={"topic-" + topic.name}>
             <Flex width="100%">
-                <AccordionButton>
+                <AccordionButton onClick={e => {
+                    fetch(backend_url + "user/" + localStorage.getItem("id"), {
+                        method: "PUT",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                        body: JSON.stringify({
+                            "lastTopic": topic.id
+                        })
+                    })
+                    .then(resp => resp.json())
+                    .then(data => {
+                        console.log(data)
+                    })
+                }}>
                     <Flex flexGrow={1} textAlign="left">
                         <Checkbox
                             colorScheme="green"
                             size="lg"
                             marginRight="20px"
-                            checked={allCompleted}
+                            isChecked={allCompleted}
                         ></Checkbox>
                         <Heading size={["sm", "md"]} letterSpacing={1}>
                             {topic.name}

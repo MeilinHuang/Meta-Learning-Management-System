@@ -9,7 +9,6 @@ import {
     PopoverHeader,
     PopoverBody,
     PopoverArrow,
-    PopoverCloseButton,
     PopoverFooter,
     Portal,
     Input,
@@ -19,8 +18,7 @@ import {
 import { ChevronRightIcon, ChevronLeftIcon } from "@chakra-ui/icons";
 import moment from "moment";
 import "./Calendar.css";
-import { backend_url } from "../Constants";
-import { set } from "draft-js/lib/DefaultDraftBlockRenderMap";
+import { backend_url } from "../../Constants";
 
 function Calendar() {
   const [month, setMonth] = useState(moment());
@@ -32,7 +30,6 @@ function Calendar() {
 
   const [invalid, setInvalid] = useState(false)
   const [input_val, setValue] = useState("")
-  const [editting, setEditting] = useState(false)
 
   let weekdayshort = moment
     .weekdaysShort()
@@ -163,11 +160,10 @@ function Calendar() {
                           className += " today";
                       }
                       for (let x = 0; x < reminders.length; x++) {
-                        let reminder_date = new Date(reminders[x].remind_date.split("T")[0])
-                        reminder_date.setHours(0, 0, 0, 0)
+                        let reminder_date = reminders[x].remind_date.split("T")[0]
                         //console.log(reminder_date, rem)
                         //TODO Getting wrong date (gets the previous day)
-                        if (reminder_date.valueOf() === rem.valueOf()) {
+                        if (reminder_date === new Date(rem).toISOString().split("T")[0]) {
                             className += " reminder"
                             reminder_note = reminders[x].description
                             break
@@ -225,8 +221,9 @@ function Calendar() {
                                         const options = {
                                             method: "PUT",
                                             headers: {
-                                                "Content-Type": "application/JSON",
-                                                Authorisation: `Bearer ${localStorage.getItem("token")}`,
+                                                Accept: "application/json",
+                                                "Content-Type": "application/json",
+                                                Authorization: `Bearer ${localStorage.getItem("token")}`,
                                             },
                                             body: JSON.stringify({
                                                 "remind_date": date.toISOString(),
@@ -265,16 +262,16 @@ function Calendar() {
                                   <Button variant={"outline"} onClick={e => {
                                       reminders.map(reminder => {
                                           if (reminder.description === reminder_text) {
-                                            const options = {
-                                              method: "DELETE",
-                                              headers: {
-                                                "Content-Type": "application/JSON",
-                                                Authorisation: `Bearer ${localStorage.getItem("token")}`,
-                                              },
-                                            };
+
                                             //Not sure why it is not working
-                                            fetch(backend_url + "user/calendar/" + reminder.id, options)
-                                            .then(resp => console.log(resp))
+                                            fetch(backend_url + "user/calendar/" + 1, {
+                                                method: "DELETE",
+                                                headers: {
+                                                  Authorisation: `Bearer ${localStorage.getItem("token")}`,
+                                                },
+                                            })
+                                            .then(resp => resp.json())
+                                            .then(data => console.log(data))
                                           }
                                       })
                                   }}>DELETE</Button>

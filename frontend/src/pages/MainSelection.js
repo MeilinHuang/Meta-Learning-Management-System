@@ -9,6 +9,7 @@ import {
 	Box,
 	Divider,
 	Accordion,
+    Button,
 } from "@chakra-ui/react";
 import { backend_url } from "../Constants.js";
 import Announcement from "../components/dashboard/Announcement/Announcement";
@@ -33,11 +34,7 @@ function MainSelection({ user }) {
 				if (user.enrolled_courses) {
 					setCourses(user.enrolled_courses);
 
-					fetch(backend_url + "user/" + localStorage.getItem("id"))
-					.then(e => e.json())
-					.then(e => setContent(e.last_accessed_topic))
-
-					const topic_groups = await Promise.all(
+					Promise.all(
 						user.enrolled_courses.map((course) => {
 							return fetch(backend_url + "topicgroup/" + course.name, {
 								headers: {
@@ -48,6 +45,29 @@ function MainSelection({ user }) {
 							})
 								.then((e) => e.json())
 								.then(e => {
+                                    e.topics_list.map(topic => {
+                                        if (topic.id === user.last_accessed_topic) {
+                                            
+                                            let cpy = topic
+
+                                            let uniq_list = []
+                                            topic.course_materials.map(mat => {
+                                                const mat_str = JSON.stringify(mat)
+                                                if (uniq_list.indexOf(mat_str) === -1) {
+                                                    uniq_list.push(mat_str)
+                                                }
+                                            })
+                                            let mat_list = []
+                                            uniq_list.map(data => {
+                                                mat_list.push(JSON.parse(data))
+                                            })
+
+                                            cpy.course_materials = mat_list
+                                            cpy.course = course.name
+
+                                            setContent(cpy)
+                                        }
+                                    })
 									user.enrolled_courses.map(course => {
 										if (course.name === e.name) {
 											Promise.all(e.topics_list.map(topic => {
@@ -76,31 +96,36 @@ function MainSelection({ user }) {
 									setCourses(user.enrolled_courses)
 									return e
 								})
+                                .catch(error => console.log(error))
 						})
-					);
-					Promise.all(
-						topic_groups.map((e) => {
-							e.announcements_list.map((announce) => {
-                                if (announce !== null) {
-                                    if (recent_announce === null || Date.parse(recent_announce.post_date) > Date.parse(announce.post_date)) {
-                                        fetch(backend_url + "user/" + announce.author, {
-                                            headers: {
-                                                Accept: "application/json",
-                                                "Content-Type": "application/json",
-                                                Authorization: `Bearer ${localStorage.getItem("token")}`,
-                                            },
-                                        })
-                                            .then((resp) => resp.json())
-                                            .then((user) => {
-                                                announce = { ...announce, author: user.user_name };
-                                                setRecent(announce);
-                                                setCode(e.topic_code);
-                                            });
+					)
+                    .then(topic_groups => {
+                        topic_groups.map(e => {
+                            if (e) {
+                                let latest = null
+                                e.announcements_list.map((announce) => {
+                                    if (announce !== null) {
+                                        if (latest === null || Date.parse(latest.post_date) < Date.parse(announce.post_date)) {
+                                            latest = announce
+                                        }
                                     }
-                                }
-							});
-						})
-					);
+                                });
+                                fetch(backend_url + "user/" + latest.author, {
+                                    headers: {
+                                        Accept: "application/json",
+                                        "Content-Type": "application/json",
+                                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                    },
+                                })
+                                .then((resp) => resp.json())
+                                .then((user) => {
+                                    latest = { ...latest, author: user.user_name };
+                                    setRecent(latest);
+                                    setCode(e.name);
+                                });
+                            }
+                        })
+                    })
 				}
 			}
 		}
@@ -147,15 +172,7 @@ function MainSelection({ user }) {
 										>
 											{ user && user.user_name.split(" ")[0]}
 										</Heading>
-									</Flex>
-									<Box>
-										<Text fontSize="large" letterSpacing="wide" fontWeight="200">
-											You have 3 assignments due
-										</Text>
-										<Text fontSize="large" letterSpacing="wide" fontWeight="200">
-											Your next assignment is COMP1234 Assignment 1
-										</Text>
-									</Box>								
+									</Flex>								
 								</VStack>
 							) : (
 								<Spinner></Spinner>
@@ -258,7 +275,8 @@ function MainSelection({ user }) {
 							<Text fontSize="2xl" letterSpacing="wide" fontWeight={600}>
 								Recent Announcement
 							</Text>
-							{recent_announce ? (
+                            <Text>{code}</Text>
+							{recent_announce && code ? (
 								<Announcement
 									padding={0}
 									margin={0}
@@ -279,190 +297,193 @@ function MainSelection({ user }) {
 							</Flex>
 						*/}
 					</Flex>
-					<Flex
-						width={["100%", "100%", "100%", "100%", "100%", "50%"]}
-						marginLeft={[0, 0, 0, 0, 0, 10]}
-						flexDirection={"column"}
-					>
-						<Flex
-							shadow="xl"
-							flexDirection="column"
-							borderRadius={10}
-							padding={5}
-							width={["100%"]}
-						>
-							<Text
-								fontSize="2xl"
-								letterSpacing="wide"
-								fontWeight={600}
-								marginBottom={5}
-							>
-								Your Progress
-							</Text>
-							<VStack divider={<Divider></Divider>} spacing={5}>
-								{courses.length > 0 ? (
-									courses.map((course) => {
-										const progress = parseInt(course.progress) + "%";
-										return (
-											<Flex width="100%" key={course.name + "-progress"}>
-												<Flex flexDirection={["column", "row"]}>
-													<Text
-														letterSpacing="wide"
-														fontWeight={200}
-														overflow="hidden"
-														textOverflow="ellipsis"
-														whiteSpace="nowrap"
-														width={[100, 150, 200]}
-													>
-														{course.name}
-													</Text>
-													<Text letterSpacing="wider" fontWeight={200}>
-														{course.topic_code}
-													</Text>
-												</Flex>
-												<Flex flexGrow={1} marginLeft={5} borderRadius={10}>
-													<Flex
-														width="100%"
-														maxHeight="15px"
-														alignSelf="center"
-														marginRight={2}
-													>
-														<Flex width="100%" bg="gray.200" borderRadius={10}>
-															<Flex
-																bg="blue.400"
-																width={progress}
-																color="blue.400"
-																borderRadius={10}
-															>
-																'
-															</Flex>
-														</Flex>
-													</Flex>
-													<Text
-														color="blue.400"
-														width={"4ch"}
-														fontWeight={500}
-														alignSelf="center"
-													>
-														{progress}
-													</Text>
-												</Flex>
-											</Flex>
-										);
-									})
-								) : (
-									<Spinner></Spinner>
-								)}
-							</VStack>
-						</Flex>
-						{ content ? (
-							<Flex
-								shadow="xl"
-								flexDirection="column"
-								borderRadius={10}
-								padding={5}
-								marginBlock={5}
-							>
-								<Text
-									fontSize="2xl"
-									letterSpacing="wide"
-									fontWeight={600}
-									marginBottom={5}
-								>
-									Continue
-								</Text>
-								{/* Use most recently accessed topic here */}
-									<Flex flexDirection="column">
-										<Text fontSize="lg" letterSpacing="wide">
-											{content.topic_code + " " + content.topics_list[0].name}
-										</Text>
-										<Accordion allowMultiple>
-											<CategoriesList
-												topic={content.topics_list[0]}
-												course={content.id}
-											></CategoriesList>
-										</Accordion>
-									</Flex>
-							</Flex>
-							) : (
-									<Flex
-									shadow="xl"
-									flexDirection="column"
-									borderRadius={10}
-									padding={5}
-									marginBlock={5}
-								>
-									<Text
-										fontSize="2xl"
-										letterSpacing="wide"
-										fontWeight={600}
-										marginBottom={5}
-									>
-										Begin Learning
-									</Text>
-										<Flex flexDirection="column">
-											<Text fontSize="lg" letterSpacing="wide">
-												Navigate to a course page and begin learning!
-											</Text>
-										</Flex>
-								</Flex>
-							)
-						}
-					</Flex>
+                    {
+                        !user.staff ?
+                        <Flex width={["100%", "100%", "100%", "100%", "100%", "50%"]} marginLeft={[0, 0, 0, 0, 0, 10]} flexDirection={"column"}>
+                            <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} width={["100%"]}>
+                                <Text fontSize="2xl" letterSpacing="wide" fontWeight={600} marginBottom={5}>
+                                    Your Progress
+                                </Text>
+                                <VStack divider={<Divider></Divider>} spacing={5}>
+                                    {courses.length > 0 ? (
+                                        courses.map((course) => {
+                                            const progress = parseInt(course.progress) + "%";
+                                            return (
+                                                <Flex width="100%" key={course.name + "-progress"}>
+                                                    <Flex flexDirection={["column", "row"]}>
+                                                        <Text
+                                                            letterSpacing="wide"
+                                                            fontWeight={200}
+                                                            overflow="hidden"
+                                                            textOverflow="ellipsis"
+                                                            whiteSpace="nowrap"
+                                                            width={[100, 150, 200]}
+                                                        >
+                                                            {course.name}
+                                                        </Text>
+                                                        <Text letterSpacing="wider" fontWeight={200}>
+                                                            {course.topic_code}
+                                                        </Text>
+                                                    </Flex>
+                                                    <Flex flexGrow={1} marginLeft={5} borderRadius={10}>
+                                                        <Flex
+                                                            width="100%"
+                                                            maxHeight="15px"
+                                                            alignSelf="center"
+                                                            marginRight={2}
+                                                        >
+                                                            <Flex width="100%" bg="gray.200" borderRadius={10}>
+                                                                <Flex
+                                                                    bg="blue.400"
+                                                                    width={progress}
+                                                                    color="blue.400"
+                                                                    borderRadius={10}
+                                                                >
+                                                                    '
+                                                                </Flex>
+                                                            </Flex>
+                                                        </Flex>
+                                                        <Text
+                                                            color="blue.400"
+                                                            width={"5ch"}
+                                                            fontWeight={500}
+                                                            alignSelf="center"
+                                                        >
+                                                            {progress}
+                                                        </Text>
+                                                    </Flex>
+                                                </Flex>
+                                            );
+                                        })
+                                    ) : (
+                                        <Spinner></Spinner>
+                                    )}
+                                </VStack>
+                            </Flex>
+                            { content ? (
+                                <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} marginBlock={5}>
+                                    <Text fontSize="2xl" letterSpacing="wide" fontWeight={600} marginBottom={5}>
+                                        Continue
+                                    </Text>
+                                    {/* Use most recently accessed topic here */}
+                                        <Flex flexDirection="column">
+                                            <Text fontSize="lg" letterSpacing="wide">
+                                                {content.course + " " + content.name}
+                                            </Text>
+                                            <Accordion allowMultiple>
+                                                <CategoriesList
+                                                    topic={content}
+                                                    course={content.name}
+                                                ></CategoriesList>
+                                            </Accordion>
+                                        </Flex>
+                                </Flex>
+                                ) : (
+                                        <Flex
+                                        shadow="xl"
+                                        flexDirection="column"
+                                        borderRadius={10}
+                                        padding={5}
+                                        marginBlock={5}
+                                    >
+                                        <Text
+                                            fontSize="2xl"
+                                            letterSpacing="wide"
+                                            fontWeight={600}
+                                            marginBottom={5}
+                                        >
+                                            Begin Learning
+                                        </Text>
+                                            <Flex flexDirection="column">
+                                                <Text fontSize="lg" letterSpacing="wide">
+                                                    Navigate to a course page and begin learning!
+                                                </Text>
+                                            </Flex>
+                                    </Flex>
+                                )
+                            }
+                        </Flex>
+                        :
+                        <Flex width={["100%", "100%", "100%", "100%", "100%", "50%"]} marginLeft={[0, 0, 0, 0, 0, 10]} flexDirection={"column"}>
+                            <Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5}>
+                                <Text
+                                    fontSize="2xl"
+                                    letterSpacing="wide"
+                                    fontWeight={600}
+                                    marginBottom={5}
+                                >
+                                    Staff Links
+                                </Text>
+                                {user.enrolled_courses.map(course => {
+                                    return (
+                                        <Flex flexGrow={1} key={course.name + "staff-link"}>
+                                            <Text alignSelf="center">{course.name}</Text>
+                                            <Flex flexGrow={1} justifyContent="end">
+                                                <Button onClick={() => history.push("/course-page/" + course.name + "/enrollment")}>Enrollment</Button>
+                                                <Button onClick={() => history.push("/course-page/" + course.name + "/forums")} marginLeft={5}>Forums</Button>
+                                            </Flex>
+                                        </Flex>
+                                    )
+                                })}
+                            </Flex>
+                        </Flex>
+                    }
 				</Flex>
 			</Flex>
 		)
 	}
 	else {
-        console.log(user)
-		return (
-			<Flex marginTop={[30, 30, 0, 0]}>
-				<Flex
-					width={["100%", "100%", "100%", "100%", "100%", "70%"]}
-					borderRadius={10}
-					shadow="lg"
-				>
-					<Flex paddingInline={[5, 5, 10]} paddingBlock={5}>
-						{user ? (
-							<VStack textAlign="left" alignItems="flex-start" spacing={5}>
-								<Flex>
-									<Heading
-										fontSize={["4xl", "5xl", "6xl"]}
-										letterSpacing="wider"
-										fontWeight="300"
-									>
-										Welcome
-									</Heading>
-									<Heading
-										fontSize={["4xl", "5xl", "6xl"]}
-										letterSpacing="wider"
-										fontWeight="500"
-										marginLeft={"10px"}
-									>
-										{ user.user_name.split(" ")[0]}
-									</Heading>
-								</Flex>
-								<Box>
-									<Text fontSize="large" letterSpacing="wide" fontWeight="200">
-										You have not enrolled in any courses
-									</Text>
-									<Text fontSize="large" letterSpacing="wide" fontWeight="200">
-										To get started navigate to the enrolments tab and enrol into a course
-									</Text>
-								</Box>								
-							</VStack>
-						) : (
-							<Spinner></Spinner>
-						)}
-					</Flex>
-					<Flex flexGrow={1} alignItems="center" justifyContent="center">
-						<Flex display={["none", "none", "none", "none", "flex"]}>
-							<Study width={"100%"} height={"100%"}></Study>
-						</Flex>
-					</Flex>
-				</Flex>
-			</Flex>
-		)
+        if (user) {
+            return (
+                <Flex marginTop={[30, 30, 0, 0]}>
+                    <Flex
+                        width={["100%", "100%", "100%", "100%", "100%", "70%"]}
+                        borderRadius={10}
+                        shadow="lg"
+                    >
+                        <Flex paddingInline={[5, 5, 10]} paddingBlock={5}>
+                            {user ? (
+                                <VStack textAlign="left" alignItems="flex-start" spacing={5}>
+                                    <Flex>
+                                        <Heading
+                                            fontSize={["4xl", "5xl", "6xl"]}
+                                            letterSpacing="wider"
+                                            fontWeight="300"
+                                        >
+                                            Welcome
+                                        </Heading>
+                                        <Heading
+                                            fontSize={["4xl", "5xl", "6xl"]}
+                                            letterSpacing="wider"
+                                            fontWeight="500"
+                                            marginLeft={"10px"}
+                                        >
+                                            { user.user_name.split(" ")[0]}
+                                        </Heading>
+                                    </Flex>
+                                    <Box>
+                                        <Text fontSize="large" letterSpacing="wide" fontWeight="200">
+                                            You have not enrolled in any courses
+                                        </Text>
+                                        <Text fontSize="large" letterSpacing="wide" fontWeight="200">
+                                            To get started navigate to the enrolments tab and enrol into a course
+                                        </Text>
+                                    </Box>								
+                                </VStack>
+                            ) : (
+                                <Spinner></Spinner>
+                            )}
+                        </Flex>
+                        <Flex flexGrow={1} alignItems="center" justifyContent="center">
+                            <Flex display={["none", "none", "none", "none", "flex"]}>
+                                <Study width={"100%"} height={"100%"}></Study>
+                            </Flex>
+                        </Flex>
+                    </Flex>
+                </Flex>
+            )
+        }
+        return null;
 	}
 }
 
