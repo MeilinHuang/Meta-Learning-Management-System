@@ -372,9 +372,9 @@ async function getTopicPreReqs(request, response) {
 }
 
 // Create new pre requisite (Modify for topic name instead of IDs ??)
-async function postPreReq(request, response) {
+async function postPreReq(request, response, requestBody) {
   //Validate Token
-  let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+  let zId = await auth.getZIdFromAuthorization(requestBody.header("Authorization"));
   if (zId == null) {
     response.status(403).send({ error: "Invalid Token" });
     throw "Invalid Token";
