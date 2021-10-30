@@ -47,6 +47,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
   const [files, setFiles] = useState({});
   const [newTag, setNewTag] = useState("");
   const [tempTags, setTempTags] = useState([]);
+  const [isStaff, setIsStaff] = useState(false);
 
   useEffect(() => {
     
@@ -57,7 +58,10 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
   }, [prereqs]);
 
   useEffect(() => {
-    
+    let isStaff = localStorage.getItem('staff');
+    if (isStaff !== null) {
+        setIsStaff(parseInt(isStaff) !== 0);
+    }
     setNotPrereqs(nodes);
   }, [nodes]);
 
@@ -305,7 +309,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                 </Tbody>
               </Table>
               {tempPrereqs.length == 0 ? <h6>No prerequisites here!</h6> : <></>}
-              <Button mb={5} colorScheme="blue" onClick={showAddPrereq}>Add prerequisite</Button>
+              {isStaff ? <Button mb={5} colorScheme="blue" onClick={showAddPrereq}>Add prerequisite</Button> : <></>}
             </Box>
             <Box>
               <Heading as="h5" size="sm">Tags</Heading>
@@ -315,7 +319,8 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                     return (
                       <Tr key={tag.name}>
                         <Td>{tag.name}</Td>
-                        <Td><Button colorScheme="red" onClick={() => deleteTag(tag)}>Delete</Button></Td>
+                        {isStaff ? 
+                        <Td><Button colorScheme="red" onClick={() => deleteTag(tag)}>Delete</Button></Td> : <></>}
                       </Tr>
                     );
                   })}
@@ -327,9 +332,10 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                     <Td><Flex flexDirection="row" w="8rem" alignItems="center" justifyContent="space-between"><Button colorScheme="green" onClick={createNewTag}>Create</Button><CloseButton onClick={hideAddTag}/></Flex></Td>
                   </Tr>
                   : <></>}
-                  <Button mb={5} colorScheme="blue" onClick={showAddTag}>Add Tag</Button>
+                  {isStaff ? <Button mb={5} colorScheme="blue" onClick={showAddTag}>Add Tag</Button> : <></>}
                 </Tbody>
               </Table>
+              {tempTags.length == 0 ? <h6>No tags here!</h6> : <></> }
             </Box>
             {typesOfFiles.map((typeOfFile) => {
               return (
@@ -349,17 +355,18 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                       <Tr key={file_string}>
                         <Td>{file_string}</Td>
                         <Td><Button colorScheme="green" mr={3} onClick={(e) => downloadFile(e, file_string)}>Download file</Button></Td>
-                        <Td><Button colorScheme="red" onClick={(e) => {deleteFile(e, typeOfFile, file_string)}}>Delete</Button></Td>
+                        {isStaff ? <Td><Button colorScheme="red" onClick={(e) => {deleteFile(e, typeOfFile, file_string)}}>Delete</Button></Td> : <></>}
                       </Tr>
                     );
                   })}
                 </Tbody>
               </Table>
               {tempFiles[typeOfFile.toLowerCase()].length == 0 ? <h6>No files here!</h6> : <></>}
+              {isStaff ? 
               <Flex flexDirection="column" mb="16px" onSubmit={(e) => e.preventDefault()}>
                   <input type="file" name="images" onChange={(e) => handleUpload(e, typeOfFile)} />
                   <Button colorScheme="blue" mt={3} type="button" onClick={(e) => uploadFile(e, typeOfFile)}>Upload file</Button>
-              </Flex>
+              </Flex> : <></>}
               
               </Box>
             )})}
@@ -368,7 +375,8 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
 
         <ModalFooter>
             <Flex>
-              <Button colorScheme="red" mr={3} onClick={deleteTopic}>Delete Topic</Button>
+              {isStaff ? 
+              <Button colorScheme="red" mr={3} onClick={deleteTopic}>Delete Topic</Button> : <></>}
               <Button colorScheme="blue" mr={3} onClick={() => closeModal()}>Close</Button>
             </Flex>
         </ModalFooter>

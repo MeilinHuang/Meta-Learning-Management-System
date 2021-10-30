@@ -20,10 +20,12 @@ import {
     FormLabel,
     Switch,
     Divider,
+    Text
   } from '@chakra-ui/react';
+  import WidgetsBar from "../widgets/WidgetsBar.js";
 import { HamburgerIcon, CloseIcon, AddIcon, SearchIcon } from '@chakra-ui/icons';
 import Select from "./ChakraReactSelect.js";
-import { get_topics_url, get_prereqs, get_all_topics} from "../../Constants.js";
+import { backend_url, get_topics_url, get_prereqs, get_all_topics} from "../../Constants.js";
 import TopicTreeViewResource from "./TopicTreeViewResource.js";
 
 import TopicTreeAddTopic from './TopicTreeAddTopic.js';
@@ -58,6 +60,11 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
     const [listPrereqs, setListPrereqs] = useState([]);
     const [notListPrereqs, setNotListPrereqs] = useState([]);
     const [topicGroupName, setTopicGroupName] = useState("");
+    const [isStaff, setIsStaff] = useState(true);
+    const [user, setUser] = useState(null);
+    const [name, setName] = useState(
+        window.location.pathname.split("/").filter((e) => e !== "")[1]
+    );
     const [selectedNode, setSelectedNode] = useState({
         "id": 0,
         "title": "",
@@ -125,6 +132,10 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         return tempTopics;
     };
 
+    function isLoggedIn() {
+        return localStorage.getItem("token") !== null;
+    }
+
     const onChangeSearch = async (value, action) => {
         value['materials_strings'] = {};
         value.materials_strings['content'] = [];
@@ -181,6 +192,32 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
     }
 
     useEffect(() => {
+        let isStaff = localStorage.getItem('staff');
+        if (isStaff === null) {
+            history.push('/login');
+        } else {
+            setIsStaff(parseInt(isStaff) !== 0);
+        }
+
+        if (!isLoggedIn()) {
+            //Redirect to main page if not logged in
+            window.location.pathname = "/"
+        }
+        else {
+            //Need to get user logged in
+            fetch(backend_url + `user/${localStorage.getItem("id")}`, {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            })
+            .then((e) => e.json())
+            .then((e) => {
+                setUser(e);
+                
+            });
+        }
         fetch(get_all_topics(), {
             'headers': {
                 'Authorization': `Bearer ${localStorage.getItem("token")}`
@@ -214,6 +251,12 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         history.push('/');
     }
 
+    function logOut() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("staff");
+        localStorage.removeItem("id");
+    }
+
     return (
         <div id={id}>
             <Box bg={useColorModeValue('blue.400', 'blue.400')} px={4}>
@@ -231,9 +274,11 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                         as={'nav'}
                         spacing={4}
                         display={{ base: 'none', md: 'flex' }}>
-                        <Link mt={1} mb={1} px={2} py={1} color={'white'} rounded={'md'} onClick={onOpenGroupModal}>Add a Topic Group</Link>
-                        <Link mt={1} px={2} py={1} color={'white'} rounded={'md'}
-                            onClick={onOpenModal}>Add a Topic</Link>
+                        { isStaff ? 
+                            <><Link mt={1} mb={1} px={2} py={1} color={'white'} rounded={'md'} onClick={onOpenGroupModal}>Add a Topic Group</Link>
+                            <Link mt={1} px={2} py={1} color={'white'} rounded={'md'}
+                                onClick={onOpenModal}>Add a Topic</Link></> : <></>}
+                        
                         <Box bg='white'  w={200}>
                             <FormControl id="new-topic-dependencies">
                                 <Select
@@ -266,18 +311,41 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                         rounded={'full'}
                         variant={'link'}
                         cursor={'pointer'}>
-                            <Avatar
-                                size={'sm'}
-                                src={
-                                'https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                                }
-                            />
+                            {user ? (
+                                <Flex alignItems="center" justifyContent="start">
+                                    <Avatar name={user.user_name} />
+                                </Flex>
+                            ) : (
+                                <Flex alignItems="center">
+                                    <Avatar />
+                                    <Box paddingLeft={3}>
+                                        <Text fontWeight="medium">Log In</Text>
+                                    </Box>
+                                </Flex>
+                            )}
                         </MenuButton>
-                        <MenuList>
-                            <MenuItem>Link 1</MenuItem>
-                            <MenuItem>Link 2</MenuItem>
-                            <MenuDivider />
-                            <MenuItem>Link 3</MenuItem>
+                        <MenuList zIndex={5}>
+                            <MenuItem>Profile</MenuItem>
+                            <MenuItem>Settings</MenuItem>
+                            {isLoggedIn() ? (
+                                <MenuItem
+                                    onClick={(e) => {
+
+                                        logOut();
+                                        history.go(0);
+                                    }}
+                                >
+                                    Log Out
+                                </MenuItem>
+                            ) : (
+                                <MenuItem
+                                    onClick={(e) => {
+                                        history.push("/login");
+                                    }}
+                                >
+                                    Log In
+                                </MenuItem>
+                            )}
                         </MenuList>
                     </Menu>
                 </Flex>
