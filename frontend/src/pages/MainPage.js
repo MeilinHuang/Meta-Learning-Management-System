@@ -20,6 +20,10 @@ function MainPage() {
       name: "Gamification",
       url: "/gamification",
     },
+    {
+      name: 'Topic Tree',
+      url: "/topictree"
+    }
   ]);
   const smVariant = "drawer";
   const mdVariant = "sidebar";
@@ -49,14 +53,6 @@ function MainPage() {
         });
     } else {
       history.push("/login");
-    }
-    if (parseInt(localStorage.getItem('staff')) !== 0) {
-      let copyLinks = JSON.parse(JSON.stringify(links));
-      copyLinks.push({
-        name: "Topic Tree",
-        url: "/topictree"
-      }); 
-      setLinks(copyLinks);
     }
   }, []);
 
