@@ -166,6 +166,7 @@ async function putCalendarById (request, response) {
 // Delete Calendar by id
 async function deleteCalendarById (request, response) {
   console.log("test")
+  try {
   const calendarId = request.params.calendarId;
     const calendarExist = await pool.query(
       `SELECT EXISTS(SELECT * FROM calendar_reminders 
@@ -175,7 +176,6 @@ async function deleteCalendarById (request, response) {
     await pool.query(`DELETE FROM calendar_reminders WHERE id = $1`, [calendarId]);
 
     response.status(200).json({success: true});
-  try {
     
   } catch (e) {
     response.status(400).send(e);

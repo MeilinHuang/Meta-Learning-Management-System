@@ -227,7 +227,7 @@ function Calendar() {
                                     else {
                                         setValue("")
                                         const options = {
-                                            method: "PUT",
+                                            method: "POST",
                                             headers: {
                                                 Accept: "application/json",
                                                 "Content-Type": "application/json",
@@ -270,16 +270,31 @@ function Calendar() {
                                   <Button variant={"outline"} onClick={e => {
                                       reminders.map(reminder => {
                                           if (reminder.description === reminder_text) {
-
-                                            //Not sure why it is not working
-                                            fetch(backend_url + "user/calendar/" + 1, {
+                                            fetch(backend_url + "user/calendar/" + reminder.id, {
                                                 method: "DELETE",
                                                 headers: {
-                                                  Authorisation: `Bearer ${localStorage.getItem("token")}`,
+                                                    "Content-Type": "application/JSON",
+                                                    Authorisation: `Bearer ${localStorage.getItem("token")}`,
                                                 },
                                             })
-                                            .then(resp => resp.json())
-                                            .then(data => console.log(data))
+                                            .then(resp => {
+                                                if (resp.status === 200) {
+                                                    const options = {
+                                                        method: "GET",
+                                                        headers: {
+                                                            "Content-Type": "application/JSON",
+                                                            Authorisation: `Bearer ${localStorage.getItem("token")}`,
+                                                        },
+                                                    };
+                                                    fetch(backend_url + "user/" + localStorage.getItem("id") +"/calendar", options)
+                                                    .then(resp => resp.json())
+                                                    .then(data => {
+                                                        setReminders(data)
+                                                    })
+                                                }
+
+                                            })
+
                                           }
                                       })
                                   }}>DELETE</Button>
