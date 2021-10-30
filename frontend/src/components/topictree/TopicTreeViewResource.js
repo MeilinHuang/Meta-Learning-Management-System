@@ -83,6 +83,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     setTempTags(copyTempTags);
     setNewTag("");
     hideAddTag();
+    setHasDelete(true);
   }
 
   const deleteTopic = async () => {
@@ -209,7 +210,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
 
   const closeModal = () => {
     if (hasDeleted) {
-      // window.location.reload();
+      window.location.reload();
     } else {
       onClose();
     }
@@ -265,7 +266,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         'preReqId': newPrereq.value,

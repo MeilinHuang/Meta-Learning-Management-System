@@ -187,7 +187,7 @@ app.post(
     console.log(
       `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/prerequisite`
     );
-    await database.postPreReq(request.body, response);
+    await database.postPreReq(request.body, response, request);
   }
 );
 

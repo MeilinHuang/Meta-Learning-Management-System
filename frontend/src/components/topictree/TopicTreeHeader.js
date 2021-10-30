@@ -109,7 +109,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
             for (let topic of topicGroup.topics_list) {
                 
                 topic['value'] = topic.name;
-                topic['label'] = topic.name;
+                topic['label'] = topic.name + " - " + topicGroup.name;
                 topic['id'] = topic.id;
                 topic['name'] = topic.name;
                 topic['group'] = topicGroup.name;
@@ -118,7 +118,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                 tempActualTopics.push(topic);
                 if (topic.tags !== undefined) {
                     for (let tag of topic.tags) {
-                        tempTopics.push({'value': topic.name, 'label': tag.name, 'id': topic.id, 'name': topic.name, 'course_materials': topic.course_materials,
+                        tempTopics.push({'value': topic.name, 'label': tag.name + " - " + topicGroup.name, 'id': topic.id, 'name': topic.name, 'course_materials': topic.course_materials,
                             'tags': topic.tags, 'group': topicGroup.name, 'groupId': topicGroup.id});
                     }
                 }
@@ -180,7 +180,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                 }
             }
             if (!found && topic.id !== value.id) {
-                notPrereqs.push({'value': topic.id, 'label': topic.name});
+                notPrereqs.push({'value': topic.id, 'label': topic.name + ' - ' + topic.group});
             }
         }
         setNotListPrereqs(notPrereqs);
