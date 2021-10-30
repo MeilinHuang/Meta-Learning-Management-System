@@ -122,7 +122,7 @@ export default function LoginForm() {
   const history = useHistory();
 
   return (
-    <Flex width="Full" align="center" justifyContent="center">
+    <Flex width="Full" align="center" justifyContent="center" pt={16}>
       <Box
         p={8}
         maxWidth="500px"

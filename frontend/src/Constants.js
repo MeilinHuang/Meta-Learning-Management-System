@@ -1,4 +1,4 @@
-export const backend_url = "http://localhost:8000/";
+export const backend_url = "https://api.metalms.tech/";
 
 export const topic_group_url = backend_url + "topicGroup";
 

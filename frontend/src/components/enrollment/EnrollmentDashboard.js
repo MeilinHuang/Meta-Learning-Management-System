@@ -289,8 +289,14 @@ export default function EnrollmentDashboard() {
     });
   }, [update]);
 
-  console.log(searchable);
-  //check login by session storage
+  const getHoursRemaining = (timestamp) => {
+    const ts = new Date(timestamp);
+    let remaining = ts - Date.now();
+    return (remaining / 3600000).toFixed(1) < 0
+      ? 0
+      : (remaining / 3600000).toFixed(1);
+  };
+
   return (
     <Flex width="Full" align="center" justifyContent="center">
       <Box width="100%">
@@ -442,7 +448,12 @@ export default function EnrollmentDashboard() {
                         </Td>
                         <Td isNumeric>
                           {k.expiration ? (
-                            k.expiration
+                            <Text>
+                              {getHoursRemaining(k.expiration)}{" "}
+                              {Math.round(getHoursRemaining(k.expiration)) === 1
+                                ? "hour"
+                                : "hours"}
+                            </Text>
                           ) : (
                             <Text as="i" color="gray">
                               ∞
