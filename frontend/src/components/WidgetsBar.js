@@ -78,7 +78,7 @@ function WidgetsBar({ page, user }) {
                   <MenuItem
                     onClick={(e) => {
                       logOut();
-                      history.go(0);
+                      history.push("/login");
                     }}
                   >
                     Log Out
