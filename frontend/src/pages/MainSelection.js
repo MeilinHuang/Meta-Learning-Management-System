@@ -397,7 +397,7 @@ function MainSelection({ user }) {
                                 </Text>
                                 {user.enrolled_courses.map(course => {
                                     return (
-                                        <Flex flexGrow={1} key={course.name + "staff-link"}>
+                                        <Flex flexGrow={1} key={course.name + "staff-link"} marginBottom={7}>
                                             <Text alignSelf="center">{course.name}</Text>
                                             <Flex flexGrow={1} justifyContent="end">
                                                 <Button onClick={() => history.push("/course-page/" + course.name + "/enrollment")}>Enrollment</Button>

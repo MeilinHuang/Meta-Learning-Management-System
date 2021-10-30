@@ -38,7 +38,7 @@ async function doLogin(email, password) {
   }
 
   const data = {
-    email: email.toLower(),
+    email: email.toLowerCase(),
     password: password,
   };
 
