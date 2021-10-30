@@ -110,19 +110,21 @@ function MainSelection({ user }) {
                                         }
                                     }
                                 });
-                                fetch(backend_url + "user/" + latest.author, {
-                                    headers: {
-                                        Accept: "application/json",
-                                        "Content-Type": "application/json",
-                                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                                    },
-                                })
-                                .then((resp) => resp.json())
-                                .then((user) => {
-                                    latest = { ...latest, author: user.user_name };
-                                    setRecent(latest);
-                                    setCode(e.name);
-                                });
+                                if (latest !== null) {
+                                    fetch(backend_url + "user/" + latest.author, {
+                                        headers: {
+                                            Accept: "application/json",
+                                            "Content-Type": "application/json",
+                                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                        },
+                                    })
+                                    .then((resp) => resp.json())
+                                    .then((user) => {
+                                        latest = { ...latest, author: user.user_name };
+                                        setRecent(latest);
+                                        setCode(e.name);
+                                    });
+                                }
                             }
                         })
                     })
@@ -286,9 +288,11 @@ function MainSelection({ user }) {
 									isAnnouncementPage={false}
 								/>
 							) : (
-								<Flex justifyContent="center">
-									<Spinner></Spinner>
-								</Flex>
+								<Flex>
+                                    <Text>
+                                        There are no new announcements
+                                    </Text>
+                                </Flex>
 							)}
 						</Flex>
 						{/* Need to figure out what to put here
