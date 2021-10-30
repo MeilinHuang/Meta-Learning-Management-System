@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar.js";
-import WidgetsBar from "../components/WidgetsBar.js";
+import WidgetsBar from "../components/widgets/WidgetsBar.js";
 
 import CourseContentPage from "../pages/CourseContentPage.js";
 import CourseDashboard from "../pages/CourseDashboard.js";
@@ -22,10 +22,6 @@ function CoursePage() {
     {
       name: "Home",
       url: "/",
-    },
-    {
-      name: "Course Outline",
-      url: "/course-outline",
     },
     {
       name: "Content",
@@ -51,39 +47,63 @@ function CoursePage() {
   const variants = useBreakpointValue({ base: smVariant, md: mdVariant });
   const [isOpen, setOpen] = useState(false);
 
-  const [topicGroup, setGroup] = useState(null);
-  const [name, setName] = useState(
-    window.location.pathname.split("/").filter((e) => e !== "")[1]
-  );
-  const [user, setUser] = useState(null);
+    const [topicGroup, setGroup] = useState(null);
+    const [name, setName] = useState(
+        window.location.pathname.split("/").filter((e) => e !== "")[1]
+    );
+    const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    fetch(backend_url + "topicGroup/" + name, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-      .then((e) => e.json())
-      .then((e) => setGroup(e));
-    //Need to get user logged in
-    if (isLoggedIn()) {
-      fetch(backend_url + `user/${localStorage.getItem("id")}`, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-        .then((e) => e.json())
-        .then((e) => setUser(e));
-    }
-  }, [name]);
+    useEffect(() => {
+        if (!isLoggedIn()) {
+            //Redirect to main page if not logged in
+            window.location.pathname = "/"
+        }
+        else {
+            //Need to get user logged in
+            fetch(backend_url + `user/${localStorage.getItem("id")}`, {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            })
+            .then((e) => e.json())
+            .then((e) => {
+                let enrolled = false
+
+                if (e.enrolled_courses) {
+                    e.enrolled_courses.map(course => {
+                        if (course["name"] === decodeURI(name)) {
+                            enrolled = true
+                        }
+                    })
+                }
+
+                //If not enrolled in course then redirect back to mainpage
+                if (!enrolled) {
+                    window.location.pathname = "/"
+                }
+                else {
+                    setUser(e)
+                }
+            });
+
+
+            fetch(backend_url + "topicGroup/" + name, {
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            })
+            .then((e) => e.json())
+            .then((e) => setGroup(e));
+        }
+    }, [name]);
 
   return (
     <div>
-      <Box position="sticky" width="100%" top={0} zIndex={100}>
+      <Box position="sticky" width="100%" top={0} zIndex={3}>
         <Box position="fixed" left={0}>
           <Sidebar
             links={links}
@@ -120,7 +140,7 @@ function CoursePage() {
             <Route
               exact
               path="/course-page/:code/content"
-              render={() => <CourseContentPage topicGroup={topicGroup} />}
+              render={() => <CourseContentPage topicGroup={topicGroup}/>}
             ></Route>
             <Route
               exact

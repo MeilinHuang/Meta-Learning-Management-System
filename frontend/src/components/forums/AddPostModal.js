@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Flex,
@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import DraftEditor from "./DraftEditor/DraftEditor";
 import TagSelect from "./TagSelect/TagSelect";
+import { backend_url } from "../../Constants"
 
 function AddPostModal({
   isOpen,
@@ -33,7 +34,7 @@ function AddPostModal({
 
   useEffect(() => {
     if (isForums) {
-      fetch(`http://localhost:8000/${code}/forum/tags`, { method: "PUT" })
+      fetch(`${backend_url}${code}/forum/tags`, { method: "PUT" })
         .then((r) => r.json())
         .then((data) => {
           setTags(data);

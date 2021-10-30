@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import Sidebar from "../components/Sidebar.js";
-import WidgetsBar from "../components/WidgetsBar.js";
+import WidgetsBar from "../components/widgets/WidgetsBar.js";
 import { Switch, Route } from "react-router-dom";
 import MainSelection from "./MainSelection.js";
 import { useBreakpointValue, Flex, Container, Box } from "@chakra-ui/react";
@@ -9,7 +9,7 @@ import { backend_url } from "../Constants.js";
 import { isLoggedIn } from "../utils/helpers.js";
 import CourseInvite from "../components/enrollment/JoinCourse";
 
-function CoursePage() {
+function MainPage() {
   const history = useHistory();
   const [links, setLinks] = useState([
     {
@@ -39,7 +39,14 @@ function CoursePage() {
       };
       fetch(backend_url + `user/${localStorage.getItem("id")}`, options)
         .then((e) => e.json())
-        .then((e) => setUser(e));
+        .then((e) => {
+            if (e === {} || e === null || e.error) {
+                history.push("/login");
+            }
+            else {
+                setUser(e)
+            }
+        });
     } else {
       history.push("/login");
     }
@@ -55,7 +62,7 @@ function CoursePage() {
 
   return (
     <div>
-      <Box position="sticky" width="100%" top={0} zIndex={100}>
+      <Box position="sticky" width="100%" top={0} zIndex={5}>
         <Box position="fixed" left={0}>
           <Sidebar
             links={links}
@@ -90,4 +97,4 @@ function CoursePage() {
   );
 }
 
-export default CoursePage;
+export default MainPage;

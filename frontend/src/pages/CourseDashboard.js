@@ -16,9 +16,7 @@ import { SearchIcon } from "@chakra-ui/icons";
 import Announcement from "../components/dashboard/Announcement/Announcement";
 import AddPostModal from "../components/forums/AddPostModal";
 import { isStaff } from "../utils/helpers"
-
-// DUMMY VALUES
-const dummyAuthor = 3;
+import { backend_url } from "../Constants"
 
 function CourseDashboard({
   match: {
@@ -33,7 +31,7 @@ function CourseDashboard({
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    fetch(`http://localhost:8000/${code}/announcement`, {
+    fetch(`${backend_url}${code}/announcement`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -46,7 +44,7 @@ function CourseDashboard({
 
         for (const post of data) {
           promises.push(
-            fetch(`http://localhost:8000/user/${post.author}`, {
+            fetch(`${backend_url}user/${post.author}`, {
               headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
@@ -72,7 +70,7 @@ function CourseDashboard({
     e.preventDefault();
 
     if (searchTerm === "") {
-      fetch(`http://localhost:8000/${code}/announcement`, {
+      fetch(`${backend_url}${code}/announcement`, {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
@@ -85,7 +83,7 @@ function CourseDashboard({
 
           for (const post of data) {
             promises.push(
-              fetch(`http://localhost:8000/user/${post.author}`, {
+              fetch(`${backend_url}user/${post.author}`, {
                 headers: {
                   Accept: "application/json",
                   "Content-Type": "application/json",
@@ -111,7 +109,7 @@ function CourseDashboard({
     }
 
     fetch(
-      `http://localhost:8000/${code}/announcement/search/${searchTerm.toLowerCase()}`,
+      `${backend_url}${code}/announcement/search/${searchTerm.toLowerCase()}`,
       {
         headers: {
           Accept: "application/json",
@@ -126,7 +124,7 @@ function CourseDashboard({
 
         for (const post of data) {
           promises.push(
-            fetch(`http://localhost:8000/user/${post.author}`, {
+            fetch(`${backend_url}user/${post.author}`, {
               headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
@@ -148,7 +146,7 @@ function CourseDashboard({
   };
 
   const handleAddPostSubmit = (formData) => {
-    fetch(`http://localhost:8000/${code}/announcement/new`, {
+    fetch(`${backend_url}${code}/announcement/new`, {
       method: "POST",
       body: formData,
       headers: {
@@ -157,7 +155,7 @@ function CourseDashboard({
       },
     }).then((r) => {
       if (r.status === 200) {
-        fetch(`http://localhost:8000/${code}/announcement`, {
+        fetch(`${backend_url}${code}/announcement`, {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -170,7 +168,7 @@ function CourseDashboard({
 
             for (const post of data) {
               promises.push(
-                fetch(`http://localhost:8000/user/${post.author}`, {
+                fetch(`${backend_url}user/${post.author}`, {
                   headers: {
                     Accept: "application/json",
                     "Content-Type": "application/json",
@@ -194,12 +192,8 @@ function CourseDashboard({
             });
           });
       }
-      // TODO: Handle error case
-      // TODO: clear form
     });
   };
-
-  console.log(announcements)
 
   return (
     <>
@@ -243,13 +237,17 @@ function CourseDashboard({
             <Spinner />
           </Flex>
         )}
-        {announcements.map((announcement) => (
-          <Announcement
-            announcement={announcement}
-            course={code}
-            setAnnouncements={setAnnouncements}
-          />
-        ))}
+        {announcements.length === 0 && !loading ?
+          <Box my="24px" textAlign="center">There are no announcements yet</Box>
+          :
+          announcements.map((announcement) => (
+            <Announcement
+              announcement={announcement}
+              course={code}
+              setAnnouncements={setAnnouncements}
+            />
+          ))
+        }
       </Box>
     </>
   );
