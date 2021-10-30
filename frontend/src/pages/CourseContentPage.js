@@ -157,7 +157,7 @@ function CourseContentPage({ topicGroup }) {
                                 return (
                                     <TopicAccordion
                                         topic={e}
-                                        course={topicGroup.id}
+                                        course={topicGroup}
                                         key={"section " + e.name}
                                     ></TopicAccordion>
                                 );

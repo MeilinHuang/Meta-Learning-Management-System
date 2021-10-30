@@ -48,9 +48,6 @@ function TopicAccordion({ topic, course }) {
                         })
                     })
                     .then(resp => resp.json())
-                    .then(data => {
-                        console.log(data)
-                    })
                 }}>
                     <Flex flexGrow={1} textAlign="left">
                         <Checkbox
@@ -72,10 +69,10 @@ function TopicAccordion({ topic, course }) {
                         {topic.prereqs.length > 0 ? (
                             <Flex>
                                 <Text>Prerequisites: </Text>
-                                {topic.prereqs.map((prereq) => {
+                                {topic.prereqs.map((prereq, index) => {
                                     return (
                                         <Button
-                                            key={topic.name + "-prereq-" + prereq.name}
+                                            key={topic.name + "-prereq-" + prereq.name + " " + index}
                                             marginLeft={"1vw"}
                                             height={7}
                                             id={"prereq-" + prereq.name}
@@ -89,7 +86,7 @@ function TopicAccordion({ topic, course }) {
                             <Text>No prerequisites</Text>
                         )}
                     </Flex>
-                    <CategoriesList topic={topic} course={course}></CategoriesList>
+                    <CategoriesList topic={topic} course={course.name} course_id={course.id}></CategoriesList>
                 </Accordion>
             </AccordionPanel>
         </AccordionItem>
