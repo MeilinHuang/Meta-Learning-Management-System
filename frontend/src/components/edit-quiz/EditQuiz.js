@@ -33,11 +33,14 @@ import {
 } from "@chakra-ui/icons"
 
 import DatePicker from "react-datepicker";
+import { useHistory, useParams } from "react-router-dom";
+import { backend_url } from "../../Constants"
 import QuestionCreation from '../question-creation/QuestionCreation';
 
 function generateNewQuiz() {
   return {
-    name: "New Quiz",
+    name: "",
+    topicGroupId: 1,
     open_date: new Date(),
     close_date: new Date(),
     time_given: 30,
@@ -54,22 +57,103 @@ export default function EditQuiz() {
   const finalRef = React.useRef();
   const [selectingCreateOrImportQuestion, setSelectingCreateOrImportQuestion] = useState(false);
   const [isImportingQuestion, setIsImportingQuestion] = useState(false);
+  const [topics, setTopics] = useState([]);
+  let { quizName } = useParams();
+  const [test, setTest] = useState([]);
 
-  const topics = [
+  const stopics = [
     "Arrays",
     "Variables",
     "Linked lists",
     "Functions"
   ]
 
+  /*
+  useEffect(async function () {
+    fetch(backend_url + "topicGroup", {
+      headers: {
+        "Content-Type": "application/JSON",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((response) => response.json())
+      .then(function (response) {
+        setTest(response);
+      });
+  }, []);
+  */
+
   useEffect(() => {
     // Generate new quiz
     const newQuizTemplate = generateNewQuiz();
+    console.log("QUIZ NAME " + quizName);
+    newQuizTemplate.name = quizName;
     setQuiz(newQuizTemplate);
+    setTopics(stopics);
+
+    async function fetchTopics() {
+      let response = await fetch(backend_url + "topicGroup", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/JSON",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      const resJson = await response.json();
+      setTest(resJson);
+    }
+
+    // fetchTopics();
+    getTopics();
+    getQuestionBank();
   }, []);
 
+  const getTopics = () => {
+    fetch(backend_url + "topicGroup", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/JSON",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((r) => {
+        if (r.status === 200) {
+          return r.json();
+        }
+        // TODO: Handle error case
+      })
+      .then((data) => {
+        // Set question bank variable
+        // setQuestionBank(data);
+        setTest(data);
+      });
+  };
+
   const getQuestionBank = () => {
+    console.log("TEST");
+    console.log(test);
     // TODO: Get from database when connecting with backend
+
+    // Get questions from question bank 
+    fetch(backend_url + "questionBank/questions", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/JSON",
+        Authorisation: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((r) => {
+        if (r.status === 200) {
+          return r.json();
+        }
+        // TODO: Handle error case
+      })
+      .then((data) => {
+        // Set question bank variable
+        setQuestionBank(data);
+        console.log(data);
+      });
   };
 
   const onChangeOpenDate = (date) => {
@@ -149,20 +233,50 @@ export default function EditQuiz() {
 
         <HStack mt="5" spacing="20px" alignItems="center">
           <Button size="sm" colorScheme="red">Delete quiz</Button>
-          <Button size="sm" colorScheme="green">Save quiz</Button>
+          <Button size="sm" colorScheme="green" onClick={handleSubmitQuiz}>Create quiz</Button>
         </HStack>
       </Box>
     );
   }
 
-  const renderQuiz = () => {
-    return (
-      <Box>
+  const handleSubmitQuiz = () => {
+    // TODO: Finish this off 
 
-      </Box>
-    );
+    const quizData = {
+      name: quiz.name,
+      topicGroupId: quiz.topicGroupId,
+      open_date: quiz.open_date,
+      close_date: quiz.close_date,
+      time_given: quiz.time_given,
+      num_questions: quiz.num_questions,
+    }
+
+    // Post new quiz 
+    fetch(`${backend_url}/topicGroup/${quiz.topicGroupId}/quizzes`, {
+      method: "POST",
+      body: quizData,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((r) => {
+        if (r.status === 200) {
+          return r.json();
+        }
+        // TODO: Handle error case
+      })
+      .then((data) => {
+        // TODO: Redirect back to QuizCreation/Quiz List
+        // history.push(`/course-page/${course}/forums/${data.post_id}`);
+
+        // Post each question
+      });
+
+      // Post questions
+
+      // Post each question's possible answers? 
   };
-
 
   const renderQuestionItem = (qs, qsIndex) => {
     // One accordion item per question 
@@ -392,11 +506,14 @@ export default function EditQuiz() {
   };
 
   const renderImportQuestionScreen = () => {
+    console.log("RENDERED IMPORT QUESTION SCREEN - TEST");
+    console.log(test);
+
     return (
       <Box>
         <Stack spacing={4}>
           <InputGroup>
-            <Input placeholder="Enter amount" />
+            <Input placeholder="Enter keywords" />
             <InputRightElement>
               <SearchIcon color="gray.800" />
 
@@ -404,16 +521,16 @@ export default function EditQuiz() {
           </InputGroup>
         </Stack>
 
-        <VStack spacing={10} px={9} mt={3}>
-          {questionBank.map(qs => {
+        <VStack spacing={10} px={3} mt={3}>
+          {questionBank.map((qs, index) => {
             return (
-              <InputGroup>
+              <InputGroup key={index}>
                 <InputLeftElement>
                   <Checkbox mr={3} />
-                  <Text>{qs.question_text}</Text>
+                  <Text>{qs.questiontext}</Text>
                 </InputLeftElement>
                 <InputRightElement>
-                  <Text>{renderTag(topics[qs.related_topic_id])}</Text>
+                  <Text>{renderTag(stopics[qs.topicid])}</Text>
                 </InputRightElement>
               </InputGroup>
             );

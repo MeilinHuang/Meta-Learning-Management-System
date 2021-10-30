@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "https://api.metalms.tech/"
+      "url": "http://localhost:8000/"
     }
   ],
   "tags": [

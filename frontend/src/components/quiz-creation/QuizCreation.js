@@ -19,23 +19,29 @@ import {
   Textarea
 } from "@chakra-ui/react"
 
-import QuestionCreation from '../question-creation/QuestionCreation';
+import { Switch, Route } from "react-router-dom";
+
+import { useHistory } from "react-router-dom";
+import EditQuiz from "../edit-quiz/EditQuiz.js"
 
 export default function QuizCreation() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const inputRef = React.useRef();
-
+  const history = useHistory();
+  
   const onHandleButtonClick = (e) => {
     setOpen(true);
   };
 
   const handleDialogClose = (e) => {
     setOpen(false);
+
   };
 
   const handleSubmit = (e) => {
-
+    // Go to EditQuiz page
+    history.push("/assessments/quiz/edit/" + name);
   };
 
   const handleNameChange = (e) => {
@@ -73,7 +79,7 @@ export default function QuizCreation() {
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button aria-label="Close" onClick={handleDialogClose}>Close</Button>
+            <Button aria-label="Close" onClick={() => {handleDialogClose(); handleSubmit();}}>Close</Button>
             <Button
               type="submit"
               ml={3}
@@ -85,6 +91,15 @@ export default function QuizCreation() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <Switch>
+        {/* Add your page as a Route here */}
+        <Route
+          exact
+          path="/assessments/edit/quiz/:quizName"
+          render={() => <EditQuiz />}
+        />
+      </Switch>
     </>
   );
 };

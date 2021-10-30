@@ -6,13 +6,31 @@ import QuestionCreation from '../components/question-creation/QuestionCreation';
 import QuizCreation from '../components/quiz-creation/QuizCreation';
 import QuizUsage from '../components/quiz-usage/QuizUsage';
 import QuizViewSubmission from '../components/quiz-view-submission/QuizViewSubmission';
+import { backend_url, topic_group_url } from "../Constants"
 
 export default function Assessments() {
-  // const [id, setId] = useState(0);
+  const [topicGroup, setTopicGroup] = useState([]);
 
   useEffect(() => {
-
-  });
+    console.log("Hello");
+    fetch(backend_url + "topicGroup", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/JSON",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+        .then((r) => {
+          if (r.status === 200) {
+            return r.json();
+          }
+          // TODO: Handle error case
+        })
+        .then((data) => {
+          console.log("Topic groups: ");
+          console.log(data);
+    });
+  }, []);
 
   const fetchRequest = () => {
     /*
@@ -38,13 +56,13 @@ export default function Assessments() {
   };
 
   return (
-    <div>
+    <Box>
       {/* <EditQuiz /> */}
-      {/* <QuizCreation /> */}
+      <QuizCreation />
       {/* <QuestionCreation /> */}
       {/* <QuizUsage /> */}
-      <QuizViewSubmission />
-    </div>
+      {/* <QuizViewSubmission /> */}
+    </Box>
   );
 
 }
