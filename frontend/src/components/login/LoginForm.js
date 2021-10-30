@@ -38,7 +38,7 @@ async function doLogin(email, password) {
   }
 
   const data = {
-    email: email,
+    email: email.toLower(),
     password: password,
   };
 
@@ -88,7 +88,7 @@ async function doRegister(name, email, zId, password, confirm) {
 
   const data = {
     name: name,
-    email: email,
+    email: email.toLower(),
     zid: zId,
     password: password,
   };
@@ -122,7 +122,7 @@ export default function LoginForm() {
   const history = useHistory();
 
   return (
-    <Flex width="Full" align="center" justifyContent="center">
+    <Flex width="Full" align="center" justifyContent="center" pt={16}>
       <Box
         p={8}
         maxWidth="500px"

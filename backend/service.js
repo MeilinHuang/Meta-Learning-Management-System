@@ -372,9 +372,9 @@ async function getTopicPreReqs(request, response) {
 }
 
 // Create new pre requisite (Modify for topic name instead of IDs ??)
-async function postPreReq(request, response) {
+async function postPreReq(request, response, requestBody) {
   //Validate Token
-  let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+  let zId = await auth.getZIdFromAuthorization(requestBody.header("Authorization"));
   if (zId == null) {
     response.status(403).send({ error: "Invalid Token" });
     throw "Invalid Token";
@@ -1182,6 +1182,12 @@ const randomString = (length) => {
   return result;
 };
 
+function addHours(date, hours) {
+  const newDate = new Date(date);
+  newDate.setHours(newDate.getHours() + Number(hours));
+  return newDate;
+}
+
 async function generateCode(request, response) {
   const topicGroupName = request.params.topicGroupName;
   try {
@@ -1206,15 +1212,16 @@ async function generateCode(request, response) {
     //generate a code, insert into db
     const code = randomString(8); // TODO check code uniqueness
 
-    // TODO figure out optional parameters
-
     if (request.body.hasOwnProperty("uses")) {
       const uses = request.body.uses;
       if (request.body.hasOwnProperty("expiration")) {
         const expiration = request.body.expiration;
+        let now = Date.now();
+        console.log(now);
+        now = addHours(now, expiration);
         let insResp = await pool.query(
           `INSERT INTO enroll_codes(id, code, topic_group_id, uses, expiration) VALUES(default, $1, $2, $3, $4)`,
-          [code, topicGroupId, uses, expiration]
+          [code, topicGroupId, uses, now]
         );
       } else {
         let insResp = await pool.query(
@@ -1225,9 +1232,12 @@ async function generateCode(request, response) {
     } else {
       if (request.body.hasOwnProperty("expiration")) {
         const expiration = request.body.expiration;
+        let now = Date.now();
+        console.log(now);
+        now = addHours(now, expiration);
         let insResp = await pool.query(
           `INSERT INTO enroll_codes(id, code, topic_group_id, expiration) VALUES(default, $1, $2, $3)`,
-          [code, topicGroupId, expiration]
+          [code, topicGroupId, now]
         );
       } else {
         let insResp = await pool.query(
@@ -1238,6 +1248,85 @@ async function generateCode(request, response) {
     }
     //return the code
     response.status(200).send({ code: code });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function enrollUserWithCode(request, response) {
+  const inviteCode = request.params.inviteCode;
+  const userId = request.params.userId;
+  try {
+    //Validate Token
+    let zId = await getZIdFromAuthorization(request.header("Authorization"));
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    const topicGroupId = resp.rows[0].id;
+    resp = await pool.query(`SELECT * FROM enroll_codes WHERE code = $1`, [
+      inviteCode,
+    ]);
+    // check code exists
+    if (resp.rows.length === 0) {
+      response.status(400).send({ error: `No such code "${inviteCode}"` });
+      throw `No such code ${inviteCode}`;
+    }
+
+    const code = resp.rows[0];
+
+    // check code has uses, delete if not
+    if (code.uses !== null) {
+      // check if its 0, if it is, delete and error
+      if (code.uses === 0) {
+        resp = await pool.query(`DELETE FROM enroll_codes WHERE id = $1`, [
+          code.id,
+        ]);
+
+        response.status(400).send({ error: `Code expired "${inviteCode}"`});
+        throw `Code expired ${inviteCode}`;
+      }
+      // decrement
+      await pool.query(`UPDATE enroll_codes SET uses = $1 WHERE id = $2`, [
+        code.uses - 1,
+        code.id,
+      ]);
+    }
+    // check code has time remaining, delete if not
+    if (code.expiration !== null) {
+      const expiration = new Date(code.expiration);
+      const now = Date.now();
+
+      // check if its 0, if it is, delete and error
+      if (expiration - now <= 0) {
+        resp = await pool.query(`DELETE FROM enroll_codes WHERE id = $1`, [
+          code.id,
+        ]);
+
+        response.status(400).send({ error: `Code expired "${inviteCode}"`});
+        throw `Code expired ${inviteCode}`;
+      }
+    }
+
+    // check if user already enrolled
+    resp = await pool.query(
+      `SELECT * FROM user_enrolled WHERE topic_group_id = $1 AND user_id = $2`,
+      [code.topic_group_id, userId]
+    );
+
+    if (resp.rows.length !== 0) {
+      response.status(400).send({ error: `You're already enrolled in that course`});
+      throw `User ${userId} already enrolled in course ${code.topic_group_id}`;
+    }
+
+    resp = await pool.query(
+      `INSERT INTO user_enrolled(topic_group_id, user_id, progress) VALUES($1, $2, $3)`,
+      [code.topic_group_id, userId, 0]
+    );
+
+    //return the codes
+    response.status(200).send({ success: "true" });
   } catch (e) {
     console.error(e);
   }
@@ -1267,6 +1356,9 @@ async function getCourseCodes(request, response) {
       `SELECT * FROM enroll_codes WHERE topic_group_id = $1`,
       [topicGroupId]
     );
+
+    // Todo: set flag to see if we deleted any codes and need to refetch
+    // then check each code in a loop to see if any are outdated or out of uses and remove them
 
     //return the codes
     response.status(200).send(resp.rows);
@@ -1393,6 +1485,17 @@ async function enrollUser(request, response) {
       throw `No topic group with name ${userZId}`;
     }
     const userId = resp.rows[0].id;
+
+    // check if user already enrolled
+    resp = await pool.query(
+      `SELECT * FROM user_enrolled WHERE topic_group_id = $1 AND user_id = $2`,
+      [topicGroupId, userId]
+    );
+
+    if (resp.rows.length !== 0) {
+      response.status(400).send({ error: `User already enrolled in this course`});
+      throw `User ${userId} already enrolled in course ${topicGroupId}`;
+    }
 
     resp = await pool.query(
       `INSERT INTO user_enrolled(topic_group_id, user_id, progress) VALUES($1, $2, $3)`,
@@ -2118,5 +2221,6 @@ module.exports = {
   getEnrollments,
   unenrollUser,
   enrollUser,
+  enrollUserWithCode,
   setSearchable,
 };

@@ -58,8 +58,12 @@ export default function TopicTree() {
             "links": []
         };
         let tempTopicGroups = [];
+        let validTopicGroups = ["C++ Programming", "Programming Fundamentals", "Object-Oriented Design & Programming"]; // Only for demo purposes
         for (let topicGroup of jsonData) {
             if (topicGroup === null) {
+                continue;
+            }
+            if (!validTopicGroups.includes(topicGroup.name)) {
                 continue;
             }
             tempTopicGroups.push({'label': topicGroup.name, 'value': topicGroup.name});
@@ -129,7 +133,7 @@ export default function TopicTree() {
                 }
             }
             if (!found && data.nodes[i].hasOwnProperty('id') && data.nodes[i].hasOwnProperty('title') && data.nodes[i].id !== id) {
-                nodes.push({'value': data.nodes[i].id.toString(), 'label': data.nodes[i].title});
+                nodes.push({'value': data.nodes[i].id.toString(), 'label': data.nodes[i].title + " - " + data.nodes[i].group});
             }
         }
 
@@ -200,7 +204,8 @@ export default function TopicTree() {
         let linkDict = {};
         for (let link of data.links) {
             let linkToAppend = {};
-
+            console.log('link', link);
+            console.log('nodeDict[link.source]', nodeDict[link.source]);
             if (expand[nodeDict[link.source].group] == false) {
                 linkToAppend['source'] = seenGroups[nodeDict[link.source].group];
 
