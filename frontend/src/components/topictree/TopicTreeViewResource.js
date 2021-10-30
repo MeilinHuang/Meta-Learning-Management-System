@@ -69,7 +69,8 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     await fetch(post_topic_tag(topicGroupName, data.title), {
       method: 'POST',
       headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         tagName: newTag
@@ -88,7 +89,8 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     await fetch(delete_topic_url(topicGroupName, data.title), {
       method: 'DELETE',
       headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
       }
     });
     
@@ -105,6 +107,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         'tagName': tagToDelete.name
@@ -128,7 +131,8 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     await fetch(delete_prereqs(topicGroupName, data.title), {
       method: 'DELETE',
       headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         'preReqId': prereqToDelete.id,
@@ -168,6 +172,9 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     setTempFiles(copyFiles);
     await fetch(update_topic(topicGroupName, data.title), {
       method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
       body: formData
     });
     return false;
@@ -193,6 +200,9 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     
     await fetch(update_topic(topicGroupName, data.title), {
       method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
       body: formData
     });
   }
@@ -254,7 +264,8 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     fetch(add_prereqs(topicGroupName, data.title), {
       method: 'POST',
       headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         'preReqId': newPrereq.value,

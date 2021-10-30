@@ -119,7 +119,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                 if (topic.tags !== undefined) {
                     for (let tag of topic.tags) {
                         tempTopics.push({'value': topic.name, 'label': tag.name, 'id': topic.id, 'name': topic.name, 'course_materials': topic.course_materials,
-                            'tags': topic.tags});
+                            'tags': topic.tags, 'group': topicGroup.name, 'groupId': topicGroup.id});
                     }
                 }
 
@@ -137,6 +137,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
     }
 
     const onChangeSearch = async (value, action) => {
+        console.log('value', value);
         value['materials_strings'] = {};
         value.materials_strings['content'] = [];
         value.materials_strings['practice'] = [];
