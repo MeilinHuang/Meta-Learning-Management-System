@@ -15,6 +15,17 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+const dateFormatter = (date) => {
+  const d = new Date(date);
+  return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDay()}/${
+    d.getMonth() + 1
+  }/${d.getFullYear()}`;
+};
+
+const logger = (request) => {
+  const now = Date.now();
+  console.log(`${request.method} - ${request.url} - ${dateFormatter(now)}`);
+};
 
 /***************************************************************
                        Open API / Swagger
@@ -44,12 +55,12 @@ const auth = require("./api/authentication")
 ***************************************************************/
 
 app.post("/auth/login", async (request, response) => {
-  console.log("POST /auth/login");
+  logger(request);
   await auth.login(request, response);
 });
 
 app.post("/auth/register", async (request, response) => {
-  console.log("POST /auth/register");
+  logger(request);
   await auth.register(request, response);
 });
 
@@ -58,75 +69,67 @@ app.post("/auth/register", async (request, response) => {
 ***************************************************************/
 
 app.get("/user/:userId", async (request, response) => {
-  console.log(`GET /user/${request.params.userId}`);
+  logger(request);
   await users.getUser(request, response);
 });
 
 app.delete("/user/:userId", async (request, response) => {
-  console.log(`DELETE /user/${request.params.userId}`);
+  logger(request);
   await users.deleteUser(request, response);
 });
 
 app.put("/user/:userId", async (request, response) => {
-  console.log(`PUT /user/${request.params.userId}`);
+  logger(request);
   await users.putAccessedTopic(request, response);
 });
 
 app.post("/user/:userId/:topicGroupId", async (request, response) => {
-  console.log(
-    `POST /user/${request.params.userId}/${request.params.topicGroupId}`
-  );
+  logger(request);
   await users.postAdmin(request, response);
 });
 
 app.delete("/user/:userId/:topicGroupId", async (request, response) => {
-  console.log(
-    `DELETE /user/${request.params.userId}/${request.params.topicGroupId}`
-  );
+  logger(request);
   await users.deleteAdmin(request, response);
 });
 
 app.put("/user/:userId/progress", async (request, response) => {
-  console.log(`PUT /user/${request.params.userId}/progress`);
+  logger(request);
   await users.putUserProgress(request, response);
 });
 
 app.get("/user/:userId/calendar", async (request, response) => {
-  console.log(`GET /user/${request.params.userId}/calendar`);
+  logger(request);
   await users.getUserCalendar(request, response);
 });
 
 app.get("/user/calendar/:calendarId", async (request, response) => {
-  console.log(`GET /user/calendar/${request.params.calendarId}`);
+  logger(request);
   await users.getCalendarById(request, response);
 });
 
 app.delete("/user/calendar/:calendarId", async (request, response) => {
-  console.log(`DELETE /user/calendar/${request.params.calendarId}`);
+  logger(request);
   await users.deleteCalendarById(request, response);
 });
 
 app.put("/user/:userId/calendar", async (request, response) => {
-  console.log(`POST /user/${request.params.userId}/calendar`);
+  logger(request);
   await users.postCalendar(request, response);
 });
 
 app.put("/user/calendar/:calendarId", async (request, response) => {
-  console.log(`PUT /user/calendar/${request.params.calendarId}`);
+  logger(request);
   await users.putCalendarById(request, response);
 });
 
 app.get("/user/:userId/progress/:topicId", async (request, response) => {
-  console.log(
-    `GET /user/${request.params.userId}/progress/${request.params.topicId}`
-  );
+  logger(request);
   await users.getUserContentProgress(request, response);
 });
 
 app.put("/user/:userId/progress/:topicId", async (request, response) => {
-  console.log(
-    `PUT /user/${request.params.userId}/progress/${request.params.topicId}`
-  );
+  logger(request);
   await users.putUserContentProgress(request, response);
 });
 
@@ -135,37 +138,37 @@ app.put("/user/:userId/progress/:topicId", async (request, response) => {
 ***************************************************************/
 
 app.get("/topicGroup", async (request, response) => {
-  console.log(`GET /topicGroup`);
+  logger(request);
   await database.getAllTopicGroups(request, response);
 });
 
-
 app.get("/topicGroup/all", async (request, response) => {
+  logger(request);
   await database.getAllTopics(request, response);
 });
 
 app.get("/topicGroup/:topicGroupName", async (request, response) => {
-  console.log(`GET /topicGroup/${request.params.topicGroupName}`);
+  logger(request);
   await database.getTopicGroup(request, response);
 });
 
-app.put("/topicGroup/:topicGroupName/searchable/:searchable", async (request, response) => {
-  console.log(`PUT /topicGroup/${request.params.topicGroupName}/searchable/${request.params.searchable}`);
-  await database.setSearchable(request, response);
-});
-
+app.put(
+  "/topicGroup/:topicGroupName/searchable/:searchable",
+  async (request, response) => {
+    logger(request);
+    await database.setSearchable(request, response);
+  }
+);
 
 app.get("/topicGroup/:topicGroupName/topic", async (request, response) => {
-  console.log(`GET /topicGroup/${request.params.topicGroupName}/topic`);
+  logger(request);
   await database.getTopics(request, response);
 });
 
 app.get(
   "/topicGroup/:topicGroupName/topic/:topicName/topic",
   async (request, response) => {
-    console.log(
-      `GET /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/topic`
-    );
+    logger(request);
     await database.getTopicFile(request, response);
   }
 );
@@ -173,9 +176,7 @@ app.get(
 app.get(
   "/topicGroup/:topicGroupName/topic/:topicName/prerequisite",
   async (request, response) => {
-    console.log(
-      `GET /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/prerequisite`
-    );
+    logger(request);
     await database.getTopicPreReqs(request, response);
   }
 );
@@ -184,10 +185,15 @@ app.get(
 app.post(
   "/topicGroup/:topicGroupName/topic/:topicName/prerequisite",
   async (request, response) => {
+<<<<<<< HEAD
     console.log(
       `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/prerequisite`
     );
     await database.postPreReq(request.body, response, request);
+=======
+    logger(request);
+    await database.postPreReq(request.body, response);
+>>>>>>> accounts
   }
 );
 
@@ -195,9 +201,7 @@ app.post(
 app.delete(
   "/topicGroup/:topicGroupName/topic/:topicName/prerequisite",
   async (request, response) => {
-    console.log(
-      `DELETE /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/prerequisite`
-    );
+    logger(request);
     await database.deletePreReq(request.body, response);
   }
 );
@@ -206,9 +210,7 @@ app.delete(
 app.post(
   "/topicGroup/:topicGroupName/topic/:topicName/tag",
   async (request, response) => {
-    console.log(
-      `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/tag`
-    );
+    logger(request);
     await database.putTopicTag(request, response);
   }
 );
@@ -216,34 +218,30 @@ app.post(
 app.delete(
   "/topicGroup/:topicGroupName/topic/:topicName/tag",
   async (request, response) => {
-    console.log(
-      `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/tag`
-    );
+    logger(request);
     await database.deleteTopicTag(request, response);
   }
 );
 
 app.post("/topicGroup/:topicGroupName", async (request, response) => {
-  console.log(`POST /topicGroup/${request.params.topicGroupName}`);
+  logger(request);
   await database.postTopicGroup(request, response);
 });
 
 app.put("/topicGroup/:topicGroupName", async (request, response) => {
-  console.log(`PUT /topicGroup/${request.params.topicGroupName}`);
+  logger(request);
   await database.putTopicGroup(request, response);
 });
 
 app.delete("/topicGroup/:topicGroupName", async (request, response) => {
-  console.log(`DELETE /topicGroup/${request.params.topicGroupName}`);
+  logger(request);
   await database.deleteTopicGroup(request, response);
 });
 
 app.post(
   "/topicGroup/:topicGroupName/topic/:topicName",
   async (request, response) => {
-    console.log(
-      `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}`
-    );
+    logger(request);
     await database.postTopic(request, response);
   }
 );
@@ -251,9 +249,7 @@ app.post(
 app.put(
   "/topicGroup/:topicGroupName/topic/:topicName",
   async (request, response) => {
-    console.log(
-      `PUT /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}`
-    );
+    logger(request);
     await database.putTopic(request, response);
   }
 );
@@ -261,18 +257,18 @@ app.put(
 app.delete(
   "/topicGroup/:topicGroupName/topic/:topicName",
   async (request, response) => {
-    console.log(
-      `DELETE /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}`
-    );
+    logger(request);
     await database.deleteTopic(request, response);
   }
 );
 
 app.get("/topic/:fileId", async (request, response) => {
+  logger(request);
   await topics.getTopicFileById(request, response);
 });
 
 app.put("/topic/:fileId", async (request, response) => {
+  logger(request);
   await topics.putTopicFileDueDate(request, response);
 });
 
@@ -281,44 +277,44 @@ app.put("/topic/:fileId", async (request, response) => {
 ***************************************************************/
 
 app.post("/enroll/code/:topicGroupName", async (request, response) => {
-  console.log(`POST /enroll/code/${request.params.topicGroupName}`);
+  logger(request);
   await database.generateCode(request, response);
 });
 
 app.put("/enroll/code/:inviteCode/:userId", async (request, response) => {
-  console.log(`PUT /enroll/code/${request.params.inviteCode}/${request.params.userId}`);
+  logger(request);
   await database.enrollUserWithCode(request, response);
 });
 
 // Gets all codes for a topic group
 app.get("/enroll/codes/:topicGroupName", async (request, response) => {
-  console.log(`GET /enroll/codes/${request.params.topicGroupName}`);
+  logger(request);
   await database.getCourseCodes(request, response);
 });
 
 // Gets a specific code
 app.get("/enroll/code/:inviteCode", async (request, response) => {
-  console.log(`GET /enroll/code/${request.params.inviteCode}`);
+  logger(request);
   await database.getCourseCode(request, response);
 });
 // Gets a specific code
 app.delete("/enroll/code/:inviteCode", async (request, response) => {
-  console.log(`DELETE /enroll/code/${request.params.inviteCode}`);
+  logger(request);
   await database.deleteCourseCode(request, response);
 });
 
 app.get("/enrollments/:topicGroupName", async (request, response) => {
-  console.log(`GET /enrollments/${request.params.topicGroupName}`);
+  logger(request);
   await database.getEnrollments(request, response);
 });
 
 app.put("/enroll/:topicGroupName/:zId", async (request, response) => {
-  console.log(`PUT /enroll/${request.params.topicGroupName}/${request.params.zId}`);
+  logger(request);
   await database.enrollUser(request, response);
 });
 
 app.put("/unenroll/:topicGroupName/:userId", async (request, response) => {
-  console.log(`PUT /unenroll/${request.params.topicGroupName}/${request.params.userId}`);
+  logger(request);
   await database.unenrollUser(request, response);
 });
 
@@ -327,81 +323,65 @@ app.put("/unenroll/:topicGroupName/:userId", async (request, response) => {
 ***************************************************************/
 
 app.get("/:topicGroup/forum", async (request, response) => {
-  console.log(`GET /${request.params.topicGroup}/forum`);
+  logger(request);
   await forums.getAllForumPosts(request, response);
 });
 
 app.get("/:topicGroup/forum/pinned", async (request, response) => {
-  console.log(`GET /${request.params.topicGroup}/forum/pinned`);
+  logger(request);
   await forums.getAllPinnedPosts(request, response);
 });
 
 app.get(
   "/:topicGroup/forum/search/:forumSearchTerm",
   async (request, response) => {
-    console.log(
-      `GET /${request.params.topicGroup}/forum/search/${request.params.forumSearchTerm}`
-    );
+    logger(request);
     await forums.getSearchPosts(request, response);
   }
 );
 
 app.get("/:topicGroup/forum/filter", async (request, response) => {
-  console.log(
-    `GET /${request.params.topicGroup}/forum/${request.query.forumFilterTerms}`
-  );
+  logger(request);
   await forums.getFilterPosts(request, response);
 });
 
 app.post("/:topicGroup/forum/post", async (request, response) => {
-  console.log(`POST /${request.params.topicGroup}/forum/post`);
+  logger(request);
   await forums.postForum(request, response);
 });
 
 app.get("/:topicGroup/forum/post/:postId", async (request, response) => {
-  console.log(
-    `GET /${request.params.topicGroup}/forum/post/${request.params.postId}`
-  );
+  logger(request);
   await forums.getPostById(request, response);
 });
 
 app.put("/:topicGroup/forum/post/:postId", async (request, response) => {
-  console.log(
-    `PUT /${request.params.topicGroup}/forum/post/${request.params.postId}`
-  );
+  logger(request);
   await forums.putPost(request, response);
 });
 
 app.delete("/:topicGroup/forum/post/:postId", async (request, response) => {
-  console.log(
-    `DELETE /${request.params.topicGroup}/forum/post/${request.params.postId}`
-  );
+  logger(request);
   await forums.deletePost(request, response);
 });
 
 app.put(
   "/:topicGroup/forum/post/:postId/reply/:replyId",
   async (request, response) => {
-    console.log(
-      `PUT /${request.params.topicGroup}/forum/post/${request.params.postId}/reply/${request.params.replyId}`
-    );
+    logger(request);
     await forums.putPostReply(request, response);
   }
 );
 
 app.post("/:topicGroup/forum/post/:postId/reply", async (request, response) => {
-  console.log(
-    `POST /${request.params.topicGroup}/forum/post/${request.params.postId}/reply`
-  );
+  logger(request);
   await forums.postReply(request, response);
 });
 
 app.delete(
   "/:topicGroup/forum/post/:postId/reply/:replyId",
   async (request, response) => {
-    console.log(
-      `DELETE /${request.params.topicGroup}/forum/post/${request.params.postId}/reply/${request.params.replyId}`
-    );
+    logger(request);
     await forums.deletePostReply(request, response);
   }
 );
@@ -409,9 +389,7 @@ app.delete(
 app.post(
   "/:topicGroup/forum/post/:postId/comment",
   async (request, response) => {
-    console.log(
-      `POST /${request.params.topicGroup}/forum/post/${request.params.postId}/comment`
-    );
+    logger(request);
     await forums.postComment(request, response);
   }
 );
@@ -419,9 +397,7 @@ app.post(
 app.put(
   "/:topicGroup/forum/post/:postId/comment/:commentId",
   async (request, response) => {
-    console.log(
-      `PUT /${request.params.topicGroup}/forum/post/${request.params.postId}/comment/${request.params.commentId}`
-    );
+    logger(request);
     await forums.putComment(request, response);
   }
 );
@@ -429,9 +405,7 @@ app.put(
 app.delete(
   "/:topicGroup/forum/post/:postId/comment/:commentId",
   async (request, response) => {
-    console.log(
-      `DELETE /${request.params.topicGroup}/forum/post/${request.params.postId}/comment/${request.params.commentId}`
-    );
+    logger(request);
     await forums.deleteComment(request, response);
   }
 );
@@ -439,9 +413,7 @@ app.delete(
 app.put(
   "/:topicGroup/forum/post/:postId/comment/:commentId/endorse/:isEndorsed",
   async (request, response) => {
-    console.log(
-      `PUT /${request.params.topicGroup}/forum/post/${request.params.postId}/comment/${request.params.commentId}/endorse/${request.params.isEndorsed}`
-    );
+    logger(request);
     await forums.putCommentEndorse(request, response);
   }
 );
@@ -449,72 +421,56 @@ app.put(
 app.put(
   "/:topicGroup/forum/post/pin/:postId/:isPinned",
   async (request, response) => {
-    console.log(
-      `PUT /${request.params.topicGroup}/forum/post/pin/${request.params.postId}/${request.params.isPinned}`
-    );
+    logger(request);
     await forums.putPostPin(request, response);
   }
 );
 
 app.get("/:topicGroup/forum/tags/:tagId", async (request, response) => {
-  console.log(
-    `GET /${request.params.topicGroup}/forum/tags/${request.params.tagId}`
-  );
+  logger(request);
   await forums.getTag(request, response);
 });
 
 app.put("/:topicGroup/forum/tags/:tagId", async (request, response) => {
-  console.log(
-    `PUT /${request.params.topicGroup}/forum/tags/${request.params.tagId}`
-  );
+  logger(request);
   await forums.putTag(request, response);
 });
 
 app.put("/:topicGroup/forum/tags", async (request, response) => {
-  console.log(`PUT /${request.params.topicGroup}/forum/tags`);
+  logger(request);
   await forums.getAllTags(request, response);
 });
 
 app.post("/:topicGroup/forum/tags", async (request, response) => {
-  console.log(`POST /${request.params.topicGroup}/forum/tags`);
+  logger(request);
   await forums.postTag(request, response);
 });
 
 app.delete("/:topicGroup/forum/tags/:tagId", async (request, response) => {
-  console.log(
-    `DELETE /${request.params.topicGroup}/forum/tags/${request.params.tagId}`
-  );
+  logger(request);
   await forums.deleteTag(request, response);
 });
 
 app.put(
   "/:topicGroup/forum/post/endorse/:postId/:isEndorsed",
   async (request, response) => {
-    console.log(
-      `PUT /${request.params.topicGroup}/forum/post/endorse/${request.params.postId}/${request.params.isEndorsed}`
-    );
+    logger(request);
     await forums.putPostEndorse(request, response);
   }
 );
 
 app.put("/:topicGroup/forum/post/like/:postId", async (request, response) => {
-  console.log(
-    `PUT /${request.params.topicGroup}/forum/post/like/${request.params.postId}`
-  );
+  logger(request);
   await forums.putPostLike(request, response);
 });
 
 app.get("/:topicGroup/forum/post/like/:postId", async (request, response) => {
-  console.log(
-    `GET /${request.params.topicGroup}/forum/post/like/${request.params.postId}`
-  );
+  logger(request);
   await forums.getPostLikes(request, response);
 });
 
 app.put("/:topicGroup/forum/post/unlike/:postId", async (request, response) => {
-  console.log(
-    `PUT /${request.params.topicGroup}/forum/post/unlike/${request.params.postId}`
-  );
+  logger(request);
   await forums.putPostUnlike(request, response);
 });
 
@@ -523,21 +479,19 @@ app.put("/:topicGroup/forum/post/unlike/:postId", async (request, response) => {
 ***************************************************************/
 
 app.get("/:topicGroup/announcement", async (request, response) => {
-  console.log(`GET /${request.params.topicGroup}/announcement`);
+  logger(request);
   await database.getAnnouncements(request, response);
 });
 
 app.post("/:topicGroup/announcement/new", async (request, response) => {
-  console.log(`POST /${request.params.topicGroup}/announcement/new`);
+  logger(request);
   await database.postAnnouncement(request, response);
 });
 
 app.get(
   "/:topicGroup/announcement/:announcementId",
   async (request, response) => {
-    console.log(
-      `GET /${request.params.topicGroup}/announcement/${request.params.announcementId}`
-    );
+    logger(request);
     await database.getAnnouncementById(request, response);
   }
 );
@@ -545,9 +499,7 @@ app.get(
 app.put(
   "/:topicGroup/announcement/:announcementId",
   async (request, response) => {
-    console.log(
-      `PUT /${request.params.topicGroup}/announcement/${request.params.announcementId}`
-    );
+    logger(request);
     await database.putAnnouncement(request, response);
   }
 );
@@ -555,9 +507,7 @@ app.put(
 app.delete(
   "/:topicGroup/announcement/:announcementId",
   async (request, response) => {
-    console.log(
-      `DELETE /${request.params.topicGroup}/announcement/${request.params.announcementId}`
-    );
+    logger(request);
     await database.deleteAnnouncement(request, response);
   }
 );
@@ -565,9 +515,7 @@ app.delete(
 app.post(
   "/:topicGroup/announcement/:announcementId/comment",
   async (request, response) => {
-    console.log(
-      `POST /${request.params.topicGroup}/announcement/${request.params.announcementId}/comment`
-    );
+    logger(request);
     await database.postAnnouncementComment(request, response);
   }
 );
@@ -575,9 +523,7 @@ app.post(
 app.put(
   "/:topicGroup/announcement/:announcementId/comment/:commentId",
   async (request, response) => {
-    console.log(
-      `PUT /${request.params.topicGroup}/announcement/${request.params.announcementId}/comment/${request.params.commentId}`
-    );
+    logger(request);
     await database.putAnnouncementComment(request, response);
   }
 );
@@ -585,9 +531,7 @@ app.put(
 app.delete(
   "/:topicGroup/announcement/:announcementId/comment/:commentId",
   async (request, response) => {
-    console.log(
-      `DELETE /${request.params.topicGroup}/announcement/${request.params.announcementId}/comment/${request.params.commentId}`
-    );
+    logger(request);
     await database.deleteAnnouncementComment(request, response);
   }
 );
@@ -595,9 +539,7 @@ app.delete(
 app.get(
   "/:topicGroup/announcement/search/:announcementSearchTerm",
   async (request, response) => {
-    console.log(
-      `GET /${request.params.topicGroup}/announcement/search/${request.params.announcementSearchTerm}/`
-    );
+    logger(request);
     await database.getSearchAnnouncements(request, response);
   }
 );
@@ -607,122 +549,122 @@ app.get(
 ***************************************************************/
 
 app.get("/topicGroup/:topicGroupId/quizzes", async (request, response) => {
-  console.log(`GET /topicGroup/${request.params.topicGroupId}/quizzes`);
+  logger(request);
   await assessment.getAllQuizzes(request, response);
 });
 
 app.get("/topicGroup/:topicGroupId/quizzes/:quizId", async (request, response) => {
-  console.log(`GET /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}`);
+  logger(request);
   await assessment.getQuizById(request, response);
 });
 
 app.post("/topicGroup/:topicGroupId/quizzes", async (request, response) => {
-  console.log(`POST /topicGroup/${request.params.topicGroupId}/quizzes`);
+  logger(request);
   await assessment.postQuiz(request, response);
 });
 
 app.put("/topicGroup/:topicGroupId/quizzes/:quizId", async (request, response) => {
-  console.log(`PUT /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}`);
+  logger(request);
   await assessment.putQuizById(request, response);
 });
 
 app.delete("/topicGroup/:topicGroupId/quizzes/:quizId", async (request, response) => {
-  console.log(`DELETE /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}`);
+  logger(request);
   await assessment.deleteQuizById(request, response);
 });
 
 app.put("/topicGroup/:topicGroupId/quizzes/:quizId/questions/:questionId", async (request, response) => {
-  console.log(`PUT /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/questions/${request.params.questionId}`);
+  logger(request);
   await assessment.putQuestionById(request, response);
 });
 
 app.get("/questionBank/questions", async (request, response) => {
-  console.log(`GET /questionBank/questions`);
+  logger(request);
   await assessment.getQuestionBankQuestions(request, response);
 });
 
 app.get("/questionBank/questions/:questionId", async (request, response) => {
-  console.log(`GET /questionBank/questions/${request.params.questionId}`);
+  logger(request);
   await assessment.getQuestionFromQuestionBank(request, response);
 });
 
 app.delete("/questionBank/questions/:questionId", async (request, response) => {
-  console.log(`DELETE /questionBank/questions/${request.params.questionId}`);
+  logger(request);
   await assessment.deleteQuestionBankQuestion(request, response);
 });
 
 app.get("/questionBank/questions/start/:questionStartId/limit/:limit", async (request, response) => {
-  console.log(`GET /questionBank/questions/start/${request.params.questionStartId}/limit/${request.params.limit}`);
+  logger(request);
   await assessment.getLimitedQuestions(request, response);
 });
 
 app.get("/questionBank/questions/start/:questionStartId/limit/:limit/sortBy/:sortTerm", async (request, response) => {
-  console.log(`GET /questionBank/questions/start/${request.params.questionStartId}/limit/${request.params.limit}/sortBy/${request.params.sortTerm}`);
+  logger(request);
   await assessment.getLimitSortQuestions(request, response);
 });
 
 app.get("/questionBank/questions/filter/:filterTopic", async (request, response) => {
-  console.log(`GET /questionBank/questions/filter/${request.params.filterTopic}`);
+  logger(request);
   await assessment.getFilterQuestions(request, response);
 });
 
 app.get("/topicGroup/:topicGroupId/quizzes/:quizId/studentAttempt", async (request, response) => {
-  console.log(`GET /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/studentAttempt`);
+  logger(request);
   await assessment.getStudentAttempts(request, response);
 });
 
 app.get("/topicGroup/:topicGroupId/quizzes/:quizId/studentAttempt/:studentId", async (request, response) => {
-  console.log(`GET /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/studentAttempt/${request.params.studentId}`);
+  logger(request);
   await assessment.getStudentAttemptById(request, response);
 });
 
 app.post("/topicGroup/:topicGroupId/quizzes/:quizId/studentAttempt/:studentId", async (request, response) => {
-  console.log(`POST /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/studentAttempt/${request.params.studentId}`);
+  logger(request);
   await assessment.postStudentAttempt(request, response);
 });
 
 app.delete("/topicGroup/:topicGroupId/quizzes/:quizId/studentAttempt/:studentId", async (request, response) => {
-  console.log(`DELETE /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/studentAttempt/${request.params.studentId}`);
+  logger(request);
   await assessment.deleteStudentAttemptByid(request, response);
 });
 
 app.post("/topicGroup/:topicGroupId/quizzes/:quizId/:questionId/:studentId", async (request, response) => {
-  console.log(`POST /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/${request.params.questionId}/${request.params.studentId}`);
+  logger(request);
   await assessment.postStudentAnswer(request, response);
 });
 
 app.put("/topicGroup/:topicGroupId/quizzes/:quizId/:questionId/:studentId", async (request, response) => {
-  console.log(`PUT /topicGroup/${request.params.topicGroupId}/quizzes/${request.params.quizId}/${request.params.questionId}/${request.params.studentId}`);
+  logger(request);
   await assessment.putStudentAnswer(request, response);
 });
 
 app.post("/topicGroup/quizzes/question/answer", async (request, response) => {
-  console.log(`POST /topicGroup/quizzes/question/answer`);
+  logger(request);
   await assessment.postQuestionAnswer(request, response);
 });
 
 app.put("/topicGroup/quizzes/question/answer/:answerId", async (request, response) => {
-  console.log(`PUT /topicGroup/quizzes/question/answer/${request.params.answerId}`);
+  logger(request);
   await assessment.putQuestionAnswer(request, response);
 });
 
 app.delete("/topicGroup/quizzes/question/answer/:answerId", async (request, response) => {
-  console.log(`DELETE /topicGroup/quizzes/question/answer/${request.params.answerId}`);
+  logger(request);
   await assessment.deleteQuestionAnswer(request, response);
 });
 
 app.post("/questionBank/question", async (request, response) => {
-  console.log(`POST /questionBank/question/new`);
+  logger(request);
   await assessment.postQuestion(request, response);
 });
 
 app.put("/questionBank/question/edit/:questionId", async (request, response) => {
-  console.log(`PUT /questionBank/question/edit/${request.params.questionId}`);
+  logger(request);
   await assessment.putQuestion(request, response);
 });
 
 app.delete("/questionBank/question/delete/:questionId", async (request, response) => {
-  console.log(`DELETE /questionBank/question/delete/${request.params.questionId}`);
+  logger(request);
   await assessment.deleteQuestion(request, response);
 });
 
@@ -731,87 +673,77 @@ app.delete("/questionBank/question/delete/:questionId", async (request, response
 ***************************************************************/
 
 app.post("/:target/file/:targetId", async (request, response) => {
-  console.log(`POST /file/${request.params.targetId}`);
+  logger(request);
   await lectureTutorial.postLectureTutorialFile(request, response);
 });
 
 app.delete("/file/:targetId", async (request, response) => {
-  console.log(`DELETE /file/${request.params.targetId}`);
+  logger(request);
   await lectureTutorial.deleteLectureTutorialFile(request, response);
 });
 
 app.get("/:topicGroupName", async (request, response) => {
-  console.log(`GET ${request.params.topicGroupName}`);
+  logger(request);
   await lectureTutorial.getWeeks(request, response);
 });
 
 app.get("/:topicGroupName/lectures", async (request, response) => {
-  console.log(`GET ${request.params.topicGroupName}/lectures`);
+  logger(request);
   await lectureTutorial.getAllLectures(request, response);
 });
 
 app.get("/:topicGroupName/lecture/:lectureId", async (request, response) => {
-  console.log(
-    `GET ${request.params.topicGroupName}/lectures/${request.params.lectureId}`
-  );
+  logger(request);
   await lectureTutorial.getLectureById(request, response);
 });
 
 app.put("/:topicGroupName/lecture/:lectureId", async (request, response) => {
-  console.log(
-    `PUT ${request.params.topicGroupName}/lectures/${request.params.lectureId}`
-  );
+  logger(request);
   await lectureTutorial.putLecture(request, response);
 });
 
 app.delete("/:topicGroupName/lecture/:lectureId", async (request, response) => {
-  console.log(
-    `DELETE ${request.params.topicGroupName}/lectures/${request.params.lectureId}`
-  );
+  logger(request);
   await lectureTutorial.deleteLecture(request, response);
 });
 
 app.post("/:topicGroupName/lecture", async (request, response) => {
-  console.log(`POST ${request.params.topicGroupName}/lecture`);
+  logger(request);
   await lectureTutorial.postLecture(request, response);
 });
 
 app.get("/:topicGroupName/tutorials", async (request, response) => {
-  console.log(`GET ${request.params.topicGroupName}/tutorials`);
+  logger(request);
   await lectureTutorial.getAllTutorials(request, response);
 });
 
 app.get("/:topicGroupName/tutorial/:tutorialId", async (request, response) => {
-  console.log(
-    `GET ${request.params.topicGroupName}/tutorial/${request.params.tutorialId}`
-  );
+  logger(request);
   await lectureTutorial.getTutorialById(request, response);
 });
 
 app.put("/:topicGroupName/tutorial/:tutorialId", async (request, response) => {
-  console.log(
-    `PUT ${request.params.topicGroupName}/tutorial/${request.params.tutorialId}`
-  );
+  logger(request);
   await lectureTutorial.putTutorial(request, response);
 });
 
 app.delete(
   "/:topicGroupName/tutorial/:tutorialId",
   async (request, response) => {
-    console.log(`DELETE ${request.params.topicGroupName}/tutorial/${request.params.tutorialId}`);
+    logger(request);
     await lectureTutorial.deleteTutorial(request, response);
   }
 );
 
 app.post("/:topicGroupName/tutorial", async (request, response) => {
-  console.log(`POST ${request.params.topicGroupName}/tutorial`);
+  logger(request);
   await lectureTutorial.postTutorial(request, response);
 });
 
 app.get("/:topicGroupName/:type/search/:searchTerm", async (request, response) => {
-  console.log(`GET /${request.params.topicGroupName}/${request.params.type}/search/${request.params.searchTerm}`);
+  logger(request);
   await lectureTutorial.getSearchFile(request, response);
-})
+});
 
 app.listen(8000, () => {
   console.log("Server listening on http://localhost:8000/\n");

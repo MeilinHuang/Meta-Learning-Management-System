@@ -38,7 +38,7 @@ async function doLogin(email, password) {
   }
 
   const data = {
-    email: email,
+    email: email.toLower(),
     password: password,
   };
 
@@ -88,7 +88,7 @@ async function doRegister(name, email, zId, password, confirm) {
 
   const data = {
     name: name,
-    email: email,
+    email: email.toLower(),
     zid: zId,
     password: password,
   };
