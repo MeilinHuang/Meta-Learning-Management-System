@@ -14,6 +14,7 @@ var svg;
 var expand = {};
 var circles, link, node, lables, simulation, tempNodes, linkNodes, tempLinks, arrows, groupPath, convexHull, genCH;
 var emptyNodes = 2; //fix later
+var inpos = [], counterX = 1, inposY = [], counterY = 1;
 
 function zoomed() {
     g.attr("transform", d3.event.transform);
@@ -171,6 +172,7 @@ export default function TopicTree() {
                         'name': node.group,
                         'title': node.group,
                         'type': 'group',
+                        'group': node.group
                     });
 
                 }
@@ -323,6 +325,9 @@ export default function TopicTree() {
                 if (seenGroups.hasOwnProperty(topicName)) {
                     expand[topicName] = true;
                     init(data);
+                    counterX = 1;
+                    inpos = [];
+                    inposY = [];
                 } else {
                     let topicName = d3.select(this).text();
 
@@ -438,59 +443,39 @@ export default function TopicTree() {
         let linkForce = d3
             .forceLink()
             .id(function (link) { return link.id });
-        var inpos = [], counterX = 1, inposY = [], counterY = 1;
+        
         simulation = d3
             .forceSimulation()
             .force('link', linkForce)
             .force('forceX', d3.forceX(function (d) {
+                
                 console.log('d', d);
                 if (!d.hasOwnProperty('title'))  {// is fake node
                     return 0;
                 }
-                if (inpos[d.title]) { // is a node?
+                if (inpos[d.group]) {
                     // console.log(inpos);
-                    if (d.type == 'group') {
-                        return inpos[d.title];
-                    } else {
-                        return inpos[d.group];
-                    }
-
+                    return inpos[d.group];
                 } else {
-                    if (d.type == 'group') {
-                        inpos[d.title] = width / counterX;
-                    } else {
-                        inpos[d.group] = width / counterX;
-                    }
+                    inpos[d.group] = width / counterX;
                     // console.log(inpos);
                     counterX++;
-                    if (d.type == 'group') {
-                        return inpos[d.title];
-                    }
                     return inpos[d.group];
                 }
+
             }))
             .force('forceY', d3.forceY(function (d) {
                 console.log('d', d);
                 if (!d.hasOwnProperty('title')) {
                     return 0;
                 }
-                if (d.hasOwnProperty('group') && inposY[d.group]) {
+                if (inposY[d.group]) {
                     // console.log(inposY);
                     return inposY[d.group];
-                } else if (inposY[d.title]) {
-                    return inposY[d.title];  
                 } else {
-                    if (d.hasOwnProperty('group')) {
-                        inposY[d.group] = height / (Math.random() * (3) + 1); 
-                        return inposY[d.group];
-                    } else {
-                        inposY[d.title] = height / (Math.random() * (3) + 1);
-                        return inposY[d.title];
-                    }
-                    
+                    inposY[d.group] = height / (Math.random() * (d.group.length - 0 + 1) + 1);
                     // console.log(inposY);
-                    
-                    
+                    return inposY[d.group];
                 }
             }));
 
@@ -523,8 +508,11 @@ export default function TopicTree() {
 
     function dragstarted(d) {
         if (!d3.event.active) simulation.alphaTarget(0.05).restart();
-        d.fx = d.x;
-        d.fy = d.y;
+        circles.each(function (d) {
+            d.fx = d.x;
+            d.fy = d.y;
+        });
+
     }
 
     function dragged(d) {

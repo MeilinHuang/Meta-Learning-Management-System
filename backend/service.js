@@ -166,7 +166,7 @@ async function getAllTopicGroups(request, response) {
         }
         let temp3 = await pool.query(
           `SELECT tags.name from tags JOIN topic_tags ON topic_tags.tag_id = tags.tag_id WHERE topic_id = $1 GROUP BY tags.tag_id`,
-          [topic_id]
+          [topicId]
         );
         tmp.rows[0].tags = temp3.rows;
       }
