@@ -185,15 +185,8 @@ app.get(
 app.post(
   "/topicGroup/:topicGroupName/topic/:topicName/prerequisite",
   async (request, response) => {
-<<<<<<< HEAD
-    console.log(
-      `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/prerequisite`
-    );
-    await database.postPreReq(request.body, response, request);
-=======
     logger(request);
     await database.postPreReq(request.body, response);
->>>>>>> accounts
   }
 );
 
