@@ -12,7 +12,7 @@ async function getUser(request, response) {
     const id = request.params.userId;
 
     let resp = await pool.query(
-      `SELECT id, zid, staff, u.name AS user_name, u.last_accessed_topic, t.enrolled_courses 
+      `SELECT id, zid, staff, email, u.name AS user_name, u.last_accessed_topic, t.enrolled_courses 
       FROM users u 
       LEFT JOIN (SELECT us.user_id AS id, array_agg(t.id) 
       AS enrolled_courses FROM user_enrolled us 

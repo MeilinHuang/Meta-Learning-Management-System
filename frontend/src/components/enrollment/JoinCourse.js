@@ -12,6 +12,10 @@ import {
   FormLabel,
 } from "@chakra-ui/react";
 
+async function doCodeEnroll() {
+  
+}
+
 export default function CourseInvite() {
   let { code } = useParams();
   const [invite, setInvite] = useState(code);

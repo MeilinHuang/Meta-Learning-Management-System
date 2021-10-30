@@ -8,6 +8,7 @@ import { useBreakpointValue, Flex, Container, Box } from "@chakra-ui/react";
 import { backend_url } from "../Constants.js";
 import { isLoggedIn } from "../utils/helpers.js";
 import CourseInvite from "../components/enrollment/JoinCourse";
+import AccountSettings from "../components/enrollment/accountSettings.js";
 
 function MainPage() {
   const history = useHistory();
@@ -82,6 +83,9 @@ function MainPage() {
             {/* Add your page as a Route here */}
             <Route path="/invite/:code?">
               <CourseInvite />
+            </Route>
+            <Route path="/account">
+              <AccountSettings user={user} />
             </Route>
             <Route path="/">
               <MainSelection user={user} />

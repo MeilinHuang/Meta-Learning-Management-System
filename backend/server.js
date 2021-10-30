@@ -285,7 +285,10 @@ app.post("/enroll/code/:topicGroupName", async (request, response) => {
   await database.generateCode(request, response);
 });
 
-// app.put("/enroll/code/:inviteCode");
+app.put("/enroll/code/:inviteCode/:userId", async (request, response) => {
+  console.log(`PUT /enroll/code/${request.params.inviteCode}/${request.params.userId}`);
+  await database.enrollUserWithCode(request, response);
+});
 
 // Gets all codes for a topic group
 app.get("/enroll/codes/:topicGroupName", async (request, response) => {
