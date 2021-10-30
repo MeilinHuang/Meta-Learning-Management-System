@@ -25,6 +25,7 @@ function TopicAccordion({ topic, course }) {
                 if (file.completed) {
                     completed++
                 }
+                return file
             })
             if (completed === total) {
                 setAll(true)

@@ -172,7 +172,7 @@ function Sidebar({
               justifyContent="center"
               cursor="pointer"
             >
-              <Box marginLeft={1} padding={4} fontSize="larger">
+              <Box marginLeft={1} paddingLeft={4} paddingRight={1} fontSize="larger">
                 <Text fontWeight="medium" letterSpacing="wider">
                   {code}
                 </Text>
@@ -212,6 +212,7 @@ function Sidebar({
         </Menu>
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupState["object"], user]);
 
   if (variant === "drawer") {
@@ -235,7 +236,7 @@ function Sidebar({
             <Menu isLazy>
               <MenuButton>
                 <Flex alignItems="center">
-                  <Avatar name="John Smith" src="https://bit.ly/dan-abramov" />
+                    { user && <Avatar name={user.user_name} /> }
                   <Box display={["none", "block", "block"]}>
                     <ChevronDownIcon
                       boxSize={6}

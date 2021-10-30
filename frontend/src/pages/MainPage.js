@@ -66,6 +66,7 @@ function MainPage() {
             isOpen={isOpen}
             setOpen={setOpen}
             variant={variants}
+            user={user}
           ></Sidebar>
         </Box>
         <Box position="fixed" right={0}>

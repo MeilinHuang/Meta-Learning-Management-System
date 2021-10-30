@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { backend_url } from "../../Constants";
 
-function CategoryContent({topic, category, content, course}) {
+function CategoryContent({topic, category, content, course, course_id}) {
     const [checked, setChecked] = useState(false)
 
     const allComplete = (list) => {
@@ -21,13 +21,14 @@ function CategoryContent({topic, category, content, course}) {
             if (!data.completed) {
                 all = false
             }
+            return data
         })
         return all
     }
 
     useEffect(() => {
         setChecked(allComplete(content))
-    })
+    }, [content])
 
     return (
         <div>
@@ -74,6 +75,7 @@ function CategoryContent({topic, category, content, course}) {
                                                             if (file.id === mat.id) {
                                                                 content[index].completed = e.target.checked
                                                             }
+                                                            return (file, index)
                                                         })
                                                         setChecked(allComplete(content))
                                                     })
@@ -89,7 +91,7 @@ function CategoryContent({topic, category, content, course}) {
                                                 onClick={() => {
                                                     window.open(
                                                         "/_files/topicGroup" +
-                                                        course +
+                                                        course_id +
                                                         "/topic" +
                                                         topic.id +
                                                         "/" +

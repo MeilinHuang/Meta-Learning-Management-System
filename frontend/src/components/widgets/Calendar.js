@@ -149,8 +149,17 @@ function Calendar() {
                 {/* Not sure on how to remove warning without doing drastic changes */}
                 <Popover>
                     {row.map((day, i) => {
-                      let rem = new Date(month.format("y") + " " + month.format("MMMM") + " " + day)
                       let className = "dayTile";
+                      if (day === "") {
+                          return (
+                            <td key={"month-" + month.format("MMMM") + " day-" + i} className={className}>
+                                <div>
+                                {day}
+                                </div>
+                            </td>
+                          )
+                      }
+                      let rem = new Date(month.format("y") + " " + month.format("MMMM") + " " + day)
                       //In case a date is a reminder
                       let reminder_note = ""
                       //Is the current date
@@ -162,7 +171,6 @@ function Calendar() {
                       for (let x = 0; x < reminders.length; x++) {
                         let reminder_date = reminders[x].remind_date.split("T")[0]
                         //console.log(reminder_date, rem)
-                        
                         if (reminder_date === new Date(rem).toISOString().split("T")[0]) {
                             className += " reminder"
                             reminder_note = reminders[x].description

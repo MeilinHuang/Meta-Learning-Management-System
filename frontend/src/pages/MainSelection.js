@@ -12,7 +12,7 @@ import {
     Button,
 } from "@chakra-ui/react";
 import { backend_url } from "../Constants.js";
-import Announcement from "../components/dashboard/Announcement/Announcement";
+import RecentAnnouncment from "../components/selection/RecentAnnouncement.js";
 import { ReactComponent as Learn } from "../static/svgs/undraw_Online_learning_re_qw08.svg";
 import { ReactComponent as Study } from "../static/svgs/undraw_studying_s3l7.svg";
 import CategoriesList from "../components/content/CategoriesList.js";
@@ -21,8 +21,6 @@ function MainSelection({ user }) {
 	const [courses, setCourses] = useState([]);
 	const [recent_announce, setRecent] = useState(null);
 	const [code, setCode] = useState(null);
-	//For announcement
-	const [announcements, setAnnouncements] = useState([]);
 	//Most recently accessed topic
 	const [content, setContent] = useState(null);
 
@@ -70,27 +68,29 @@ function MainSelection({ user }) {
                                     })
 									user.enrolled_courses.map(course => {
 										if (course.name === e.name) {
-											Promise.all(e.topics_list.map(topic => {
-												return fetch(backend_url + "user/" + localStorage.getItem("id") + "/progress/" + topic.id)
-											}))
-											.then(resp => Promise.all(resp.map(r => r.json())))
-											.then (data => {
-												let total = 0
-												let complete = 0
-												data.map(topic_progress => {
-													topic_progress.map(progress => {
-														total++
-														if (progress.completed) {
-															complete++
-														}
-													})
-												})
-												let progress = 0
-												if (total > 0) {
-													progress = (complete/total) * 100
-												}
-												course.progress = progress
-											})
+                                            if (e && course) {
+                                                Promise.all(e.topics_list.map(topic => {
+                                                    return fetch(backend_url + "user/" + localStorage.getItem("id") + "/progress/" + topic.id)
+                                                }))
+                                                .then(resp => Promise.all(resp.map(r => r.json())))
+                                                .then (data => {
+                                                    let total = 0
+                                                    let complete = 0
+                                                    data.map(topic_progress => {
+                                                        topic_progress.map(progress => {
+                                                            total++
+                                                            if (progress.completed) {
+                                                                complete++
+                                                            }
+                                                        })
+                                                    })
+                                                    let progress = 0
+                                                    if (total > 0) {
+                                                        progress = (complete/total) * 100
+                                                    }
+                                                    course.progress = progress
+                                                })
+                                            }
 										}
 									})
 									setCourses(user.enrolled_courses)
@@ -268,33 +268,7 @@ function MainSelection({ user }) {
 						width={["100%", "100%", "100%", "100%", "100%", "50%"]}
 						flexDirection="column"
 					>
-						<Flex
-							shadow="xl"
-							flexDirection="column"
-							borderRadius={10}
-							padding={5}
-						>
-							<Text fontSize="2xl" letterSpacing="wide" fontWeight={600}>
-								Recent Announcement
-							</Text>
-                            <Text>{code}</Text>
-							{recent_announce && code ? (
-								<Announcement
-									padding={0}
-									margin={0}
-									announcement={recent_announce}
-									course={code}
-									setAnnouncements={setAnnouncements}
-									isAnnouncementPage={false}
-								/>
-							) : (
-								<Flex>
-                                    <Text>
-                                        There are no new announcements
-                                    </Text>
-                                </Flex>
-							)}
-						</Flex>
+						<RecentAnnouncment recent_announce={recent_announce} code={code}></RecentAnnouncment>
 						{/* Need to figure out what to put here
 							<Flex shadow="xl" flexDirection="column" borderRadius={10} padding={5} marginTop={5}>
 								<Text fontSize="2xl" letterSpacing="wide" fontWeight={600}>WORK IN PROGRESS</Text>
@@ -369,15 +343,18 @@ function MainSelection({ user }) {
                                     <Text fontSize="2xl" letterSpacing="wide" fontWeight={600} marginBottom={5}>
                                         Continue
                                     </Text>
-                                    {/* Use most recently accessed topic here */}
                                         <Flex flexDirection="column">
                                             <Text fontSize="lg" letterSpacing="wide">
-                                                {content.course + " " + content.name}
+                                                {content.course}
+                                            </Text>
+                                            <Text fontWeight="semibold" fontSize="lg">
+                                                {content.name}
                                             </Text>
                                             <Accordion allowMultiple>
                                                 <CategoriesList
                                                     topic={content}
                                                     course={content.name}
+                                                    course_id={content.topic_group_id}
                                                 ></CategoriesList>
                                             </Accordion>
                                         </Flex>
