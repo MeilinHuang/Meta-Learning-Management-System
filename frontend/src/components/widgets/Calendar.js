@@ -162,7 +162,7 @@ function Calendar() {
                       for (let x = 0; x < reminders.length; x++) {
                         let reminder_date = reminders[x].remind_date.split("T")[0]
                         //console.log(reminder_date, rem)
-                        //TODO Getting wrong date (gets the previous day)
+                        
                         if (reminder_date === new Date(rem).toISOString().split("T")[0]) {
                             className += " reminder"
                             reminder_note = reminders[x].description
