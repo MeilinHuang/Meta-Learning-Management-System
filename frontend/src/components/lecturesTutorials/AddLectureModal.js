@@ -80,7 +80,7 @@ function AddPostModal({
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            Create new lecture
+            Create new lecture week
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -90,7 +90,7 @@ function AddPostModal({
               enctype="multipart/form-data"
             >
               <Flex flexDirection="column" mb="16px">
-                <Heading size="sm" mb="4px">
+                <Heading size="sm" mb="4px" paddingBottom="1%">
                   Week:
                 </Heading>
                 <Input
@@ -99,8 +99,8 @@ function AddPostModal({
                   autoFocus
                 />
               </Flex>
-              <Flex flexDirection="column" mb="16px">
-                <Heading size="sm" mb="4px">
+              <Flex flexDirection="column" mb="16px" marginBottom="-2%">
+                <Heading size="sm" mb="4px" paddingBottom="1%">
                   Attachments:
                 </Heading>
                 <input type="file" name="lectureFiles" onChange={handleUpload} />

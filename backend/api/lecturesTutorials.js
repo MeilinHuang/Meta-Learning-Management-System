@@ -37,33 +37,25 @@ async function postLectureTutorialFile (request, response) {
       fs.mkdirSync(`../frontend/public/_files/${fileTarget}${destId}`);
     }
 
-    await pool.query(
+    let resp = await pool.query(
     `INSERT INTO ${fileTarget}_files (id, name, file, type, ${fileTarget}_id) 
-    VALUES(default, $1, $2, $3, $4)`, [fileName, filePath, fileTarget, destId]);
+    VALUES(default, $1, $2, $3, $4) RETURNING id`, [fileName, filePath, fileTarget, destId]);
     fs.writeFileSync(`../frontend/public/_files/${fileTarget}${destId}/${fileName}`, request.files.uploadFile.data, "binary", 
     function (err) { if (err) throw err; });
+
+    if (resp.rows.length && fileTarget == 'lecture') {
+      await pool.query(`INSERT INTO lecture_files_lectures(fileId, lectureId)
+      VALUES($1, $2)`, [resp.rows[0].id, destId]);
+    } else if (resp.rows.length && fileTarget == 'tutorial') {
+      await pool.query(`INSERT INTO tutorial_files_tutorials(fileId, tutorialId)
+      VALUES($1, $2)`, [resp.rows[0].id, destId]);
+    }
 
     response.status(200).json({success: true, file: fileName, filePath: filePath});
   } catch (e) {
     response.status(400).json({error: e});
   }
 }
-
-// (REDUNDANT)  
-/* async function putFile (request, response) {
-  try {
-    const fileTarget = request.params.lectureId ? "lecture" : "tutorial";
-    const fileName = request.files.uploadFile.name;
-    const fileId = request.body.fileId;
-
-    await pool.query(
-    `UPDATE $1_files SET name = $2 WHERE id = $3`, [fileTarget, fileName, fileId]);
-
-    response.status(200).json({success: true, file: fileName});
-  } catch (e) {
-    response.status(400).json({error: e});
-  }
-} */
 
 // Delete file for lecture or tutorial
 async function deleteLectureTutorialFile (request, response) {
@@ -99,17 +91,21 @@ async function getSearchFile (request, response) {
     const topicGroupId = idReq.rows[0].id;
     let resp;
 
-    if (type == 'lecture') {
+    if (type == 'lectures') {
       resp = await pool.query(`
-      SELECT lf.id, lf.name, lf.file, lf.lecture_id FROM lecture_files lf
-      JOIN lectures l ON l.id = lf.id
+      SELECT lf.id, lf.name, lf.file, lf.lecture_id 
+      FROM lecture_files lf
+      JOIN lectures l ON l.id = lf.lecture_id
+      JOIN lecture_files_lectures lfl ON lfl.fileId = lf.id AND lfl.lectureId = l.id
       WHERE l.topic_group_id = $1 AND LOWER(lf.name) ~ LOWER($2)
       GROUP BY lf.id
       ORDER BY lf.id`, [topicGroupId, searchTerm]);
     } else {
       resp = await pool.query(`
-      SELECT tf.id, tf.name, tf.file, tf.tutorial_id FROM tutorial_files tf
-      JOIN tutorials t ON t.id = tf.id
+      SELECT tf.id, tf.name, tf.file, tf.tutorial_id 
+      FROM tutorial_files tf
+      JOIN tutorials t ON t.id = tf.tutorial_id
+      JOIN tutorial_files_tutorials tft ON tft.fileId = tf.id AND tft.tutorialId = t.id
       WHERE t.topic_group_id = $1 AND LOWER(tf.name) ~ LOWER($2)
       GROUP BY tf.id
       ORDER BY tf.id`, [topicGroupId, searchTerm]);
@@ -134,8 +130,7 @@ async function getAllLectures (request, response) {
     const topicGroupId = idReq.rows[0].id;
 
     const resp = await pool.query(
-    `SELECT l.id, l.week, l.topic_group_id, l.topic_reference, l.lecturer_id, 
-    l.start_time, l.end_time, l.lecture_video, array_agg(lf.id) as lecture_files
+    `SELECT l.id, l.week, l.topic_group_id, l.topic_reference, array_agg(lf.id) as lecture_files
     FROM lectures l
     LEFT JOIN lecture_files lf ON lf.lecture_id = l.id
     WHERE l.topic_group_id = $1
@@ -176,8 +171,7 @@ async function getSearchLectures (request, response) {
     // Convert searchTerm to topicReference id
     
     const resp = await pool.query(
-      `SELECT l.id, l.week, l.topic_group_id, l.topic_reference, l.lecturer_id, 
-      l.start_time, l.end_time, l.lecture_video, array_agg(lf.id) as lecture_files
+      `SELECT l.id, l.week, l.topic_group_id, l.topic_reference, array_agg(lf.id) as lecture_files
       FROM lectures l
       LEFT JOIN lecture_files lf ON lf.lecture_id = l.id
       WHERE l.topic_group_id = $1 AND (l.week = $2 OR l.topic_reference = $2) 
@@ -231,12 +225,8 @@ async function getLectureById (request, response) {
 // Create new lecture
 async function postLecture (request, response) {
   const topicGroupName = request.params.topicGroupName;
-    const lecturerId = request.body.lecturerId;
-    const week = request.body.week;
-    const startTime = request.body.startTime ? request.body.startTime : null;
-    const endTime = request.body.endTime ? request.body.endTime : null;
+  const week = request.body.week;
     //const topicRef = request.body.topicReference ? request.body.topicReference : null;
-    const lectureVideo = request.body.lectureVideo ? request.body.lectureVideo : null;
 
     /* const topicReq = await pool.query(`SELECT id FROM topics WHERE LOWER(name) = LOWER($1)`, [topicRef]);
     if (!topicReq.rows.length) throw (`Failed: Topic {${topicRef}} does not exist`);
@@ -255,10 +245,9 @@ async function postLecture (request, response) {
     }
 
     let resp = await pool.query(
-      `INSERT INTO lectures(id, topic_group_id, lecturer_id, week, start_time, 
-      end_time, lecture_video)
-      VALUES(default, $1, $2, $3, $4, $5, $6) RETURNING id`, 
-      [topicGroupId, lecturerId, week, startTime, endTime, lectureVideo]);
+      `INSERT INTO lectures(id, topic_group_id, week)
+      VALUES(default, $1, $2) RETURNING id`, 
+      [topicGroupId, week]);
     if (!resp.rows.length) throw (`Failed: Lecture creation unsuccessful`);
 
     response.status(200).json({success: true, lectureId: resp.rows[0].id});
@@ -274,12 +263,8 @@ async function putLecture (request, response) {
   try {
     const topicGroupName = request.params.topicGroupName;
     const lectureId = request.params.lectureId;
-    const lecturerId = request.body.lecturerId;
     const week = request.body.week;
-    const startTime = request.body.startTime;
-    const endTime = request.body.endTime;
     const topicRef = request.body.topicReference;
-    const lectureVideo = request.body.lectureVideo ? request.body.lectureVideo : null;
 
     const tgReq = await pool.query(`SELECT id FROM topic_group WHERE LOWER(name) = LOWER($1)`, [topicGroupName]);
     if(!tgReq.rows.length) throw (`Failed: Topic group {${topicGroupName}} does not exist`);
@@ -291,10 +276,9 @@ async function putLecture (request, response) {
 
     let resp = await pool.query(
       `UPDATE lectures
-      SET lecturer_id = $1, week = $2, start_time = $3, end_time = $4,
-      lecture_video = $5, topic_reference = $6 WHERE topic_group_id = $7 AND id = $8
+      SET week = $1, topic_reference = $2 WHERE topic_group_id = $3 AND id = $4
       RETURNING id`, 
-      [lecturerId, week, startTime, endTime, lectureVideo, topicId, topicGroupId, lectureId]);
+      [week, topicId, topicGroupId, lectureId]);
     if (!resp.rows.length) throw (`Failed: Lecture update unsuccessful`);
 
     response.status(200).json({success: true});
@@ -317,7 +301,17 @@ async function deleteLecture (request, response) {
     const req = await pool.query(`DELETE FROM lectures WHERE week = $1 AND topic_group_id = $2 RETURNING id`, [lectureId, topicGroupId]);
     if (!req.rows.length) throw (`Week with id {${lectureId}} does not exist`);
 
-    // Delete all files related as well
+    if (fs.existsSync(`../frontend/public/_files/lecture${lectureId}`)) {
+      fs.rmdir(
+        `../frontend/public/_files/lecture${lectureId}`,
+        { recursive: true },
+        (err) => {
+          if (err) {
+            throw err;
+          }
+        }
+      );
+    }
 
     response.status(200).json({success: true});
   } catch (e) {

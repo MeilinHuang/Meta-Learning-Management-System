@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "https://api.metalms.tech/"
+      "url": "http://localhost:8000/"
     }
   ],
   "tags": [
@@ -1814,7 +1814,7 @@
         }
       }
     },
-    "/user/{userId}/{topicGroupId}": {
+    "/user/{userId}/{topicGroupId}/admin": {
       "post": {
         "tags": ["User"],
         "summary": "Make user an admin for a topic group",
@@ -2118,7 +2118,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -2169,7 +2169,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -5912,7 +5912,7 @@
         }
       }
     },
-    "/{topicGroupName}/lectures/search/": {
+    "/{topicGroupName}/lectures/search/{searchTerm}": {
       "get": {
         "tags": ["Lectures and Tutorials"],
         "summary": "Gets list of lecture files related to search term",
@@ -5933,17 +5933,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          }
-          ,
-          {
-            "name": "Specify",
-            "in": "query",
-            "description": "Search term",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["lecture", "tutorial"]
             }
           }
         ],
@@ -5973,7 +5962,7 @@
         }
       }
     },
-    "/{topicGroupName}/tutorials/search/": {
+    "/{topicGroupName}/tutorials/search/{searchTerm}": {
       "get": {
         "tags": ["Lectures and Tutorials"],
         "summary": "Gets list of tutorial files related to search term",
@@ -5994,17 +5983,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          }
-          ,
-          {
-            "name": "Specify",
-            "in": "query",
-            "description": "Search term",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["lecture", "tutorial"]
             }
           }
         ],
@@ -6098,7 +6076,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"
@@ -6278,7 +6256,7 @@
             "name": "Authorization",
             "in": "header",
             "description": "Auth token",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "default": "Bearer <Token>"

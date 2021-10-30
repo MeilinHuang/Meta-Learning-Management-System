@@ -10,7 +10,7 @@ app.use("/_files", express.static("public/_files"));
 const cors = require("cors");
 const corsOptions = {
   origin: '*',
-  Credentials: true,
+  credentials: true,
   optionSuccessStatus: 200,
 };
 
@@ -83,12 +83,12 @@ app.put("/user/:userId", async (request, response) => {
   await users.putAccessedTopic(request, response);
 });
 
-app.post("/user/:userId/:topicGroupId", async (request, response) => {
+app.post("/user/:userId/:topicGroupId/admin", async (request, response) => {
   logger(request);
   await users.postAdmin(request, response);
 });
 
-app.delete("/user/:userId/:topicGroupId", async (request, response) => {
+app.delete("/user/:userId/:topicGroupId/admin", async (request, response) => {
   logger(request);
   await users.deleteAdmin(request, response);
 });
@@ -113,7 +113,7 @@ app.delete("/user/calendar/:calendarId", async (request, response) => {
   await users.deleteCalendarById(request, response);
 });
 
-app.put("/user/:userId/calendar", async (request, response) => {
+app.post("/user/:userId/calendar", async (request, response) => {
   logger(request);
   await users.postCalendar(request, response);
 });

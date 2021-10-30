@@ -360,23 +360,15 @@ CREATE TABLE "tutorials" (
   id SERIAL NOT NULL PRIMARY KEY,
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
   week INTEGER,
-  tutor_id INTEGER NOT NULL REFERENCES users(id),
-  start_time TIME NOT NULL,
-  end_time TIME NOT NULL,
-  topic_reference INTEGER REFERENCES topics(id),
-  tutorial_video TEXT
+  topic_reference INTEGER REFERENCES topics(id)
 );
 
 DROP TABLE IF EXISTS "lectures" CASCADE;
 CREATE TABLE "lectures" (
   id SERIAL NOT NULL PRIMARY KEY,
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  lecturer_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   week INTEGER,
-  start_time TIME,
-  end_time TIME,
-  topic_reference INTEGER REFERENCES topics(id),
-  lecture_video TEXT
+  topic_reference INTEGER REFERENCES topics(id)
 );
 
 DROP TABLE IF EXISTS "lecture_files" CASCADE;
@@ -409,6 +401,34 @@ CREATE TABLE "enrolled_tutorials" (
   tutorial_id INTEGER NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE ON UPDATE CASCADE,
   student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY (tutorial_id, student_id)
+);
+
+DROP TABLE IF EXISTS "lecture_files_lectures" CASCADE;
+CREATE TABLE "lecture_files_lectures" (
+  fileId INTEGER NOT NULL REFERENCES lecture_files(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  lectureId INTEGER NOT NULL REFERENCES lectures(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (fileId, lectureId)
+);
+
+DROP TABLE IF EXISTS "tutorial_files_tutorials" CASCADE;
+CREATE TABLE "tutorial_files_tutorials" (
+  fileId INTEGER NOT NULL REFERENCES tutorial_files(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  tutorialId INTEGER NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (fileId, tutorialId)
+);
+
+-- Temp
+DROP TABLE IF EXISTS "panels" CASCADE;
+CREATE TABLE "panels" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT
+);
+
+DROP TABLE IF EXISTS "panel_files" CASCADE;
+CREATE TABLE "panel_files" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  panelId INTEGER REFERENCES panels(id)
 );
 
 -- Enrol types
