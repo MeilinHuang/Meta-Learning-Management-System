@@ -17,19 +17,17 @@ import {
 function AddPostModal({
   isOpen,
   onClose,
-  isLectures,
   onSubmit,
   code
 }) {
   const [week, setWeek] = useState();
-  const [attachments, setAttachments] = useState([]);
   const toast = useToast();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     e.target.reset();
 
-    if (!week || attachments.length === 0) {
+    if (!week) {
       toast({
         title: "Required fields missing",
         status: "error",
@@ -42,30 +40,19 @@ function AddPostModal({
     // const timeZoneOffset = new Date().getTimezoneOffset() * 60000;
     // const date = new Date(Date.now() - timeZoneOffset).toISOString();
 
-    const formArr = [];
-
-    const formData = new FormData();
-    formData.append("lecturerId", localStorage.getItem("id"));
-    formData.append("week", week);
-    // formData.append("startTime", date);
-    // formData.append("endTime", date);
-
-    const fileFormData = new FormData();
-    fileFormData.append("uploadFile", attachments);
-
-    formArr.push(formData);
-    formArr.push(fileFormData);
-
-    onSubmit(formArr);
-    setAttachments([]);
+    fetch(`http://localhost:8000/${code}/lecture/${week}`, {
+      method: "DELETE",
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then(r => r.json())
+    .then(data => {
+      onSubmit();
+    })
 
     onClose();
   };
-
-  // handle upload
-  const handleUpload = e => {
-    setAttachments(e.target.files[0])
-  }
 
   return (
     <>
@@ -80,7 +67,7 @@ function AddPostModal({
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            Create new lecture
+            Delete Lecture
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -99,17 +86,11 @@ function AddPostModal({
                   autoFocus
                 />
               </Flex>
-              <Flex flexDirection="column" mb="16px">
-                <Heading size="sm" mb="4px">
-                  Attachments:
-                </Heading>
-                <input type="file" name="lectureFiles" onChange={handleUpload} />
-              </Flex>
             </form>
           </ModalBody>
           <ModalFooter display="flex" justifyContent="center">
             <Button type="submit" form="createLecture">
-              Create
+              Delete
             </Button>
           </ModalFooter>
         </ModalContent>

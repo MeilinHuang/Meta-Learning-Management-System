@@ -4,7 +4,6 @@ import {
   Box,
   Divider,
   Flex,
-  Icon,
   InputGroup,
   Text,
   useToast,
@@ -19,6 +18,7 @@ import UpvoteButton from '../UpvoteButton'
 import htmlToDraft from "html-to-draftjs";
 import styles from "./PostDetails.module.css";
 import { isLoggedInUser, isStaff } from "../../../utils/helpers"
+import { backend_url } from "../../../Constants"
 
 function PostDetails({
   post: {
@@ -64,7 +64,7 @@ function PostDetails({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch(`http://localhost:8000/${code}/forum/post/${post_id}`, {
+    fetch(`${backend_url}${code}/forum/post/${post_id}`, {
       method: "PUT",
       body: JSON.stringify({
         description: details,
@@ -76,7 +76,7 @@ function PostDetails({
       },
     }).then((r) => {
       if (r.status === 200) {
-        fetch(`http://localhost:8000/${code}/forum/post/${post_id}`, {
+        fetch(`${backend_url}${code}/forum/post/${post_id}`, {
           headers: {
             "Content-Type": "application/JSON",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -91,7 +91,7 @@ function PostDetails({
 
   const handleEndorse = () => {
     fetch(
-      `http://localhost:8000/${code}/forum/post/endorse/${post_id}/${!isendorsed}`,
+      `${backend_url}${code}/forum/post/endorse/${post_id}/${!isendorsed}`,
       {
         method: "PUT",
         headers: {
@@ -102,7 +102,7 @@ function PostDetails({
       }
     ).then((r) => {
       if (r.status === 200) {
-        fetch(`http://localhost:8000/${code}/forum/post/${post_id}`, {
+        fetch(`${backend_url}${code}/forum/post/${post_id}`, {
           headers: {
             "Content-Type": "application/JSON",
             Authorization: `Bearer ${localStorage.getItem("token")}`,

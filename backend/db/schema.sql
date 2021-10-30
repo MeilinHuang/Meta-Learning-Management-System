@@ -277,62 +277,73 @@ CREATE TABLE "announcement_comment_files" (
 );
 
 -- Assessment 
-DROP TABLE IF EXISTS "quiz" CASCADE;
-CREATE TABLE "quiz" (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  due_date TIMESTAMP,
-  time_given INTEGER
-);
+CREATE TYPE question AS ENUM ('mc', 'sa', 'cb');
 
-DROP TABLE IF EXISTS "quiz_question" CASCADE;
-CREATE TABLE "quiz_question" (
-  id SERIAL PRIMARY KEY,
-  quiz_id INTEGER REFERENCES quiz(id) ON UPDATE CASCADE ON DELETE CASCADE,
-  quiz_type TEXT NOT NULL,
-  marks_awarded REAL,
-  description TEXT NOT NULL,
-  related_topic_id INTEGER NOT NULL REFERENCES topics(id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS "quiz_question_answer" CASCADE;
-CREATE TABLE "quiz_question_answer" (
-  id SERIAL NOT NULL PRIMARY KEY,
-  quiz_id INTEGER NOT NULL REFERENCES quiz(id) ON UPDATE CASCADE ON DELETE CASCADE,
-  question_id INTEGER NOT NULL REFERENCES quiz_question(id) ON UPDATE CASCADE ON DELETE CASCADE,
-  is_correct_answer BOOLEAN NOT NULL,
-  description TEXT
-);
-
-DROP TABLE IF EXISTS "quiz_student_answer" CASCADE;
-CREATE TABLE "quiz_student_answer" (
-  student_id INTEGER NOT NULL REFERENCES users(id),
-  quiz_id INTEGER NOT NULL REFERENCES quiz(id) ON UPDATE CASCADE ON DELETE CASCADE,
-  question_id INTEGER NOT NULL REFERENCES quiz_question(id) ON UPDATE CASCADE ON DELETE CASCADE,
-  answer_selected_id INTEGER NOT NULL REFERENCES quiz_question_answer(id)
-);
-
-DROP TABLE IF EXISTS "quiz_question_bank" CASCADE;
-CREATE TABLE "quiz_question_bank" (
-  id SERIAL NOT NULL PRIMARY KEY,
-  name TEXT NOT NULL
-);
-
-DROP TABLE IF EXISTS "question_bank_question" CASCADE;
-CREATE TABLE "question_bank_question" (
-  question_bank_id INTEGER NOT NULL REFERENCES quiz_question_bank(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  question_id INTEGER NOT NULL REFERENCES quiz_question(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY (question_bank_id, question_id)
-);
-
-DROP TABLE IF EXISTS "quiz_poll" CASCADE;
-CREATE TABLE "quiz_poll" (
+DROP TABLE IF EXISTS "quizzes" CASCADE;
+CREATE TABLE "quizzes" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
-  start_time TIMESTAMP, 
-  close_time TIMESTAMP,
-  is_closed BOOLEAN NOT NULL,
-  poll_type TEXT NOT NULL
+  topicGroupId INTEGER NOT NULL REFERENCES topic_group(id),
+  openDate TIME,
+  closeDate TIME,
+  timeGiven INTEGER NOT NULL,
+  numQuestions INTEGER NOT NULL
+);
+
+DROP TABLE IF EXISTS "question_bank" CASCADE;
+CREATE TABLE "question_bank" (
+  id SERIAL NOT NULL PRIMARY KEY
+);
+
+DROP TABLE IF EXISTS "questions" CASCADE;
+CREATE TABLE "questions" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  topicId INTEGER NOT NULL REFERENCES topics(id),
+  questionBankId INTEGER NOT NULL REFERENCES question_bank(id),
+  questionText TEXT NOT NULL,
+  questionType question NOT NULL,
+  marksAwarded INTEGER NOT NULL
+);
+
+DROP TABLE IF EXISTS "quiz_questions" CASCADE;
+CREATE TABLE "quiz_questions" (
+  quizId INTEGER NOT NULL REFERENCES quizzes(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  questionId INTEGER NOT NULL REFERENCES questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  PRIMARY KEY (quizId, questionId)
+);
+
+DROP TABLE IF EXISTS "question_possible_answers" CASCADE;
+CREATE TABLE "question_possible_answers" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  questionId INTEGER NOT NULL REFERENCES questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  answerText TEXT NOT NULL,
+  isCorrect BOOLEAN NOT NULL,
+  explanation TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS "student_attempts" CASCADE;
+CREATE TABLE "student_attempts" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  quizId INTEGER NOT NULL REFERENCES quizzes(id),
+  studentId INTEGER NOT NULL REFERENCES users(id),
+  startTime TIME,
+  endTime TIME
+);
+
+DROP TABLE IF EXISTS "student_answers" CASCADE;
+CREATE TABLE "student_answers" (
+  id SERIAL NOT NULL PRIMARY KEY,
+  quizId INTEGER NOT NULL REFERENCES quizzes(id),
+  studentId INTEGER NOT NULL REFERENCES users(id),
+  questionId INTEGER NOT NULL REFERENCES questions(id),
+  answer TEXT
+);
+
+DROP TABLE IF EXISTS "attempt_answers" CASCADE;
+CREATE TABLE "attempt_answers" (
+  attemptId INTEGER NOT NULL REFERENCES student_attempts(id),
+  answerId INTEGER NOT NULL REFERENCES student_answers(id),
+  PRIMARY KEY (attemptId, answerId)
 );
 
 -- Lectures and Tutorials
@@ -362,8 +373,8 @@ CREATE TABLE "lectures" (
   topic_group_id INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
   lecturer_id INTEGER NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
   week INTEGER,
-  start_time TIME NOT NULL,
-  end_time TIME NOT NULL,
+  start_time TIME,
+  end_time TIME,
   topic_reference INTEGER REFERENCES topics(id),
   lecture_video TEXT
 );
