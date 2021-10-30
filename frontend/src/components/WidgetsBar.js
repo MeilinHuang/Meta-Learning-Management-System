@@ -67,8 +67,13 @@ function WidgetsBar({ page, user }) {
             </MenuButton>
             <Portal>
               <MenuList zIndex={100}>
-                <MenuItem>Profile</MenuItem>
-                <MenuItem>Settings</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    history.push("/account");
+                  }}
+                >
+                  Account
+                </MenuItem>
                 {isLoggedIn() ? (
                   <MenuItem
                     onClick={(e) => {
