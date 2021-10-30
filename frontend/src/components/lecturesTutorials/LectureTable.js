@@ -1,9 +1,9 @@
 import React from "react";
 import { 
   Link,
-  Button,
   AccordionItem,
-  Flex
+  Flex,
+  Button
 } from "@chakra-ui/react";
 import { DownloadIcon } from '@chakra-ui/icons'
 
@@ -21,7 +21,7 @@ function LectureTable({ isAdmin, lecture, code, searchFiles}) {
 
   return (
     <Flex align-items="center" text-align="center"> 
-      <AccordionItem width="100%" text-align="left" padding="1%">
+      <AccordionItem width="88%" text-align="left" padding="1%">
         {
           isLectureFiles(lecture) ? lecture.lecture_files.map( file => (
             <> 
@@ -42,7 +42,7 @@ function LectureTable({ isAdmin, lecture, code, searchFiles}) {
             </>
           )) : console.log("No search files")
         }
-        
+        <Button> TEST </Button>
       </AccordionItem>
     </Flex>
   )

@@ -10,7 +10,7 @@ app.use("/_files", express.static("public/_files"));
 const cors = require("cors");
 const corsOptions = {
   origin: '*',
-  Credentials: true,
+  credentials: true,
   optionSuccessStatus: 200,
 };
 
@@ -72,16 +72,16 @@ app.put("/user/:userId", async (request, response) => {
   await users.putAccessedTopic(request, response);
 });
 
-app.post("/user/:userId/:topicGroupId", async (request, response) => {
+app.post("/user/:userId/:topicGroupId/admin", async (request, response) => {
   console.log(
-    `POST /user/${request.params.userId}/${request.params.topicGroupId}`
+    `POST /user/${request.params.userId}/${request.params.topicGroupId}/admin`
   );
   await users.postAdmin(request, response);
 });
 
-app.delete("/user/:userId/:topicGroupId", async (request, response) => {
+app.delete("/user/:userId/:topicGroupId/admin", async (request, response) => {
   console.log(
-    `DELETE /user/${request.params.userId}/${request.params.topicGroupId}`
+    `DELETE /user/${request.params.userId}/${request.params.topicGroupId}/admin`
   );
   await users.deleteAdmin(request, response);
 });
@@ -106,7 +106,7 @@ app.delete("/user/calendar/:calendarId", async (request, response) => {
   await users.deleteCalendarById(request, response);
 });
 
-app.put("/user/:userId/calendar", async (request, response) => {
+app.post("/user/:userId/calendar", async (request, response) => {
   console.log(`POST /user/${request.params.userId}/calendar`);
   await users.postCalendar(request, response);
 });
@@ -808,7 +808,7 @@ app.post("/:topicGroupName/tutorial", async (request, response) => {
 app.get("/:topicGroupName/:type/search/:searchTerm", async (request, response) => {
   console.log(`GET /${request.params.topicGroupName}/${request.params.type}/search/${request.params.searchTerm}`);
   await lectureTutorial.getSearchFile(request, response);
-})
+}) *
 
 app.listen(8000, () => {
   console.log("Server listening on http://localhost:8000/\n");
