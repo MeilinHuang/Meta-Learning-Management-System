@@ -444,45 +444,48 @@ export default function TopicTree() {
             .forceLink()
             .id(function (link) { return link.id });
         
-        simulation = d3
-            .forceSimulation()
-            .force('link', linkForce)
-            .force('forceX', d3.forceX(function (d) {
+        // simulation = d3
+        //     .forceSimulation()
+        //     .force('link', linkForce)
+        //     .force('forceX', d3.forceX(function (d) {
                 
-                console.log('d', d);
-                if (!d.hasOwnProperty('title'))  {// is fake node
-                    return 0;
-                }
-                if (inpos[d.group]) {
-                    // console.log(inpos);
-                    return inpos[d.group];
-                } else {
-                    inpos[d.group] = width / counterX;
-                    // console.log(inpos);
-                    counterX++;
-                    return inpos[d.group];
-                }
+        //         console.log('d', d);
+        //         if (!d.hasOwnProperty('title'))  {// is fake node
+        //             return 0;
+        //         }
+        //         if (d.group != d.title) {
+        //             return -50;
+        //         }
+        //         if (inpos[d.group]) {
+        //             // console.log(inpos);
+        //             return inpos[d.group];
+        //         } else {
+        //             inpos[d.group] = width / counterX;
+        //             // console.log(inpos);
+        //             counterX++;
+        //             return inpos[d.group];
+        //         }
 
-            }))
-            .force('forceY', d3.forceY(function (d) {
-                console.log('d', d);
-                if (!d.hasOwnProperty('title')) {
-                    return 0;
-                }
-                if (inposY[d.group]) {
-                    // console.log(inposY);
-                    return inposY[d.group];
-                } else {
-                    inposY[d.group] = height / (Math.random() * (d.group.length - 0 + 1) + 1);
-                    // console.log(inposY);
-                    return inposY[d.group];
-                }
-            }));
+        //     }))
+        //     .force('forceY', d3.forceY(function (d) {
+        //         console.log('d', d);
+        //         if (!d.hasOwnProperty('title')) {
+        //             return 0;
+        //         }
+        //         if (inposY[d.group]) {
+        //             // console.log(inposY);
+        //             return inposY[d.group];
+        //         } else {
+        //             inposY[d.group] = height / (Math.random() * (d.group.length - 0 + 2) + 1);
+        //             // console.log(inposY);
+        //             return inposY[d.group];
+        //         }
+        //     }));
 
-        // simulation = d3.forceSimulation()
-        //     .force("link", d3.forceLink().id(function(d) { console.log('d', d); return d.id; }).distance(1000))
-            // .force("charge", d3.forceManyBody().strength(-70))
-            //  .force("center", d3.forceCenter(width / 2, height / 2));
+        simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().id(function(d) { console.log('d', d); return d.id; }).distance(2000))
+            .force("charge", d3.forceManyBody().strength(-300))
+             .force("center", d3.forceCenter(width / 2, height / 2));
 
         // https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json
         fetch(get_all_topics(),
