@@ -35,76 +35,76 @@ const quizzes = {
   quiz1: {
     id: 1,
     name: "Quiz1",
-    open_date: "2016-06-22 19:10:25-07",
-    close_date: "2016-06-22 19:10:25-07",
-    time_given: 45,
-    num_questions: 3,
+    openDate: "2016-06-22 19:10:25-07",
+    closeDate: "2016-06-22 19:10:25-07",
+    timeGiven: 45,
+    numQuestions: 3,
   },
   quiz2: {
     id: 2,
     name: "Quiz2",
-    open_date: "2016-06-22 19:10:25-07",
-    close_date: "2016-06-22 19:10:25-07",
-    time_given: 45,
-    num_questions: 3,
+    openDate: "2016-06-22 19:10:25-07",
+    closeDate: "2016-06-22 19:10:25-07",
+    timeGiven: 45,
+    numQuestions: 3,
   },
 };
 
 // POST /quiz
 const sampleQuiz = {
   name: "SampleQuiz",
-  open_date: "2016-06-22 19:10:25-07",
-  close_date: "2016-06-22 19:10:25-07",
-  time_given: 45,
-  num_questions: 2,
+  openDate: "2016-06-22 19:10:25-07",
+  closeDate: "2016-06-22 19:10:25-07",
+  timeGiven: 45,
+  numQuestions: 2,
   questions: [
     {
-      question_text: "Question text",
-      question_type: "mc", // sa, cb
-      marks_awarded: 3,
-      related_topic_id: 10, // Obtained via GET /topics
+      questionText: "Question text",
+      questionType: "mc", // sa, cb
+      marksAwarded: 3,
+      topicId: 10, // Obtained via GET /topics
       answers: [
         {
-          answer_text: "answer1",
-          is_correct: true,
+          answerText: "answer1",
+          isCorrect: true,
           explanation: ""
         },
         {
-          answer_text: "answer2",
-          is_correct: false,
+          answerText: "answer2",
+          isCorrect: false,
           explanation: ""
         },
         {
-          answer_text: "answer3",
-          is_correct: false,
+          answerText: "answer3",
+          isCorrect: false,
           explanation: ""
         },
         {
-          answer_text: "answer4",
-          is_correct: false,
+          answerText: "answer4",
+          isCorrect: false,
           explanation: ""
         },
       ]
     },
     {
-      question_text: "Question text",
-      question_type: "cb",
-      marks_awarded: 1,
-      related_topic_id: 1,
+      questionText: "Question text",
+      questionType: "cb",
+      marksAwarded: 1,
+      topicId: 1,
       answers: [ // can have multiple answers correct
         {
-          answer_text: "cb1",
-          is_correct: true,
+          answerText: "cb1",
+          isCorrect: true,
           explanation: ""
         },
         {
-          answer_text: "cb2",
-          is_correct: true,
+          answerText: "cb2",
+          isCorrect: true,
           explanation: ""
         },
         {
-          answer_text: "cb3",
-          is_correct: false,
+          answerText: "cb3",
+          isCorrect: false,
           explanation: ""
         },
       ]
@@ -112,35 +112,12 @@ const sampleQuiz = {
   ]
 }
 
-function generateNewQuestion() {
-  return {
-    question_text: "",
-    question_type: "mc", // sa, cb
-    marks_awarded: 0,
-    related_topic_id: 0, // Obtained via GET /topics
-    answers: [
-      {
-        answer_text: "answer1",
-        is_correct: true,
-        explanation: ""
-      },
-      {
-        answer_text: "answer2",
-        is_correct: false,
-        explanation: ""
-      },
-    ],
-    is_expanded: false,
-    add_to_question_bank: false,
-  }
-};
 
 const API_URL = "http://localhost:8000";
 
 export default function QuestionCreation({ addQuestionToQuiz, topics, isCreatingQuestion, addToQuestionBank }) {
   const [questionText, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState("mc");
-  const [relatedTopicId, setRelatedTopicId] = useState("0");
   const [newQuestion, setNewQuestion] = useState({});
   const [isValidQuestion, setIsValidQuestion] = useState(true);
   const [isNewQuestion, setIsNewQuestion] = useState(true);
@@ -153,10 +130,33 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
     setIsNewQuestion(isCreatingQuestion);
   }, []);
 
+  const generateNewQuestion = () => {
+    return {
+      questionText: "",
+      questionType: "mc", // sa, cb
+      marksAwarded: 0,
+      topicId: topics[0].id, // Obtained via GET /topics
+      answers: [
+        {
+          answerText: "answer1",
+          isCorrect: true,
+          explanation: ""
+        },
+        {
+          answerText: "answer2",
+          isCorrect: false,
+          explanation: ""
+        },
+      ],
+      isExpanded: false,
+      shouldAddToQuestionBank: true,
+    }
+  };
+
   const generateNewAnswer = () => {
     return {
-      answer_text: "new_answer",
-      is_correct: false,
+      answerText: "new answer",
+      isCorrect: false,
       explanation: ""
     }
   }
@@ -166,12 +166,12 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
       <Box>
         <Box mt="3">
           <Text fontWeight="bold" color="gray.600">Question text: </Text>
-          <Textarea size="md" placeholder="Enter question" onChange={onChangeQuestionText} value={newQuestion.question_text} />
+          <Textarea size="md" placeholder="Enter question" onChange={onChangeQuestionText} value={newQuestion.questionText} />
         </Box>
 
         <HStack my="2">
           <Text fontWeight="bold" color="gray.600">Marks awarded: </Text>
-          <NumberInput size="sm" maxW={16} min={0} onChange={onChangeMarksAwarded} value={newQuestion.marks_awarded}>
+          <NumberInput size="sm" maxW={16} min={0} onChange={onChangeMarksAwarded} value={newQuestion.marksAwarded}>
             <NumberInputField />
             <NumberInputStepper>
               <NumberIncrementStepper />
@@ -184,8 +184,8 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
           <Text fontWeight="bold" color="gray.600">Related topic: </Text>
           {/* TODO: Replace values with backend GET /topics */}
           <Box>
-            <Select size="sm" defaultValue="0" onChange={onChangeRelatedTopicId} value={newQuestion.related_topic_id}>
-              {topics?.map((t, i) => <option key={i} value={i}>{t}</option>)}
+            <Select size="sm" defaultValue="1" onChange={onChangeRelatedTopicId} value={newQuestion.topicId}>
+              {topics?.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </Select>
           </Box>
         </HStack>
@@ -193,7 +193,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
         <HStack my="2">
           <Text mb="1" fontWeight="bold" color="gray.600">Question type:</Text>
           <Box>
-            <Select size="sm" defaultValue="mc" onChange={onChangeQuestionType} value={newQuestion.question_type}>
+            <Select size="sm" defaultValue="mc" onChange={onChangeQuestionType} value={newQuestion.questionType}>
               <option value="mc">Multiple choice</option>
               <option value="sa">Short answer</option>
               <option value="cb">Checkboxes</option>
@@ -204,7 +204,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
         {renderPossibleAnswers(newQuestion)}
 
         <HStack spacing={3} mt={5}>
-          <Checkbox onChange={onChangeAddToQuestionBank}>Add to Question Bank</Checkbox>
+          <Checkbox isChecked={newQuestion.shouldAddToQuestionBank} onChange={onChangeAddToQuestionBank}>Add to Question Bank</Checkbox>
           <QuestionOutlineIcon color="blue" />
         </HStack>
       </Box>
@@ -212,15 +212,15 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
   };
 
   const onChangeAddToQuestionBank = (e) => {
-    setNewQuestion({ ...newQuestion, add_to_question_bank: e.target.checked });
+    setNewQuestion({ ...newQuestion, shouldAddToQuestionBank: e.target.checked });
   };
 
   const onChangeMarksAwarded = (newValue) => {
-    setNewQuestion({ ...newQuestion, marks_awarded: +newValue });
+    setNewQuestion({ ...newQuestion, marksAwarded: +newValue });
   };
 
   const onChangeRelatedTopicId = (e) => {
-    setNewQuestion({ ...newQuestion, related_topic_id: +e.target.value });
+    setNewQuestion({ ...newQuestion, topicId: +e.target.value });
   };
 
   const getDefaultAnswers = () => {
@@ -231,14 +231,14 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
       defaultAnswers = [
         {
           id: 1,
-          answer_text: "answer1",
-          is_correct: true,
+          answerText: "answer1",
+          isCorrect: true,
           explanation: ""
         },
         {
           id: 2,
-          answer_text: "answer2",
-          is_correct: false,
+          answerText: "answer2",
+          isCorrect: false,
           explanation: ""
         },
       ];
@@ -247,8 +247,8 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
       defaultAnswers = [
         {
           id: 1,
-          answer_text: "",
-          is_correct: true,
+          answerText: "",
+          isCorrect: true,
           explanation: ""
         }
       ];
@@ -257,20 +257,20 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
       defaultAnswers = [
         {
           id: 1,
-          answer_text: "answer1",
-          is_correct: true,
+          answerText: "answer1",
+          isCorrect: true,
           explanation: ""
         },
         {
           id: 2,
-          answer_text: "answer2",
-          is_correct: false,
+          answerText: "answer2",
+          isCorrect: false,
           explanation: ""
         },
         {
           id: 3,
-          answer_text: "answer3",
-          is_correct: false,
+          answerText: "answer3",
+          isCorrect: false,
           explanation: ""
         },
       ];
@@ -281,11 +281,11 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
 
   const onChangeQuestionType = (e) => {
     const defaultAnswers = getDefaultAnswers();
-    setNewQuestion({ ...newQuestion, question_type: e.target.value, answers: defaultAnswers });
+    setNewQuestion({ ...newQuestion, questionType: e.target.value, answers: defaultAnswers });
   };
 
   const onChangeQuestionText = (e) => {
-    setNewQuestion({ ...newQuestion, question_text: e.target.value });
+    setNewQuestion({ ...newQuestion, questionText: e.target.value });
   };
 
   const addPossibleAnswer = () => {
@@ -316,20 +316,20 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
   };
 
   const getCorrectAnswers = () => {
-    if (newQuestion.question_type === "mc") {
-      let foundCorrectAnswerIndex = newQuestion.answers.findIndex(a => a.is_correct);
+    if (newQuestion.questionType === "mc") {
+      let foundCorrectAnswerIndex = newQuestion.answers.findIndex(a => a.isCorrect);
       return foundCorrectAnswerIndex.toString();
     }
 
-    if (newQuestion.question_type === "sa") {
-      const suggestedAnswer = (newQuestion.answers.length > 0) ? newQuestion.answers[0].answer_text : "";
+    if (newQuestion.questionType === "sa") {
+      const suggestedAnswer = (newQuestion.answers.length > 0) ? newQuestion.answers[0].answerText : "";
       return suggestedAnswer;
     }
 
-    if (newQuestion.question_type === "cb") {
+    if (newQuestion.questionType === "cb") {
       let correctAnswers = [];
       newQuestion.answers.forEach((answer, index) => {
-        if (answer.is_correct) {
+        if (answer.isCorrect) {
           correctAnswers.push(index.toString());
         }
       });
@@ -341,22 +341,22 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
   };
 
   const onChangeRadioAnswer = (e) => {
-    const newAnswers = newQuestion.answers.map((answer, index) => (index === +e) ? { ...answer, is_correct: true } : { ...answer, is_correct: false });
+    const newAnswers = newQuestion.answers.map((answer, index) => (index === +e) ? { ...answer, isCorrect: true } : { ...answer, isCorrect: false });
     setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
 
   const onChangeShortAnswer = (e) => {
-    const newAnswers = newQuestion.answers.map((answer, index) => (index === 0) ? { ...answer, answer_text: e.target.value } : { ...answer, is_correct: false });
+    const newAnswers = newQuestion.answers.map((answer, index) => (index === 0) ? { ...answer, answerText: e.target.value } : { ...answer, isCorrect: false });
     setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
 
   const onChangeCheckboxAnswer = (idx) => (e) => {
-    const newAnswers = newQuestion.answers.map((answer, index) => (index === idx) ? { ...answer, is_correct: e.target.checked } : answer);
+    const newAnswers = newQuestion.answers.map((answer, index) => (index === idx) ? { ...answer, isCorrect: e.target.checked } : answer);
     setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
 
   const onChangeAnswerText = (idx) => (e) => {
-    const newAnswers = newQuestion.answers.map((answer, index) => (index === idx) ? { ...answer, answer_text: e.target.value } : answer);
+    const newAnswers = newQuestion.answers.map((answer, index) => (index === idx) ? { ...answer, answerText: e.target.value } : answer);
     setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
 
@@ -365,7 +365,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
   };
 
   const renderPossibleAnswers = (question) => {
-    if (question.question_type === "mc") {
+    if (question.questionType === "mc") {
       return (
         <Box mt={5}>
           <HStack mb={2} spacing={5}>
@@ -384,7 +384,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
                     </InputLeftElement>
                     <Input
                       pl="2.5rem"
-                      value={ans.answer_text}
+                      value={ans.answerText}
                       onChange={onChangeAnswerText(+i)}
                     />
                     <InputRightElement width="15rem" zIndex="0">
@@ -420,7 +420,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
         </Box>
       );
     }
-    else if (question.question_type === "sa") {
+    else if (question.questionType === "sa") {
       // Text box
       return (
         <Box mt={5}>
@@ -429,7 +429,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
         </Box>
       );
     }
-    else if (question.question_type === "cb") {
+    else if (question.questionType === "cb") {
       // Checkboxes
       // Loop through list of possible answers
 
@@ -448,11 +448,11 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
                 <FormControl isInvalid={!ans} key={i}>
                   <InputGroup>
                     <InputLeftElement px={4} width="2.5rem">
-                      <Checkbox key={i} value={i} isChecked={ans.is_correct} onChange={onChangeCheckboxAnswer(+i)} />
+                      <Checkbox key={i} value={i} isChecked={ans.isCorrect} onChange={onChangeCheckboxAnswer(+i)} />
                     </InputLeftElement>
                     <Input
                       pl="2.5rem"
-                      value={ans.answer_text}
+                      value={ans.answerText}
                       onChange={onChangeAnswerText(+i)}
                     />
                     <InputRightElement width="15rem" zIndex="0">
@@ -502,8 +502,8 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
     const correctAnswersList = [];
 
     newQuestion?.answers?.forEach(ans => {
-      if (ans.is_correct) {
-        correctAnswersList.push(ans.answer_text);
+      if (ans.isCorrect) {
+        correctAnswersList.push(ans.answerText);
       }
     });
 
@@ -523,9 +523,9 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
 
   const checkQuestionValidity = () => {
     // TODO: Check if correct answer/s has been selected
-    const correctAnswerExists = (ans) => ans.is_correct && ans.answer_text !== "";
+    const correctAnswerExists = (ans) => ans.isCorrect && ans.answerText !== "";
     const hasSetCorrectAnswers = newQuestion.answers.some(correctAnswerExists);
-    const isValidQuestionText = newQuestion.question_text !== "";
+    const isValidQuestionText = newQuestion.questionText !== "";
 
     if (!hasSetCorrectAnswers || !isValidQuestionText) {
       // TODO: Render user-friendly error message when not valid
@@ -535,11 +535,12 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
 
     setIsValidQuestion(true);
 
-    if (newQuestion.add_to_question_bank) {
+    if (newQuestion.shouldAddToQuestionBank) {
       // Add question to question bank
       addToQuestionBank(newQuestion);
     }
 
+    console.log("NEW QUESTION TOPIC ID: " + newQuestion.topicId);
     addQuestionToQuiz(newQuestion);
   }
 
@@ -550,7 +551,7 @@ export default function QuestionCreation({ addQuestionToQuiz, topics, isCreating
       {!isValidQuestion && printInvalidQuestionError()}
 
       <Box d="flex" justifyContent="flex-end" mt="6">
-        {/* {newQuestion.question_type !== "sa" && <Button colorScheme="orange" variant="solid" mr="8" onClick={addPossibleAnswer}>Add new answer</Button>} */}
+        {/* {newQuestion.questionType !== "sa" && <Button colorScheme="orange" variant="solid" mr="8" onClick={addPossibleAnswer}>Add new answer</Button>} */}
         {/* <Button colorScheme="blue" variant="solid" mr="8" onClick={resetQuestionFields}>Reset fields</Button> */}
 
         {isNewQuestion && <Button colorScheme="teal" variant="solid" onClick={checkQuestionValidity}>Add to quiz</Button>}

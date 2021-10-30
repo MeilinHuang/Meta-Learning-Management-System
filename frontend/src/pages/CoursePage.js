@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar.js";
-import WidgetsBar from "../components/WidgetsBar.js";
+import WidgetsBar from "../components/widgets/WidgetsBar.js";
 
 import CourseContentPage from "../pages/CourseContentPage.js";
 import CourseDashboard from "../pages/CourseDashboard.js";
@@ -23,10 +23,6 @@ function CoursePage() {
     {
       name: "Home",
       url: "/",
-    },
-    {
-      name: "Course Outline",
-      url: "/course-outline",
     },
     {
       name: "Content",
@@ -72,9 +68,9 @@ function CoursePage() {
             //Need to get user logged in
             fetch(backend_url + `user/${localStorage.getItem("id")}`, {
                 headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             })
             .then((e) => e.json())

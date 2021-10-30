@@ -36,15 +36,16 @@ import DatePicker from "react-datepicker";
 import { useHistory, useParams } from "react-router-dom";
 import { backend_url } from "../../Constants"
 import QuestionCreation from '../question-creation/QuestionCreation';
+import { forEach } from 'draft-js/lib/DefaultDraftBlockRenderMap';
 
 function generateNewQuiz() {
   return {
     name: "",
-    topicGroupId: 1,
-    open_date: new Date(),
-    close_date: new Date(),
-    time_given: 30,
-    num_questions: 0,
+    topicGroupId: 1, // 1 is currently COMP6771 (C++ Programming) - used for final demo
+    openDate: new Date(),
+    closeDate: new Date(),
+    timeGiven: 30,
+    numQuestions: 0,
     questions: [
     ]
   }
@@ -59,58 +60,21 @@ export default function EditQuiz() {
   const [isImportingQuestion, setIsImportingQuestion] = useState(false);
   const [topics, setTopics] = useState([]);
   let { quizName } = useParams();
-  const [test, setTest] = useState([]);
-
-  const stopics = [
-    "Arrays",
-    "Variables",
-    "Linked lists",
-    "Functions"
-  ]
-
-  /*
-  useEffect(async function () {
-    fetch(backend_url + "topicGroup", {
-      headers: {
-        "Content-Type": "application/JSON",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-      .then((response) => response.json())
-      .then(function (response) {
-        setTest(response);
-      });
-  }, []);
-  */
+  const [postedQuestionIds, setPostedQuestionIds] = useState([]); // add ids of questions that you've done a request to POST it
+  const [questionsToUpdate, setQuestionsToUpdate] = useState([]);
 
   useEffect(() => {
     // Generate new quiz
     const newQuizTemplate = generateNewQuiz();
-    console.log("QUIZ NAME " + quizName);
     newQuizTemplate.name = quizName;
     setQuiz(newQuizTemplate);
-    setTopics(stopics);
 
-    async function fetchTopics() {
-      let response = await fetch(backend_url + "topicGroup", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/JSON",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      const resJson = await response.json();
-      setTest(resJson);
-    }
-
-    // fetchTopics();
     getTopics();
     getQuestionBank();
   }, []);
 
   const getTopics = () => {
-    fetch(backend_url + "topicGroup", {
+    fetch(backend_url + "topicGroup/C++ Programming/topic", {
       method: "GET",
       headers: {
         "Content-Type": "application/JSON",
@@ -126,15 +90,11 @@ export default function EditQuiz() {
       .then((data) => {
         // Set question bank variable
         // setQuestionBank(data);
-        setTest(data);
+        setTopics(data.topics_list);
       });
   };
 
   const getQuestionBank = () => {
-    console.log("TEST");
-    console.log(test);
-    // TODO: Get from database when connecting with backend
-
     // Get questions from question bank 
     fetch(backend_url + "questionBank/questions", {
       method: "GET",
@@ -152,26 +112,42 @@ export default function EditQuiz() {
       .then((data) => {
         // Set question bank variable
         setQuestionBank(data);
-        console.log(data);
       });
   };
 
   const onChangeOpenDate = (date) => {
-    setQuiz({ ...quiz, open_date: date });
+    setQuiz({ ...quiz, openDate: date });
   }
 
   const onChangeCloseDate = (date) => {
-    setQuiz({ ...quiz, close_date: date });
+    setQuiz({ ...quiz, closeDate: date });
   }
 
+  const getTopicName = (id) => {
+    const foundTopic = topics.find((obj) => +obj.id === +id);
+
+    if (foundTopic) {
+      return foundTopic.name;
+    }
+
+    return "";
+  };
+
   const renderQuizDetails = () => {
-    const marksReducer = (accumulator, currentQuestion) => accumulator + currentQuestion.marks_awarded;
+    const marksReducer = (accumulator, currentQuestion) => accumulator + currentQuestion.marksAwarded;
 
     let allRelatedTopics = {};
     let sortedRelatedTopicsList = [];
     for (let i = 0; i < quiz.questions?.length; i++) {
-      const currentTopicId = quiz.questions[i].related_topic_id;
-      const currentTopic = topics[currentTopicId];
+      const currentTopicId = quiz.questions[i].topicId;
+      const currentTopic = getTopicName(currentTopicId); // topics[currentTopicId];
+
+      // If topic not found, skip
+      if (!currentTopic) {
+        continue;
+      }
+
+      // Sorts topics based on frequency of questions for that particular topic
       if (!(currentTopic in allRelatedTopics)) {
         allRelatedTopics[currentTopic] = 1;
         sortedRelatedTopicsList.push(currentTopic);
@@ -191,10 +167,15 @@ export default function EditQuiz() {
           <Input placeholder="Enter quiz name" size="sm" onChange={(e) => setQuiz({ name: e.target.value })} value={quiz.name} />
         </HStack>
 
+        <HStack maxWidth="300">
+          <Text fontWeight="bold">Topic Group: </Text>
+          <Input size="sm" isDisabled value={"C++ Programming"} />
+        </HStack>
+
         <HStack d="flex" my="2">
           <Text fontWeight="bold">Open date: </Text>
           <DatePicker
-            selected={quiz.open_date}
+            selected={quiz.openDate}
             onChange={onChangeOpenDate}
             showTimeSelect
             dateFormat="Pp"
@@ -204,7 +185,7 @@ export default function EditQuiz() {
         <HStack d="flex" my="2">
           <Text fontWeight="bold">Due date: </Text>
           <DatePicker
-            selected={quiz.close_date}
+            selected={quiz.closeDate}
             onChange={onChangeCloseDate}
             showTimeSelect
             dateFormat="Pp"
@@ -213,12 +194,12 @@ export default function EditQuiz() {
 
         <HStack my="2" align>
           <Text fontWeight="bold">Time given: </Text>
-          <Text>{quiz.time_given}</Text>
+          <Text>{quiz.timeGiven}</Text>
         </HStack>
 
         <HStack align>
           <Text mb="2" fontWeight="bold">Number of questions: </Text>
-          <Text>{quiz.num_questions}</Text>
+          <Text>{quiz.numQuestions}</Text>
         </HStack>
 
         <HStack align>
@@ -228,7 +209,7 @@ export default function EditQuiz() {
 
         <Box maxWidth="300">
           <Text mb="2" fontWeight="bold">Related topics: </Text>
-          {sortedRelatedTopicsList.map((topic) => <Box width="fit-content">{renderTag(topic + " (" + allRelatedTopics[topic] + ")")}</Box>)}
+          {sortedRelatedTopicsList.map((topicName) => <Box width="fit-content">{renderTag(topicName + " (" + allRelatedTopics[topicName] + ")")}</Box>)}
         </Box>
 
         <HStack mt="5" spacing="20px" alignItems="center">
@@ -242,17 +223,77 @@ export default function EditQuiz() {
   const handleSubmitQuiz = () => {
     // TODO: Finish this off 
 
-    const quizData = {
-      name: quiz.name,
-      topicGroupId: quiz.topicGroupId,
-      open_date: quiz.open_date,
-      close_date: quiz.close_date,
-      time_given: quiz.time_given,
-      num_questions: quiz.num_questions,
-    }
+    // TODO: PUT request to update questions (if they have changed since POSTed)
+    // Will use ordering of questions to determine which questions need to be updated (since question order can't be moved around anyways)
+    const updatePromises = [];
 
+    // PUT request for any questions that need updating
+    questionsToUpdate.forEach((questionIndex) => {
+      const questionToUpdate = quiz.questions[+questionIndex];
+      const id = postedQuestionIds[+questionIndex];
+
+      const updateData = {
+        questionId: id,
+        topicId: questionToUpdate.topicId,
+        questionText: questionToUpdate.questionText,
+        marksAwarded: questionToUpdate.marksAwarded,
+        questionType: questionToUpdate.questionType
+      };
+
+      updatePromises.push(
+        fetch(`${backend_url}questionBank/question/edit/${id}`, {
+          method: "PUT",
+          body: updateData,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          },
+        }).then((r) => {
+          if (r.status === 200) {
+            return r.json();
+          }
+          else {
+            throw new Error(`Update question failed`);
+          }
+        })
+      );
+    });
+
+    // Wait for all question updates to be successfully done before posting new quiz
+    Promise.all(updatePromises).then((updates) => {
+      const quizData = {
+        name: quiz.name,
+        topicGroupId: quiz.topicGroupId,
+        openDate: quiz.openDate,
+        closeDate: quiz.closeDate,
+        timeGiven: quiz.timeGiven,
+        questionIds: postedQuestionIds
+      };
+
+      // Post new quiz 
+      fetch(`${backend_url}topicGroup/${quiz.topicGroupId}/quizzes`, {
+        method: "POST",
+        body: quizData,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+      }).then((r) => {
+        if (r.status === 200) {
+          return r.json();
+        }
+        else {
+          throw new Error(`Post new quiz failed`);
+        }
+      });
+    });
+
+    // TODO: Only keep post new quiz
+    // Looks like you're meant to make POST requests for questions before posting new quiz
+    // with references to those created questions' ids. 
+    /*
     // Post new quiz 
-    fetch(`${backend_url}/topicGroup/${quiz.topicGroupId}/quizzes`, {
+    fetch(backend_url + "topicGroup/" + quizData.topicGroupId + "/quizzes", {
       method: "POST",
       body: quizData,
       headers: {
@@ -264,18 +305,111 @@ export default function EditQuiz() {
         if (r.status === 200) {
           return r.json();
         }
-        // TODO: Handle error case
+        else {
+          throw new Error(`Post new quiz ${quizData.name} failed`);
+        }
       })
       .then((data) => {
         // TODO: Redirect back to QuizCreation/Quiz List
         // history.push(`/course-page/${course}/forums/${data.post_id}`);
 
         // Post each question
+        // const questionPromises = [];
+
+        for (const question of quiz.questions) {
+          const questionData = {
+            questionBankId: 1,
+            topicId: question.topicId,
+            questionText: question.questionText,
+            marksAwarded: question.marksAwarded,
+          };
+
+            fetch(`${backend_url}questionBank/question`, {
+              method: "POST",
+              body: questionData,
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+              },
+            })
+            .then((r) => {
+              if (r.status === 200) {
+                return r.json();
+              }
+              else {
+                throw new Error(`Quiz [${quizData.name}] - Post new question ${questionData.questionText} failed`);
+              } 
+            })
+            .then((data) => {
+              // const qAnswerPromises = [];
+
+              // Post each question answer for this question
+              const owningQuestionId = data.questionId;
+
+              for (const qAnswer of question.answers) {
+                const qAnswerData = {
+                  questionId: owningQuestionId,
+                  answerText: qAnswer.answerText,
+                  isCorrect: qAnswer.isCorrect,
+                  explanation: qAnswer.explanation
+                };
+
+                fetch(`${backend_url}topicGroup/quizzes/question/answer`, {
+                  method: "POST",
+                  body: qAnswerData,
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                  },
+                })
+                .then((r) => {
+                  if (r.status === 200) {
+                    return r.json();
+                  }
+                  else {
+                    throw new Error(`Quiz [${quizData.name}] - Question ${questionData.questionText} - Answer ${qAnswerData.answerText} failed`);
+                  } 
+                })
+              }
+            })
+          }
       });
+      */
 
       // Post questions
 
       // Post each question's possible answers? 
+  };
+
+  const onClickDeleteQuestion = (qs, qsIndex) => {
+    // TODO: Delete question in quiz variable and delete question in db using postedQuestionIds value in qsIndex index
+
+    // DELETE request
+    fetch(`${backend_url}topicGroup/quizzes/question/answer`, {
+      method: "DELETE",
+      body: { 
+        questionId: postedQuestionIds[qsIndex] 
+      },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+    .then((r) => {
+      if (r.status === 200) {
+        return r.json();
+      }
+      else {
+        throw new Error(`Delete Question ${quiz.questions[qsIndex].questionText} failed`);
+      } 
+    })
+    .then((data) => {
+        // Delete from local data (quiz.questions and postedQuestionIds)
+        quiz.questions.splice(qsIndex, 1);
+        
+        const newPostedQuestionIds = postedQuestionIds;
+        newPostedQuestionIds.splice(qsIndex, 1);
+    });
   };
 
   const renderQuestionItem = (qs, qsIndex) => {
@@ -295,6 +429,8 @@ export default function EditQuiz() {
             <QuestionCreation addQuestionToQuiz={addQuestionToQuiz} topics={topics} isCreatingQuestion={false} />
           </Box>
         </AccordionPanel>
+
+        <Button size="lg" colorScheme="Red" onClick={onClickDeleteQuestion}>Delete question</Button>
       </Box>
     );
   };
@@ -327,11 +463,11 @@ export default function EditQuiz() {
   const onChangeQuestionItems = (expandedIndices) => {
     let newQuestions = quiz.questions?.map((qs, index) => {
       const obj = Object.assign({}, qs);
-      if (expandedIndices.includes(index) && !obj.is_expanded) {
-        obj.is_expanded = true;
+      if (expandedIndices.includes(index) && !obj.isExpanded) {
+        obj.isExpanded = true;
       }
-      else if (!expandedIndices.includes(index) && obj.is_expanded) {
-        obj.is_expanded = false;
+      else if (!expandedIndices.includes(index) && obj.isExpanded) {
+        obj.isExpanded = false;
       }
       return obj;
     });
@@ -358,7 +494,7 @@ export default function EditQuiz() {
   const getExpandedQuestions = () => {
     let expandedQuestions = [];
     quiz.questions?.forEach((qs, index) => {
-      if (qs.is_expanded) {
+      if (qs.isExpanded) {
         expandedQuestions.push(index);
       }
     });
@@ -369,7 +505,7 @@ export default function EditQuiz() {
   const expandAllQuestions = () => {
     let newQuestions = quiz.questions?.map((qs, index) => {
       const obj = Object.assign({}, qs);
-      obj.is_expanded = true;
+      obj.isExpanded = true;
       return obj;
     });
 
@@ -379,7 +515,7 @@ export default function EditQuiz() {
   const collapseAllQuestions = () => {
     let newQuestions = quiz.questions?.map((qs, index) => {
       const obj = Object.assign({}, qs);
-      obj.is_expanded = false;
+      obj.isExpanded = false;
       return obj;
     });
 
@@ -389,7 +525,61 @@ export default function EditQuiz() {
   const addQuestionToQuiz = (newQuestion) => {
     // Update questions in quiz
     const updatedQuestions = quiz.questions.concat([newQuestion])
-    setQuiz({ ...quiz, num_questions: quiz.num_questions + 1, questions: updatedQuestions });
+    setQuiz({ ...quiz, numQuestions: quiz.numQuestions + 1, questions: updatedQuestions });
+
+    // TODO: POST request - post new question 
+    fetch(backend_url + "questionBank/question/new", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/JSON",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((r) => {
+        if (r.status === 200) {
+          return r.json();
+        }
+        else {
+          throw new Error(`Quiz [${quiz.name}] Post new question ${newQuestion.questionText} failed`);
+        }
+      })
+      .then((data) => {
+        // Add new question's id to questionIds array in quiz
+        let newQuestionIds = postedQuestionIds;
+        newQuestionIds.push(data.questionId);
+        setPostedQuestionIds(newQuestionIds);
+
+        // TODO: POST request possible question answers 
+        for (const qAnswer of newQuestion.answers) {
+          const qAnswerData = {
+            questionId: data.questionId,
+            answerText: qAnswer.answerText,
+            isCorrect: qAnswer.isCorrect,
+            explanation: qAnswer.explanation
+          };
+
+          fetch(`${backend_url}topicGroup/quizzes/question/answer`, {
+            method: "POST",
+            body: qAnswerData,
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            },
+          })
+          .then((r) => {
+            if (r.status === 200) {
+              return r.json();
+            }
+            else {
+              throw new Error(`Answer ${qAnswer.answerText} failed`);
+            } 
+          })
+        }
+        
+      })
+
+      console.log("Added question to quiz (and POSTed)");
+      console.log(postedQuestionIds);
   };
 
   const renderQuestionLinks = () => {
@@ -404,16 +594,19 @@ export default function EditQuiz() {
   }
 
   const renderQuestionLinkItem = (qs, index) => {
+    const tagText = getTopicName(qs.topicId);
+
     return (
       <HStack key={index}>
         <Button colorScheme="teal" variant="link" onClick={() => toggleQuestionItem(+index)}>Question {index + 1}</Button>
-        <Text size="sm" color="grey">({qs.marks_awarded} {qs.marks_awarded > 1 ? "marks" : "mark"})</Text>
-        {renderTag(topics[qs.related_topic_id])}
+        <Text size="sm" color="grey">({qs.marksAwarded} {qs.marksAwarded > 1 ? "marks" : "mark"})</Text>
+        {renderTag(tagText)}
       </HStack>
     );
   }
 
   const renderTag = (tagText) => {
+
     return (
       <Box size="sm" bgColor="gray.500" borderRadius="md" py={0.5} px={1}>
         <Text fontWeight="bold" fontSize="sm" color="white">{tagText}</Text>
@@ -434,14 +627,12 @@ export default function EditQuiz() {
   };
 
   const addQuestionToQuestionBank = (question) => {
-    // TODO: Make POST request to add question to question bank
-
-    // Remove this later once above TODO is complete
     const newQuestionBank = questionBank.concat([question]);
     setQuestionBank(newQuestionBank);
   };
 
   const renderNewQuestionModal = () => {
+
     const creatingNewQuestion = (!selectingCreateOrImportQuestion && !isImportingQuestion);
     const importingNewQuestion = (!selectingCreateOrImportQuestion && isImportingQuestion);
 
@@ -506,8 +697,6 @@ export default function EditQuiz() {
   };
 
   const renderImportQuestionScreen = () => {
-    console.log("RENDERED IMPORT QUESTION SCREEN - TEST");
-    console.log(test);
 
     return (
       <Box>
@@ -527,29 +716,16 @@ export default function EditQuiz() {
               <InputGroup key={index}>
                 <InputLeftElement>
                   <Checkbox mr={3} />
-                  <Text>{qs.questiontext}</Text>
+                  <Text>{qs.questionText}</Text>
                 </InputLeftElement>
                 <InputRightElement>
-                  <Text>{renderTag(stopics[qs.topicid])}</Text>
+                  <Text>{renderTag(getTopicName(qs.topicId))}</Text>
                 </InputRightElement>
               </InputGroup>
             );
           })}
         </VStack>
       </Box>
-    );
-  };
-
-  const renderQuestionFromQuestionBank = (qs) => {
-    return (
-      <InputGroup>
-        <InputLeftElement>
-          <Text>{qs.question_text}</Text>
-        </InputLeftElement>
-        <InputRightElement>
-          <Text>{renderTag(topics[qs.related_topic_id])}</Text>
-        </InputRightElement>
-      </InputGroup>
     );
   };
 
@@ -566,12 +742,12 @@ export default function EditQuiz() {
   return (
     <>
       <Flex ref={finalRef} height="100" width="100" mt="10">
-        <Box flex="1" pl="5">
+        <Box flex="1" px="5">
           <Text fontWeight="bold" fontSize="2xl">Question List</Text>
           {quiz.questions?.length !== 0 ? renderQuestionLinks() : <Text my="3">There are no questions in the quiz. Add a question!</Text>}
         </Box>
         <Box flex="0.1" borderLeft="1px" borderColor="gray.400" height="890px" />
-        <Box flex="2.5" px="20">
+        <Box flex="2.5" pl="10" pr="20">
           {renderQuestions()}
         </Box>
         <Box flex="0.1" borderLeft="1px" borderColor="gray.400" height="890px" />
