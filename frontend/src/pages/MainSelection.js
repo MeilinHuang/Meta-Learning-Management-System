@@ -459,7 +459,7 @@ function MainSelection({ user }) {
                 </Text>
                 {user.enrolled_courses.map((course) => {
                   return (
-                    <Flex flexGrow={1} key={course.name + "staff-link"}>
+                    <Flex flexGrow={1} key={course.name + "staff-link"} border="#ddd 1px solid" borderRadius={5} p={2} my={2} backgroundColor="#fafafa">
                       <Text alignSelf="center">{course.name}</Text>
                       <Flex flexGrow={1} justifyContent="end">
                         <Button
