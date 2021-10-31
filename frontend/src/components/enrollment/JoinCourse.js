@@ -73,7 +73,8 @@ export default function CourseInvite() {
 
   useEffect(() => {
     if (!isLoggedIn()) {
-      history.push("/login");
+      const redirect = encodeURIComponent(`redirect=invite/${code}`)
+      history.push(`/login?${redirect}`);
     }
   }, []);
 

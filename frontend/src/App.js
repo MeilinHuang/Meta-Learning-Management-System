@@ -16,9 +16,12 @@ function App() {
           <Route exact path="/topictree">
             <TopicTree />
           </Route>
-          <Route exact path="/login">
+          <Route path="/login">
             <LoginForm />
           </Route>
+          {/* <Route exact path="/login">
+            <LoginForm />
+          </Route> */}
           <Route exact path="/topictreelist">
             <TopicTreeList />
           </Route>
