@@ -237,7 +237,7 @@ function Sidebar({
             <Menu isLazy>
               <MenuButton>
                 <Flex alignItems="center">
-                    { user && <Avatar name={user.user_name} /> }
+                    { user && <Avatar src={user.img_url} name={user.user_name} /> }
                   <Box display={["none", "block", "block"]}>
                     <ChevronDownIcon
                       boxSize={6}

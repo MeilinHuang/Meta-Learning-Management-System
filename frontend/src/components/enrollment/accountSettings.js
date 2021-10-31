@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import {
   Flex,
+  FormControl,
+  FormLabel,
   Box,
   Heading,
   Avatar,
@@ -13,6 +15,7 @@ import {
   Th,
   Link,
   Td,
+  useToast,
   Button,
   Input,
 } from "@chakra-ui/react";
@@ -32,10 +35,43 @@ async function getUser(id) {
   return ret;
 }
 
+async function doUpdate(pass, id, email, imgUrl, newPass, newPassConf) {
+  if (newPass && newPass !== newPassConf) {
+    return { error: "Passwords do not match." };
+  }
+
+  const lowerEmail = email ? email.toLowerCase() : undefined;
+  const data = {
+    email: lowerEmail,
+    password: pass,
+    newPassword: newPass,
+    imgUrl: imgUrl,
+  };
+
+  const options = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/JSON",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: JSON.stringify(data),
+  };
+
+  const r = await fetch(`${backend_url}user/${id}`, options);
+  const ret = await r.json();
+  return ret;
+}
+
 export default function AccountSettings() {
   const [userProfile, setUserProfile] = useState({});
   const [update, setUpdate] = useState(false);
+  const [password, setPassword] = useState();
+  const [newPassword, setNewPassword] = useState();
+  const [newConfirmPassword, setNewConfirmPassword] = useState();
+  const [email, setEmail] = useState();
+  const [imgUrl, setImgUrl] = useState();
   const [editing, setEditing] = useState(false);
+  const toast = useToast();
 
   const history = useHistory();
   useEffect(() => {
@@ -89,43 +125,135 @@ export default function AccountSettings() {
               </Box>
             </Flex>
             <Box my={4}>
-              {editing ? (
-                <>
-                  <Input defaultValue={userProfile.email} />
-                  <Input type="password" placeholder="Password" />
-                  <Input type="password" placeholder="Confirm Password" />
-                  <Button>Upload Profile Image</Button>
-                  <br />
-                  <Button
-                    onClick={() => {
-                      setEditing(false);
-                    }}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setEditing(false);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Text>{userProfile.email}</Text>
-                  <Text>Password</Text>
-                  <Button
-                    onClick={() => {
-                      setEditing(true);
-                    }}
-                  >
-                    Edit
-                  </Button>
-                </>
-              )}
+              <Flex width="100%" justify="space-around">
+                <Box width="45%">
+                  <FormControl>
+                    <FormLabel> Email </FormLabel>
+                    <Input
+                      defaultValue={userProfile.email}
+                      disabled={!editing}
+                      type="email"
+                      placeholder="name@mail.com"
+                      size="lg"
+                      onChange={(e) => setEmail(e.currentTarget.value)}
+                    />
+                  </FormControl>
+                  <FormControl mt={4}>
+                    <FormLabel> Profile Picture URL </FormLabel>
+                    <Input
+                      defaultValue={userProfile.img_url}
+                      disabled={!editing}
+                      type="email"
+                      placeholder="https://i.imgur.com/???????.jpg"
+                      size="lg"
+                      onChange={(e) => setImgUrl(e.currentTarget.value)}
+                    />
+                  </FormControl>
+                </Box>
+                <Box width="45%">
+                  <FormControl>
+                    <FormLabel>New Password </FormLabel>
+                    <Input
+                      disabled={!editing}
+                      type="password"
+                      placeholder="********"
+                      size="lg"
+                      onChange={(e) => setNewPassword(e.currentTarget.value)}
+                    />
+                  </FormControl>
+                  <FormControl mt={4}>
+                    <FormLabel>Confirm New Password </FormLabel>
+                    <Input
+                      disabled={!editing}
+                      type="password"
+                      placeholder="********"
+                      size="lg"
+                      onChange={(e) =>
+                        setNewConfirmPassword(e.currentTarget.value)
+                      }
+                    />
+                  </FormControl>
+                </Box>
+              </Flex>
+              <Flex justify="space-around" mt={4}>
+                <Box width="45%">
+                  <FormControl isRequired>
+                    <FormLabel>Current Password </FormLabel>
+                    <Input
+                      disabled={!editing}
+                      type="password"
+                      placeholder="********"
+                      size="lg"
+                      onChange={(e) => setPassword(e.currentTarget.value)}
+                    />
+                  </FormControl>
+                </Box>
+                <Box width="45%" textAlign="right" mt={8}>
+                  {editing ? (
+                    <>
+                      <Button
+                        mr={2}
+                        onClick={() => {
+                          doUpdate(
+                            password,
+                            userProfile.id,
+                            email,
+                            imgUrl,
+                            newPassword,
+                            newConfirmPassword
+                          ).then((r) => {
+                            console.log(r);
+                            if (!!r.error) {
+                              toast({
+                                title: `Unable to update profile`,
+                                description: `${r.error} Please ensure you're entering all details correctly.`,
+                                status: "error",
+                                duration: 5000,
+                                isClosable: true,
+                              });
+                            } else {
+                              setEditing(false);
+                              setUpdate((prev) => !prev);
+                              toast({
+                                title: "Successfully Updated Profile!",
+                                status: "success",
+                                duration: 5000,
+                                isClosable: true,
+                              });
+                            }
+                          });
+                        }}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setEditing(false);
+                          setUpdate((prev) => !prev);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        onClick={() => {
+                          setEditing(true);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    </>
+                  )}
+                </Box>
+              </Flex>
+              <br />
             </Box>
-            <Box>
+            <Box my={4}>
+              <Text fontSize="2xl">
+                <strong>Current Courses:</strong>
+              </Text>
               <Table variant="simple">
                 <Thead>
                   <Tr>
