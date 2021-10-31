@@ -18,17 +18,19 @@ function RecentAnnouncment({recent_announce, code}) {
             <Text fontSize="lg" fontWeight="semibold">{code}</Text>
             { show ? (
                 <Flex>
-                    {
-                        recent_announce && code ? (
-                            <Announcement padding={0} margin={0} announcement={recent_announce} course={code} setAnnouncements={setAnnouncements} isAnnouncementPage={false}/>
-                        ) : (
-                            <Flex>
-                                <Text>
-                                    There are no new announcements
-                                </Text>
-                            </Flex>
-                        )
-                    }
+                    <Flex>
+                        {
+                            recent_announce && code ? (
+                                <Announcement padding={0} margin={0} announcement={recent_announce} course={code} setAnnouncements={setAnnouncements} isAnnouncementPage={false}/>
+                            ) : (
+                                <Flex>
+                                    <Text>
+                                        There are no new announcements
+                                    </Text>
+                                </Flex>
+                            )
+                        }
+                    </Flex>
                 </Flex>
             ) : (
                 <Flex maxHeight={400} overflow="hidden">
@@ -46,12 +48,14 @@ function RecentAnnouncment({recent_announce, code}) {
                 </Flex>
             )
             }
-            
-            <Flex paddingTop={2} flexGrow={1} justifyContent="end">
-                <Button onClick={() => setShow(!show)}>
-                    { show ? "Hide" : "Show"}
-                </Button>
-            </Flex>
+            {
+                recent_announce && code &&
+                <Flex paddingTop={2} flexGrow={1} justifyContent="end">
+                    <Button onClick={() => setShow(!show)}>
+                        { show ? "Hide" : "Show"}
+                    </Button>
+                </Flex>
+            }
         </Flex>
     )
 }

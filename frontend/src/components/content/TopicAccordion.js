@@ -36,7 +36,7 @@ function TopicAccordion({ topic, course }) {
         <AccordionItem id={"topic-" + topic.name}>
             <Flex width="100%">
                 <AccordionButton onClick={e => {
-                    fetch(backend_url + "user/" + localStorage.getItem("id"), {
+                    fetch(backend_url + "user/" + localStorage.getItem("id") + "/lastAccessed", {
                         method: "PUT",
                         headers: {
                             Accept: "application/json",
@@ -48,6 +48,7 @@ function TopicAccordion({ topic, course }) {
                         })
                     })
                     .then(resp => resp.json())
+                    .then(data => console.log(data))
                 }}>
                     <Flex flexGrow={1} textAlign="left">
                         <Checkbox

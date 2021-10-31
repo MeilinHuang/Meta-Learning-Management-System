@@ -37,8 +37,10 @@ async function doLogin(email, password) {
     return { error: "Password is blank" };
   }
 
+  const lowerEmail = email.toLowerCase()
+
   const data = {
-    email: email.toLowerCase(),
+    email: lowerEmail,
     password: password,
   };
 
@@ -86,9 +88,11 @@ async function doRegister(name, email, zId, password, confirm) {
     return { error: "Invalid zID" };
   }
 
+  const lowerEmail = email.toLowerCase()
+
   const data = {
     name: name,
-    email: email.toLower(),
+    email: lowerEmail,
     zid: zId,
     password: password,
   };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { isLoggedIn } from "../../utils/helpers";
-
+import { isLoggedIn, getCurrentUser } from "../../utils/helpers";
+import { backend_url } from "../../Constants";
 import {
   Flex,
   Box,
@@ -10,16 +10,66 @@ import {
   Button,
   FormControl,
   FormLabel,
+  useToast,
+  Text,
 } from "@chakra-ui/react";
 
-async function doCodeEnroll() {
-  
+async function doCodeEnroll(code) {
+  const options = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/JSON",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  };
+
+  const r = await fetch(
+    `${backend_url}enroll/code/${code}/${getCurrentUser()}`,
+    options
+  );
+  const ret = await r.json();
+  return ret;
+}
+
+async function doSearch(query) {
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/JSON",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  };
+
+  const r = await fetch(`${backend_url}enroll/search/${query}`, options);
+  const ret = await r.json();
+  return ret;
+}
+
+async function doEnroll(name) {
+  const options = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/JSON",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  };
+
+  const id = getCurrentUser();
+  const r = await fetch(`${backend_url}enroll/${name}/id/${id}`, options);
+  if (r.status !== 200) {
+    return { error: "Enrollment failed." };
+  }
+  const ret = await r.json();
+  return ret;
 }
 
 export default function CourseInvite() {
   let { code } = useParams();
   const [invite, setInvite] = useState(code);
+  const [query, setQuery] = useState();
+  const [results, setResults] = useState([]);
   const history = useHistory();
+  const toast = useToast();
 
   useEffect(() => {
     if (!isLoggedIn()) {
@@ -34,9 +84,14 @@ export default function CourseInvite() {
         <Box textAlign="center">
           <Heading>Join a course!</Heading>
         </Box>
-        <Flex width="Full" align="center" justifyContent="space-around">
+        <Flex
+          mt={8}
+          width="Full"
+          align="flex-start"
+          justifyContent="space-around"
+        >
           <Box my={4} textAlign="center" width="40%">
-            <FormControl isRequired>
+            <FormControl>
               <FormLabel>Join with an invite code</FormLabel>
               <Input
                 type="text"
@@ -54,19 +109,38 @@ export default function CourseInvite() {
               maxWidth="200px"
               onClick={(e) => {
                 e.preventDefault();
+                doCodeEnroll(invite).then((r) => {
+                  if (!!r.error) {
+                    toast({
+                      title: `Unable to enroll in course`,
+                      description: `${r.error}. Please ensure you're entering the correct invite code.`,
+                      status: "error",
+                      duration: 5000,
+                      isClosable: true,
+                    });
+                  } else {
+                    toast({
+                      title: "Successfully Enrolled.",
+                      description: `Please return to the dashboard to view your new course!`,
+                      status: "success",
+                      duration: 5000,
+                      isClosable: true,
+                    });
+                  }
+                });
               }}
             >
               Join Course!
             </Button>
           </Box>
           <Box my={4} textAlign="center" width="40%">
-            <FormControl isRequired>
+            <FormControl>
               <FormLabel>Search for a course</FormLabel>
               <Input
                 type="text"
                 placeholder="Enter a course name"
                 size="lg"
-                onChange={(e) => setInvite(e.currentTarget.value)}
+                onChange={(e) => setQuery(e.currentTarget.value)}
               />
             </FormControl>
             <Button
@@ -77,10 +151,60 @@ export default function CourseInvite() {
               maxWidth="200px"
               onClick={(e) => {
                 e.preventDefault();
+                doSearch(query).then((r) => {
+                  setResults(r.results);
+                });
               }}
             >
               Search
             </Button>
+            <Box>
+              {results.map((k) => {
+                return (
+                  <Box
+                    backgroundColor="#dddddd"
+                    p={2}
+                    my={2}
+                    borderRadius={10}
+                    textAlign="left"
+                  >
+                    <Text fontSize="xl">
+                      <strong>{k.topic_code}</strong> - {k.name}
+                    </Text>
+                    <Text noOfLines={2}>{k.course_outline}</Text>
+                    <Box mr={4} textAlign="right">
+                      <Button
+                        my={2}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          doEnroll(k.name).then((r) => {
+                            if (!!r.error) {
+                              toast({
+                                title: `Unable to enroll in course`,
+                                description: `${r.error}`,
+                                status: "error",
+                                duration: 5000,
+                                isClosable: true,
+                              });
+                            } else {
+                              toast({
+                                title: "Successfully Enrolled.",
+                                description: `Please return to the dashboard to view your new course!`,
+                                status: "success",
+                                duration: 5000,
+                                isClosable: true,
+                              });
+                            }
+                          });
+                        }}
+                      >
+                        Enroll
+                      </Button>
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
           </Box>
         </Flex>
       </Box>

@@ -172,6 +172,12 @@ async function getStaff(name) {
 }
 
 async function doEnroll(name, zid, enrollments) {
+  // zId sanitization
+  if (!zid) return { error: "Invalid zID." };
+  if (zid.length !== 8 || zid.replace(/\d/g, "") !== "z") {
+    return { error: "Invalid zID." };
+  }
+
   const found = enrollments.some((k) => k.zid === zid);
   if (found) return { error: "Student already enrolled in this course." };
 
