@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { isLoggedIn } from "../../utils/helpers";
-
+import { isLoggedIn, getCurrentUser } from "../../utils/helpers";
+import { backend_url } from "../../Constants";
 import {
   Flex,
   Box,
@@ -10,16 +10,31 @@ import {
   Button,
   FormControl,
   FormLabel,
+  useToast,
 } from "@chakra-ui/react";
 
-async function doCodeEnroll() {
-  
+async function doCodeEnroll(code) {
+  const options = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/JSON",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  };
+
+  const r = await fetch(
+    `${backend_url}enroll/code/${code}/${getCurrentUser()}`,
+    options
+  );
+  const ret = await r.json();
+  return ret;
 }
 
 export default function CourseInvite() {
   let { code } = useParams();
   const [invite, setInvite] = useState(code);
   const history = useHistory();
+  const toast = useToast();
 
   useEffect(() => {
     if (!isLoggedIn()) {
@@ -36,7 +51,7 @@ export default function CourseInvite() {
         </Box>
         <Flex width="Full" align="center" justifyContent="space-around">
           <Box my={4} textAlign="center" width="40%">
-            <FormControl isRequired>
+            <FormControl>
               <FormLabel>Join with an invite code</FormLabel>
               <Input
                 type="text"
@@ -54,13 +69,32 @@ export default function CourseInvite() {
               maxWidth="200px"
               onClick={(e) => {
                 e.preventDefault();
+                doCodeEnroll(invite).then((r) => {
+                  if (!!r.error) {
+                    toast({
+                      title: `Unable to enroll in course`,
+                      description: `${r.error}. Please ensure you're entering the correct invite code.`,
+                      status: "error",
+                      duration: 5000,
+                      isClosable: true,
+                    });
+                  } else {
+                    toast({
+                      title: "Successfully Enrolled.",
+                      description: `Please return to the dashboard to view your new course!`,
+                      status: "success",
+                      duration: 5000,
+                      isClosable: true,
+                    });
+                  }
+                });
               }}
             >
               Join Course!
             </Button>
           </Box>
           <Box my={4} textAlign="center" width="40%">
-            <FormControl isRequired>
+            <FormControl>
               <FormLabel>Search for a course</FormLabel>
               <Input
                 type="text"

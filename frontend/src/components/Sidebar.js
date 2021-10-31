@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { isLoggedIn, logOut } from "../utils/helpers";
 import {
   Stack,
   Text,
@@ -247,9 +248,31 @@ function Sidebar({
               </MenuButton>
               <Portal>
                 <MenuList zIndex={5}>
-                  <MenuItem>Profile</MenuItem>
-                  <MenuItem>Settings</MenuItem>
-                  <MenuItem>Logout</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      history.push("/account");
+                    }}
+                  >
+                    Account
+                  </MenuItem>
+                  {isLoggedIn() ? (
+                    <MenuItem
+                      onClick={(e) => {
+                        logOut();
+                        history.push("/login");
+                      }}
+                    >
+                      Log Out
+                    </MenuItem>
+                  ) : (
+                    <MenuItem
+                      onClick={(e) => {
+                        history.push("/login");
+                      }}
+                    >
+                      Log In
+                    </MenuItem>
+                  )}
                 </MenuList>
               </Portal>
             </Menu>

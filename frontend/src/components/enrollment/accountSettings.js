@@ -74,11 +74,17 @@ export default function AccountSettings() {
           */}
           <Box width="100%">
             <Flex align="center" width="full">
-              <Avatar size="2xl" name={userProfile.user_name} />
+              <Avatar
+                size="2xl"
+                name={userProfile.user_name}
+                src={userProfile.img_url}
+              />
               <Box ml={4}>
                 <Heading size="2xl">{userProfile.user_name}</Heading>
                 <Text fontSize="xl" as="i">
-                {userProfile.zid}{" - "}{userProfile.staff ? "Staff Member" : "Student"}
+                  {userProfile.zid}
+                  {" - "}
+                  {userProfile.staff ? "Staff Member" : "Student"}
                 </Text>
               </Box>
             </Flex>
