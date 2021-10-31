@@ -15,13 +15,14 @@ CREATE TABLE IF NOT EXISTS "users" (
   staff BOOLEAN NOT NULL
 );
 
+-- Changed searchable type cause errors
 DROP TABLE IF EXISTS "topic_group" CASCADE;
 CREATE TABLE IF NOT EXISTS "topic_group" (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   topic_code TEXT NOT NULL UNIQUE,
   course_outline TEXT,
-  searchable BOOLEAN NOT NULL
+  searchable BOOLEAN
 );
 
 DROP TABLE IF EXISTS "user_admin" CASCADE;
@@ -348,6 +349,8 @@ CREATE TABLE "attempt_answers" (
 
 -- Lectures and Tutorials
 
+CREATE TYPE classType AS ENUM ('lecture', 'tutorial');
+
 -- not used
 DROP TABLE IF EXISTS "weeks" CASCADE;
 CREATE TABLE "weeks" (
@@ -418,17 +421,12 @@ CREATE TABLE "tutorial_files_tutorials" (
 );
 
 -- Temp
-DROP TABLE IF EXISTS "panels" CASCADE;
-CREATE TABLE "panels" (
+DROP TABLE IF EXISTS "recording_panels" CASCADE;
+CREATE TABLE "recording_panels" (
   id SERIAL NOT NULL PRIMARY KEY,
-  title TEXT NOT NULL,
-  description TEXT
-);
-
-DROP TABLE IF EXISTS "panel_files" CASCADE;
-CREATE TABLE "panel_files" (
-  id SERIAL NOT NULL PRIMARY KEY,
-  panelId INTEGER REFERENCES panels(id)
+  topicGroupId INTEGER NOT NULL REFERENCES topic_group(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  class classType NOT NULL,
+  link TEXT
 );
 
 -- Enrol types

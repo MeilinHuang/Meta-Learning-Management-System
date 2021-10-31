@@ -427,6 +427,15 @@ async function postTopicGroup(request, response) {
       [topicGroupName, topic_code]
     );
 
+    // Create recording panel for lectures feature
+    await pool.query(`
+    INSERT INTO recording_panels(id, topicgroupid, class) 
+    VALUES(default, $1, 'lecture') RETURNING id`, [resp.rows[0].id]);
+
+    await pool.query(`
+    INSERT INTO recording_panels(id, topicgroupid, class) 
+    VALUES(default, $1, 'tutorial') RETURNING id`, [resp.rows[0].id]);
+
     if (request.files != null) {
       if (
         !fs.existsSync(`../frontend/public/_files/topicGroup${resp.rows[0].id}`)
@@ -488,7 +497,6 @@ async function postTopicGroup(request, response) {
 
     response.sendStatus(200);
   } catch (e) {
-    console.error(e);
     response.status(400).send(e);
   }
 }
@@ -704,6 +712,8 @@ async function deleteTopicGroup(request, response) {
     await pool.query("DELETE FROM topic_group WHERE LOWER(name) = LOWER($1)", [
       topicGroupName,
     ]);
+
+    await pool.query(`DELETE FROM recording_panels WHERE topicgroupid = $1`, [checkExist.rows[0].id]);
 
     if (
       fs.existsSync(

@@ -3,7 +3,6 @@ import {
   Button,
   Flex,
   Heading,
-  Input,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -14,12 +13,12 @@ import {
   useToast,
 } from "@chakra-ui/react";
 
-function AddLectureModal({
+function AddPostModal({
   isOpen,
   onClose,
-  onSubmit
+  onSubmit,
+  lectureId
 }) {
-  const [week, setWeek] = useState();
   const [attachments, setAttachments] = useState([]);
   const toast = useToast();
 
@@ -27,7 +26,7 @@ function AddLectureModal({
     e.preventDefault();
     e.target.reset();
 
-    if (!week || attachments.length === 0) {
+    if (attachments.length === 0) {
       toast({
         title: "Required fields missing",
         status: "error",
@@ -37,19 +36,11 @@ function AddLectureModal({
       return;
     }
 
-    const formArr = [];
-
     const formData = new FormData();
-    formData.append("lecturerId", localStorage.getItem("id"));
-    formData.append("week", week);
+    formData.append("targetId", lectureId);
+    formData.append("uploadFile", attachments);
 
-    const fileFormData = new FormData();
-    fileFormData.append("uploadFile", attachments);
-
-    formArr.push(formData);
-    formArr.push(fileFormData);
-
-    onSubmit(formArr);
+    onSubmit(formData);
     setAttachments([]);
 
     onClose();
@@ -73,7 +64,7 @@ function AddLectureModal({
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            Create new lecture week
+            Add new file
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -82,16 +73,6 @@ function AddLectureModal({
               onSubmit={handleSubmit}
               enctype="multipart/form-data"
             >
-              <Flex flexDirection="column" mb="16px">
-                <Heading size="sm" mb="4px" paddingBottom="1%">
-                  Week:
-                </Heading>
-                <Input
-                  name="lectureWeek"
-                  onChange={(e) => setWeek(e.target.value)}
-                  autoFocus
-                />
-              </Flex>
               <Flex flexDirection="column" mb="16px" marginBottom="-2%">
                 <Heading size="sm" mb="4px" paddingBottom="1%">
                   Attachments:
@@ -102,7 +83,7 @@ function AddLectureModal({
           </ModalBody>
           <ModalFooter display="flex" justifyContent="center">
             <Button type="submit" form="createLecture">
-              Create
+              Add
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -111,4 +92,4 @@ function AddLectureModal({
   );
 }
 
-export default AddLectureModal;
+export default AddPostModal;

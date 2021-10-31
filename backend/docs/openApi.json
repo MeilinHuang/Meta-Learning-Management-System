@@ -5776,6 +5776,260 @@
         "x-codegen-request-body-name": "TopicGroup"
       }
     },
+    "/{target}/{topicGroupName}/panels": {
+      "get": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Gets information panels for topic group",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "target",
+            "in": "query",
+            "description": "Target type",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["lecture", "tutorial"]
+            }
+          },
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "name of topic group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{target}/{topicGroupName}/panel": {
+      "post": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Post panel for lecture or tutorial",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "topicGroupName",
+            "in": "path",
+            "description": "topic group name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "target",
+            "in": "query",
+            "description": "Target type",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["lecture", "tutorial"]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "link": {
+                    "type": "string",
+                    "example": "www.youtube.com"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panel/{panelId}/": {
+      "put": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Update panel",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "panelId",
+            "in": "path",
+            "description": "panel id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "link": {
+                    "type": "string",
+                    "example": "www.youtube.com"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Lectures and Tutorials"],
+        "summary": "Delete panel from lecture or tutorial",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Auth token",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Bearer <Token>"
+            }
+          },
+          {
+            "name": "panelId",
+            "in": "path",
+            "description": "Id of panel to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/file/{targetId}": {
       "post": {
         "tags": ["Lectures and Tutorials"],
@@ -5990,61 +6244,6 @@
           "200": {
             "description": "OK",
             "content": {}
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/400"
-                }
-              }
-            }
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/403"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/{topicGroupName}": {
-      "get": {
-        "tags": ["Lectures and Tutorials"],
-        "summary": "Gets list of weeks",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Auth token",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "Bearer <Token>"
-            }
-          },
-          {
-            "name": "topicGroupName",
-            "required": false,
-            "in": "path",
-            "description": "Topic group to get lectures for",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/GetWeeks" }
-              }
-            }
           },
           "400": {
             "content": {

@@ -670,14 +670,9 @@ app.post("/:target/file/:targetId", async (request, response) => {
   await lectureTutorial.postLectureTutorialFile(request, response);
 });
 
-app.delete("/file/:targetId", async (request, response) => {
+app.delete("/:target/file/:targetId", async (request, response) => {
   logger(request);
   await lectureTutorial.deleteLectureTutorialFile(request, response);
-});
-
-app.get("/:topicGroupName", async (request, response) => {
-  logger(request);
-  await lectureTutorial.getWeeks(request, response);
 });
 
 app.get("/:topicGroupName/lectures", async (request, response) => {
@@ -736,6 +731,26 @@ app.post("/:topicGroupName/tutorial", async (request, response) => {
 app.get("/:topicGroupName/:type/search/:searchTerm", async (request, response) => {
   logger(request);
   await lectureTutorial.getSearchFile(request, response);
+});
+
+app.get("/:target/:topicGroupName/panels", async (request, response) => {
+  logger(request);
+  await lectureTutorial.getRecordingPanel(request, response);
+});
+
+app.post("/:target/:topicGroupName/panel", async (request, response) => {
+  logger(request);
+  await lectureTutorial.postRecordingPanel(request, response);
+});
+
+app.put("/panel/:panelId", async (request, response) => {
+  logger(request);
+  await lectureTutorial.putRecordingPanel(request, response);
+});
+
+app.delete("/panel/:panelId", async (request, response) => {
+  logger(request);
+  await lectureTutorial.deleteRecordingPanel(request, response);
 });
 
 app.listen(8000, () => {

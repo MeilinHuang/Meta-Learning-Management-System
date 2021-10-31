@@ -1,4 +1,5 @@
-import React from "react"
+/* eslint-disable eqeqeq */
+import React, { useState, useEffect } from "react"
 import { 
     Accordion,
     AccordionButton,
@@ -12,19 +13,30 @@ import {
     useBreakpointValue,
     useDisclosure,
     Flex,
-    IconButton,
-    Spacer
+    IconButton
 } from "@chakra-ui/react";
 import { GrAdd } from 'react-icons/gr';
-import { EditIcon, DeleteIcon } from '@chakra-ui/icons'
+import { EditIcon, DeleteIcon, NotAllowedIcon } from '@chakra-ui/icons'
 
 import LectureTable from './LectureTable';
 import AddLectureModal from './AddLectureModal';
+import EditLectureModal from './EditLectureModal';
+import EditLinkModal from './EditLinkModal';
+import { backend_url } from "../../Constants";
 
 function LectureTableContainer({ lectures, code, searchFiles, handleLectureState }) {
   const buttonContents = useBreakpointValue({ base: "", md: "Add" });
   const buttonIcon = useBreakpointValue({ base: <GrAdd />, md: null });
+
+  const isAdmin = localStorage.getItem("staff");
+
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {isOpen: isOpenEdit, onOpen: onOpenEdit, onClose: onCloseEdit} = useDisclosure();
+  const {isOpen: isOpenLink, onOpen: onOpenLink, onClose: onCloseLink} = useDisclosure();
+
+  const [ target, setTarget ] = useState();
+  const [ link, setLink ] = useState();
+  const [ panelId, setPanelId ] = useState();
 
   const compare = ( a, b ) => {
     if ( a.week < b.week ) return -1;
@@ -32,9 +44,25 @@ function LectureTableContainer({ lectures, code, searchFiles, handleLectureState
     return 0;
   };
 
+  // Render link
+  useEffect(() => {
+    fetch(`${backend_url}target/${code}/panels?target=lecture`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      }
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        setLink(data.link);
+        setPanelId(data.id);
+      });
+  }, [setLink, code]);
+
   // Sets lecture state
   const renderLectures = () => {
-    fetch(`http://localhost:8000/${code}/lectures`, {
+    fetch(`${backend_url}${code}/lectures`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -50,7 +78,7 @@ function LectureTableContainer({ lectures, code, searchFiles, handleLectureState
    // Post lecture
   const handleAddLectureSubmit = (formData) => {
     // Post lecture
-    fetch(`http://localhost:8000/${code}/lecture`, {
+    fetch(`${backend_url}${code}/lecture`, {
       method: "POST",
       body: formData[0],
       headers: {
@@ -60,15 +88,82 @@ function LectureTableContainer({ lectures, code, searchFiles, handleLectureState
     }).then(r => r.json())
     .then(data => {
       // Upload files 
-      fetch(`http://localhost:8000/lecture/file/${data.lectureId}`, {
+      fetch(`${backend_url}lecture/file/${data.lectureId}`, {
       method: "POST",
       body: formData[1],
       headers: {
         Accept: "*/*",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      }).then(renderLectures())
+      }).then( () => renderLectures)
+    }).then(() => {
+      renderLectures();
     })
+  };
+
+  // Handle Edit
+  const handleLectureEdit = (formData) => {
+    // PUT lecture
+    fetch(`${backend_url}${code}/lecture/${target}`, {
+      method: "PUT",
+      body: formData,
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then(r => r.json())
+    .then( () => {
+      renderLectures();
+    })
+    setTarget();
+  };
+
+  // Handle Delete
+  const handleDelete = (lectureId) => {
+    fetch(`${backend_url}${code}/lecture/${lectureId}`, {
+      method: "DELETE",
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then(r => r.json())
+    .then( () => {
+      renderLectures();
+    })
+  };
+
+  // Handle link edit
+  const handleLinkEdit = (form) => {
+    fetch(`${backend_url}panel/${panelId}`, {
+      method: "PUT",
+      body: form,
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then(r => r.json())
+    .then(r => {
+      setLink(r.link);
+    });
+  };
+
+  // Handle link clear
+  const handleLinkClear = () => {
+    const formData = new FormData();
+    formData.append("link", "");
+
+    fetch(`${backend_url}panel/${panelId}`, {
+      method: "PUT",
+      body: formData,
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then(r => r.json())
+    .then( () => {
+      renderLectures();
+    })
+    setLink();
   };
   
   if (lectures && lectures.length) lectures.sort(compare);
@@ -86,23 +181,40 @@ function LectureTableContainer({ lectures, code, searchFiles, handleLectureState
                     </Box>
                     <AccordionIcon />
                   </AccordionButton>
-                  <IconButton backgroundColor="white" size="sm" marginLeft="1%" marginRight="0.5%" icon={<EditIcon />}/>
-                  <IconButton backgroundColor="white" size="sm" icon={<DeleteIcon />}/>
+                  {isAdmin == 1 && <><IconButton 
+                    onClick={onOpenLink} 
+                    backgroundColor="white" size="sm" 
+                    marginLeft="1%" marginRight="0.5%" 
+                    icon={<EditIcon />}
+                  />
+                  <EditLinkModal 
+                    isOpen={isOpenLink} 
+                    onClose={onCloseLink} 
+                    isLectures 
+                    onSubmit={handleLinkEdit}
+                    code={code} 
+                  />
+                  <IconButton 
+                    onClick={handleLinkClear} 
+                    backgroundColor="white" 
+                    size="sm" 
+                    icon={<NotAllowedIcon />}
+                  /></>}
                 </Flex>
                 <AccordionPanel pb={4} px={0} overflowX={{ base: 'scroll', md: 'initial' }}>
-                  { /* Add new database lecture-information panel */ }
                   <Box flex="1" textAlign="left" padding="1%">
-                    Lecture videos playlist at: 
-                    <Link href="https://www.youtube.com" padding="1%" color="blue">
-                      www.youtube.com
-                    </Link>
+                    Lecture recordings:
+                    {link ?  
+                    <Link href={link} padding="1%" color="blue" isExternal>
+                    {link}
+                    </Link> : " N/A" }
                   </Box>
                 </AccordionPanel>
               </AccordionItem>
             }
               {
-                (lectures && lectures.length) && lectures.map( lecture => (
-                  <AccordionItem width="99%">
+                (lectures && lectures.length) ? lectures.map( lecture => (
+                  <AccordionItem key={lecture.id} width="99%">
                     <Flex alignItems="center">  
                       <AccordionButton>
                         <Box flex="1" textAlign="left" fontWeight="bold">
@@ -110,13 +222,31 @@ function LectureTableContainer({ lectures, code, searchFiles, handleLectureState
                         </Box>
                         <AccordionIcon />
                       </AccordionButton> 
-                      <IconButton backgroundColor="white" size="sm" marginLeft="1%" marginRight="0.5%" icon={<EditIcon />}/>
-                      <IconButton backgroundColor="white" size="sm" icon={<DeleteIcon />}/>
+                      {isAdmin == 1 && <><IconButton 
+                        onClick={() => {
+                          onOpenEdit();
+                          setTarget(lecture.id)
+                        }}
+                        backgroundColor="white" 
+                        size="sm" 
+                        marginLeft="1%" 
+                        marginRight="0.5%" 
+                        icon={<EditIcon />}
+                      />
+                      <EditLectureModal 
+                        isOpen={isOpenEdit} 
+                        onClose={onCloseEdit} 
+                        isLectures 
+                        onSubmit={handleLectureEdit}
+                        lectureId={lecture.id}
+                        code={code} 
+                      /> 
+                      <IconButton backgroundColor="white" size="sm" icon={<DeleteIcon />} onClick={() => handleDelete(lecture.id)} /></>}
                     </Flex>
                     <AccordionPanel pb={4} px={0} overflowX={{ base: 'scroll', md: 'initial' }}>
-                    <LectureTable lecture={lecture} code={code} />
+                    <LectureTable lecture={lecture} code={code} renderLectures={renderLectures}/>
                     </AccordionPanel>
-                  </AccordionItem>))
+                  </AccordionItem>)) : <></>
               }
               {
                 searchFiles && 
@@ -133,10 +263,13 @@ function LectureTableContainer({ lectures, code, searchFiles, handleLectureState
                 </AccordionItem>
               }
           </AccordionItem>
-          <Center width={{ base: '100%', lg: '100%' }} padding="1%">
-            <Button onClick={onOpen} leftIcon={buttonIcon} pr={{ base: '8px', md: '16px'}} width="100%" backgroundColor="white">{buttonContents}</Button>
-            <AddLectureModal isOpen={isOpen} onClose={onClose} isLectures onSubmit={handleAddLectureSubmit} code={code} /> 
-          </Center>
+          {
+            (!searchFiles && isAdmin == 1) && 
+            <Center width={{ base: '100%', lg: '100%' }} padding="1%">
+              <Button onClick={onOpen} leftIcon={buttonIcon} pr={{ base: '8px', md: '16px'}} width="100%" backgroundColor="white">{buttonContents}</Button>
+              <AddLectureModal isOpen={isOpen} onClose={onClose} isLectures onSubmit={handleAddLectureSubmit} code={code} /> 
+            </Center>
+          }
       </Accordion>
   )
 }
