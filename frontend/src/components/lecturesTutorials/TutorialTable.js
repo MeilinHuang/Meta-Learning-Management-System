@@ -16,13 +16,13 @@ import { DownloadIcon, AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import AddFileModal from './AddFileModal';
 import { backend_url } from "../../Constants";
 
-function LectureTable({lecture, code, searchFiles, renderLectures}) {
+function TutorialTable({tutorial, code, searchFiles, renderTutorials}) {
   const isAdmin = localStorage.getItem("staff");
   const buttonIcon = useBreakpointValue({ base: <AddIcon />, md: null });
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const isLectureFiles = (lecture) => {
-    if (lecture) if (lecture.lecture_files) return true
+  const isTutorialFiles = (tutorial) => {
+    if (tutorial) if (tutorial.tutorial_files) return true
     return false;
   }
     
@@ -33,32 +33,32 @@ function LectureTable({lecture, code, searchFiles, renderLectures}) {
 
   // Upload Lecture File
   const handleFileUpload = (formData) => {
-    fetch(`${backend_url}lecture/file/${lecture.id}`, {
+    fetch(`${backend_url}tutorial/file/${tutorial.id}`, {
     method: "POST",
     body: formData,
     headers: {
       Accept: "*/*",
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-    }).then(renderLectures);
+    }).then(renderTutorials);
   };
 
   // Delete file
   const handleFileDelete = (target) => {
-    fetch(`${backend_url}lecture/file/${target}`, {
+    fetch(`${backend_url}tutorial/file/${target}`, {
     method: "DELETE",
     headers: {
       Accept: "*/*",
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-    }).then(renderLectures);
+    }).then(renderTutorials);
   };
 
   return (
     <Flex align-items="center" text-align="center"> 
       <AccordionItem width="88%" text-align="left" padding="1%">
         {
-          (isLectureFiles(lecture) && lecture.lecture_files.length) ? lecture.lecture_files.map( file => (
+          (isTutorialFiles(tutorial) && tutorial.tutorial_files.length) ? tutorial.tutorial_files.map( file => (
             <Flex alignItems="center"> 
               <Box>
                 <Link href={file.file} key={file.id} download>
@@ -104,7 +104,7 @@ function LectureTable({lecture, code, searchFiles, renderLectures}) {
               Add File 
             </Button>
             <AddFileModal 
-            lectureId={lecture.id}
+            tutorialId={tutorial.id}
             isOpen={isOpen} 
             onClose={onClose} 
             isLectures 
@@ -117,4 +117,4 @@ function LectureTable({lecture, code, searchFiles, renderLectures}) {
   )
 }
 
-export default LectureTable;
+export default TutorialTable;

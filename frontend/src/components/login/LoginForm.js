@@ -40,7 +40,11 @@ async function doLogin(email, password) {
   const lowerEmail = email.toLowerCase();
 
   const data = {
+<<<<<<< HEAD
     email: lowerEmail,
+=======
+    email: email.toLowerCase(),
+>>>>>>> backend
     password: password,
   };
 

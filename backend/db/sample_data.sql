@@ -207,9 +207,15 @@ VALUES(default, 1, 1, 3);
 INSERT INTO lecture_files(id, name, file, type, lecture_id) 
 VALUES(default, 'intro-slides.pdf', '/_files/lecture1/intro-slides.pdf', 'lecture', 1);
 INSERT INTO lecture_files(id, name, file, type, lecture_id) 
-VALUES(default, 'loops.pdf', '/_files/lecture1/loops.pdf', 'lecture', 2);
+VALUES(default, 'loops.pdf', '/_files/lecture1/loops.pdf', 'lecture', 1);
 INSERT INTO lecture_files(id, name, file, type, lecture_id) 
-VALUES(default, 'arrays.pdf', '/_files/lecture1/arrays.pdf', 'lecture', 3);
+VALUES(default, 'arrays.pdf', '/_files/lecture1/arrays.pdf', 'lecture', 1);
+INSERT INTO lecture_files(id, name, file, type, lecture_id) 
+VALUES(default, 'design-patterns.pdf', '/_files/lecture2/design-patterns.pdf', 'lecture', 2);
+INSERT INTO lecture_files(id, name, file, type, lecture_id) 
+VALUES(default, 'libraries.docx', '/_files/lecture3/libraries.docx', 'lecture', 3);
+INSERT INTO lecture_files(id, name, file, type, lecture_id) 
+VALUES(default, 'oo-refresher.pdf', '/_files/lecture3/oo-refresher.pdf', 'lecture', 3);
 
 -- Lecture file links
 INSERT INTO lecture_files_lectures(fileId, lectureId) 
@@ -218,13 +224,63 @@ INSERT INTO lecture_files_lectures(fileId, lectureId)
 VALUES(2, 1);
 INSERT INTO lecture_files_lectures(fileId, lectureId) 
 VALUES(3, 1);
+INSERT INTO lecture_files_lectures(fileId, lectureId) 
+VALUES(4, 2);
+INSERT INTO lecture_files_lectures(fileId, lectureId) 
+VALUES(5, 3); 
+INSERT INTO lecture_files_lectures(fileId, lectureId) 
+VALUES(6, 3);
 
 -- Create NonEnrol-Tutorials
 INSERT INTO tutorials(id, topic_group_id, week, topic_reference) 
 VALUES(default, 1, 1, 1);
 INSERT INTO tutorials(id, topic_group_id, week, topic_reference) 
-VALUES(default, 1, 1, 1);
+VALUES(default, 1, 2, 1);
+INSERT INTO tutorials(id, topic_group_id, week, topic_reference) 
+VALUES(default, 1, 3, 1);
+INSERT INTO tutorials(id, topic_group_id, week, topic_reference) 
+VALUES(default, 1, 4, 1);
+INSERT INTO tutorials(id, topic_group_id, week, topic_reference) 
+VALUES(default, 1, 5, 1);
 
 -- Tutorial files
-INSERT INTO tutorial_files(id, name, file, type, tutorial_id) 
-VALUES(default, 'tutorial1-slides.pdf', '/_files/tutorial1/lecture1-slides.pdf', 'tutorial', 1);
+INSERT INTO tutorial_files(id, name, file, type, tutorial_id)
+VALUES(default, 'tutorial1-slides.pdf', '/_files/tutorial1/tutorial1-slides.pdf', 'tutorial', 1);
+INSERT INTO tutorial_files(id, name, file, type, tutorial_id)
+VALUES(default, 'info-handout.doc', '/_files/tutorial1/info-handout.doc', 'tutorial', 1);
+INSERT INTO tutorial_files(id, name, file, type, tutorial_id)
+VALUES(default, 'tutorial2.pdf', '/_files/tutorial2/tutorial2.pdf', 'tutorial', 2);
+INSERT INTO tutorial_files(id, name, file, type, tutorial_id)
+VALUES(default, 'tutorial3.pdf', '/_files/tutorial3/tutorial3.pdf', 'tutorial', 3);
+INSERT INTO tutorial_files(id, name, file, type, tutorial_id)
+VALUES(default, 'notes.pdf', '/_files/tutorial3/notes.pdf', 'tutorial', 3);
+INSERT INTO tutorial_files(id, name, file, type, tutorial_id)
+VALUES(default, 'sample-questions.pdf', '/_files/tutorial4/sample-questions.pdf', 'tutorial', 4);
+INSERT INTO tutorial_files(id, name, file, type, tutorial_id)
+VALUES(default, 'tutorial5.pdf', '/_files/tutorial5/tutorial5.pdf', 'tutorial', 5);
+
+-- Tutorial file links
+INSERT INTO tutorial_files_tutorials(fileId, tutorialId) 
+VALUES(1, 1);
+INSERT INTO tutorial_files_tutorials(fileId, tutorialId) 
+VALUES(2, 1);
+INSERT INTO tutorial_files_tutorials(fileId, tutorialId) 
+VALUES(3, 2);
+INSERT INTO tutorial_files_tutorials(fileId, tutorialId) 
+VALUES(4, 3);
+INSERT INTO tutorial_files_tutorials(fileId, tutorialId) 
+VALUES(5, 3);
+INSERT INTO tutorial_files_tutorials(fileId, tutorialId) 
+VALUES(6, 4);
+INSERT INTO tutorial_files_tutorials(fileId, tutorialId) 
+VALUES(7, 5);
+
+-- Create recording panels
+INSERT INTO recording_panels(id, topicGroupId, class, link) 
+VALUES(default, 1, 'lecture', 'https://youtu.be/xnBUvpFkU6Q');
+INSERT INTO recording_panels(id, topicGroupId, class) 
+VALUES(default, 1, 'tutorial');
+INSERT INTO recording_panels(id, topicGroupId, class, link) 
+VALUES(default, 2, 'lecture', 'https://youtu.be/xnBUvpFkU6Q');
+INSERT INTO recording_panels(id, topicGroupId, class, link) 
+VALUES(default, 2, 'tutorial', 'https://youtu.be/xnBUvpFkU6Q');
