@@ -43,16 +43,27 @@ function WidgetsBar({ page, user }) {
                         })
                         .then((e) => e.json())
                         .then(e => {
+                            let total = 0
+                            
+                            e.topics_list.map(cpy => {
+                                let uniq_list = []
+                                cpy.course_materials.map(mat => {
+                                    const mat_str = JSON.stringify(mat)
+                                    if (uniq_list.indexOf(mat_str) === -1) {
+                                        uniq_list.push(mat_str)
+                                        total++
+                                    }
+                                })
+                            })
+                            
                             Promise.all(e.topics_list.map(topic => {
                                 return fetch(backend_url + "user/" + localStorage.getItem("id") + "/progress/" + topic.id)
                             }))
                             .then(resp => Promise.all(resp.map(r => r.json())))
                             .then (data_list => {
-                                let total = 0
                                 let complete = 0
                                 data_list.map(data => {
                                     data.map(file => {
-                                        total++
                                         if (file.completed) {
                                             complete++
                                         }

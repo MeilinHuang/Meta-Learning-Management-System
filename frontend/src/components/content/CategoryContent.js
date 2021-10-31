@@ -71,6 +71,7 @@ function CategoryContent({topic, category, content, course, course_id}) {
                                                     })
                                                     .then(resp => resp.json())
                                                     .then(data => {
+                                                        console.log(data)
                                                         content.map((file, index) => {
                                                             if (file.id === mat.id) {
                                                                 content[index].completed = e.target.checked

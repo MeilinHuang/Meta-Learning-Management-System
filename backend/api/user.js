@@ -273,36 +273,51 @@ async function getUserContentProgress (request, response) {
 
 // Update completion status of user content progress
 async function putUserContentProgress (request, response) {
-  try {
-    const topicId = request.params.topicId;
-    const userId = request.params.userId;
-    const topicFileId = request.body.topicFileId;
-    const completion = request.body.completion;
+    try {
+        const topicId = request.params.topicId;
+        const userId = request.params.userId;
+        const topicFileId = request.body.topicFileId;
+        const completion = request.body.completion;
 
-    const userExist = await pool.query(
-      `SELECT EXISTS(SELECT * FROM users 
-      WHERE id = $1)`, [userId]);
+        const userExist = await pool.query(
+            `SELECT EXISTS(SELECT * FROM users 
+            WHERE id = $1)`, [userId]);
 
-    const topicExist = await pool.query(
-      `SELECT EXISTS(SELECT * FROM topics 
-      WHERE id = $1)`, [topicId]);
+        const topicExist = await pool.query(
+            `SELECT EXISTS(SELECT * FROM topics 
+            WHERE id = $1)`, [topicId]);
 
-    const topicFileExist = await pool.query(
-      `SELECT EXISTS(SELECT * FROM topic_files 
-      WHERE id = $1)`, [topicFileId]);
+        const topicFileExist = await pool.query(
+            `SELECT EXISTS(SELECT * FROM topic_files 
+            WHERE id = $1)`, [topicFileId]);
+        
+      
+        if (userExist.rows[0].exists == false) throw new Error(`User with id '${userId}' does not exist`);
+        if (topicExist.rows[0].exists == false) throw new Error(`Topic with id '${topicId}' does not exist`);
+        if (topicFileExist.rows[0].exists == false) throw new Error(`Topic File with id '${topicFileId}' does not exist`);
+    
+        const progressExists = await pool.query(
+            `SELECT EXISTS(SELECT * FROM user_content_progress 
+            WHERE user_id = $1 AND topic_file_id = $2 AND topic_id = $3)`, 
+            [userId, topicFileId, topicId])
+            
+            
+        if (progressExists.rows[0].exists) {
+            await pool.query(`UPDATE user_content_progress SET completed = $1 
+                WHERE user_id = $2 AND topic_file_id = $3 AND topic_id = $4`, 
+                [completion, userId, topicFileId, topicId]);
+        }
+        else {
+            await pool.query(
+                `INSERT INTO user_content_progress(user_id, topic_file_id, topic_id, completed) VALUES($1, $2, $3, $4)`,
+                [userId, topicFileId, topicId, completion])
+        }
+    
 
-    if (userExist.rows[0].exists == false) throw new Error(`User with id '${userId}' does not exist`);
-    if (topicExist.rows[0].exists == false) throw new Error(`Topic with id '${topicId}' does not exist`);
-    if (topicFileExist.rows[0].exists == false) throw new Error(`Topic File with id '${topicFileId}' does not exist`);
-
-    await pool.query(`UPDATE user_content_progress SET completed = $1 
-    WHERE user_id = $2 AND topic_file_id = $3 AND topic_id = $4`, 
-    [completion, userId, topicFileId, topicId]);
-
-    response.status(200).json({success: true});
-  } catch (e) {
-    response.status(400).send(e);
-  }
+        response.status(200).json({success: true});
+    } catch (e) {
+        response.status(400).send(e);
+    }
 }
 
 module.exports = {

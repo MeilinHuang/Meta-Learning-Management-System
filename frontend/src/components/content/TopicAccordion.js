@@ -67,20 +67,23 @@ function TopicAccordion({ topic, course }) {
                 <Accordion width="100%" allowMultiple>
                     <Flex paddingBlock={3}>
                         {topic.prereqs.length > 0 ? (
-                            <Flex>
-                                <Text>Prerequisites: </Text>
-                                {topic.prereqs.map((prereq, index) => {
-                                    return (
-                                        <Button
-                                            key={topic.name + "-prereq-" + prereq.name + " " + index}
-                                            marginLeft={"1vw"}
-                                            height={7}
-                                            id={"prereq-" + prereq.name}
-                                        >
-                                            {prereq.name}
-                                        </Button>
-                                    );
-                                })}
+                            <Flex flexDirection={["column", "column", "column", "column", "row"]}>
+                                <Text marginTop={2}>Prerequisites: </Text>
+                                <div>
+                                    {topic.prereqs.map((prereq, index) => {
+                                        return (
+                                            <Button
+                                                key={topic.name + "-prereq-" + prereq.name + " " + index}
+                                                marginLeft={"1vw"}
+                                                marginTop={1}
+                                                height={7}
+                                                id={"prereq-" + prereq.name}
+                                            >
+                                                {prereq.name}
+                                            </Button>
+                                        );
+                                    })}
+                                </div>
                             </Flex>
                         ) : (
                             <Text>No prerequisites</Text>
