@@ -95,7 +95,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
       }
     });
     
-    // window.location.reload();
+    window.location.reload();
   };
 
   const deleteTag = async (tagToDelete) => {
@@ -197,7 +197,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     const formData = new FormData();
     formData.append('name', data.title);
     formData.append('fileDeleteList', name);
-    formData.append('uploadedFileTypes', '');
+    formData.append('uploadedFileTypes', 'pdf');
     
     await fetch(update_topic(topicGroupName, data.title), {
       method: 'PUT',

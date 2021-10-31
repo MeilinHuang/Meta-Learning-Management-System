@@ -217,7 +217,7 @@ app.delete(
   "/topicGroup/:topicGroupName/topic/:topicName/tag",
   async (request, response) => {
     console.log(
-      `POST /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/tag`
+      `DELETE /topicGroup/${request.params.topicGroupName}/topic/${request.params.topicName}/tag`
     );
     await database.deleteTopicTag(request, response);
   }

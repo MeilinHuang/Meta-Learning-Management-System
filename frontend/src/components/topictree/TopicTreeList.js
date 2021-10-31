@@ -139,6 +139,17 @@ export default function TopicTreeList() {
     tags: [],
   });
 
+  function topicGroupLimiter(data) {
+    let newData = [];
+    let validTopicGroups = ["C++ Programming", "Programming Fundamentals", "Object-Oriented Design & Programming"]; // Only for demo purposes
+    for (let topicGroup of data) {
+      if (validTopicGroups.includes(topicGroup.name )) {
+        newData.push(topicGroup);
+      }
+    }
+    return newData;
+  }
+
   useEffect(async function () {
     fetch(topic_group_url, {
       headers: {
@@ -147,6 +158,7 @@ export default function TopicTreeList() {
       },
     })
       .then((response) => response.json())
+      .then((response) => topicGroupLimiter(response))
       .then(function (response) {
         setData(response);
         setDisplay(response);
