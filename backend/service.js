@@ -233,7 +233,9 @@ async function setSearchable(request, response) {
   const searchable = request.params.searchable;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1285,7 +1287,9 @@ async function enrollUserWithCode(request, response) {
   const userId = request.params.userId;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1365,7 +1369,9 @@ async function getCourseCodes(request, response) {
   const topicGroupName = request.params.topicGroupName;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1427,7 +1433,9 @@ async function getCourseCode(request, response) {
   const courseCode = request.params.inviteCode;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1455,7 +1463,9 @@ async function deleteCourseCode(request, response) {
   const courseCode = request.params.inviteCode;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1480,11 +1490,33 @@ async function deleteCourseCode(request, response) {
   }
 }
 
+async function searchCourses(request, response) {
+  try {
+    const query = request.params.query;
+
+    let resp = await pool.query(
+      `SELECT * FROM topic_group
+      WHERE searchable = true
+      AND (LOWER (name) LIKE LOWER($1)
+      OR LOWER (topic_code) LIKE LOWER($1)
+      OR LOWER (course_outline) LIKE LOWER($1))`,
+      [`%${query}%`]
+    );
+
+    //return the courses
+    response.status(200).send({ results: resp.rows });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 async function getEnrollments(request, response) {
   const topicGroupName = request.params.topicGroupName;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1518,7 +1550,9 @@ async function enrollUser(request, response) {
   const userZId = request.params.zId;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1567,12 +1601,62 @@ async function enrollUser(request, response) {
   }
 }
 
+async function enrollUserId(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const userId = request.params.id;
+  try {
+    //Validate Token
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+    const topicGroupId = resp.rows[0].id;
+
+    // check if user already enrolled
+    resp = await pool.query(
+      `SELECT * FROM user_enrolled WHERE topic_group_id = $1 AND user_id = $2`,
+      [topicGroupId, userId]
+    );
+
+    if (resp.rows.length !== 0) {
+      response
+        .status(400)
+        .send({ error: `User already enrolled in this course` });
+      throw `Already enrolled in course ${topicGroupId}`;
+    }
+
+    resp = await pool.query(
+      `INSERT INTO user_enrolled(topic_group_id, user_id, progress) VALUES($1, $2, $3)`,
+      [topicGroupId, userId, 0]
+    );
+
+    //return the codes
+    response.status(200).send({ success: "true" });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 async function unenrollUser(request, response) {
   const topicGroupName = request.params.topicGroupName;
   const userId = request.params.userId;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -2285,6 +2369,7 @@ module.exports = {
   postAnnouncement,
   postAnnouncementComment,
   getSearchAnnouncements,
+  enrollUserId,
   generateCode,
   getTopicGroup,
   getTopicFile,
@@ -2298,5 +2383,6 @@ module.exports = {
   unenrollUser,
   enrollUser,
   enrollUserWithCode,
+  searchCourses,
   setSearchable,
 };

@@ -301,6 +301,11 @@ app.delete("/enroll/code/:inviteCode", async (request, response) => {
   await database.deleteCourseCode(request, response);
 });
 
+app.get("/enroll/search/:query", async (request, response) => {
+  logger(request);
+  await database.searchCourses(request, response);
+});
+
 app.get("/enrollments/:topicGroupName", async (request, response) => {
   logger(request);
   await database.getEnrollments(request, response);
@@ -309,6 +314,11 @@ app.get("/enrollments/:topicGroupName", async (request, response) => {
 app.put("/enroll/:topicGroupName/:zId", async (request, response) => {
   logger(request);
   await database.enrollUser(request, response);
+});
+
+app.put("/enroll/:topicGroupName/id/:id", async (request, response) => {
+  logger(request);
+  await database.enrollUserId(request, response);
 });
 
 app.put("/unenroll/:topicGroupName/:userId", async (request, response) => {

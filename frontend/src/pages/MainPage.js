@@ -6,7 +6,7 @@ import { Switch, Route } from "react-router-dom";
 import MainSelection from "./MainSelection.js";
 import { useBreakpointValue, Flex, Container, Box } from "@chakra-ui/react";
 import { backend_url } from "../Constants.js";
-import { isLoggedIn } from "../utils/helpers.js";
+import { isLoggedIn, isStaff } from "../utils/helpers.js";
 import CourseInvite from "../components/enrollment/JoinCourse";
 import AccountSettings from "../components/enrollment/accountSettings.js";
 
@@ -22,9 +22,13 @@ function MainPage() {
       url: "/gamification",
     },
     {
-      name: 'Topic Tree',
-      url: "/topictree"
-    }
+      name: "Topic Tree",
+      url: "/topictree",
+    },
+    {
+      name: "Enrollment",
+      url: "/invite",
+    },
   ]);
   const smVariant = "drawer";
   const mdVariant = "sidebar";
@@ -45,12 +49,11 @@ function MainPage() {
       fetch(backend_url + `user/${localStorage.getItem("id")}`, options)
         .then((e) => e.json())
         .then((e) => {
-            if (e === {} || e === null || e.error) {
-                history.push("/login");
-            }
-            else {
-                setUser(e)
-            }
+          if (e === {} || e === null || e.error) {
+            history.push("/login");
+          } else {
+            setUser(e);
+          }
         });
     } else {
       history.push("/login");
