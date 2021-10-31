@@ -50,13 +50,13 @@ function MainPage() {
         .then((e) => e.json())
         .then((e) => {
           if (e === {} || e === null || e.error) {
-            // history.push("/login");
+            history.push("/login");
           } else {
             setUser(e);
           }
         });
     } else {
-      // history.push("/login");
+      history.push("/login");
     }
   }, []);
 

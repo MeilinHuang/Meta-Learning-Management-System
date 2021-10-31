@@ -75,10 +75,18 @@ function Calendar() {
         },
       };
     fetch(backend_url + "user/" + localStorage.getItem("id") +"/calendar", options)
-    .then(resp => resp.json())
+    .then(resp => {
+        if (resp.status === 200) {
+            return resp.json()
+        }
+        else {
+            throw "Calendar error"
+        }
+    })
     .then(data => {
         setReminders(data)
     })
+    .catch(e => console.log(e))
 
     //remove dependency array warning, probably should fix this
     // eslint-disable-next-line
