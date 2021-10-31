@@ -19,9 +19,6 @@ function App() {
           <Route path="/login">
             <LoginForm />
           </Route>
-          {/* <Route exact path="/login">
-            <LoginForm />
-          </Route> */}
           <Route exact path="/topictreelist">
             <TopicTreeList />
           </Route>
