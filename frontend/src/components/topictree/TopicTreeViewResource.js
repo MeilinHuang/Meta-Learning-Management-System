@@ -300,7 +300,8 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                     return (
                       <Tr key={prereq.name}>
                         <Td>{prereq.name}</Td>
-                        <Td><Button colorScheme="red" onClick={() => {deletePrerequisite(prereq)}}>Delete</Button></Td>
+                        {isStaff ? 
+                        <Td><Button colorScheme="red" onClick={() => {deletePrerequisite(prereq)}}>Delete</Button></Td> : <></>}
                       </Tr>
                     );
                   })}
