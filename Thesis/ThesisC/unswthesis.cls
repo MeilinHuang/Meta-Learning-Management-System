@@ -438,7 +438,8 @@ Graduate Research.
 	    \vskip 0pt plus 8fill%
 	    {\largeboldcoverpagefont \ThesisTitle \par}%
             \vskip 0pt plus 8fill
-	    Thesis submitted as a partial requirement for the degree of\\[1ex]
+      
+	    Thesis submitted as a requirement for the degree of\\[1ex]
             \ThesisDegreeName \par%
             \begin{tabular}{ c c c }
               Allen Wu & z5205003 & Software Engineering \\
@@ -448,6 +449,10 @@ Graduate Research.
               Emily Ngo & z5164090 & Software Engineering \\
               Rason Chia & z5084566  & Software Engineering \\
               Rebekah Chow & z5160152 & Software Engineering\\
+              \\
+              Supervisor: & Maurice Pagnucco\\
+              Assessor: & Dr John Shepherd\\
+              Submitted: & November 2021\\
             \end{tabular}\par
 	\end{center}\par
     \end{titlepage}}%
