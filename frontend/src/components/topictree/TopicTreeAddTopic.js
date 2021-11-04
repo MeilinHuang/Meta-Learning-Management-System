@@ -16,6 +16,7 @@ import {
   AlertIcon,
   AlertDescription,
   CloseButton,
+  Heading
 } from "@chakra-ui/react";
 import Select from "./ChakraReactSelect.js";
 import {
@@ -24,13 +25,18 @@ import {
   post_new_prereq,
 } from "../../Constants.js";
 
-export default function TopicTreeAddTopic({ isOpen, onClose, topicGroups }) {
+export default function TopicTreeAddTopic({ isOpen, onClose, topicGroups, allTopics }) {
   const [topics, setTopics] = useState([]);
   const [topicGroupName, setTopicGroupName] = useState("");
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [newTopicName, setNewTopicName] = useState("");
+  const [cloneTopic, setCloneTopic] = useState(-1);
   const [showAlert, setShowAlert] = useState(false);
   const [alertTitle, setAlertTitle] = useState("");
+
+  useEffect(() => {
+    console.log('allTopics', allTopics);
+  }, [allTopics]);
 
   const convertToList = (jsonData) => {
     let tempTopics = [];
@@ -55,6 +61,13 @@ export default function TopicTreeAddTopic({ isOpen, onClose, topicGroups }) {
     setNewTopicName(value.target.value);
   };
 
+  const onChangeCloneTopic = (value) => {
+    console.log('valueClone', value);
+    setNewTopicName(value.name);
+    
+    setCloneTopic(value.groupId);
+  }
+
   const onSubmitTopic = async () => {
     if (newTopicName == "") {
       setShowAlert(true);
@@ -73,6 +86,8 @@ export default function TopicTreeAddTopic({ isOpen, onClose, topicGroups }) {
         },
         body: JSON.stringify({
           uploadedFileTypes: "pdf",
+          cloneTopic: cloneTopic !== -1,
+          cloneTopicGroupId: cloneTopic
         }),
       }
     );
@@ -110,6 +125,7 @@ export default function TopicTreeAddTopic({ isOpen, onClose, topicGroups }) {
   };
 
   useEffect(() => {
+    
     if (topicGroupName !== "") {
       fetch(get_topics_url(topicGroupName), {
         headers: {
@@ -152,10 +168,25 @@ export default function TopicTreeAddTopic({ isOpen, onClose, topicGroups }) {
                   onChange={onChangeNewName}
                   placeholder="Enter topic name..."
                   type="text"
+                  value={newTopicName}
+                />
+              </FormControl>
+              <Heading as="h6" size="xs">
+                OR
+              </Heading>
+              <FormControl id="clone-topic">
+                <FormLabel>Clone a Topic (optional)</FormLabel>
+                <Select
+                  name="clone-topic"
+                  options={allTopics}
+                  placeholder="Select a topic to clone"
+                  closeMenuOnSelect={true}
+                  size="sm"
+                  onChange={onChangeCloneTopic}
                 />
               </FormControl>
               <FormControl id="topic-group">
-                <FormLabel>Topic Group</FormLabel>
+                <FormLabel>Topic Group (required)</FormLabel>
                 <Select
                   name="topicGroups"
                   options={topicGroups}
@@ -165,7 +196,7 @@ export default function TopicTreeAddTopic({ isOpen, onClose, topicGroups }) {
                 />
               </FormControl>
               <FormControl id="new-topic-dependencies">
-                <FormLabel>Select Topic Prerequisites</FormLabel>
+                <FormLabel>Select Topic Prerequisites (optional)</FormLabel>
                 <Select
                   isMulti
                   name="topics"

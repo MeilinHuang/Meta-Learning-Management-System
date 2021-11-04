@@ -131,7 +131,7 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
         }
 
 
-        
+        console.log('tempActualTopics', tempActualTopics);
         setActualTopics(tempActualTopics);
         return tempTopics;
     };
@@ -365,8 +365,8 @@ export default function TopicTreeHeader({id,  topicGroups, view}) {
                 </Box>
             ) : null}
             </Box>
-            <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} topicGroups={topicGroups}/>
-            <TopicTreeAddGroup isOpen={isOpenGroupModal} onClose={onCloseGroupModal} />
+            <TopicTreeAddTopic isOpen={isOpenModal} onClose={onCloseModal} topicGroups={topicGroups}  allTopics={actualTopics}/>
+            <TopicTreeAddGroup isOpen={isOpenGroupModal} onClose={onCloseGroupModal}/>
             <TopicTreeViewResource data={selectedNode} isOpen={isOpenViewModal} onClose={onCloseViewModal} prereqs={listPrereqs} topicGroupName={topicGroupName} nodes={notListPrereqs} />
         </div>
     );
