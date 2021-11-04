@@ -415,6 +415,7 @@ export default function TopicTreeHeader({ id, topicGroups, view }) {
         isOpen={isOpenModal}
         onClose={onCloseModal}
         topicGroups={topicGroups}
+        allTopics={actualTopics}
       />
       <TopicTreeAddGroup
         isOpen={isOpenGroupModal}

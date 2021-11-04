@@ -774,6 +774,9 @@ async function deleteTopic(request, response) {
     return;
   }
 
+  console.log('topicName', topicName);
+  console.log('topicGroup', topicGroupName);
+
   const topicGroupId = idResp.rows[0].id;
   let tmp = await pool.query(
     `SELECT id FROM topics WHERE LOWER(name) = LOWER($1) AND topic_group_id = $2`,
@@ -833,14 +836,14 @@ async function putTopicTag(request, response) {
     );
     if (!tgReq.rows.length)
       throw `Failed: topic group {${topicGroupName}} does not exist`;
-
+    const topicGroupId = tgReq.rows[0].id;
     let tReq = await pool.query(
-      `SELECT id FROM topics WHERE LOWER(name) = LOWER($1)`,
-      [topicName]
+      `SELECT id FROM topics WHERE LOWER(name) = LOWER($1) and topic_group_id = $2`,
+      [topicName, topicGroupId]
     );
     if (!tReq.rows.length) throw `Failed: topic {${topicName}} does not exist`;
 
-    const topicGroupId = tgReq.rows[0].id;
+    
     const topicId = tReq.rows[0].id;
 
     let resp = await pool.query(
@@ -943,14 +946,14 @@ async function putTopic(request, response) {
     );
     if (!tgReq.rows.length)
       throw `Failed: topic group {${topicGroupName}} does not exist`;
-
+    const topicGroupId = tgReq.rows[0].id;
     let tReq = await pool.query(
-      `SELECT id FROM topics WHERE LOWER(name) = LOWER($1)`,
-      [topicName]
+      `SELECT id FROM topics WHERE LOWER(name) = LOWER($1) AND topic_group_id = $2`,
+      [topicName, topicGroupId]
     );
     if (!tReq.rows.length) throw `Failed: topic {${topicName}} does not exist`;
 
-    const topicGroupId = tgReq.rows[0].id;
+    
     const topicId = tReq.rows[0].id;
     const fileTypeList = request.body.uploadedFileTypes.split(",");
 
@@ -1069,6 +1072,20 @@ async function postTopic(request, response) {
     if (idResp.rows.length == 0) throw "Could not find topic group";
     const topicGroupId = idResp.rows[0].id;
     const fileTypeList = request.body.uploadedFileTypes.split(",");
+    const cloneTopic = request.body.cloneTopic;
+    console.log('cloneTopic', cloneTopic);
+
+    if (cloneTopic) {
+      const cloneTopicGroupId = request.body.cloneTopicGroupId;
+      let tReq = await pool.query(
+        `SELECT id FROM topics WHERE LOWER(name) = LOWER($1) AND topic_group_id = $2`,
+        [topicName, cloneTopicGroupId]
+      );
+      console.log('tReq', tReq);
+
+      var topicCloneId = tReq.rows[0].id;
+
+    }
 
     let resp = await pool.query(
       "INSERT INTO topics(id, topic_group_id, name) values(default, $1, $2) RETURNING id",
@@ -1096,6 +1113,22 @@ async function postTopic(request, response) {
       fs.mkdirSync(
         `../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`
       );
+    }
+
+    if (cloneTopic) {
+
+      let fileResp = await pool.query(
+        "SELECT id, name, file, type FROM topic_files WHERE topic_id = $1",
+        [topicCloneId]
+      );
+      console.log('fileResp');
+      for (let fileRow of fileResp.rows) {
+        await pool.query(
+          "INSERT INTO topic_files (id, name, file, type, topic_id) VALUES (default, $1, $2, $3, $4)",
+          [fileRow.name, fileRow.file, fileRow.type, topicCloneId]
+        );
+      }
+
     }
 
     if (request.files != null) {

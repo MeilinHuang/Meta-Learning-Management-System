@@ -95,7 +95,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
       }
     });
     
-    // window.location.reload();
+    window.location.reload();
   };
 
   const deleteTag = async (tagToDelete) => {
@@ -197,7 +197,7 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
     const formData = new FormData();
     formData.append('name', data.title);
     formData.append('fileDeleteList', name);
-    formData.append('uploadedFileTypes', '');
+    formData.append('uploadedFileTypes', 'pdf');
     
     await fetch(update_topic(topicGroupName, data.title), {
       method: 'PUT',
@@ -300,7 +300,8 @@ export default function TopicTreeViewResource({data, isOpen, onClose, prereqs, t
                     return (
                       <Tr key={prereq.name}>
                         <Td>{prereq.name}</Td>
-                        <Td><Button colorScheme="red" onClick={() => {deletePrerequisite(prereq)}}>Delete</Button></Td>
+                        {isStaff ? 
+                        <Td><Button colorScheme="red" onClick={() => {deletePrerequisite(prereq)}}>Delete</Button></Td> : <></>}
                       </Tr>
                     );
                   })}
