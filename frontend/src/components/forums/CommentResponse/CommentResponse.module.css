@@ -21,6 +21,14 @@
     border-radius: 8px;
 }
 
+.description a {
+    color: #0e5ea8;
+}
+
+.description a:hover {
+    text-decoration: underline;
+}
+
 .description pre {
     background-color: #eee;
     padding: 4px 8px;
