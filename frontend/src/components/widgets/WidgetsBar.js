@@ -24,57 +24,99 @@ function WidgetsBar({ page, user }) {
   const [progress, setProgress] = useState("0%");
   const [reminders, setReminders] = useState([]);
 
-  useEffect(() => {
-    if (user) {
-      if (page === "course") {
-        let course_name = decodeURI(
-          document.location.pathname.split("/").filter((e) => e !== "")[1]
-        );
-
-        user.enrolled_courses.map((course) => {
-          if (course.name === course_name) {
-            fetch(backend_url + "topicgroup/" + course.name, {
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            })
-              .then((e) => e.json())
-              .then((e) => {
-                Promise.all(
-                  e.topics_list.map((topic) => {
-                    return fetch(
-                      backend_url +
-                        "user/" +
-                        localStorage.getItem("id") +
-                        "/progress/" +
-                        topic.id
-                    );
-                  })
-                )
-                  .then((resp) => Promise.all(resp.map((r) => r.json())))
-                  .then((data_list) => {
+    useEffect(() => {
+        if (user) {
+            if (page === "course") {
+                let course_name = decodeURI(
+                    document.location.pathname.split("/").filter((e) => e !== "")[1]
+                );
+        
+                user.enrolled_courses.map((course) => {
+                    
+                    if (course.name === course_name) {
+                        fetch(backend_url + "topicgroup/" + course.name, {
+                            headers: {
+                                Accept: "application/json",
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                            },
+                        })
+                        .then((e) => e.json())
+                        .then(e => {
+                            let total = 0
+                            
+                            e.topics_list.map(cpy => {
+                                let uniq_list = []
+                                cpy.course_materials.map(mat => {
+                                    const mat_str = JSON.stringify(mat)
+                                    if (uniq_list.indexOf(mat_str) === -1) {
+                                        uniq_list.push(mat_str)
+                                        total++
+                                    }
+                                })
+                            })
+                            
+                            Promise.all(e.topics_list.map(topic => {
+                                return fetch(backend_url + "user/" + localStorage.getItem("id") + "/progress/" + topic.id)
+                            }))
+                            .then(resp => Promise.all(resp.map(r => r.json())))
+                            .then (data_list => {
+                                let complete = 0
+                                data_list.map(data => {
+                                    data.map(file => {
+                                        if (file.completed) {
+                                            complete++
+                                        }
+                                    })
+                                })
+                                let progress = 0
+                                if (total > 0) {
+                                    progress = (complete/total) * 100
+                                }
+                                setProgress(parseInt(progress) + "%")
+                            })
+                        })
+                        .catch(error => console.log(error))
+                    }
+                })
+            user.enrolled_courses.map((course) => {
+            if (course.name === course_name) {
+                fetch(backend_url + "topicgroup/" + course.name, {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                })
+                .then((e) => e.json())
+                .then((e) => {
                     let total = 0;
                     let complete = 0;
-                    data_list.map((data) => {
-                      data.map((file) => {
-                        total++;
-                        if (file.completed) {
-                          complete++;
+                    Promise.all(
+                        e.topics_list.map((topic) => {
+                            total += topic.course_materials.length
+                            return fetch(backend_url + "user/" + localStorage.getItem("id") + "/progress/" + topic.id);
+                        })
+                    )
+                    .then((resp) => Promise.all(resp.map((r) => r.json())))
+                    .then((data_list) => {
+                        data_list.map((data) => {
+                            data.map((file) => {
+                                if (file.completed) {
+                                    complete++;
+                                }
+                            });
+                        });
+                        let progress = 0;
+                        if (total > 0) {
+                            progress = (complete / total) * 100;
                         }
-                      });
+                        setProgress(parseInt(progress) + "%");
                     });
-                    let progress = 0;
-                    if (total > 0) {
-                      progress = (complete / total) * 100;
-                    }
-                    setProgress(parseInt(progress) + "%");
-                  });
-              })
-              .catch((error) => console.log(error));
-          }
-        });
+                })
+                .catch((error) => console.log(error));
+            }
+            });
       }
 
       fetch(backend_url + "user/" + localStorage.getItem("id") + "/calendar", {

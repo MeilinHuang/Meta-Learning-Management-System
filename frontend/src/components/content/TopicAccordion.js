@@ -36,7 +36,7 @@ function TopicAccordion({ topic, course }) {
         <AccordionItem id={"topic-" + topic.name}>
             <Flex width="100%">
                 <AccordionButton onClick={e => {
-                    fetch(backend_url + "user/" + localStorage.getItem("id"), {
+                    fetch(backend_url + "user/" + localStorage.getItem("id") + "/lastAccessed", {
                         method: "PUT",
                         headers: {
                             Accept: "application/json",
@@ -48,6 +48,7 @@ function TopicAccordion({ topic, course }) {
                         })
                     })
                     .then(resp => resp.json())
+                    .then(data => console.log(data))
                 }}>
                     <Flex flexGrow={1} textAlign="left">
                         <Checkbox
@@ -67,20 +68,23 @@ function TopicAccordion({ topic, course }) {
                 <Accordion width="100%" allowMultiple>
                     <Flex paddingBlock={3}>
                         {topic.prereqs.length > 0 ? (
-                            <Flex>
-                                <Text>Prerequisites: </Text>
-                                {topic.prereqs.map((prereq, index) => {
-                                    return (
-                                        <Button
-                                            key={topic.name + "-prereq-" + prereq.name + " " + index}
-                                            marginLeft={"1vw"}
-                                            height={7}
-                                            id={"prereq-" + prereq.name}
-                                        >
-                                            {prereq.name}
-                                        </Button>
-                                    );
-                                })}
+                            <Flex flexDirection={["column", "column", "column", "column", "row"]}>
+                                <Text marginTop={2}>Prerequisites: </Text>
+                                <div>
+                                    {topic.prereqs.map((prereq, index) => {
+                                        return (
+                                            <Button
+                                                key={topic.name + "-prereq-" + prereq.name + " " + index}
+                                                marginLeft={"1vw"}
+                                                marginTop={1}
+                                                height={7}
+                                                id={"prereq-" + prereq.name}
+                                            >
+                                                {prereq.name}
+                                            </Button>
+                                        );
+                                    })}
+                                </div>
                             </Flex>
                         ) : (
                             <Text>No prerequisites</Text>

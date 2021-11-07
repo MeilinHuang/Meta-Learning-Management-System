@@ -8,6 +8,7 @@ import ForumOverviewPage from "../pages/ForumOverviewPage.js";
 import ForumPostPage from "../pages/ForumPostPage";
 import CourseAnnouncementPage from "../pages/CourseAnnouncementPage";
 import LecturesPage from "./LecturesPage.js";
+import TutorialsPage from "./TutorialsPage.js";
 
 import { Switch, Route } from "react-router-dom";
 import { backend_url } from "../Constants.js";
@@ -34,7 +35,10 @@ function CoursePage() {
     {
       name: "Lectures",
       url: "/lectures",
-    },
+    },{
+      name: "Tutorials",
+      url: "/tutorials",
+    }
   ];
   if (isStaff()) {
     links.push({
@@ -127,6 +131,11 @@ function CoursePage() {
         >
           <Switch>
             {/* Add your page as a Route here */}
+            <Route
+              exact
+              path="/course-page/:code/tutorials"
+              component={TutorialsPage}
+            />
             <Route
               exact
               path="/course-page/:code/lectures"

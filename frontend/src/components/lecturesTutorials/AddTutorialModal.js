@@ -14,20 +14,20 @@ import {
   useToast,
 } from "@chakra-ui/react";
 
-function AddPostModal({
+function AddTutorialModal({
   isOpen,
   onClose,
-  onSubmit,
-  code
+  onSubmit
 }) {
   const [week, setWeek] = useState();
+  const [attachments, setAttachments] = useState([]);
   const toast = useToast();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     e.target.reset();
 
-    if (!week) {
+    if (!week || attachments.length === 0) {
       toast({
         title: "Required fields missing",
         status: "error",
@@ -37,22 +37,27 @@ function AddPostModal({
       return;
     }
 
-    // const timeZoneOffset = new Date().getTimezoneOffset() * 60000;
-    // const date = new Date(Date.now() - timeZoneOffset).toISOString();
+    const formArr = [];
 
-    fetch(`http://localhost:8000/${code}/lecture/${week}`, {
-      method: "DELETE",
-      headers: {
-        Accept: "*/*",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }).then(r => r.json())
-    .then(data => {
-      onSubmit();
-    })
+    const formData = new FormData();
+    formData.append("week", week);
+
+    const fileFormData = new FormData();
+    fileFormData.append("uploadFile", attachments);
+
+    formArr.push(formData);
+    formArr.push(fileFormData);
+
+    onSubmit(formArr);
+    setAttachments([]);
 
     onClose();
   };
+
+  // handle upload
+  const handleUpload = e => {
+    setAttachments(e.target.files[0])
+  }
 
   return (
     <>
@@ -67,30 +72,36 @@ function AddPostModal({
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            Delete Lecture
+            Create new tutorial week
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <form
-              id="createLecture"
+              id="createTutorial"
               onSubmit={handleSubmit}
               enctype="multipart/form-data"
             >
               <Flex flexDirection="column" mb="16px">
-                <Heading size="sm" mb="4px">
+                <Heading size="sm" mb="4px" paddingBottom="1%">
                   Week:
                 </Heading>
                 <Input
-                  name="lectureWeek"
+                  name="tutorialWeek"
                   onChange={(e) => setWeek(e.target.value)}
                   autoFocus
                 />
               </Flex>
+              <Flex flexDirection="column" mb="16px" marginBottom="-2%">
+                <Heading size="sm" mb="4px" paddingBottom="1%">
+                  Attachments:
+                </Heading>
+                <input type="file" name="tutorialFiles" onChange={handleUpload} />
+              </Flex>
             </form>
           </ModalBody>
           <ModalFooter display="flex" justifyContent="center">
-            <Button type="submit" form="createLecture">
-              Delete
+            <Button type="submit" form="createTutorial">
+              Create
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -99,4 +110,4 @@ function AddPostModal({
   );
 }
 
-export default AddPostModal;
+export default AddTutorialModal;

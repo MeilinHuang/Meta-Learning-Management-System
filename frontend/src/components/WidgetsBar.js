@@ -51,7 +51,7 @@ function WidgetsBar({ page, user }) {
             <MenuButton _hover={{ textDecoration: "underline" }}>
               {user ? (
                 <Flex alignItems="center">
-                  <Avatar name={user.user_name} />
+                  <Avatar src={user.img_url} name={user.user_name} />
                   <Box paddingLeft={3}>
                     <Text fontWeight="medium">{user.user_name}</Text>
                   </Box>

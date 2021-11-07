@@ -137,9 +137,16 @@ function Announcement({
   const handleDelete = (onClose) => {
     fetch(`${backend_url}${course}/announcement/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     }).then((r) => {
       if (r.status === 200) {
-        fetch(`${backend_url}${course}/announcement`)
+        fetch(`${backend_url}${course}/announcement`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        })
           .then((r) => r.json())
           .then((data) => {
             const promises = [];

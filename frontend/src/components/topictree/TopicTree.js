@@ -58,7 +58,7 @@ export default function TopicTree() {
             "links": []
         };
         let tempTopicGroups = [];
-        let validTopicGroups = ["C++ Programming", "Programming Fundamentals", "Object-Oriented Design & Programming"]; // Only for demo purposes
+        let validTopicGroups = ["C++ Programming", "Programming Fundamentals", "Object-Oriented Design & Programming", "TESTTOPIC"]; // Only for demo purposes
         for (let topicGroup of jsonData) {
             if (topicGroup === null) {
                 continue;
@@ -324,8 +324,8 @@ export default function TopicTree() {
             .selectAll("g")
             .data(tempNodes)
             .enter().append("g")
-            .on("click", function() {
-
+            .on("click", function(groupData) {
+                console.log('groupData', groupData);
                 let topicName = d3.select(this).text();
                 if (seenGroups.hasOwnProperty(topicName)) {
                     expand[topicName] = true;
@@ -338,7 +338,7 @@ export default function TopicTree() {
 
                     let nodeData = tempNodes.filter(function (dataValue) {
 
-                        return dataValue.title === topicName;
+                        return dataValue.title === topicName && dataValue.id == groupData.id;
                     });
 
 

@@ -14,12 +14,10 @@ import {
   useToast,
 } from "@chakra-ui/react";
 
-function AddPostModal({
+function AddLectureModal({
   isOpen,
   onClose,
-  isLectures,
-  onSubmit,
-  code
+  onSubmit
 }) {
   const [week, setWeek] = useState();
   const [attachments, setAttachments] = useState([]);
@@ -39,16 +37,11 @@ function AddPostModal({
       return;
     }
 
-    // const timeZoneOffset = new Date().getTimezoneOffset() * 60000;
-    // const date = new Date(Date.now() - timeZoneOffset).toISOString();
-
     const formArr = [];
 
     const formData = new FormData();
     formData.append("lecturerId", localStorage.getItem("id"));
     formData.append("week", week);
-    // formData.append("startTime", date);
-    // formData.append("endTime", date);
 
     const fileFormData = new FormData();
     fileFormData.append("uploadFile", attachments);
@@ -118,4 +111,4 @@ function AddPostModal({
   );
 }
 
-export default AddPostModal;
+export default AddLectureModal;

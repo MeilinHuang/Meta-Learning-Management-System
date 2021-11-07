@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 import {
   Flex,
@@ -37,7 +37,7 @@ async function doLogin(email, password) {
     return { error: "Password is blank" };
   }
 
-  const lowerEmail = email.toLowerCase()
+  const lowerEmail = email.toLowerCase();
 
   const data = {
     email: lowerEmail,
@@ -88,7 +88,7 @@ async function doRegister(name, email, zId, password, confirm) {
     return { error: "Invalid zID" };
   }
 
-  const lowerEmail = email.toLowerCase()
+  const lowerEmail = email.toLowerCase();
 
   const data = {
     name: name,
@@ -113,6 +113,10 @@ async function doRegister(name, email, zId, password, confirm) {
   return ret;
 }
 
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -124,6 +128,7 @@ export default function LoginForm() {
   const [login, setLogin] = useState(true);
 
   const history = useHistory();
+  const query = useQuery();
 
   return (
     <Flex width="Full" align="center" justifyContent="center" pt={16}>
@@ -213,7 +218,6 @@ export default function LoginForm() {
                 setIsLoading(true);
                 if (login) {
                   doLogin(email, password).then((r) => {
-                    
                     setIsLoading(false);
                     if (r.hasOwnProperty("error")) {
                       setError(r.error);
@@ -223,12 +227,16 @@ export default function LoginForm() {
                         ? localStorage.setItem("staff", 1)
                         : localStorage.setItem("staff", 0);
                       localStorage.setItem("id", r.id);
-                      history.push("/");
+                      if (String(query).length === 0) {
+                        history.push("/");
+                      } else {
+                        const redirect = decodeURIComponent(String(query))
+                        history.push(`/invite/${redirect.split("/")[1].split("=")[0]}`)
+                      }
                     }
                   });
                 } else {
                   doRegister(name, email, zId, password, confirm).then((r) => {
-                    
                     setIsLoading(false);
                     if (r.hasOwnProperty("error")) {
                       setError(r.error);
@@ -238,7 +246,12 @@ export default function LoginForm() {
                         ? localStorage.setItem("staff", 1)
                         : localStorage.setItem("staff", 0);
                       localStorage.setItem("id", r.id);
-                      history.push("/");
+                      if (String(query).length === 0) {
+                        history.push("/");
+                      } else {
+                        const redirect = decodeURIComponent(String(query))
+                        history.push(`/invite/${redirect.split("/")[1].split("=")[0]}`)
+                      }
                     }
                   });
                 }

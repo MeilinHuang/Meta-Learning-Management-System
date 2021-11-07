@@ -1,7 +1,8 @@
-const pool = require('../db/database');
-var fs = require('fs');
+const pool = require("../db/database");
+var fs = require("fs");
 
 const errorCheck = require("./error.js");
+const auth = require("./authentication.js");
 
 /***************************************************************
                        User Functions
@@ -18,7 +19,8 @@ async function getUser(request, response) {
       AS enrolled_courses FROM user_enrolled us 
       LEFT JOIN topic_group t ON t.id = us.topic_group_id 
       GROUP BY us.user_id) t USING (id) WHERE id = $1`,
-      [id]);
+      [id]
+    );
     var enrolledCourses = [];
 
     if (resp.rows[0].enrolled_courses) {
@@ -28,61 +30,140 @@ async function getUser(request, response) {
           FROM topic_group tg
           LEFT JOIN user_enrolled ue 
           ON tg.id = ue.topic_group_id AND ue.user_id = $1
-          WHERE tg.id = $2`, [id, topic_id]);
+          WHERE tg.id = $2`,
+          [id, topic_id]
+        );
         enrolledCourses.push(tmp.rows[0]);
-      };
+      }
       resp.rows[0].enrolled_courses = enrolledCourses;
     }
-    
+
     response.status(200).json(resp.rows[0]);
   } catch (e) {
     response.status(400).send(e);
   }
 }
 
-// Delete user from database
-async function deleteUser (request, response) {
+async function updateUser(request, response) {
   try {
-    const id = parseInt(request.params.userId)
-    await pool.query('DELETE FROM users WHERE id = $1 CASCADE', [id]);
-    response.status(200).json({success: true, deletedUserId: `${id}`})
+    const id = request.params.userId;
+    const email = request.body.email;
+    const password = request.body.password;
+    const newPassword = request.body.newPassword;
+    const imgUrl = request.body.imgUrl;
+    console.log("here0");
+
+    //Validate Token
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+    console.log("here1");
+
+    let resp = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
+    // if user not found
+    if (resp.rows.length === 0) {
+      response.status(400).send({ error: "Invalid User" });
+      throw "Invalid User";
+    }
+
+    console.log("here2");
+    const user = resp.rows[0];
+    // check current password
+    if (password !== user.password) {
+      response.status(400).send({ error: "Incorrect password" });
+      throw "Incorrect password";
+    }
+
+    // update everything
+    if (email) {
+      console.log("here3");
+      // check if email already exists
+      resp = await pool.query(`SELECT id FROM users WHERE email = $1`, [email]);
+      if (resp.rows.length > 0) {
+        response
+          .status(400)
+          .send({ error: "This email has already been taken" });
+        throw "This email has already been taken";
+      }
+
+      resp = await pool.query(`UPDATE users SET email = $1 WHERE id = $2`, [
+        email,
+        id,
+      ]);
+    }
+
+    if (newPassword) {
+      console.log("here4");
+      resp = await pool.query(`UPDATE users SET password = $1 WHERE id = $2`, [
+        newPassword,
+        id,
+      ]);
+    }
+
+    if (imgUrl) {
+      console.log("here5");
+      resp = await pool.query(`UPDATE users SET img_url = $1 WHERE id = $2`, [
+        imgUrl,
+        id,
+      ]);
+    }
+    console.log("here6");
+
+    response.status(200).json({ success: true });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+// Delete user from database
+async function deleteUser(request, response) {
+  try {
+    const id = parseInt(request.params.userId);
+    await pool.query("DELETE FROM users WHERE id = $1 CASCADE", [id]);
+    response.status(200).json({ success: true, deletedUserId: `${id}` });
   } catch (e) {
     response.status(400).send(e);
   }
 }
 
 // Create admin
-async function postAdmin (request, response) {
+async function postAdmin(request, response) {
   try {
     const id = parseInt(request.params.userId);
     const topicGroupId = parseInt(request.params.topicGroupId);
 
     await pool.query(
-    'INSERT INTO user_admin(admin_id, topic_group_id) VALUES($1, $2)',
-    [id, topicGroupId]);
+      "INSERT INTO user_admin(admin_id, topic_group_id) VALUES($1, $2)",
+      [id, topicGroupId]
+    );
 
-    response.status(200).json({success: true, admin: id});
+    response.status(200).json({ success: true, admin: id });
   } catch (e) {
     response.status(400).send(e);
   }
 }
 
 // Delete admin
-async function deleteAdmin (request, response) {
+async function deleteAdmin(request, response) {
   try {
-    const id = parseInt(request.params.userId)
+    const id = parseInt(request.params.userId);
 
-    await pool.query('DELETE FROM user_admin WHERE admin_id = $1 CASCADE', 
-    [id]);
+    await pool.query("DELETE FROM user_admin WHERE admin_id = $1 CASCADE", [
+      id,
+    ]);
 
-    response.status(200).json({success: true, deleted: id});
+    response.status(200).json({ success: true, deleted: id });
   } catch (e) {
     response.status(400).send(e);
   }
 }
 
 // Update progress for enrolled course
-async function putUserProgress (request, response) {
+async function putUserProgress(request, response) {
   try {
     const newProgress = request.body.progressVal;
     const userId = request.params.userId;
@@ -90,58 +171,78 @@ async function putUserProgress (request, response) {
 
     const userExist = await pool.query(
       `SELECT EXISTS(SELECT * FROM users 
-      WHERE id = $1)`, [userId]);
+      WHERE id = $1)`,
+      [userId]
+    );
 
     const topicGroupExist = await pool.query(
       `SELECT EXISTS(SELECT * FROM topic_group 
-      WHERE LOWER(name) LIKE LOWER($1))`, [topicGroupName]);
-    
-    if (newProgress < 0 || newProgress > 100) throw (`Failed: Progress cannot be larger than '100' or less than '0'`);
-    if (userExist.rows[0].exists == false) throw (`Failed: User with id '${userId}' does not exist`);
-    if (topicGroupExist.rows[0].exists == false) throw (`Failed: Topic Group '${topicGroupName}' does not exist`);
+      WHERE LOWER(name) LIKE LOWER($1))`,
+      [topicGroupName]
+    );
 
-    const tgReq = await pool.query (
+    if (newProgress < 0 || newProgress > 100)
+      throw `Failed: Progress cannot be larger than '100' or less than '0'`;
+    if (userExist.rows[0].exists == false)
+      throw `Failed: User with id '${userId}' does not exist`;
+    if (topicGroupExist.rows[0].exists == false)
+      throw `Failed: Topic Group '${topicGroupName}' does not exist`;
+
+    const tgReq = await pool.query(
       `SELECT id FROM topic_group 
-      WHERE LOWER(name) LIKE LOWER($1)`, [topicGroupName]);
+      WHERE LOWER(name) LIKE LOWER($1)`,
+      [topicGroupName]
+    );
 
     const topicGroupId = tgReq.rows[0].id;
 
     await pool.query(
       `UPDATE user_enrolled SET progress = $1
-       WHERE user_id = $2 AND topic_group_id = $3`, [newProgress, userId, topicGroupId]);
+       WHERE user_id = $2 AND topic_group_id = $3`,
+      [newProgress, userId, topicGroupId]
+    );
 
-    response.status(200).json({success: true, userId: userId});
+    response.status(200).json({ success: true, userId: userId });
   } catch (e) {
     response.status(400).send(e);
   }
 }
 
 // Post Calendar for user
-async function postCalendar (request, response) {
+async function postCalendar(request, response) {
   try {
     const newDate = request.body.remind_date;
     const description = request.body.description;
     const userId = request.params.userId;
 
     const userExist = await pool.query(
-    `SELECT EXISTS(SELECT * FROM users 
-    WHERE id = $1)`, [userId]);
-    
-    if (userExist.rows[0].exists == false) throw (`Failed: User with id '${userId}' does not exist`);
-    let newReminderId = await pool.query(`INSERT INTO calendar_reminders(id, remind_date, description)
-    VALUES(default, $1, $2) RETURNING id`, [newDate, description]);
+      `SELECT EXISTS(SELECT * FROM users 
+    WHERE id = $1)`,
+      [userId]
+    );
 
-    await pool.query(`INSERT INTO user_calendar_reminders(reminder_id, user_id)
-    VALUES($1, $2)`, [newReminderId.rows[0].id, userId]);
+    if (userExist.rows[0].exists == false)
+      throw `Failed: User with id '${userId}' does not exist`;
+    let newReminderId = await pool.query(
+      `INSERT INTO calendar_reminders(id, remind_date, description)
+    VALUES(default, $1, $2) RETURNING id`,
+      [newDate, description]
+    );
 
-    response.status(200).json({success: true});
+    await pool.query(
+      `INSERT INTO user_calendar_reminders(reminder_id, user_id)
+    VALUES($1, $2)`,
+      [newReminderId.rows[0].id, userId]
+    );
+
+    response.status(200).json({ success: true });
   } catch (e) {
     response.status(400).send(e);
   }
 }
 
 // Put Calendar for user
-async function putCalendarById (request, response) {
+async function putCalendarById(request, response) {
   try {
     const newDate = request.body.remind_date;
     const description = request.body.description;
@@ -149,55 +250,69 @@ async function putCalendarById (request, response) {
 
     const calendarExist = await pool.query(
       `SELECT EXISTS(SELECT * FROM calendar_reminders 
-      WHERE id = $1)`, [calendarId]);
+      WHERE id = $1)`,
+      [calendarId]
+    );
 
-    if (calendarExist.rows[0].exists == false) throw (`Failed: Calendar with id '${calendarId}' does not exist`);
+    if (calendarExist.rows[0].exists == false)
+      throw `Failed: Calendar with id '${calendarId}' does not exist`;
 
-    await pool.query(`UPDATE calendar_reminders 
+    await pool.query(
+      `UPDATE calendar_reminders 
     SET remind_date = $1, description = $2
-    WHERE id = $3`, [newDate, description, calendarId]);
+    WHERE id = $3`,
+      [newDate, description, calendarId]
+    );
 
-    response.status(200).json({success: true});
+    response.status(200).json({ success: true });
   } catch (e) {
     response.status(400).send(e);
-  }  
+  }
 }
 
 // Delete Calendar by id
-async function deleteCalendarById (request, response) {
-  console.log("test")
+async function deleteCalendarById(request, response) {
+  console.log("test");
   try {
-  const calendarId = request.params.calendarId;
+    const calendarId = request.params.calendarId;
     const calendarExist = await pool.query(
       `SELECT EXISTS(SELECT * FROM calendar_reminders 
-      WHERE id = $1)`, [calendarId]);
+      WHERE id = $1)`,
+      [calendarId]
+    );
 
-    if (calendarExist.rows[0].exists == false) throw (`Failed: Calendar with id '${calendarId}' does not exist`);
-    await pool.query(`DELETE FROM calendar_reminders WHERE id = $1`, [calendarId]);
+    if (calendarExist.rows[0].exists == false)
+      throw `Failed: Calendar with id '${calendarId}' does not exist`;
+    await pool.query(`DELETE FROM calendar_reminders WHERE id = $1`, [
+      calendarId,
+    ]);
 
-    response.status(200).json({success: true});
-    
+    response.status(200).json({ success: true });
   } catch (e) {
     response.status(400).send(e);
   }
 }
 
 // Get Calendar for user
-async function getUserCalendar (request, response) {
+async function getUserCalendar(request, response) {
   try {
     const userId = request.params.userId;
     const userExist = await pool.query(
       `SELECT EXISTS(SELECT * FROM users 
-      WHERE id = $1)`, [userId]);
+      WHERE id = $1)`,
+      [userId]
+    );
 
-    if (userExist.rows[0].exists == false) throw (`Failed: User with id '${userId}' does not exist`);
+    if (userExist.rows[0].exists == false)
+      throw `Failed: User with id '${userId}' does not exist`;
 
     let resp = await pool.query(
       `SELECT c.id, c.remind_date, c.description
       FROM calendar_reminders c
       INNER JOIN user_calendar_reminders uc
-      ON c.id = uc.reminder_id AND uc.user_id = $1`, 
-      [userId]);
+      ON c.id = uc.reminder_id AND uc.user_id = $1`,
+      [userId]
+    );
 
     response.status(200).json(resp.rows);
   } catch (e) {
@@ -206,17 +321,21 @@ async function getUserCalendar (request, response) {
 }
 
 // Get Calendar by id
-async function getCalendarById (request, response) {
+async function getCalendarById(request, response) {
   try {
     const calendarId = request.params.calendarId;
     const calendarExist = await pool.query(
       `SELECT EXISTS(SELECT * FROM calendar_reminders 
-      WHERE id = $1)`, [calendarId]);
+      WHERE id = $1)`,
+      [calendarId]
+    );
 
-    if (calendarExist.rows[0].exists == false) throw (`Failed: Calendar with id '${calendarId}' does not exist`);
+    if (calendarExist.rows[0].exists == false)
+      throw `Failed: Calendar with id '${calendarId}' does not exist`;
     let resp = await pool.query(
-      `SELECT * FROM calendar_reminders WHERE id = $1`, 
-      [calendarId]);
+      `SELECT * FROM calendar_reminders WHERE id = $1`,
+      [calendarId]
+    );
 
     response.status(200).json(resp.rows[0]);
   } catch (e) {
@@ -225,46 +344,61 @@ async function getCalendarById (request, response) {
 }
 
 // Update last accessed topic for a user
-async function putAccessedTopic (request, response) {
+async function putAccessedTopic(request, response) {
   try {
     const userId = request.params.userId;
     const lastTopic = request.body.lastTopic;
 
     const userExist = await pool.query(
       `SELECT EXISTS(SELECT * FROM users 
-      WHERE id = $1)`, [userId]);
+      WHERE id = $1)`,
+      [userId]
+    );
 
-    if (userExist.rows[0].exists == false) throw (`Failed: User with id '${userId}' does not exist`);
-    await pool.query(`UPDATE users SET last_accessed_topic = $1 WHERE id = $2`, [lastTopic, userId]);
+    if (userExist.rows[0].exists == false)
+      throw `Failed: User with id '${userId}' does not exist`;
+    await pool.query(
+      `UPDATE users SET last_accessed_topic = $1 WHERE id = $2`,
+      [lastTopic, userId]
+    );
 
-    response.status(200).json({success: true, userId: userId, lastAccessedTopic: lastTopic})
+    response
+      .status(200)
+      .json({ success: true, userId: userId, lastAccessedTopic: lastTopic });
   } catch (e) {
     response.status(400).send(e);
   }
 }
 
 // Get user content progress by id
-async function getUserContentProgress (request, response) {
+async function getUserContentProgress(request, response) {
   try {
     const topicId = request.params.topicId;
     const userId = request.params.userId;
 
     const userExist = await pool.query(
       `SELECT EXISTS(SELECT * FROM users 
-      WHERE id = $1)`, [userId]);
+      WHERE id = $1)`,
+      [userId]
+    );
 
     const topicExist = await pool.query(
       `SELECT EXISTS(SELECT * FROM topics 
-      WHERE id = $1)`, [topicId]);
+      WHERE id = $1)`,
+      [topicId]
+    );
 
-    if (userExist.rows[0].exists == false) throw (`Failed: User with id '${userId}' does not exist`);
-    if (topicExist.rows[0].exists == false) throw (`Failed: Topic with id '${topicId}' does not exist`);
+    if (userExist.rows[0].exists == false)
+      throw `Failed: User with id '${userId}' does not exist`;
+    if (topicExist.rows[0].exists == false)
+      throw `Failed: Topic with id '${topicId}' does not exist`;
 
     let resp = await pool.query(
       `SELECT * FROM user_content_progress 
-      WHERE user_id = $1 AND topic_id = $2`
-      , [userId, topicId]);
-    
+      WHERE user_id = $1 AND topic_id = $2`,
+      [userId, topicId]
+    );
+
     response.status(200).json(resp.rows);
   } catch (e) {
     response.status(400).send(e);
@@ -273,40 +407,56 @@ async function getUserContentProgress (request, response) {
 
 // Update completion status of user content progress
 async function putUserContentProgress (request, response) {
-  try {
-    const topicId = request.params.topicId;
-    const userId = request.params.userId;
-    const topicFileId = request.body.topicFileId;
-    const completion = request.body.completion;
+    try {
+        const topicId = request.params.topicId;
+        const userId = request.params.userId;
+        const topicFileId = request.body.topicFileId;
+        const completion = request.body.completion;
 
-    const userExist = await pool.query(
-      `SELECT EXISTS(SELECT * FROM users 
-      WHERE id = $1)`, [userId]);
+        const userExist = await pool.query(
+            `SELECT EXISTS(SELECT * FROM users 
+            WHERE id = $1)`, [userId]);
 
-    const topicExist = await pool.query(
-      `SELECT EXISTS(SELECT * FROM topics 
-      WHERE id = $1)`, [topicId]);
+        const topicExist = await pool.query(
+            `SELECT EXISTS(SELECT * FROM topics 
+            WHERE id = $1)`, [topicId]);
 
-    const topicFileExist = await pool.query(
-      `SELECT EXISTS(SELECT * FROM topic_files 
-      WHERE id = $1)`, [topicFileId]);
+        const topicFileExist = await pool.query(
+            `SELECT EXISTS(SELECT * FROM topic_files 
+            WHERE id = $1)`, [topicFileId]);
+        
+      
+        if (userExist.rows[0].exists == false) throw new Error(`User with id '${userId}' does not exist`);
+        if (topicExist.rows[0].exists == false) throw new Error(`Topic with id '${topicId}' does not exist`);
+        if (topicFileExist.rows[0].exists == false) throw new Error(`Topic File with id '${topicFileId}' does not exist`);
+    
+        const progressExists = await pool.query(
+            `SELECT EXISTS(SELECT * FROM user_content_progress 
+            WHERE user_id = $1 AND topic_file_id = $2 AND topic_id = $3)`, 
+            [userId, topicFileId, topicId])
+            
+            
+        if (progressExists.rows[0].exists) {
+            await pool.query(`UPDATE user_content_progress SET completed = $1 
+                WHERE user_id = $2 AND topic_file_id = $3 AND topic_id = $4`, 
+                [completion, userId, topicFileId, topicId]);
+        }
+        else {
+            await pool.query(
+                `INSERT INTO user_content_progress(user_id, topic_file_id, topic_id, completed) VALUES($1, $2, $3, $4)`,
+                [userId, topicFileId, topicId, completion])
+        }
+    
 
-    if (userExist.rows[0].exists == false) throw new Error(`User with id '${userId}' does not exist`);
-    if (topicExist.rows[0].exists == false) throw new Error(`Topic with id '${topicId}' does not exist`);
-    if (topicFileExist.rows[0].exists == false) throw new Error(`Topic File with id '${topicFileId}' does not exist`);
-
-    await pool.query(`UPDATE user_content_progress SET completed = $1 
-    WHERE user_id = $2 AND topic_file_id = $3 AND topic_id = $4`, 
-    [completion, userId, topicFileId, topicId]);
-
-    response.status(200).json({success: true});
-  } catch (e) {
-    response.status(400).send(e);
-  }
+        response.status(200).json({success: true});
+    } catch (e) {
+        response.status(400).send(e);
+    }
 }
 
 module.exports = {
   getUser,
+  updateUser,
   deleteUser,
   postAdmin,
   deleteAdmin,
@@ -318,5 +468,5 @@ module.exports = {
   getCalendarById,
   putAccessedTopic,
   getUserContentProgress,
-  putUserContentProgress
+  putUserContentProgress,
 };

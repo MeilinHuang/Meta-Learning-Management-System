@@ -233,7 +233,9 @@ async function setSearchable(request, response) {
   const searchable = request.params.searchable;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -431,13 +433,28 @@ async function postTopicGroup(request, response) {
     const topicGroupName = request.params.topicGroupName;
     const topic_code = request.body.topic_code;
     const fileTypeList = request.body.uploadedFileTypes.split(",");
-
+    console.log('topic_code', topic_code);
+    console.log('fileTypeList', fileTypeList);
     let resp = await pool.query(
-      "INSERT INTO topic_group(id, name, topic_code) values(default, $1, $2) RETURNING id",
+      "INSERT INTO topic_group(id, name, topic_code, searchable) values(default, $1, $2, FALSE) RETURNING id",
       [topicGroupName, topic_code]
     );
+    console.log('finished insert');
+
+    // Create recording panel for lectures feature
+    // await pool.query(`
+    // INSERT INTO recording_panels(id, topicgroupid, class) 
+    // VALUES(default, $1, 'lecture') RETURNING id`, [resp.rows[0].id]);
+
+    // await pool.query(`
+    // INSERT INTO recording_panels(id, topicgroupid, class) 
+    // VALUES(default, $1, 'tutorial') RETURNING id`, [resp.rows[0].id]);
 
     if (request.files != null) {
+      if (fileTypeList[0] == 'none') {
+        response.sendStatus(200);
+        return;
+      }
       if (
         !fs.existsSync(`../frontend/public/_files/topicGroup${resp.rows[0].id}`)
       ) {
@@ -471,6 +488,10 @@ async function postTopicGroup(request, response) {
           typeCounter += 1;
         }
       } else {
+        if (fileTypeList[0] == 'none') {
+          response.sendStatus(200);
+          return;
+        }
         if (fileTypeList.length > 1)
           throw "Uploaded file type list longer than uploaded files";
         else if (fileTypeList.length < 0)
@@ -498,7 +519,7 @@ async function postTopicGroup(request, response) {
 
     response.sendStatus(200);
   } catch (e) {
-    console.error(e);
+    console.log('e', e);
     response.status(400).send(e);
   }
 }
@@ -721,6 +742,8 @@ async function deleteTopicGroup(request, response) {
       topicGroupName,
     ]);
 
+    await pool.query(`DELETE FROM recording_panels WHERE topicgroupid = $1`, [checkExist.rows[0].id]);
+
     if (
       fs.existsSync(
         `../frontend/public/_files/topicGroup${checkExist.rows[0].id}`
@@ -761,6 +784,9 @@ async function deleteTopic(request, response) {
     response.status(400).json({ error: "Could not find topic group" });
     return;
   }
+
+  console.log('topicName', topicName);
+  console.log('topicGroup', topicGroupName);
 
   const topicGroupId = idResp.rows[0].id;
   let tmp = await pool.query(
@@ -821,14 +847,14 @@ async function putTopicTag(request, response) {
     );
     if (!tgReq.rows.length)
       throw `Failed: topic group {${topicGroupName}} does not exist`;
-
+    const topicGroupId = tgReq.rows[0].id;
     let tReq = await pool.query(
-      `SELECT id FROM topics WHERE LOWER(name) = LOWER($1)`,
-      [topicName]
+      `SELECT id FROM topics WHERE LOWER(name) = LOWER($1) and topic_group_id = $2`,
+      [topicName, topicGroupId]
     );
     if (!tReq.rows.length) throw `Failed: topic {${topicName}} does not exist`;
 
-    const topicGroupId = tgReq.rows[0].id;
+    
     const topicId = tReq.rows[0].id;
 
     let resp = await pool.query(
@@ -931,14 +957,14 @@ async function putTopic(request, response) {
     );
     if (!tgReq.rows.length)
       throw `Failed: topic group {${topicGroupName}} does not exist`;
-
+    const topicGroupId = tgReq.rows[0].id;
     let tReq = await pool.query(
-      `SELECT id FROM topics WHERE LOWER(name) = LOWER($1)`,
-      [topicName]
+      `SELECT id FROM topics WHERE LOWER(name) = LOWER($1) AND topic_group_id = $2`,
+      [topicName, topicGroupId]
     );
     if (!tReq.rows.length) throw `Failed: topic {${topicName}} does not exist`;
 
-    const topicGroupId = tgReq.rows[0].id;
+    
     const topicId = tReq.rows[0].id;
     const fileTypeList = request.body.uploadedFileTypes.split(",");
 
@@ -1057,6 +1083,20 @@ async function postTopic(request, response) {
     if (idResp.rows.length == 0) throw "Could not find topic group";
     const topicGroupId = idResp.rows[0].id;
     const fileTypeList = request.body.uploadedFileTypes.split(",");
+    const cloneTopic = request.body.cloneTopic;
+    console.log('cloneTopic', cloneTopic);
+
+    if (cloneTopic) {
+      const cloneTopicGroupId = request.body.cloneTopicGroupId;
+      let tReq = await pool.query(
+        `SELECT id FROM topics WHERE LOWER(name) = LOWER($1) AND topic_group_id = $2`,
+        [topicName, cloneTopicGroupId]
+      );
+      console.log('tReq', tReq);
+
+      var topicCloneId = tReq.rows[0].id;
+
+    }
 
     let resp = await pool.query(
       "INSERT INTO topics(id, topic_group_id, name) values(default, $1, $2) RETURNING id",
@@ -1084,6 +1124,22 @@ async function postTopic(request, response) {
       fs.mkdirSync(
         `../frontend/public/_files/topicGroup${topicGroupId}/topic${topicId}`
       );
+    }
+
+    if (cloneTopic) {
+
+      let fileResp = await pool.query(
+        "SELECT id, name, file, type FROM topic_files WHERE topic_id = $1",
+        [topicCloneId]
+      );
+      console.log('fileResp');
+      for (let fileRow of fileResp.rows) {
+        await pool.query(
+          "INSERT INTO topic_files (id, name, file, type, topic_id) VALUES (default, $1, $2, $3, $4)",
+          [fileRow.name, fileRow.file, fileRow.type, topicCloneId]
+        );
+      }
+
     }
 
     if (request.files != null) {
@@ -1285,7 +1341,9 @@ async function enrollUserWithCode(request, response) {
   const userId = request.params.userId;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1365,7 +1423,9 @@ async function getCourseCodes(request, response) {
   const topicGroupName = request.params.topicGroupName;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1427,7 +1487,9 @@ async function getCourseCode(request, response) {
   const courseCode = request.params.inviteCode;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1455,7 +1517,9 @@ async function deleteCourseCode(request, response) {
   const courseCode = request.params.inviteCode;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1480,11 +1544,33 @@ async function deleteCourseCode(request, response) {
   }
 }
 
+async function searchCourses(request, response) {
+  try {
+    const query = request.params.query;
+
+    let resp = await pool.query(
+      `SELECT * FROM topic_group
+      WHERE searchable = true
+      AND (LOWER (name) LIKE LOWER($1)
+      OR LOWER (topic_code) LIKE LOWER($1)
+      OR LOWER (course_outline) LIKE LOWER($1))`,
+      [`%${query}%`]
+    );
+
+    //return the courses
+    response.status(200).send({ results: resp.rows });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 async function getEnrollments(request, response) {
   const topicGroupName = request.params.topicGroupName;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1518,7 +1604,9 @@ async function enrollUser(request, response) {
   const userZId = request.params.zId;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -1567,12 +1655,62 @@ async function enrollUser(request, response) {
   }
 }
 
+async function enrollUserId(request, response) {
+  const topicGroupName = request.params.topicGroupName;
+  const userId = request.params.id;
+  try {
+    //Validate Token
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
+    if (zId == null) {
+      response.status(403).send({ error: "Invalid Token" });
+      throw "Invalid Token";
+    }
+
+    //lookup topic group name to get corresponding id
+    let resp = await pool.query(`SELECT id FROM topic_group WHERE name = $1`, [
+      topicGroupName,
+    ]);
+    if (resp.rows.length === 0) {
+      response.status(400).send(`No topic group with name ${topicGroupName}`);
+      throw `No topic group with name ${topicGroupName}`;
+    }
+    const topicGroupId = resp.rows[0].id;
+
+    // check if user already enrolled
+    resp = await pool.query(
+      `SELECT * FROM user_enrolled WHERE topic_group_id = $1 AND user_id = $2`,
+      [topicGroupId, userId]
+    );
+
+    if (resp.rows.length !== 0) {
+      response
+        .status(400)
+        .send({ error: `User already enrolled in this course` });
+      throw `Already enrolled in course ${topicGroupId}`;
+    }
+
+    resp = await pool.query(
+      `INSERT INTO user_enrolled(topic_group_id, user_id, progress) VALUES($1, $2, $3)`,
+      [topicGroupId, userId, 0]
+    );
+
+    //return the codes
+    response.status(200).send({ success: "true" });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 async function unenrollUser(request, response) {
   const topicGroupName = request.params.topicGroupName;
   const userId = request.params.userId;
   try {
     //Validate Token
-    let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+    let zId = await auth.getZIdFromAuthorization(
+      request.header("Authorization")
+    );
     if (zId == null) {
       response.status(403).send({ error: "Invalid Token" });
       throw "Invalid Token";
@@ -2285,6 +2423,7 @@ module.exports = {
   postAnnouncement,
   postAnnouncementComment,
   getSearchAnnouncements,
+  enrollUserId,
   generateCode,
   getTopicGroup,
   getTopicFile,
@@ -2298,5 +2437,6 @@ module.exports = {
   unenrollUser,
   enrollUser,
   enrollUserWithCode,
+  searchCourses,
   setSearchable,
 };
