@@ -191,7 +191,7 @@ app.post(
   "/topicGroup/:topicGroupName/topic/:topicName/prerequisite",
   async (request, response) => {
     logger(request);
-    await database.postPreReq(request.body, response);
+    await database.postPreReq(request.body, response, request);
   }
 );
 

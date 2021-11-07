@@ -162,7 +162,6 @@ export default function TopicTreeHeader({ id, topicGroups, view }) {
         value.materials_strings[fileObj.type].push(fileObj.name);
       }
     }
-    value.course_materials = [];
 
     value["title"] = value.name;
     setSelectedNode(value);

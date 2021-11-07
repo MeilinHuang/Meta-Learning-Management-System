@@ -51,7 +51,7 @@ export default function TopicTreeAddGroup({isOpen, onClose}) {
         }
         const formData = new FormData();
         formData.append('topic_code', topicCode);
-        formData.append('uploadedFileTypes', 'pdf');
+        formData.append('uploadedFileTypes', 'none');
         await fetch(new_topic_group(newTopicGroupName),
         {
             method: 'POST',
@@ -68,7 +68,7 @@ export default function TopicTreeAddGroup({isOpen, onClose}) {
                 'Authorization': `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({
-                'uploadedFileTypes': "pdf"
+                'uploadedFileTypes': "none"
             })
         });
         window.location.reload();

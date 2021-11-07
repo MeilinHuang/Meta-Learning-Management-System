@@ -433,22 +433,28 @@ async function postTopicGroup(request, response) {
     const topicGroupName = request.params.topicGroupName;
     const topic_code = request.body.topic_code;
     const fileTypeList = request.body.uploadedFileTypes.split(",");
-
+    console.log('topic_code', topic_code);
+    console.log('fileTypeList', fileTypeList);
     let resp = await pool.query(
-      "INSERT INTO topic_group(id, name, topic_code) values(default, $1, $2) RETURNING id",
+      "INSERT INTO topic_group(id, name, topic_code, searchable) values(default, $1, $2, FALSE) RETURNING id",
       [topicGroupName, topic_code]
     );
+    console.log('finished insert');
 
     // Create recording panel for lectures feature
-    await pool.query(`
-    INSERT INTO recording_panels(id, topicgroupid, class) 
-    VALUES(default, $1, 'lecture') RETURNING id`, [resp.rows[0].id]);
+    // await pool.query(`
+    // INSERT INTO recording_panels(id, topicgroupid, class) 
+    // VALUES(default, $1, 'lecture') RETURNING id`, [resp.rows[0].id]);
 
-    await pool.query(`
-    INSERT INTO recording_panels(id, topicgroupid, class) 
-    VALUES(default, $1, 'tutorial') RETURNING id`, [resp.rows[0].id]);
+    // await pool.query(`
+    // INSERT INTO recording_panels(id, topicgroupid, class) 
+    // VALUES(default, $1, 'tutorial') RETURNING id`, [resp.rows[0].id]);
 
     if (request.files != null) {
+      if (fileTypeList[0] == 'none') {
+        response.sendStatus(200);
+        return;
+      }
       if (
         !fs.existsSync(`../frontend/public/_files/topicGroup${resp.rows[0].id}`)
       ) {
@@ -482,6 +488,10 @@ async function postTopicGroup(request, response) {
           typeCounter += 1;
         }
       } else {
+        if (fileTypeList[0] == 'none') {
+          response.sendStatus(200);
+          return;
+        }
         if (fileTypeList.length > 1)
           throw "Uploaded file type list longer than uploaded files";
         else if (fileTypeList.length < 0)
@@ -509,6 +519,7 @@ async function postTopicGroup(request, response) {
 
     response.sendStatus(200);
   } catch (e) {
+    console.log('e', e);
     response.status(400).send(e);
   }
 }
