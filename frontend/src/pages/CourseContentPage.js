@@ -68,6 +68,7 @@ function CourseContentPage({ topicGroup }) {
                 setData(topicGroup.topics_list);
                 setDisplay(topicGroup.topics_list);
             })
+            .catch(error => console.log(error))
         }
     }, [topicGroup]);
 

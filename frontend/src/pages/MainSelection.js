@@ -30,8 +30,6 @@ function MainSelection({ user }) {
         async function fetchData() {
             if (user) {
                 if (user.enrolled_courses) {
-                    setCourses(user.enrolled_courses);
-
                     Promise.all(
                         user.enrolled_courses.map((course) => {
                             return fetch(backend_url + "topicgroup/" + course.name, {
@@ -41,61 +39,62 @@ function MainSelection({ user }) {
                                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                                 },
                             })
-                                .then((e) => e.json())
-                                .then((e) => {
-                                    e.topics_list.map((topic) => {
-                                        if (topic.id === user.last_accessed_topic) {
-                                            let cpy = topic;
-
-                                            let uniq_list = [];
-                                            topic.course_materials.map((mat) => {
-                                                const mat_str = JSON.stringify(mat);
-                                                if (uniq_list.indexOf(mat_str) === -1) {
-                                                    uniq_list.push(mat_str);
-                                                }
-                                            });
-                                            let mat_list = [];
-                                            uniq_list.map((data) => {
-                                                mat_list.push(JSON.parse(data));
-                                            });
-
-                                            cpy.course_materials = mat_list;
-                                            cpy.course = course.name;
-
-                                            setContent(cpy);
-                                        }
-                                    });
-                                    let total = 0
-                                    let complete = 0
-                                    Promise.all(
-                                        e.topics_list.map(topic => {
-                                            total += topic.course_materials.length
-                                            return fetch(backend_url + "user/" + localStorage.getItem("id") + "/progress/" + topic.id)
-                                        })
-                                    )
-                                    .then(resp => Promise.all(resp.map(r =>r.json())))
-                                    .then(data_list => {
-                                        data_list.map(data => {
-                                            data.map(progress => {
-                                                if (progress.completed) {
-                                                    complete++
-                                                }
-                                            })
-                                        })
-                                        let course_progress = 0
-                                        if (total > 0) {
-                                            course_progress = (complete/total) * 100
-                                        }
-                                        course.progress = course_progress
-                                    })
-                                    setCourses(user.enrolled_courses);
-                                    return e;
-                                })
-                                .catch((error) => console.log(error));
                         })
-                    ).then((topic_groups) => {
+                    )
+                    .then(resp_list => Promise.all(resp_list.map(resp => resp.json())))
+                    .then((topic_groups) => {
                         topic_groups.map((e) => {
                             if (e) {
+
+                                e.topics_list.map((topic) => {
+                                    if (topic.id === user.last_accessed_topic) {
+                                        let cpy = topic;
+
+                                        let uniq_list = [];
+                                        topic.course_materials.map((mat) => {
+                                            const mat_str = JSON.stringify(mat);
+                                            if (uniq_list.indexOf(mat_str) === -1) {
+                                                uniq_list.push(mat_str);
+                                            }
+                                        });
+                                        let mat_list = [];
+                                        uniq_list.map((data) => {
+                                            mat_list.push(JSON.parse(data));
+                                        });
+
+                                        cpy.course_materials = mat_list;
+                                        cpy.course = e.name;
+
+                                        setContent(cpy);
+                                    }
+                                });
+
+                                let total = 0
+                                let complete = 0
+                                Promise.all(
+                                    e.topics_list.map(topic => {
+                                        total += topic.course_materials.length
+                                        return fetch(backend_url + "user/" + localStorage.getItem("id") + "/progress/" + topic.id)
+                                    })
+                                )
+                                .then(resp => Promise.all(resp.map(r =>r.json())))
+                                .then(data_list => {
+                                    data_list.map(data => {
+                                        data.map(progress => {
+                                            if (progress.completed) {
+                                                complete++
+                                            }
+                                        })
+                                    })
+                                    let course_progress = 0
+                                    if (total > 0) {
+                                        course_progress = (complete/total) * 100
+                                    }
+                                    e.progress = course_progress
+                                })
+                                .then(() => setCourses(topic_groups))
+                                .catch(error => console.log(error))
+
                                 let latest = null;
                                 e.announcements_list.map((announce) => {
                                     if (announce !== null) {
@@ -121,11 +120,13 @@ function MainSelection({ user }) {
                                             latest = { ...latest, author: user.user_name };
                                             setRecent(latest);
                                             setCode(e.name);
-                                        });
+                                        })
+                                        .catch(error => console.log(error));
                                 }
                             }
                         });
-                    });
+                    })
+                    .catch(error => console.log(error));
                 }
             }
         }

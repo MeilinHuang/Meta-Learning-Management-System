@@ -63,11 +63,13 @@ function WidgetsBar({ page, user }) {
                             .then (data_list => {
                                 let complete = 0
                                 data_list.map(data => {
-                                    data.map(file => {
-                                        if (file.completed) {
-                                            complete++
-                                        }
-                                    })
+                                    if (data) {
+                                        data.map(file => {
+                                            if (file.completed) {
+                                                complete++
+                                            }
+                                        })
+                                    }
                                 })
                                 let progress = 0
                                 if (total > 0) {
@@ -75,6 +77,7 @@ function WidgetsBar({ page, user }) {
                                 }
                                 setProgress(parseInt(progress) + "%")
                             })
+                            .catch(error => console.log(error))
                         })
                         .catch(error => console.log(error))
                     }
@@ -101,18 +104,21 @@ function WidgetsBar({ page, user }) {
                     .then((resp) => Promise.all(resp.map((r) => r.json())))
                     .then((data_list) => {
                         data_list.map((data) => {
-                            data.map((file) => {
-                                if (file.completed) {
-                                    complete++;
-                                }
-                            });
+                            if (data) {
+                                data.map((file) => {
+                                    if (file.completed) {
+                                        complete++;
+                                    }
+                                });
+                            }
                         });
                         let progress = 0;
                         if (total > 0) {
                             progress = (complete / total) * 100;
                         }
                         setProgress(parseInt(progress) + "%");
-                    });
+                    })
+                    .catch(error => console.log(error));
                 })
                 .catch((error) => console.log(error));
             }
