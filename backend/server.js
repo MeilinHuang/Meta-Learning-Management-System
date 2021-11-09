@@ -200,7 +200,7 @@ app.delete(
   "/topicGroup/:topicGroupName/topic/:topicName/prerequisite",
   async (request, response) => {
     logger(request);
-    await database.deletePreReq(request.body, response);
+    await database.deletePreReq(request.body, response, request);
   }
 );
 

@@ -401,9 +401,9 @@ async function postPreReq(request, response, requestBody) {
 }
 
 // Delete pre-requisite data
-async function deletePreReq(request, response) {
+async function deletePreReq(request, response, requestBody) {
   //Validate Token
-  let zId = await auth.getZIdFromAuthorization(request.header("Authorization"));
+  let zId = await auth.getZIdFromAuthorization(requestBody.header("Authorization"));
   if (zId == null) {
     response.status(403).send({ error: "Invalid Token" });
     throw "Invalid Token";
@@ -978,6 +978,15 @@ async function putTopic(request, response) {
       if (fileDeleteList.length) {
         // Deletes files specified in delete list
         for (const fileName of fileDeleteList) {
+
+          let fileIdRep = await pool.query(
+            `SELECT id FROM topic_files WHERE name = $1 AND topic_id = $2`,
+            [fileName, topicId]
+          );
+          await pool.query(
+            `DELETE FROM user_content_progress WHERE topic_file_id = $1`,
+            [fileIdRep.rows[0].id]
+          );
           let tmpQ = await pool.query(
             `DELETE FROM topic_files WHERE name = $1 AND topic_id = $2 RETURNING file`,
             [fileName, topicId]

@@ -109,8 +109,12 @@ export default function TopicTreeHeader({ id, topicGroups, view }) {
   const convertToList = (jsonData) => {
     let tempTopics = [];
     let tempActualTopics = [];
+    let validTopicGroups = ["C++ Programming", "Programming Fundamentals", "Object-Oriented Design & Programming", "TESTTOPIC"]; // Only for demo purposes
     for (let topicGroup of jsonData.result) {
       if (topicGroup === null) {
+        continue;
+      }
+      if (!validTopicGroups.includes(topicGroup.name)) {
         continue;
       }
       for (let topic of topicGroup.topics_list) {
