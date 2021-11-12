@@ -28,4 +28,32 @@ This requirement was classed low priority as the system was designed to be the o
 
 \subsection {Non functional requirements}
 
-The following details 
+The following details the analysis undertaken to examine the accessibility, security and performance of the feature. 
+
+\subsection {Performance}
+
+Performance of the system could be improved, with the main topic tree graph view loading a little slowly. Google Lighthouse was used to analyse performance, and performance differs depending on the database server used i.e. if a remote server was used, the topic tree takes longer to load the graph.\\
+
+Google Lighthouse is a tool used to measure page performance and accessibility, and gives a score out of 100 after running its tests. It waits until there is no more movement on the graph and measures the time taken, however the page is interactive before movement stops on the graph due to nodes slowly moving outwards from where they loaded.\\
+
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{topic-tree-performance}
+    \caption{Performance report of the topic tree}
+\end{figure}
+
+As shown in the report, a score of 32/100 was given for the topic tree's performance. Restructuring of the database and less API requests are strategies that can be used to improve the performance of the topic tree, as well as a different graphing library as d3 is not an optimised library for handling graphs.\\
+
+\subsection{Accessibility}
+Accessibility of the feature is good, as the Chakra UI library was used to ensure that alt and aria tags were used. Colour contrast of the feature could be improved, but is still quite good with contrasting blue and white colours used. \\
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{topic-tree-accessibility}
+    \caption{Accessibility report of the topic tree}
+\end{figure}
+
+A score of 98 was achieved for accessibility. Google Lighthouse accesses tags and html elements used, as well as contrast ratios to assess accessibility.\\
+
+\subsection{}
