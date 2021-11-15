@@ -3,12 +3,12 @@
 The topic tree feature will be examined based on a framework to determine how well the implemented feature has achieved its intended purpose and its functionality. \\
 
 Therefore the analysis includes four sections:\\
-\begin{enumerate}
+\begin{itemize}
     \item Functional Requirements - does the system fulfil the functional requirements set out in the project approach?
     \item Non-functional requirements - how well does the system achieve the non functional requirements including performance and accessibility
     \item Scalability and Efficiency - how well does the feature perform with many, many topics and topic groups?
     \item Feedback from potential users of the feature - what do users such as lecturers, tutors and students think about the feature and how could it be improved?
-\end{enumerate}
+\end{itemize}
 
 \subsection{Functional requirements}
 The functional requirements of the feature were analysed for completedness. Each functional requirement has a priority attached to it, and the functionality of the system was assessed against this priority. \\
@@ -56,4 +56,58 @@ Accessibility of the feature is good, as the Chakra UI library was used to ensur
 
 A score of 98 was achieved for accessibility. Google Lighthouse accesses tags and HTML elements used, as well as contrast ratios to assess accessibility.\\
 
-\subsection{}
+\subsection{Scalability Testing}
+
+This section focuses on how well the feature copes against tens and hundreds of topic groups and a large amount of data. As the feature will be used with many, many topic groups, scalability testing is performed to ensure the feature is usable.\\
+
+To assess the feature, each topic group will contain 1-10 topics to simulate a real world topic group. The feature will be tested with 3, 5, 10, 20, 50, 100, and 300 topic groups. The School of CSE currently runs around 100 courses, and so as this topic tree is designed to be used by a faculty or school, 300 topic groups is the limit that will be tested. Ideally, disciplines will be implemented in the future which will create separate topic trees for each school or faculty. \\
+
+Each test will be assessed by measuring the performance using Google Lighthouse i.e. the time to finish loading the website. Several operations will be undertaken including: \\
+\begin{itemize}
+    \item Clicking a topic group to expand into individual topics
+    \item Creating a new topic
+    \item Deleting a prerequisite
+    \item Uploading a file
+    \item Viewing a file
+\end{itemize}
+
+The user experience will also be assessed, with comments made after each test referring to whether managing the number of topics is efficient or not.\\
+
+\textbf{Results} \\
+
+\subsection{Feedback from Potential Users}
+Feedback from students, tutors and lecturers have been collected to analyse the user experience of the system and what could be improved. \\
+
+\textbf{Audience} \\
+
+Feedback was collected from a range of fields including:\\
+\begin{itemize}
+    \item Computer Science and Engineering
+    \item Humanities and Languages 
+    \item Business and Economics 
+\end{itemize}
+
+This range of different areas provides context on how usable the feature would be in their subject area or faculty, and also provides a diverse range of users.\\
+
+\textbf{Questions} \\
+These users were asked various questions before a demonstration of the feature, and then asked more questions after the demonstration as well. The questions are as follows:\\
+\textbf{Prior to Demonstration}
+\begin{enumerate}
+    \item What learning management systems have you used previously?
+    \item (Academics only) Have you experienced a situation where you have tried to reuse content? If so, what was it?
+\end{enumerate}
+
+People from UNSW all answered the first question with Moodle and some answered WebCMS. One user from the University of Sydney answered Canvas, as they use a different learning management system.\\
+Academics from the school of Computer Science and Engineering at UNSW answered the second question with "Yes", and most have explained that it was quite difficult having to create new content for the same topic in their courses. However, academics in Humanities and Languages explained that it was very easy to reuse course content in Moodle, as they only need to create a new offering of the course and have no need to reuse content from other courses.\\
+
+\textbf{After Demonstration}
+\begin{enumerate}
+    \item Is the system easy to use? What UI issues did you have with it?
+    \item (Academics Only) Would you use the system to help organise content better?
+    \item Is the terminology of the system such as topics and topic groups easy to understand?
+    \item Would you use the graph or list view of the topic tree more?
+    \item What are some positive aspects of the topic tree?
+    \item What could be improved?
+    \item Do you have any final comments or questions?
+\end{enumerate}
+
