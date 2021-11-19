@@ -6,7 +6,7 @@ The Quiz creation page is where a staff member can add questions to a newly crea
 \subsubsection{Creating a quiz}
 A quiz can be created as a course lecturer or staff member while on a topic group page. That is the intended workflow, however the current implementation is not integrated with the topic group page. A button for adding a new quiz will be visible and once clicked, a modal will appear to initiate the quiz creation:
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-create-quiz-modal}
 	\caption{Quiz creation modal}
@@ -15,9 +15,9 @@ A quiz can be created as a course lecturer or staff member while on a topic grou
 After entering a quiz name and clicking the 'Add Quiz' button, the user will be redirected to the quiz creation page where they can start adding questions.
 
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.35]{assessments-quiz-creation-interface}
+	\includegraphics[scale=0.25]{assessments-quiz-creation-interface}
 	\caption{Quiz creation page}
 \end{figure}
 
@@ -25,7 +25,7 @@ After entering a quiz name and clicking the 'Add Quiz' button, the user will be 
 \subsubsection{Adding a question}
 To add a question, the user can click on the 'New Question' button.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-quiz-creation-new-question-button}
 	\caption{New Question button}
@@ -33,7 +33,7 @@ To add a question, the user can click on the 'New Question' button.
 
 A modal will appear, asking the user whether they want to create a new question or import a question that was made and stored in the question bank in a previous quiz. 
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-create-question-modal}
 	\caption{Create a question modal}
@@ -41,7 +41,7 @@ A modal will appear, asking the user whether they want to create a new question 
 
 Since the import option is incomplete, the user is only able to create a new question as of now. The modal will now update to show data fields for the new question that must be filled in before they're able to add the question to the questions list that was shown on the page. The user can select which topic the question is related to, the question type (multiple choice, short answer and checkboxes) and also add answers along with explanations if desired.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-new-question-modal}
 	\caption{New Question data fields}
@@ -49,7 +49,7 @@ Since the import option is incomplete, the user is only able to create a new que
 
 The staff member can add an answer via the "Add Answer" button, as well as delete an answer by clicking on the respective red garbage bin icon on a particular answer. Explanations can be added to an answer if desired. An explanation can be added by expanding the 'Explanation' accordion under an answer and entering the explanation there.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-answer-explanation}
 	\caption{Adding an explanation to a possible answer}
@@ -59,7 +59,7 @@ These explanations describe why the specified answer is correct or incorrect, an
 
 Once the fields have been filled in, the staff member clicks on the "Add to Quiz" button to add the question to the questions section. By default, "Add to Question Bank" is ticked so all questions will automatically be saved in the question bank for future re-use.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-add-to-quiz-button}
 	\caption{Add To Quiz button}
@@ -69,13 +69,13 @@ The question will appear in the question list and questions section. The questio
 
 \begin{figure}[!hbpt]
 	\centering
-	\includegraphics[scale=0.35]{assessments-question-list}
+	\includegraphics[scale=0.25]{assessments-question-list}
 	\caption{Question list and section}
 \end{figure}
 
 To show fields of a particular question, you can expand it by clicking on its header in the question section, or on its question list link. Similarly, you can collapse a question by clicking on a question's header/link while it's expanded. There is also a "Expand all" and "Collapse All" button to expand or collapse all questions.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-expand-question}
 	\caption{Question list and section}
@@ -85,7 +85,7 @@ To show fields of a particular question, you can expand it by clicking on its he
 \subsubsection{Editing quiz details}
 The quiz name, open date, due date and time given can be modified in the Quiz Details column of the Quiz Creation page. Other details such as the number of questions and total marks are displayed. 
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-quiz-details}
 	\caption{Quiz details}
@@ -95,24 +95,18 @@ The quiz name, open date, due date and time given can be modified in the Quiz De
 \subsection{Quiz Usage}
 The Quiz Usage page is where students enrolled in a topic group can attempt a quiz that was made for the topic group. From left to right, the columns are the quiz progression column, the question itself, and the timer showing the time remaining for the quiz attempt. The quiz progression column indicates to the student which questions they've attempted or not attempted yet. A blue icon with a question mark represents an unattempted question while a green icon with a tick represents an attempted question. This allows the student to be always aware of which questions they'll need to go back to later. The student can also click on any of the question number icons to jump to that particular question. 
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.35]{assessments-quiz-submission}
+	\includegraphics[scale=0.25]{assessments-quiz-submission}
 	\caption{Quiz submission page}
 \end{figure}
 
 \subsubsection{Answering a question}
 The student can answer a question by clicking on one of the options (multiple choice), one or more of the options (checkbox), or by entering text into the textbox (short answer). 
 
-\begin{figure}[!hbpt]
-	\centering
-	\includegraphics[scale=0.35]{assessments-quiz-submission}
-	\caption{Quiz submission page}
-\end{figure}
-
 Once they've selected an answer, that counts as an attempt of the question and the question icon (in the quiz progression column) for that question will turn green with a tick as shown below.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-question-attempt}
 	\caption{Successful question attempt}
@@ -122,7 +116,7 @@ Once they've selected an answer, that counts as an attempt of the question and t
 \subsubsection{Editing an answer}
 To edit an answer, the student can select another possible answer and their new answer will be the updated answer to the question.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-editing-answer}
 	\caption{Editing an answer}
@@ -132,7 +126,7 @@ To edit an answer, the student can select another possible answer and their new 
 \subsubsection{Submitting an attempt}
 Once the student is satisfied with their submission, they can click on the "Submit answer" button below the Quiz Progression section to submit their quiz submission.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-submit-answers-button}
 	\caption{Submitting answers button}
@@ -140,7 +134,7 @@ Once the student is satisfied with their submission, they can click on the "Subm
 
 A confirmation modal will appear before the quiz submission is submitted and no changes can no longer be made to the attempt.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-submit-attempt-modal}
 	\caption{Submit quiz attempt confirmation modal}
@@ -148,7 +142,7 @@ A confirmation modal will appear before the quiz submission is submitted and no 
 
 After pressing the "Submit" button, a submission confirmation message will be shown.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-successful-quiz-submission-message}
 	\caption{Successful quiz submission message}
@@ -158,7 +152,7 @@ After pressing the "Submit" button, a submission confirmation message will be sh
 \subsection{Viewing quiz results and feedback}
 After a student has submitted their quiz attempt, their attempt has been marked and the due date has passed, the student can review their quiz submission on the Quiz Review Submission page.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-view-submission}
 	\caption{Review submission page}
@@ -167,7 +161,7 @@ After a student has submitted their quiz attempt, their attempt has been marked 
 \subsubsection{Viewing correct answers against their answers}
 The student can compare their answers with the correct answers. If they answered a question incorrectly, their selected answer's text will turn red and the correct answer's text will turn green.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-compare-answers}
 	\caption{Compare correct answers against a student's answers}
@@ -177,7 +171,7 @@ The student can compare their answers with the correct answers. If they answered
 \subsubsection{Viewing an explanation of the correct answer and incorrect answers}
 Below the possible answers will be the explanations, if the staff member has written any. Explanations for all the answers will be shown. This allows the student to understand why a particular answer is wrong or right.
 
-\begin{figure}[!hbpt]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.35]{assessments-view-explanations}
 	\caption{View explanations for each answer to a question (if provided)}
