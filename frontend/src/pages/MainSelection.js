@@ -24,111 +24,6 @@ function MainSelection({ user }) {
   //Most recently accessed topic
   const [content, setContent] = useState(null);
 
-<<<<<<< Updated upstream
-    useEffect(() => {
-        //NEED TO CHANGE TO GET ENROLLED COURSES AND MOST RECENTLY ACCESSED CONTENT
-        //Getting currently enrolled courses and most recent announcement
-        async function fetchData() {
-            if (user) {
-                if (user.enrolled_courses) {
-                    Promise.all(
-                        user.enrolled_courses.map((course) => {
-                            return fetch(backend_url + "topicgroup/" + course.name, {
-                                headers: {
-                                    Accept: "application/json",
-                                    "Content-Type": "application/json",
-                                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                                },
-                            })
-                        })
-                    )
-                    .then(resp_list => Promise.all(resp_list.map(resp => resp.json())))
-                    .then((topic_groups) => {
-                        topic_groups.map((e) => {
-                            if (e) {
-
-                                e.topics_list.map((topic) => {
-                                    if (topic.id === user.last_accessed_topic) {
-                                        let cpy = topic;
-
-                                        let uniq_list = [];
-                                        topic.course_materials.map((mat) => {
-                                            const mat_str = JSON.stringify(mat);
-                                            if (uniq_list.indexOf(mat_str) === -1) {
-                                                uniq_list.push(mat_str);
-                                            }
-                                        });
-                                        let mat_list = [];
-                                        uniq_list.map((data) => {
-                                            mat_list.push(JSON.parse(data));
-                                        });
-
-                                        cpy.course_materials = mat_list;
-                                        cpy.course = e.name;
-
-                                        setContent(cpy);
-                                    }
-                                });
-
-                                let total = 0
-                                let complete = 0
-                                Promise.all(
-                                    e.topics_list.map(topic => {
-                                        total += topic.course_materials.length
-                                        return fetch(backend_url + "user/" + localStorage.getItem("id") + "/progress/" + topic.id)
-                                    })
-                                )
-                                .then(resp => Promise.all(resp.map(r =>r.json())))
-                                .then(data_list => {
-                                    data_list.map(data => {
-                                        data.map(progress => {
-                                            if (progress.completed) {
-                                                complete++
-                                            }
-                                        })
-                                    })
-                                    let course_progress = 0
-                                    if (total > 0) {
-                                        course_progress = (complete/total) * 100
-                                    }
-                                    e.progress = course_progress
-                                })
-                                .then(() => setCourses(topic_groups))
-                                .catch(error => console.log(error))
-
-                                let latest = null;
-                                e.announcements_list.map((announce) => {
-                                    if (announce !== null) {
-                                        if (
-                                            latest === null ||
-                                            Date.parse(latest.post_date) <
-                                            Date.parse(announce.post_date)
-                                        ) {
-                                            latest = announce;
-                                        }
-                                    }
-                                });
-                                if (latest !== null) {
-                                    fetch(backend_url + "user/" + latest.author, {
-                                        headers: {
-                                            Accept: "application/json",
-                                            "Content-Type": "application/json",
-                                            Authorization: `Bearer ${localStorage.getItem("token")}`,
-                                        },
-                                    })
-                                        .then((resp) => resp.json())
-                                        .then((user) => {
-                                            latest = { ...latest, author: user.user_name };
-                                            setRecent(latest);
-                                            setCode(e.name);
-                                        })
-                                        .catch(error => console.log(error));
-                                }
-                            }
-                        });
-                    })
-                    .catch(error => console.log(error));
-=======
   useEffect(() => {
     //NEED TO CHANGE TO GET ENROLLED COURSES AND MOST RECENTLY ACCESSED CONTENT
     //Getting currently enrolled courses and most recent announcement
@@ -233,7 +128,6 @@ function MainSelection({ user }) {
                       setRecent(latest);
                       setCode(e.name);
                     });
->>>>>>> Stashed changes
                 }
               }
             });
