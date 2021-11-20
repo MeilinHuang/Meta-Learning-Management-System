@@ -9,9 +9,9 @@ The main aspects that the features of the course pages that will be analysed and
 
 \subsection{Functional Requirements}
 As stated before, there were a total of 14 functional requirements. Within these requirements there were 6 high priorty requirements, 3 medium priority requirements and 5 low priority requirements.
-In total only 9 of the functional requirements were completed. The 5 features that were not complete due to being low priority. There were also 
+In total only 9 of the functional requirements were completed. The 5 features that were not complete due to being low priority.
 
-\title{Completed}
+\subsubsection{Completed}
 \begin{itemize}
     \item Users can click on the links in the sidebar to be directed to the corresponding component;
     \item Users can view the announcments within the dashboard;
@@ -27,7 +27,7 @@ In total only 9 of the functional requirements were completed. The 5 features th
     \item Users can toggle on or off specific widgets.
 \end{itemize}
 
-\title{Uncompleted}
+\subsubsection{Uncompleted}
 \begin{itemize}
     \item Users can view the course outline of a course;
     \item Administrators can add course content into the page by selecting content from the topic tree;
@@ -54,14 +54,87 @@ These functional features were added early in Thesis B as they are the features 
 The non-functional requirements that will be used to analyse the course pages are:
 \begin{itemize}
     \item Performance;
+    \item Accessibility.
     \item Responsiveness;
-    \item Scalability.
 \end{itemize}
 
 \subsubsection{Performance}
+Google Lighthouse was utilised to quantify the performance of the different aspects within the course pages. Google Lighthouse provides a simple way to test various aspects of a page,
+ for example the performance, accessibility and assessing whether the website complies with best practices.
+The course pages that will be analysed are comprised of:
+\begin{itemize}
+    \item Course selection page;
+    \item Course dashboard.
+    \item Course content page;
+\end{itemize}
+
+The performance of all of these pages all range within 40-50, indicating that there are a variety of further optimisations to better the performance of each page.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{course-selection-performance}
+    \caption{Performance report of the course selection page}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{course-dashboard-performance}
+    \caption{Performance report of the course dashboard page}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{content-page-performance}
+    \caption{Performance report of the course content page}
+\end{figure}
+
+As shown, the performance of the course selection page is 48/100, the course dashboard being 55/100 and the course content page being 41/100. This would be due to the variety of features within the page which would require numerous API calls.
+Possible optimisations could include, restructuring the use of API calls and database schema to improve fetch times and also minifying javascript files which would further improve performance as this test was run on a development server.
+For the course selection page, there are a variety of features, such as the most recent announcement, course progress or most recently accessed topic. This page could be optimised by having the associated data be attached to a user, making only 1 API call needed.
+The course dashboard involves a variety of API calls, which include getting the announcement data, the user who made the announcement and other metadata. 
+The course pages can be improved through redesigning the topic schema. The main concern was the multiple API calls needed to get the topic data and the corresponding files. If a topic contained a large file, then the API call to get the topic data would take longer.
+
+\subsubsection{Accessibility}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{course-selection-accessibility}
+    \caption{Accessibility report of the course selection page}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{course-dashboard-accessibility}
+    \caption{Accessibility report of the course dashboard page}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{content-page-accessibility}
+    \caption{Accessibility report of the course content page}
+\end{figure}
+
+As shown the accessibility of the course pages range within 70-80 and as such is one aspect that could be improved on with minor changes. With the use of Chakra UI, many aspects of accessbility within frontend design was already handled. For example aria labels and the roles of certain HTML elements were handled with Chakra UI.
+However some aspects such as colour contrast and certain HTML semantics can be improved. For example some buttons do not have accessible names for screen readers to be able to read.
 
 \subsubsection{Responsiveness}
+The responsiveness of the course pages were one aspect of design that was deliberately designed. Each page has 3 intermediate stages, which correspond to screen widths, with the breakpoints being 990px and 765px.
+The main aspect of responsiveness is to provide the same functionality regardless of the screen size. This however has not been fully achieved within the course pages.
+The corresponding component affecting the responsiveness are the 2 sidebars, the navigation sidebar and widgets bar. As shown in the figures, the medium and small screen sizes do not have any widget functionality.
 
-\subsubsection{Scalability}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{course-selection-medium}
+    \caption{Medium screen size for the course selection page}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{course-dashboard-small}
+    \caption{Small screen size for the course dashboard page}
+\end{figure}
+
+A way to provide this functionality would be to allow users to select an option when clicking on the account button on the top right of the screen which would open up the widgets bar.
+In this design, the functionality of the widgets bar would still be present within smaller screens and also larger screens, however is less accessible for users to navigate.
 
 \subsection{Usability Tests}
