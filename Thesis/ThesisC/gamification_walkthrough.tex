@@ -1,4 +1,4 @@
-\newpage
+
 \section{Gamification Walkthrough}
 
 \subsection{Definition of Levels in Gamification }
@@ -35,7 +35,6 @@ Staff will first select a topic group from a list retrieved from metalms. The st
 \subsubsection{Considerations}
 \begin{itemize}
     \item Levels should be customisable, editable after creation and performant as the platform could be retrieving many levels at once.
-    \item T
 \end{itemize}
 
 \newpage
@@ -162,7 +161,6 @@ At the results page, the platform retrieves the latest snapshot of a student's a
 \begin{itemize}
     \item Student's selected answers are recorded into the system immidiately when they select / change the answer. This deisgn inherently causes more requests to the backend api as students may change answers multiple times during the question compared to keeping the state locally and update backend at the end of the countdown. Ultimately decided with the frequent update due to increased reliability and ensure that changes just before the countdown ends are definitely captured correctly.
     \item The points penalty system took alot of deliberation to design and implement. If there was no penalty to simply guessing the answers for the level, students may not take the levels seriously and make random guesses. However, the system must also be fair to ensure that students who are tryting but struggling are not negatively impacted but rather encouraged to do better. The final design was with the categories of less than or equal to 40\% correct inurring penalty, between 41\% and 60\% answers correct will not earn or lose points and greater than 60\% answers correct will earn points on the answers they got correct.
-    \item D
 \end{itemize}
 
 \newpage
@@ -250,6 +248,8 @@ This feature is only accessible by users with role of Staff. Upon entering the g
     \caption{Admin Levels Dashboard}
 \end{figure}
 
+\newpage
+
 Upon clicking on the New Level button, admins are asked to provide a name for the level in a prompt. Once admin has entered a name for the level, they will be directed to Edit Level Page.
 
 \begin{figure}[h!]
@@ -265,13 +265,13 @@ Admins are then directed to edit information about the level and its content. Th
 \begin{figure}[h!]
     \includegraphics[scale=0.5]{gamification-admin3}
     \centering
-    \caption{Create new Level}
+    \caption{Edit Level}
 \end{figure}
 
 \begin{figure}[h!]
     \includegraphics[scale=0.5]{gamification-admin4}
     \centering
-    \caption{Create new Level}
+    \caption{Add Questions}
 \end{figure}
 
 \newpage
@@ -281,32 +281,79 @@ Upon clicking edit question, the user will see the edit question page. This page
 \begin{figure}[h!]
     \includegraphics[scale=0.5]{gamification-admin5}
     \centering
-    \caption{Create new Level}
+    \caption{Edit Question}
 \end{figure}
-
 
 \newpage
 
 \subsubsection{Purpose}
-Provide students with prescriptive advice to enhance their learning while providing statistics on how they are progressing compared to their peers. This feature aims to create a competitive environment but avoid most of the negative connotations of ranking.
+Creating and Editing content for levels form the foundations to allow customisation to enable different content to be created on the platform for students to learn. This feature allows admins to easily create new content and edit past content.
 
 \subsubsection{What was Implemented}
-A centralised organisation of statistics that displays to the student their rank in the topic group, how far they are to rank up and also the top 3 students in the topic group. This feature shows these details per topic group so it is more specific and targeted.
+A capability to create new levels or edit levels that is only accessible to staff. Edit question allows admin to amend various atrributes of the level and apply it immidiately by saving. It also allows admin to determine the number and order of questions that will appear when students playthrough the level. The edit question page allows the admin to set the question text, add helper image or video, set the points that can be earned,  set duration of the question and also set the answers for the question.
 
 \subsubsection{How it was Implemented}
-The platform first ranks the user in their topic group based on the amount of points earned on the platform. It then finds out the difference in points to the user in the next higher rank and displays the difference to the student. The system also pulls the details like name, points and ranking of the top 3 students. This is done for each of the topic groups that the student is enrolled in and is displayed one after another in a list format.
+When a new level is requested by the admin, the backend creates a new record in the database for an empty level with the name specified. When opening the edit level page for a level, the backend retrieves all the attributes relating to the level and the array of question objects using the level id. The attributes are inserted into the UI inputs which can be amended by the admin. Once admin has finished their changes, clicking save on the top right will send the new data to the backend to update database records. The User Interface also loops through each question object in question array, displaying the question text, points available and time allowed. Admins have an option to Edit or Delete specific questions, clicking Edit will bring them to edit question page and delete will remove the question selected from the array, thus removing it from the level.
+
+On the Edit Question page, similar to edit levels page, the platform pulls the attributes for the specific question using the question id. It populates the existing data into the UI fields and allows admins to amend its content. The second part of the page allows admins to change the possible answers that will appear (up to 6) and also select which answers are correct (could be multiple). Admins can also change the text for each answer. When an admin has made all their changes, clicking save on the top right will send this updated question state to the backend to be stored. The changes are immidiate and students will see the changes.
 
 \subsubsection{Considerations}
 \begin{itemize}
-    \item Avoid negative connotations by using a more objective approach to display facts that foster competition
-    \item Provide prescriptive advice for students to improve their progress in the platform to break the goal of improvement into small achievable steps.
+    \item Organisation of Levels as parent to questions helped to simplify this flow. Initial design of questions as an attribute instead of part of array of objects caused problems with implementation.
+    \item A design choice was made to not limit the number of questions for a level which could be an obstacle for some types of levels, instead the control is given to admins to manage the max number of questions as they see fit. The platform is capable to handle up to a few hundred questions before performance issues will appear on the edit pages.
 \end{itemize}
 
+\newpage
 
+\subsection{Manage Topic Groups and Repository}
+\subsubsection{Design}
+Admins can access the Topic Groups link in the top navigation bar. They will be presented with a grid list of topic groups they have admin rights for. 
 
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-tp2}
+    \centering
+    \caption{Manage Topic Groups}
+\end{figure}
 
+Upon clicking Add Topic Group, admins can see a list of available topic groups in the metalms system. They can select it to inherit the student permissions of the topic groups as meta-data like topic group descriptions into the gamification platform. Admins can then add additional information on the topic group like start / end date, term and year to make the topic group active. Once admin clicks import topic group, the students assigned in the wider metalms will have access to the levels within topic groups they are enrolled into. 
 
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-tp1}
+    \centering
+    \caption{Importing a Topic Group}
+\end{figure}
 
+Admins can add or remove levels they own / created by clicking the Edit Levels Button on the specific topic group tile. They will be presented with a list of levels available to be added or removed. The system detects if the level is already present in topic group and allow the admin to remove and otherwise it will allow the admin to add.
 
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-tp3}
+    \centering
+    \caption{Add or Remove Levels from Topic Group}
+\end{figure}
+
+Admins can access the repository through the Repository Link in the top navigation bar. Once on the repository page, admins can see a list of all levels created by all admins on the platform. From there admins can search and find any levels (set of questions for a single topic) which they can add into their topic group. 
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-repo}
+    \centering
+    \caption{Repository}
+\end{figure}
+
+\newpage
+
+\subsubsection{Purpose}
+Manage Topic Groups page allows admins to retrieve the topic groups from metalms that they need to actively manage. The topic group will help admins to make levels visible to students who have been enrolled into the topic group on the metalms. The repository acts as a centralised hub for all levels on the platform to be found, it allows any admin to search for levels which are set of questions for specific topics. This enables levels to be reused by admins.
+
+\subsubsection{What was Implemented}
+Importing of metadata on topic groups, assigning levels to topic groups and removal of topic groups from gamification (does not affect metalms). Repository displays all levels created with a search and sort function to allow admins to easily find and reuse content.
+
+\subsubsection{How it was Implemented}
+When selecting add new topic group, the platform pulls the latest list of topic groups available on the metalms. This is presented to user as a list of topic groups. Once user selected a topic group, the system will retrieve all metadata relating to the topic group based on the topic group id and it will appear on the topic groups page for users as a new tile with some metadata displayed. From the tile, admins are able to edit or delete the topic group (does not affect metalms). Clicking on edit levels will retrieve all the levels that the admin owns or have created. After selecting a level on this prompt, the platform uses the level id to identify if the level is already assigned to the topic group. If level has already been assigned, it will display a remove button instead of an add button. When user clicks on the add or remove button, the platform sends a request to add or remove level from topic groups using the level id and topic group id. Deleting topic group will send the topic group id to backend to remove topic group from gamification section of the database and this will not affect the topic group on the metalms. 
+
+\subsubsection{Considerations}
+\begin{itemize}
+    \item Destructive changes like delete of topic group will not affect metalms. This was a concious decision as deletion of topic groups should occur in the enrolment section on the main metalms page.
+    \item Initial design was to have both topic groups and levels in the repository but it was complex to provide visibility over both topic groups and levels at the same time. Ultimately implemented with levels which is the smallest module to increase flexibility for admins.
+\end{itemize}
 
 \newpage
