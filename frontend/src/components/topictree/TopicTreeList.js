@@ -158,7 +158,7 @@ export default function TopicTreeList() {
       },
     })
       .then((response) => response.json())
-      .then((response) => topicGroupLimiter(response))
+      // .then((response) => topicGroupLimiter(response))
       .then(function (response) {
         setData(response);
         setDisplay(response);

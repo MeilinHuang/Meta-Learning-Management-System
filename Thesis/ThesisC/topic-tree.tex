@@ -2,14 +2,35 @@
 \subsection{Overview}
 Most learning management systems do not have a simple and easy method to import course material and resources from other courses. Some LMS platforms such as OpenLearning have no method of importing any data at all, and other platforms such as Canvas allows you to import crowd sourced material into your own course, however still does not allow you to import topics of resources. \\
 
-This new LMS will have a new topic tree feature, which will allow teachers and academics to add course material under a specific topic instead.\\
-Each topic will have prequisites of other topics, for example the topic Graphs will be a prequisite for the topic Depth first Search.\\
+This new LMS has a new topic tree feature, which will allow teachers and academics to add course material under a specific topic instead.\\
 
 \textbf{Topics} \\
 A topic is a collection of educational material that is related to a particular subject. For example, in UNSW's Introduction to Programming course (COMP1511), one of the topics in the course is ``Pointers", which contains all course material related to pointers.\\
 
 At Charles Sturt University, each topic is defined as a small subject that is three hours in length \cite{csutopictree}. CSU's curriculum covers around 1000 topics with each topic being three hours in length for a degree. In this thesis, we will also define a topic being three hours of content, but instructors can choose what amount of content constitutes as a topic.\\
 
+\textbf{Topic Groups} \\
+Topic groups are similar to courses themselves, except they are purely for organisational and enrolment purposes. We found that it would be much easier to enrol students into a group of topics instead of each individual topic, and it makes searching the topic tree much easier as there are a smaller number of topic groups than topics themselves. \\
+
+Topic groups themselves do not contain assessments, exams, or any other resources. Only topics themselves contain this information. Therefore, academics must store assessments in individual topics and set up the prerequisites so if they wish, they can store a final exam in the last topic that students must complete or in an empty "milestone" topic. We decided to name this grouping of topics as "topic groups" instead of courses due to how a traditional course contains assessments and other content for the entire course, and does not have prerequisites between the topics themselves. This naming helps differentiate the system from the traditional university model.\\
+
+\textbf{Prerequisites} \\
+
+Each topic can have its own prerequisites, as discussed briefly previously. Some topics must be completed in order to complete the current topic. Prerequisites can be across topic groups as well. For example, Linked Lists in the "Introduction to Programming" topic group must be completed in order to start Graphs in "Data Structures and Algorithms". This improves reusability, as topics in other topic groups can be set as prerequisites eg. Git can be set a prerequisite for "Web Front end Programming" instead.
+
+\textbf{Reusability} \\
+The topic tree enables academics to easily reuse content - by setting specific topics, academics can reuse content instead of creating new content for the same topic in their own course. A good example of this is "Web Front end Programming" at UNSW - Instead of creating new content for Git, academics can set Git as a prerequisite. However, to encourage reusability, a cloning feature is also provided where academics can clone a topic and its resources from another topic group and put it in its own topic group. This further enables reusability, demonstrating that there is no need to spend time creating new content.\\
+
+\textbf{Course Materials} \\
+The Meta Learning Management System also organises content into four sections:
+\begin{itemize}
+    \item Content
+    \item Practice
+    \item Preparation
+    \item Assessments
+\end{itemize}
+
+These various sections were chosen as they fit many learning models, including UNSW's learning models as listed on their website \cite{learningModel}. Students are introduced to it in the content section, and then get to know more about it in the practice section, and try it out in the preparation and assessments sections. After receiving feedback, this cycle repeats again.\\
 
 \begin{figure}[h!]
     \centering
@@ -19,58 +40,28 @@ At Charles Sturt University, each topic is defined as a small subject that is th
 
 In the above example, pointers, structs and discrete mathematics must be learned in order to learn graphs. Likewise, graphs and recursion is required to learn depth first search.\\
 
-
-Specific courses in this new LMS would be created by choosing the topics this new course has, and all course materials under each topic would be imported into the respective topic. This allows for faster creation of courses, and course materials can be reused more easily.\\
-
-\subsection{UI/UX}
-The UI for the topic tree involves two different views of the topic tree - a graph view and a traditional view. The graph view will be the focus of the LMS, as it will allow instructors to visualise the prerequisities between topics easily. However if time permits, a traditional interface will be implemented as well in Thesis C, with an option to switch between the two views. This traditional interface will be easier to use for some users, as it is similar to typical interfaces and a graph interface may be too confusing to use.\\
-
-\newpage
-\textbf{Graph Interface}
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[scale=0.4]{topic-tree-graph-view}
-    \caption{Topic Groups Graph UI}
-\end{figure}
-
-This is a mockup of a possible graph UI. Arrows indicate prerequisites, as in this example Memory is required to be learnt in order to learn about Pointers. This will be the default view of the topic tree, and a modal will open to display content for a specific topic when the ``View Content" button is clicked. Topics will be grouped together - in this example, ``Introduction to Programming" would be the name of this group of topics, and would be represented as a ``region" of the topic tree.
-
-\textbf{Traditional Interface}\\
-The following mockups show what a traditional interface could look like, and will be changed and improved upon in the future.\\
-\begin{figure}[h!]
-    \centering
-    \includegraphics[scale=0.4]{topic-tree-groups-list}
-    \caption{Topic Groups UI}
-\end{figure}
-
-\newpage
-
-Each group of topics is listed in card format. The topics in each group can be viewed by clicking on the topic.\\
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[scale=0.4]{topic-tree-group}
-    \caption{Topic Group - C Programming Example}
-\end{figure}
-
-Inside a topic group, the full list of topics inside this group is listed. Prerequisites are NOT shown here. \\
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[scale=0.4]{topic-tree-pointers}
-    \caption{Topic - Pointers Example}
-\end{figure}
-
-All resources for this topic are listed, and prerequisites are also listed on this page. This view is modelled after the UNSW Handbook \url{https://www.handbook.unsw.edu.au/}, where course prerequisites are listed as links. This topic can then be imported into a course with the import button at the bottom.\\
-
 \subsection{Requirements}
-The requirements below are draft requirements, and will become more specific throughout the next stages of the thesis.\\
 Each requirement will have a priority: High, Medium or Low. High priority requirements will be completed first, and then medium and low priority requirements respectively. \\
 
 \subsection{Functional Requirements}
 
 \textbf{Viewing Topics}
+
+\begin{table}[]
+\begin{tabular}{ll}
+\textit{As a}      & User                                                \\
+\textit{I want to} & View groups of topics                               \\
+\textit{So that}   & I can see how topic groups interact with each other
+\end{tabular}
+\end{table}
+
+\begin{table}[]
+\begin{tabular}{ll}
+As a      & User                                                \\
+I want to & View topics within each group                       \\
+So that   & I can see how topic groups interact with each other
+\end{tabular}
+\end{table}
 
     \begin{enumerate}
     \item Users can view groups of topics \textcolor{Orange}{Medium}

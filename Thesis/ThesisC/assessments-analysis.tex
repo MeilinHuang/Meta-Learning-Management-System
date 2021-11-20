@@ -1,0 +1,117 @@
+\section{Assessments}
+
+The Assessments feature will be examined based on the following:
+\begin{enumerate}
+	\item Functional Requirements - whether the system provide enough functionality for the user to complete their task
+	\item Non-functional Requirements - whether it satisfies the goals of the feature and performs operations in a timely manner
+	\item Usability Tests - if users can navigate through the feature and be able to complete tasks.
+\end{enumerate}
+
+\subsection{Functional Requirements}
+The order of requirements that were implemented was based on the priority level of each requirement - \textcolor{Red}{[Must Have]} being a core feature and "Could have" being the lowest priority. 
+
+In total, 9 requirements out of 30 were fully completed. This resulted in 8 out of 14 \textcolor{Red}{[Must Have]} features being implemented. Below are the mentioned completed requirements:
+
+\subsubsection{Quiz Creation [1-3, 9]}
+\begin{enumerate}
+	\item Course lecturers can create a quiz \textcolor{Red}{[Must Have]}
+	\item Course lecturers can add questions to a quiz \textcolor{Red}{[Must Have]}
+	\item Course lecturers can create different types of quiz questions (multiple-choice, short answer, checkboxes) \textcolor{Red}{[Must Have]}
+	\item Course lecturers can set up a timer or due date for a quiz \textcolor{Red}{[Must Have]}
+		\item Course lecturers can add a question to a question bank \textcolor{Blue}{[Should Have]}
+\end{enumerate}
+
+\subsubsection{Viewing quiz results and feedback [1, 4]}
+\begin{enumerate}
+	\item Students can view results against their answers \textcolor{Blue}{[Should Have]}
+	\item Students can view an explanation of the correct answer if answered incorrectly \textcolor{Orange}{[Could Have]}
+\end{enumerate}
+
+The following explains the requirements that were not completed and why they were not completed:
+
+\subsubsection{Quiz creation [5-7, 8, 10], Quiz modification/removal [3, 4], Quiz usage [4]}
+\begin{enumerate}
+	\item Course lecturers can add "drag and drop" type questions \textcolor{Orange}{[Could Have]}
+	\item Course lecturers can add "connect the pairs" type questions \textcolor{Orange}{[Could Have]}
+	\item Course lecturers can add media (audio or video) into a question as the entire question or as a supplementary material to the question \textcolor{Orange}{[Could Have]}
+	\item Course lecturers can create a question bank \textcolor{Blue}{[Should Have]}*
+	\item Course lecturers can import a question from a question bank \textcolor{Blue}{[Should Have]}
+	\item Course lecturers can remove a question bank \textcolor{Blue}{[Should Have]}
+	\item Course lecturers can remove a question from a question bank \textcolor{Blue}{[Should Have]}
+	\item Students can manually save their progress at any time \textcolor{Blue}{[Should Have]}
+\end{enumerate}
+
+These were not completed due to the core question types (multiple-choice, short answer and checkboxes) unexpectedly taking a lot of time to implement due to bugs and the nature of the answers being formatted differently (with multiple choice and checkboxes being given answers that you must select from and short answer being a free answer the student must enter). There were difficulties when allowing the quiz creator to switch between question types and structuring the data storing those choices to work with all question types. 
+
+*For simplicity sake, instead of allowing the course lecturer to create a question bank, the default is a single question bank exists to store all questions that want to be used in future quizzes. 
+
+\subsubsection{Viewing quiz results and feedback [2, 3]}
+\begin{enumerate}
+	\item Students, course lecturers and admins can see how many students selected each answer for a question \textcolor{Blue}{[Should Have]}
+	\item Students can view topic or lecture the question derives from \textcolor{Blue}{[Should Have]}
+\end{enumerate}
+
+\subsubsection{Poll feature and Re-usability}
+These were not implemented due to the Quiz portion taking more time than expected and multiple re-designs of how to store the data for each question. However, there are placeholder entry points on the frontend and API endpoints that available for the re-usability portion (importing questions from question bank).
+
+
+\subsection{Non-functional Requirements}\
+The non-functional requirements used is heavily inspired by the Jakob Nielsen's 10 usability heuristics that's used to evaluate the usability of user interfaces. 
+
+\begin{enumerate}
+	\item \textbf{Efficiency} - users are able to perform tasks without taking too many steps
+	\item \textbf{Learnability} - new and returning users are able to quickly learn how to use and interact with the feature on the go
+	\item \textbf{Performance} - operations within the feature are completed within a timely manner, resulting in a smooth process
+	\item \textbf{Consistency} - components, colour themes and formats are consistent across pages 
+	\item \textbf{Aesthetic and minimalist design} - the user interface is appealing and simple while providing the expected features
+	\item \textbf{Re-usability} - users are able to re-use components and content they've previously made
+\end{enumerate}
+
+\subsubsection{Efficiency}
+From what the user interface provides, there are multiple options provided for the same action (such as expanding a question by clicking on the Question accordion header or by using the Question List tool on the left column on the Quiz Creation page) as well as useful tools. This allows the user to perform specific tasks faster and more efficiently. 
+
+\subsubsection{Learnability}
+This cannot be tested with returning users since no usability test was done in early iterations of the feature, however can be evaluated with new users using the results from the usability tests which is in the next section.
+
+\subsubsection{Performance}
+Due to the frontend of the Assessments feature being partially connected to the backend due to the API calls being denied for unknown reasons, the performance cannot be evaluated properly.
+
+\subsubsection{Consistency}
+The colours themes used are consistent across pages, however the formatting and components differ per page. On the quiz creation page, there are 3 columns while the quiz usage page has 2 columns and the quiz review submission page has 1 column, where the content is vertically aligned in the center. This may be satisfactory, but could be improved upon future iterations.
+
+There is also a combination of icons and words being used for icons which might make the user interface more confusing or difficult to navigate. 
+
+\subsubsection{Aesthetic and minimalist design}
+The user interface looks somewhat appealing, however can have improvements made to be more appealing, such as the quiz details section on the quiz creation page. The design for the quiz creation page is not minimalistic due to the extra ability to remove, edit and add new answers. The design for the quiz usage and review submission page is quite minimalistic. 
+
+\subsubsection{Re-usability}
+There is currently no re-usability support and so this requirement has not been completed.
+
+\subsection{Usability tests}
+The following are results from the usability tests focusing on the student-related pages (Quiz Submission and Review Submission pages), which was conducted on 6 participants who are currently or were students that have used at least one learning management system before.
+
+\subsubsection{Results}
+Below is a summary of the results recorded while the participants were completing the tasks specified in the usability test plan:
+
+\begin{itemize}
+	\item 2 out of 4 participants were able to complete all tasks with no misclicks, errors or detours
+	\item The main cause of errors was due to the outline of input boxes and selection buttons (eg. radio and checkbox buttons) being very light and weakly contrasting with the white background
+	\item Each task was completed on average between 10-20 seconds by each participant which suggests the interface was usable and quick to learn for being first time users.
+\end{itemize}
+
+\subsubsection{Feedback from participants}
+The main pieces of feedback were:
+
+Quiz Submission page:
+\begin{itemize}
+	\item Selection options and input boxes were too light and difficult to see
+	\item At the last question, have a "Submit quiz" button appear next to the "Previous Question" button to maintain the 2 button format (that was "Previous Question" and "Next Question" for middle questions)
+\end{itemize}
+
+Quiz Review Submission page:
+\begin{itemize}
+	\item Moving between questions one at a time may be better so students can focus on reviewing a particular question
+	\item Providing links to any referenced materials (eg. lecture slide PDF) would allow faster revision and be convenient
+	\item Have a box around the Answer Explanations section to indicate that it is not part of the original question
+	\item Have a cross at the end of incorrect answers and a tick at the end of correct answers
+\end{itemize}

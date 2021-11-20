@@ -456,7 +456,7 @@ export default function EnrollmentDashboard() {
                           {k.expiration ? (
                             <Text>
                               {getHoursRemaining(k.expiration)}{" "}
-                              {Math.round(getHoursRemaining(k.expiration)) === 1
+                              {getHoursRemaining(k.expiration) === 1
                                 ? "hour"
                                 : "hours"}
                             </Text>
@@ -541,6 +541,14 @@ export default function EnrollmentDashboard() {
                           title: `Unable to enroll student ${zId}`,
                           description: `${r.error} Please ensure you're typing the student you wish to enroll's zId correctly.`,
                           status: "error",
+                          duration: 5000,
+                          isClosable: true,
+                        });
+                      } else {
+                        toast({
+                          title: `Successfully Enrolled Student!`,
+                          description: `Student ${zId} has been successfully enrolled in ${code}!`,
+                          status: "success",
                           duration: 5000,
                           isClosable: true,
                         });
