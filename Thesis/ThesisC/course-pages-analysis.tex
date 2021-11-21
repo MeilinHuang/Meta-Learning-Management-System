@@ -138,3 +138,44 @@ A way to provide this functionality would be to allow users to select an option 
 In this design, the functionality of the widgets bar would still be present within smaller screens and also larger screens, however is less accessible for users to navigate.
 
 \subsection{Usability Tests}
+
+The usability tests were conducted on a variety of UNSW students primarily studying computer science and engineering.
+For the usability testing a series of tasks were utilised to simulate several use cases for regular users and administrators.
+The following tasks were presented to the individuals in which the usability tests were conducted on:
+\begin{enumerate}
+    \item Login as john smith.
+    \item Can you tell me what courses you are enrolled in?
+    \item Can you tell me the progress of the courses?
+    \item Can you identify anything else that is shown on the page?
+    \item Can you make a reminder on the calendar and delete it?
+    \item Can you tell me what the reminder section is for and what do you think of it?
+    \item Go to the C++ programming course home page and to the content of that course.
+    \item Can you find and open the while loops pdf file and signify that you have completed it?
+    \item Tell me the perquisites of the topic that the while loops pdf file is in.
+    \item On the same page can you navigate to another course?
+    \item Login as jane doe.
+    \item Can you identify what is shown on the page?
+    \item Go the C++ Programming page and create an announcement with the title: ‘Week 2 updates’ and content: ‘Continue with your work and finish variable topic content for next week’.
+    \item Edit the newly created announcement so the content is ‘Finish while loops content this week and next week we will announce a new assignment’.
+    \item Delete the announcement.
+\end{enumerate}
+
+Before beginning each individual usability test, each participant was given context of the topic groups, topics and topic files. Specifically the relationship between courses and topic groups were explained, along with how topics contain 4 types of material (preparation, content, practice, assessments).
+Most users could navigate through all of the tasks with ease. However there were certain aspects that took longer than expected to complete or did not fully understand.
+These were:
+\begin{itemize}
+    \item Not understanding the which announcement is for which particular course in the course selection page
+    \item Not understanding the most recently accessed feature
+    \item Not noticing the difference between the course selection page and course dashboard/content page.
+    \item Difficulty to distinguish the separate topics and content types in the course content page
+\end{itemize}
+
+These results highlight UI deficiency in providing a clear outline of allowing users to understand the functionality.
+For the first 2 points, help buttons or tooltips could be implemented to provide the user with the ability to search how the feature is intended to be used.
+The 3rd point involves the lack of unique distinction between the course selection and a particular course page. A possible solution would be to change the side bar colors when a user enters a particular course page.
+This would be similiar to WebCMS3 as it uses colours to distinguish different courses from each other.
+Another supplement to this solution to provide more distinction that a user can return back to the course selection page would be to highlight the return button.
+Lastly the accordion within the course content page would need to be updated to further distinguish items within a topic. This can be done by increasing the margin for each item or having different font weights for topics or topic content.
+In general the course dashboard had no complaints as it was a familiar feature for users to utilise.
+Some users also conveyed some concern with understanding the relationship between topic groups and courses, as they would not have understood how to utilise the MetaLMS without the background context.
+In this aspect, the MetaLMS would benefit with a general help page to assist users with understanding the several relationships.
