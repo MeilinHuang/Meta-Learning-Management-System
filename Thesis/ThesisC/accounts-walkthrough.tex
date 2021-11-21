@@ -104,7 +104,31 @@ This screen contains all of the important controls for managing the enrollments 
 
 There are two options a staff member has when generating an invite code. First, they can set the number of uses a code has, with a range from zero to infinite. They can also set the time an invite code is valid for, also ranging from zero to infinite. Under the inputs for these two fields is a "Generate Link" button which when pressed packages the values set for the optional parameters, and sends them in a request to the back-end. The back-end receives this request, and inserts a new code object into the database. If the parameter for time remaining or uses are set to 0 when sent to the back-end, the back-end does not add these parameters to the data entered into the database and thus the code has infinite uses or infinite time remaining. After entering the data for the code into the database, the backend responds to the front-end with the usable code. The front-end then automatically appends this code to the URL of the site and displays this in the text-box at the top of the screen. It also adds the code to the enrollment codes table below.
 
-Below the code generation area is a table where all of the currently outstanding invite links can be viewed. The data for these codes are fetched whenever the page is loaded. First, the front-end requests the list of all invite codes for the course. The back-end then gets a list of all codes for that course from the database. It then checks this list for any which have 0 uses remaining, or have 0 time remaining and deletes them from the database. It then sends this updated list to the front-end to be displayed.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.1]{images/accounts-staff-link.jpg}
+    \caption{Generate Invite Link}
+\end{figure}
+
+Below the code generation area is a table where all of the currently outstanding invite links can be viewed. The data for these codes are fetched whenever the page is loaded. First, the front-end requests the list of all invite codes for the course. The back-end then gets a list of all codes for that course from the database. It then checks this list for any which have 0 uses remaining, or have 0 time remaining and deletes them from the database. It then sends this updated list to the front-end to be displayed. For these codes in the table, if the user clicks the copy button, it copies the invite link corresponding to that code directly to the clipboard. There is also a delete button, that when pressed, optimistically updates the front-end to reflect the delete, and sends a delete request to the backend, which then deletes it from the database.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.1]{images/accounts-staff-table.jpg}
+    \caption{Invite Link Table}
+\end{figure}
+
+The next UI element is the search-ability toggle. On the page load, it reads the state of the search-ability of the course from the payload sent from the back-end that is requested when the page loads. It then sets the state of the search-ability toggle accordingly. When a user interacts with the toggle, the front-end optimistically updates, and sends a request to the back-end to change the state. The back-end then updates the state in the database, and sends a confirmation to the front end. 
+
+The final component is the enroll by student ID and student list section. The enroll by student ID feature allows a staff member to enter a student's ID into the text field and submit it to be enrolled into the course. When it is submitted, the front-end checks to see if the student ID is in a valid format, and if so, sends it to the back-end to enroll the student in the course. The back-end checks to see if the student exists, then if the student is already in the course. If both of those checks pass, the back-end enters the student into the course in the database, and sends an updated enrolled student list of the course to the front-end. Unlike many other components on this page, the manual enroll is not optimistically updated on the front-end due to the higher chance of failure due to a high reliance on user input. Thus, the front-end waits to receive the updated student list from the back-end to update the student list on the front-end. The student list is simply a list of all users enrolled in the course, with students separated out from staff. A staff member will also see a red x next to all the students in the course allowing them to manually un-enroll a student. When clicked, the front-end optimistically updates the list to remove the student, then sends the delete request to the back-end, which then removes that students enrollment from the database and sends a confirmation to the front-end.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.1]{images/accounts-staff-student.jpg}
+    \caption{Manual Invites and Student List}
+\end{figure}
+
+For the entire page, if at any point an error occurs, any optimistic updates will be reverted, and an error toast will be displayed to the user explaining what went wrong. This is by design, so that the information on the page is always correct, and errors are in a consistent and easy to understand format.
 
 \textbf{Considerations}
 
