@@ -160,7 +160,7 @@ export default function LoginForm() {
               <FormLabel> Email </FormLabel>
               <Input
                 type="email"
-                placeholder="test@test.com"
+                placeholder="email@domain.com"
                 size="lg"
                 onChange={(e) => setEmail(e.currentTarget.value)}
               />
