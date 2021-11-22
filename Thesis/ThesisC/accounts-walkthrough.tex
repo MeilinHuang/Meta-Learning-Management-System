@@ -1,4 +1,4 @@
-\section{Accounts}
+\section{Accounts and Enrollments}
 
 \subsection{Login and Sign Up}
 \textbf{Design}
@@ -104,16 +104,70 @@ This screen contains all of the important controls for managing the enrollments 
 
 There are two options a staff member has when generating an invite code. First, they can set the number of uses a code has, with a range from zero to infinite. They can also set the time an invite code is valid for, also ranging from zero to infinite. Under the inputs for these two fields is a "Generate Link" button which when pressed packages the values set for the optional parameters, and sends them in a request to the back-end. The back-end receives this request, and inserts a new code object into the database. If the parameter for time remaining or uses are set to 0 when sent to the back-end, the back-end does not add these parameters to the data entered into the database and thus the code has infinite uses or infinite time remaining. After entering the data for the code into the database, the backend responds to the front-end with the usable code. The front-end then automatically appends this code to the URL of the site and displays this in the text-box at the top of the screen. It also adds the code to the enrollment codes table below.
 
-Below the code generation area is a table where all of the currently outstanding invite links can be viewed. The data for these codes are fetched whenever the page is loaded. First, the front-end requests the list of all invite codes for the course. The back-end then gets a list of all codes for that course from the database. It then checks this list for any which have 0 uses remaining, or have 0 time remaining and deletes them from the database. It then sends this updated list to the front-end to be displayed.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.2]{images/accounts-staff-link.jpg}
+    \caption{Generate Invite Link}
+\end{figure}
+
+Below the code generation area is a table where all of the currently outstanding invite links can be viewed. The data for these codes are fetched whenever the page is loaded. First, the front-end requests the list of all invite codes for the course. The back-end then gets a list of all codes for that course from the database. It then checks this list for any which have 0 uses remaining, or have 0 time remaining and deletes them from the database. It then sends this updated list to the front-end to be displayed. For these codes in the table, if the user clicks the copy button, it copies the invite link corresponding to that code directly to the clipboard. There is also a delete button, that when pressed, optimistically updates the front-end to reflect the delete, and sends a delete request to the backend, which then deletes it from the database.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.2]{images/accounts-staff-table.jpg}
+    \caption{Invite Link Table}
+\end{figure}
+
+The next UI element is the search-ability toggle. On the page load, it reads the state of the search-ability of the course from the payload sent from the back-end that is requested when the page loads. It then sets the state of the search-ability toggle accordingly. When a user interacts with the toggle, the front-end optimistically updates, and sends a request to the back-end to change the state. The back-end then updates the state in the database, and sends a confirmation to the front end. 
+
+The final component is the enroll by student ID and student list section. The enroll by student ID feature allows a staff member to enter a student's ID into the text field and submit it to be enrolled into the course. When it is submitted, the front-end checks to see if the student ID is in a valid format, and if so, sends it to the back-end to enroll the student in the course. The back-end checks to see if the student exists, then if the student is already in the course. If both of those checks pass, the back-end enters the student into the course in the database, and sends an updated enrolled student list of the course to the front-end. Unlike many other components on this page, the manual enroll is not optimistically updated on the front-end due to the higher chance of failure due to a high reliance on user input. Thus, the front-end waits to receive the updated student list from the back-end to update the student list on the front-end. The student list is simply a list of all users enrolled in the course, with students separated out from staff. A staff member will also see a red x next to all the students in the course allowing them to manually un-enroll a student. When clicked, the front-end optimistically updates the list to remove the student, then sends the delete request to the back-end, which then removes that students enrollment from the database and sends a confirmation to the front-end.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.2]{images/accounts-staff-student.jpg}
+    \caption{Manual Invites and Student List}
+\end{figure}
+
+For the entire page, if at any point an error occurs, any optimistic updates will be reverted, and an error toast will be displayed to the user explaining what went wrong. This is by design, so that the information on the page is always correct, and errors are in a consistent and easy to understand format.
 
 \textbf{Considerations}
 
-was going to be broken into multiple pages - decided against
+The primary consideration made when designing and developing this dashboard was ease of use. As a result, the initial plan to separate these features into multiple pages, one for invite links, one for manual invites and one for monitoring student lists and managing search-ability, was decided to not be followed in favour of the current implementation, having it all in one place. This allows users to more quickly manage enrollments, and not have to waste time switching contexts.
 
 \subsection{Enrollment Dashboard - Student}
 
 \textbf{Design}
+
+The student enrollment dashboard is split into two main areas, the join with invite code area, and the search for a course area. Both sides consist of two very basic UI elements, a text input, and a submit button. For the invite code side, students input a code given to them by a teacher, and submit that to be enrolled into a course. For the search side, students can enter either the course code, course name, or key words related to something they wish to learn about and submit it. This will then return matching courses in the form of cards, which say the courses name, code and course outline, and has a button they can press to enroll.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.1]{images/accounts-student-dash.jpg}
+    \caption{Student Enrollment Dashboard}
+\end{figure}
+
 \textbf{Purpose}
+
+Due to the fast-paced nature of learning that comes from using the topic group approach, it is important that students have a high level of agency over their learning. As such, it is essential the tools students have access to that allow them to manage their enrollments are powerful enough to afford them this agency. This adds a tremendous amount of value to the Meta LMS as it gives students access to the full benefits of the topic group system.
+
 \textbf{What Was Implemented}
+
+The two systems implemented are the student face of the invite code system, and the course searching system. The course invite system also encapsulates the login redirect feature, that allows students who are not currently logged in to the LMS to simply click an invite link, login or sign up, and then automatically be redirected to the student enrollment dashboard with the invite code pre-filled to quickly and easily begin using the LMS to learn.
+
 \textbf{How It Was Implemented}
+
+The course invite system works by allowing a user to input a course invite code, and submit it to enroll themselves into a course. This field will be blank on the page load if the user has navigated to the enrollment page manually, but will be pre-filled if the user has arrived to the page by using an invite link. This is done by reading the ID URL parameter of the invite link, and setting that as the default value of that text field. When the user submits an invite code, the front-end sends that code in a request to the back-end. The back-end first checks to see if the code exists in the database, then checks if the code is valid, that is, if it has time remaining, or uses remaining. If the code has become invalid, it deletes it from the database and sends an error to the front-end. If the code is valid, it then checks if the student is already enrolled in the course, and if they aren't, it enrolls them, and updates the remaining uses for that invite. If the student's enrollment causes this code to become invalid, it is then removes that code from the database. Once the enrollment is successful, its sends the confirmation payload to the front-end. This payload contains the information of the course the student was enrolled in, as well as the confirmation status. This information is then displayed to the user on the front-end in the form of a toast that confirms the enrollment was successful and the course they were enrolled in.
+
+The search for a course feature is much the same, the user inputs a string and sends it to the back-end. However, the string entered will correspond to either a course's code, a course title or details about a course. When the user submits this, the front-end sends a request to the back-end for results related to the user's query. The back-end then compares the query to the course codes, names and course outlines stored in the back-end, but only of courses that have been marked as search-able. It then assembles a list of results and sends that response back to the front-end. The front-end then displays this list to the user in the form of cards. These cards contain all the basic information about the course, and also have an enroll button. When the user clicks the enroll button, the front-end sends the enroll request to the back-end. The back-end then does checks to see if the user is already in the course, and if not, enrolls them in the course and sends confirmation back to the front-end. This successful enrollment is then displayed in the form of a toast.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.6]{images/accounts-login-redirect.jpg}
+    \caption{Invite Code Login Redirect}
+\end{figure}
+
+The feature that handles the redirect to the invite screen from the login page does so by storing the invite code from an invite link in the redirect URL parameter of the invite page. If this parameter is present, once a user has successfully logged in, it will redirect them to the invite page and pre-fill the code.
+
 \textbf{Considerations}
+
+The primary consideration for this feature was the redirect from the login screen, particularly for new users. To create as positive a user experience as possible, the sign up to enrollment process needs to be as seamless and friction-less as possible. Allowing users to simply input an invite code, create an account then automatically be redirected to the enrollment page with the code pre-filled makes this enrollment process as easy as possible for the user, allowing them to begin using the LMS to learn very quickly.

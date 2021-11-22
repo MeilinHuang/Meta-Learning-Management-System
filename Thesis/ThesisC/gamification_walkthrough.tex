@@ -1,140 +1,359 @@
+
 \section{Gamification Walkthrough}
-\subsection{Overview}
-Learning Management Systems (LMS) are often only used as tools to distribute course content in various forms and act as a communication tool between course staff and students. Many LMS do not provide features that actively engage, retain and influence students for a better academic outcome. Futhermore, many LMS do not have sufficient capability to ensure content is not lost, can be easily readapted or reused and provide academics a simple flow efficiently set up interactive content. This gamification feature will focus on addressing this lack of capability in the market to provide students and academics an immersive and engaging learning experience within a wider meta-lms where content can be easily reused, readapted and monitored.
-\newline
 
-Gamification of LMS can achieve this through an interactive and immersive approach by applying game-like mechanics, creating a fun learning experience for students within an integrated environment of the meta-lms where data is tightly connected to other parts of the lms (i.e. Course Page, Forums, Assessments).
-A Gamification feature must also link seamlessly into a wider meta-lms to ensure course content can be easily retrieved, reused and updated to provide a high-quality learning journey for students.
+\subsection{Definition of Levels in Gamification }
 
-\subsection{Feature 1}
-Gamification of a Learning System is defined as implementing game thinking and game mechanics into core features of the platform to provide a more interactive learning experience for students. Gamification is built on three simple concepts: Objectives, Rewards and Competition. Objectives can be set by platform admins, aligning to specific course learning objectives. 
-These objectives provide students with a purpose to remain on the platform and ultimately achieve course learning outcomes. A reward system is a positive reinforcement for students and can be a driving factor for students to stay on the platform. In a well designed gamification experience, competitive interest pushes students to perform better and to gain more knowledge to attain a higher position than others. 
-Through these fairly simple concepts, the gamification feature in a learning management system can help students achieve course learning objectives in an immersive and rewarding manner.
+\subsubsection{Purpose}
+Level is a playable set of questions with content from a single topic that students can play through and earn points. It also allows staff to customise questions, question type, points available and time allowed for each question.
 
-\newpage
+\subsubsection{What was Implemented}
+Levels are sets of questions that consist of content from a specific topic within a topic group. Levels can be categorized as Knowledge, Practice and Challenge with increasing difficulty and point earning potential respectively. Levels are built to be reusable and customisable by any staff on the platform.
 
-\subsection{Feature 2}
-The goal of this feature is to form a crucial component in the meta-lms to provide a reusable, customisable and seamless experience for course admins as well as a fun, interactive and immersive learning experience for students using the platform. This feature aims to implement the 3 gamification concepts of Objectives, Rewards and Competition. 
-The gamification feature will be structured into levels with Core Knowledge modules providing clear objectives for students, Challenge modules providing practical hands on practice that when combined with the reward system create a competitive environment for students. These modules will provide a level of customisation based on wider lms permissions to academics. 
-\newline
+\subsubsection{How it was Implemented}
+Levels store general info like name of level, type of level, week it is visible as well as an array of questions in the backend. We can create a level through our backend api built that takes in all the information and creates a level entity stored in postgres database. In gamification, Level is directly related to a topic on a one to one basis, a level should only have content from a single topic and a topic group will encompass multiple levels which are content from multiple topics.
 
-Academics can customise the questions and question types in each module, set the correct answers as well as set the achievement / rewards that students will earn on completion.
-The types of games in scope for development will be multiple-choice style (Timed and Untimed) games, True / False games and coding questions (Assessed on test suite). The feature will also enable academics to customise the levels and select the games they like to be included in their course run. The Gamification feature will be integrated into the larger meta-lms where the data is stored.
-
+\subsubsection{Considerations}
 \begin{itemize}
-    \item High Levels of Engagement and Retention on Platform
-    \item Present content with a fun and immersive approach
-    \item Better retention and improved proficiency through practice
-    \item Challenge and stimulate creativity
-    \item Trigger change in thinking
-    \item Influence positive behavioral change
+    \item Levels should be customisable, editable after creation and performant as the platform could be retrieving many levels at once.
+    \item Tradeoff between time allocated for entire level vs time allocated per question
+Time limit per question increases difficulty and will generate more competition compared to the time limit for the entire level. I have decided to implement the time allocated per question to increase customizability. As points are awarded based on correct answers, this decision also increases the value of points on the platform.
 \end{itemize}
 
 \newpage
 
+\subsection{Definition of Topic Groups in Gamification}
 
-\subsection{Feature 3}
-Since the backend for the Meta LMS is being built out independently to the individual features, the following contains a description of the ideal backend design for the forum component.
+\subsubsection{Purpose}
+Topic Groups hold information on topics created within the topic group. Topic Groups are read from the wider metalms to present appropriate content to users in the gamification platform.
 
-\subsubsection{Feature 4}
-\begin{figure}[h!]
-    \includegraphics[scale=1.5]{gamification-structure.png}
-    \centering
-    \caption{Learning Level Structure}
-\end{figure}
+\subsubsection{What was Implemented}
+In gamification, topic groups are pulled from the metalms and enable the system to identify students assigned to topic groups and levels (topics) created within the topic group. With this relationship between topic groups and levels (which are a set of questions on a topic), admins can easily add or remove topics to topic groups and in doing so change which students have visibility of the levels.
 
-The above outlines the learning structure for the gamification feature. This includes Core Knowledge modules that can be set as objectives for the week. Academics can customise the content and the number of these core knowledge modules which should be broken down by topics (E.g. Variables, Arrays, Loops). The Challenge module allows academics to create challenging practical exercises for students to apply their knowledge learnt in core knowledge modules. Academics can set the rewards and achievements that students will earn in each of the different modules. These rewards will allow the system to automatically produce leaderboards and in game prompts to drive a competitive environment.
+\subsubsection{How it was Implemented}
+Staff will first select a topic group from a list retrieved from metalms. The staff must then add start and end dates for the term that the topic group will run in. Once this is done, any levels assigned to this topic group will be assigned to all the students that are enrolled in this topic group. For students, the platform retrieves topic groups assigned to them, this is pulled through the backend api from the enrolment table in DB. Using the topic group id, the platform retrieves all levels associated with the topic groups. The frontend will then filter and only display the levels to users that are visible according to its visibility setting customised by admins.
 
-\subsubsection{Feature 5}
-Core Knowledge modules aims to present the fundumental knownledge topics in video, slides or pdf form and followed up with some simple practice to reinforce the new learnings for students.
-This sub feature will have functionality to add video content, content from webpage as well as pdf content. After these content, several game types can be added (MCQ, True/False, Coding Questions) to test the knowledge students just learnt. Core Knowledge modules can be set as prerequisite for challenges and allow the students to earn reward points as well. Core Knowledge modules will be used to introduce specific topics through short videos followed by questions to test the newly gained knowledge. 
-
-\subsubsection{Feature 6}
-Challenge modules aims to create interactive content that enables students to apply knowledge they learnt by providing an environment to develop their critical thinking skills.
-Challenges are more challenging timed games where students need to apply the core knowledge in various ways to earn points. This reinforces and simulates a review of the core knowledge. Challenges are timed levels with a higher difficulty level but provide students with the most rewards based on their performance (Time Taken and Accuracy Of Answers).
-
-\subsubsection{Feature 7}
-The reward system aims to provide a mechanism for positive reinforcement, create a competitive environment and set some goals for students to achieve, ultimately increasing engagement and retention of students.
-In Core Knowledge and Challenge modules, students can earn points based on their accuracy in answering questions under time pressure. The number of points earned per activity can be customised by course admin. These points will be recorded for modules, weeks and all time to generate leaderboards. Based on points earned and certain criteria, the platform can issue an achievement that is unique and only be earned once per course. These achievements can be customised by the course admin. Students will be able to use the points earned to redeem items that will help them earn more points. Some examples: x2 points for 1 hour. 
-
-\subsubsection{Game Types}
-Game Types facilitate the assessment of student's knowledege in an interactive manner. These games should be extremely reusable and customisable.
-In scope are Timed or Untimed multiple choice questions, True / False questions as well as coding questions (through integrated text editor). The game type structures pull data from the meta-lms database that are related to their specific data structure. Course admins will be able to create, customise and choose reward parameters for each game type. This feature will be implemented to be easily modified to include more game types in the future.
-
-\subsubsection{Student Frontend Requirements}
-\begin{enumerate}
-    \item As a Student, I need to be able to access the gamification feature to navigate and complete modules for my course. (Permissions)
-    \item As a Student, I need to be able to complete Core Knowledge Modules. (Course)
-    \item As a Student, I need to be able to complete Challenge Modules. (Course)
-    \item As a Student, I need to be able to see a recap of my progress in level. (Course)
-    \item As a Student, I need to be able to view all my enrolled courses and access weekly activities. (Course)
-    \item As a Student, I need to be able to monitor my progress compared to other students. (Course)
-    \item As a Student, I need to be able to see my achievements and reward points. (Rewards)
-    \item As a Student, I need to be able to see my leaderboard rankings compared to my peers. (Rewards)
-\end{enumerate}
-
-\subsubsection{Academic Frontend Requirements}
-\begin{enumerate}
-    \item As an Academic, I need to be able to access the gamification feature to navigate, customise courses and set permissions for students. (Permissions)
-    \item As an Academic, I need to be able to create a new course run either new or clone from previous course. (Course Management)
-    \item As an Academic, I need to be able to customise content and number of questions for Core Knowledge Modules and Challenge Modules. (Course Management)
-    \item As an Academic, I need to be able to create new timed or untimed questions of types (MCQ, True / False, Coding). (Course Management)
-    \item As an Academic, I need to be able to monitor the leaderboards for the course and monitor course level statistics. (Course Management)
-    \item As an Academic, I need to be able to customise the rewards awarded to students on completion of questions in modules. (Rewards Management)
-\end{enumerate}
+\subsubsection{Considerations}
+\begin{itemize}
+    \item Levels should be customisable, editable after creation and performant as the platform could be retrieving many levels at once.
+\end{itemize}
 
 \newpage
 
-\subsubsection{Backend Requirements}
-Gamification Feature will require some backend connections to the meta-lms to setup for integration of permissions, content and results.
-This feature will also need backend functions that will enable setup and customisation of courses, modules and student profiles.
+\subsection{Accessing Gamification from metalms}
+From the homepage of the metalms, students and admins can get to the gamification feature by clicking Gamification on the sidebar.
 
-\begin{enumerate}
-    \item Retrieve a list of students enrolled in course from meta-lms
-    \item Retrieve a list of all or courses in meta-lms
-    \item Retrieve a list of all or course games
-    \item Retrieve a list of levels in course
-    \item Retrieve individual post details for post page (including comments and responses)
-    \item Retrieve permissions for user
-    \item Store course
-    \item Store level
-    \item Store game
-    \item Update game
-    \item Update level
-    \item Update course
-    \item Update user rewards
-    \item Update permissions for user
-\end{enumerate}
+\begin{figure}[h!]
+\includegraphics[scale=0.5]{topic-tree-dashboard}
+    \centering
+    \caption{Accessing Gamification}
+\end{figure}
 
-\subsection{Software Development Approach}
-In this new gamification feature for the meta-lms, we will be using React as our frontend architecture. It is the most modern and widely used framework that will ensure the longevity of this feature.
-While React is used as a frontend framework, node js is used as a middle layer for data manipulation and api creation. Node js is a simple framework based on js that allows for quick development of REST APIs that are hosted on the web server. The data manipulation layer will interact with the PostgreSQL backend which will hold all the data for the meta-lms.
-Gamification feature will have its own suite of REST APIs developed that are specific to implementation of the 3 concepts.
 
-\begin{enumerate}
-    \item Data Structure for Gamification will first be set up in the PostgreSQL. These include the SQL tables required and a UML diagram to outline how each table will interact with one another.
-    \item REST APIs created to facilitate interactions between frontend and backend.
-    \item Frontend Development
-    \item Testing of Gamification Feature
-    \item Integration to meta-lms
-\end{enumerate}
+\subsubsection{Purpose}
+Serves a connection to the metalms and create a seamless move from metalms to gamification platform
 
-\subsection{Evaluation}
-Before implementation, we need to understand our users (Academics and Students). In Term 2, we will provide several students and academics with a questionnaire surveying knowledge about gamification as well as popular features and use cases in a gamified LMS. Using the survey, we can test and refine our initial user stories to ensure we meet the end user’s needs.
-
-To evaluate the quality of the implementation, the gamification feature must be integrated into the wider meta-lms and pass various feature specific automated tests as well as meta-lms automated tests. These tests will ensure that the feature is performing to its specifications and that this remains through when operating it as an integrated feature in the meta-lms.
-
-On completion of a working prototype of the meta-lms gamification feature, we will conduct user testing that will help to refine and iron out issues with the platform. The user testing will include hands-on interaction with the prototype running through various use cases on the gamified lms. Upon completion we will utilise the feedback from user testing to refine the platform. Success of the thesis will determine completion of the gamified LMS feature with positive user feedback for the platform.
+\subsubsection{What was Implemented}
+When a user clicks on the gamification link, the system will redirect the user to the gamification feature. Once this redirect occurs, the user's profile metadata is loaded up into the gamification feature as well for a seamless experience.
 
 \newpage
 
-\subsection{Project Timeline}
-Below is a rough guideline of some milestones that should be met throughout the year in order to complete this feature on time.
+\subsubsection{How it was Implemented}
+The metalms has a stored local variable for the authentication token. This token is passed through into the gamification feature which then authenticates the user with the backend database and at the same time retrieves metadata relating to the user. This profile includes user's full name, user's role (Student or Staff), Assigned Topic Groups, Levels Progression and Points Earned. 
+
+\subsubsection{Considerations}
+\begin{itemize}
+    \item In the final design, I assumed that all users must access the gamification feature through the metalms and cannot seperately login into the gamification system. This was to simplify the routes required and create the integrated experience for users.
+    \item A performance and security consideration was how to pass the user from metalms to gamification. Ultimately implemented it based on passing of authentication token which is used to query the backend when user arrived on gamification landing page. This query pulls the user's latest metadata. This has performance impact compared to simply passing the data along, however the security benefit of this outweighed the performance gains that would have been realised.
+\end{itemize}
+
+\newpage
+
+\subsection{Student Dashboard}
+\subsubsection{Design}
+Students will be redirected to the Dashboard page where they can see all the levels assigned to them.
 
 \begin{figure}[h!]
-    \includegraphics[scale=1.5]{gamification-plan.png}
+    \includegraphics[scale=0.5]{gamification-walkthrough-dashboard}
     \centering
-    \caption{Term 2 and 3 Project Implementation Timeline}
+    \caption{Student Dashboard}
 \end{figure}
+
+\subsubsection{Purpose}
+Provide students an overview of levels available to be played. Provide staff to see the existing levels that they have edit permissions on as well as ability to create new levels.
+
+\subsubsection{What was Implemented}
+A grid list of level previews that display the levels available to user. The grid list is searchable to allow users to find specific levels. Level previews display level name, number of questions in level, time allowed and an option to start playing level.
+
+\subsubsection{How it was Implemented}
+The system will pull user’s assigned topic groups and populate the levels. Metadata for each level is displayed onto a tile for each level including name of level, duration of level, number of questions and how many points available to be earned. 
+
+\subsubsection{Considerations}
+\begin{itemize}
+    \item The tile presenting level information should be clear and concise, providing students only information they need.
+    \item Decided to implement grid list search and sort functions although it took longer than expected as it allows students to navigate levels easily if there are multiple levels displayed.
+    \item Decided to implement view of goals in the dashboard as a combined page as dashboard will ensure students see the goals first before interacting with other functionality.
+\end{itemize}
+
+\newpage
+
+\subsection{Starting and Playing a Level}
+\subsubsection{Design}
+Upon clicking the play button on the level tile on the dashboard page, students will see a get ready page below. Clicking Start Level will move the student to the first question.
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.4]{gamification-starting}
+    \centering
+    \caption{Starting Level}
+\end{figure}
+
+Students will be presented with the question and possible answers. They are tasked to select the most correct / appropriate answer. The timer starts the countdown for the time available for this question immediately. Upon reaching 0 time left, the answers will no longer be selectable.
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.3]{gamification-playlevel}
+    \centering
+    \caption{Playing Level}
+\end{figure}
+
+\newpage
+
+Upon the end of time available for the question, the correct answer is displayed in green and wrong answer displayed in red. The student is also provided with feedback on whether their answer was correct or wrong. If a student did not input an answer, by default their answer is wrong. 
+They will be presented with a button to move onto the next question.
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-endquestion}
+    \centering
+    \caption{End Of Question}
+\end{figure}
+
+At the end of the level, students will be presented with an overview of how they performed in the level through correct / wrong outcomes for each question. Additionally, a feedback statement is provided based on the result. If the student has achieved more than 60\% of answers correct, they will see a statement confirming their amount of points earned. If a student achieved between  41\% - 60\% of answers correct, they will see a statement confirming no points awarded. 
+
+\newpage
+
+Finally if a student achieved less than 40\% or lower of answers correct, they will see a statement noting the amount of points penalty applied. The points changes are immediate and students are able to see the new points in the top navigation bar. Additionally, if a student had any boosters active from the shop, their points earned will be adjusted for the effect of the booster. After reading this page, students can return to the dashboard using the return home button.
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-endlevel}
+    \centering
+    \caption{End Of Level}
+\end{figure}
+
+\newpage
+
+\subsubsection{Purpose}
+Playing levels feature enables students to play through the level questions, display time limit per question, review correct answers and determine points earned at end of level.
+
+\subsubsection{What was Implemented}
+Students start the playing level feature by clicking play on the selected level. This will bring students to the loading page and subsequently the first question. A countdown timer starts immediately and the question \& answers are displayed. Students can select / change answers until the timer reaches 0 where the UI changes to compare the student's answer to the correct answer and display if the answer was correct. Clicking the next button will allow students to move onto the next question.
+
+After the last question, the feature calculates total points that the user has earned based on the number of questions students have answered correctly / incorrectly. If students answered less than 40\% of questions correctly, they will receive negative points on the questions they answered wrongly. If a student answered between 41\% - 60\% of questions correctly, they do not earn or lose any points. If a student answers more than 60\% of questions correctly, they will earn points based on the questions that they answered correctly.
+
+
+\subsubsection{How it was Implemented}
+Upon clicking the play button on a level, the platform uses the level id to retrieve the questions with respective time allocated, answers for each question and points available for each question. During this process, the user can observe a loading wheel followed by a screen that tells students the maximum amount of points they can earn for the specific level. Students will then be able to click start to begin the level.
+
+Students will then see the first question. The platform will create a countdown timer using the time allocated for the question. During this time before countdown ends, if the user selects an answer, the platform updates selected answers state and sends it off to the backend to ensure that all changes in answers are captured immediately instead of at the end of the countdown. Once the timer ends, it updates the state and locks the selection of answers, it will then compare if selected answers are equal to the answers for the question. If incorrect, it will display “Your answer was wrong”, if correct, it will display “Your answer was correct”. In the background, the platform stores the selected answers back into the backend server and sets a completion timestamp for the question. This same pattern is reused until the last question has been answered. 
+
+\newpage
+
+At the results page, the platform retrieves the latest snapshot of a student's answers and calculates the points earned by the student. This is then validated to find out which category the result falls into (40\%, 41\%-60\%, 61\% - 100\%) and determines a points result which could be negative, 0 or positive. In the background, the platform automatically updates student’s points with the points result. This is how a user loses, earns or maintains their points when playing through a level.
+
+\subsubsection{Considerations}
+\begin{itemize}
+    \item Student's selected answers are recorded into the system immidiately when they select / change the answer. This deisgn inherently causes more requests to the backend api as students may change answers multiple times during the question compared to keeping the state locally and update backend at the end of the countdown. Ultimately decided with the frequent update due to increased reliability and ensure that changes just before the countdown ends are definitely captured correctly.
+    \item The points penalty system took alot of deliberation to design and implement. If there was no penalty to simply guessing the answers for the level, students may not take the levels seriously and make random guesses. However, the system must also be fair to ensure that students who are tryting but struggling are not negatively impacted but rather encouraged to do better. The final design was with the categories of less than or equal to 40\% correct inurring penalty, between 41\% and 60\% answers correct will not earn or lose points and greater than 60\% answers correct will earn points on the answers they got correct.
+\end{itemize}
+
+\newpage
+
+\subsection{Buying and Using Items from Shop}
+\subsubsection{Design}
+To access the shop where students can spend their points, they click on the Shop link in the top navigation bar. Once on the shop page, students can see the available items to be purchased using their points. These items are generally to help students earn more points within a set limited time period.
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-shop1}
+    \centering
+    \caption{Browse Shop Page}
+\end{figure}
+
+Students can simply select the Use X Points on the specific item they are looking for. The details of the effect and duration of the item is shown on the same tile. Upon clicking Use X Points where X is the number of points it will cost, students will see a confirmation page which will confirm that the booster’s effect will begin immediately. Upon clicking buy, the effect starts and the student will see a banner on the top of the platform to display that the booster is active.
+
+\newpage 
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-shop2}
+    \centering
+    \caption{Buy an Item}
+\end{figure}
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-shop3}
+    \centering
+    \caption{Shop Item In Effect}
+\end{figure}
+
+\newpage
+
+\subsubsection{Purpose}
+The shop feature allows students to spend their points on boosters to increase the rate of earning points.
+
+\subsubsection{What was Implemented}
+There are 2 boosters available which are x2 points earned and x4 points earned with 10 minutes and 15 minutes duration respectively. These can be easily customised by platform admins and shop items are by default visible to all users on the gamification platform. Users can only buy 1 booster at a time and must use it immediately. Once a booster is used, there will be a banner on the top of the platform to notify users that the booster is in effect, this banner will remain until the effective duration is over. While the booster is in effect, the points that user earned will be multiplied by the multiplier of the booster used.
+
+\subsubsection{How it was Implemented}
+Within the backend server, we have a table setup with items. By default only 2 times with the attributes: item name, item type, item duration, item multiplier, item cost. These attributes will change how the booster behaves and the cost required to attain the booster. This information is retrieved when the user navigates to the shop page and the platform will display the items which are available for purchase in a grid list format with an option to buy. In the current implementation, the usage built is only on the item type = booster, it is possible to add other game item types to increase the variety of rewards for points.
+
+\subsubsection{Considerations}
+\begin{itemize}
+    \item Value of boosters vs the value of points needs to be balanced to drive correct behaviours and competitive environment
+\end{itemize}
+
+\newpage
+
+\subsection{Leaderboards}
+\subsubsection{Design}
+Students can access the leaderboards through the Leaderboards link in the navigation bar. The leaderboards page will display the user’s progress through each of the topic groups that they are part of. It will display a mixture of prescriptive advice for the student to progress further in the platform and provide high level rankings details for the top 3 students in the topic group run to foster a competitive goal for students.
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-leaderboards}
+    \centering
+    \caption{Student Leaderboards}
+\end{figure}
+
+\newpage
+
+\subsubsection{Purpose}
+Provide students with prescriptive advice to enhance their learning while providing statistics on how they are progressing compared to their peers. This feature aims to create a competitive environment but avoid most of the negative connotations of ranking.
+
+\subsubsection{What was Implemented}
+A centralised organisation of statistics that displays to the student their rank in the topic group, how far they are to rank up and also the top 3 students in the topic group. This feature shows these details per topic group so it is more specific and targeted.
+
+\subsubsection{How it was Implemented}
+The platform first ranks the user in their topic group based on the amount of points earned on the platform. It then finds out the difference in points to the user in the next higher rank and displays the difference to the student. The system also pulls the details like name, points and ranking of the top 3 students. This is done for each of the topic groups that the student is enrolled in and is displayed one after another in a list format.
+
+\subsubsection{Considerations}
+\begin{itemize}
+    \item Avoid negative connotations by using a more objective approach to display facts that foster competition
+    \item Provide prescriptive advice for students to improve their progress in the platform to break the goal of improvement into small achievable steps.
+\end{itemize}
+
+\newpage
+
+\subsection{Creating and Editing Content in Levels}
+\subsubsection{Design}
+This feature is only accessible by users with role of Staff. Upon entering the gamification platform, users with the assigned role of Admins will be directed to a Levels Dashboard which will display a grid list of all the levels they own / created. There is a button to add a New Level.
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-admin1}
+    \centering
+    \caption{Admin Levels Dashboard}
+\end{figure}
+
+\newpage
+
+Upon clicking on the New Level button, admins are asked to provide a name for the level in a prompt. Once admin has entered a name for the level, they will be directed to Edit Level Page.
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-admin2}
+    \centering
+    \caption{Create new Level}
+\end{figure}
+
+\newpage
+
+Admins are then directed to edit information about the level and its content. This page can be accessed on a new or existing level. Here the admin will add information like level name, week number (determines when in the term the level is visible to students), level type (Knowledge, Practice or Challenge), level format (Level or Live Kahoot Style Quiz) and a Thumbnail for the main image of the level. Below this is a functionality to edit questions that users will see within the level. Clicking Add a question, the user will see questions added with default 10s time available and 1000 points available. These questions can also be easily reordered by dragging the hamburger icon on the left of the tile to move the questions in order with the first question being at the top and last at the bottom.
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-admin3}
+    \centering
+    \caption{Edit Level}
+\end{figure}
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-admin4}
+    \centering
+    \caption{Add Questions}
+\end{figure}
+
+\newpage
+
+Upon clicking edit question, the user will see the edit question page. This page is specific to a single question and allows admin to customise the text for the question, the points available to be earned, the time available (duration) for the question, add any helper media like images or videos and determine the possible answers as well as selecting the correct answers with the green check boxes (can be multiple).
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-admin5}
+    \centering
+    \caption{Edit Question}
+\end{figure}
+
+\newpage
+
+\subsubsection{Purpose}
+Creating and Editing content for levels form the foundations to allow customisation to enable different content to be created on the platform for students to learn. This feature allows admins to easily create new content and edit past content.
+
+\subsubsection{What was Implemented}
+A capability to create new levels or edit levels that is only accessible to staff. Edit question allows admin to amend various atrributes of the level and apply it immidiately by saving. It also allows admin to determine the number and order of questions that will appear when students playthrough the level. The edit question page allows the admin to set the question text, add helper image or video, set the points that can be earned,  set duration of the question and also set the answers for the question.
+
+\subsubsection{How it was Implemented}
+When a new level is requested by the admin, the backend creates a new record in the database for an empty level with the name specified. When opening the edit level page for a level, the backend retrieves all the attributes relating to the level and the array of question objects using the level id. The attributes are inserted into the UI inputs which can be amended by the admin. Once admin has finished their changes, clicking save on the top right will send the new data to the backend to update database records. The User Interface also loops through each question object in question array, displaying the question text, points available and time allowed. Admins have an option to Edit or Delete specific questions, clicking Edit will bring them to edit question page and delete will remove the question selected from the array, thus removing it from the level.
+
+On the Edit Question page, similar to edit levels page, the platform pulls the attributes for the specific question using the question id. It populates the existing data into the UI fields and allows admins to amend its content. The second part of the page allows admins to change the possible answers that will appear (up to 6) and also select which answers are correct (could be multiple). Admins can also change the text for each answer. When an admin has made all their changes, clicking save on the top right will send this updated question state to the backend to be stored. The changes are immidiate and students will see the changes.
+
+\subsubsection{Considerations}
+\begin{itemize}
+    \item Organisation of Levels as parent to questions helped to simplify this flow. Initial design of questions as an attribute instead of part of array of objects caused problems with implementation.
+    \item A design choice was made to not limit the number of questions for a level which could be an obstacle for some types of levels, instead the control is given to admins to manage the max number of questions as they see fit. The platform is capable to handle up to a few hundred questions before performance issues will appear on the edit pages.
+\end{itemize}
+
+\newpage
+
+\subsection{Manage Topic Groups and Repository}
+\subsubsection{Design}
+Admins can access the Topic Groups link in the top navigation bar. They will be presented with a grid list of topic groups they have admin rights for. 
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-tp2}
+    \centering
+    \caption{Manage Topic Groups}
+\end{figure}
+
+Upon clicking Add Topic Group, admins can see a list of available topic groups in the metalms system. They can select it to inherit the student permissions of the topic groups as meta-data like topic group descriptions into the gamification platform. Admins can then add additional information on the topic group like start / end date, term and year to make the topic group active. Once admin clicks import topic group, the students assigned in the wider metalms will have access to the levels within topic groups they are enrolled into. 
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-tp1}
+    \centering
+    \caption{Importing a Topic Group}
+\end{figure}
+
+Admins can add or remove levels they own / created by clicking the Edit Levels Button on the specific topic group tile. They will be presented with a list of levels available to be added or removed. The system detects if the level is already present in topic group and allow the admin to remove and otherwise it will allow the admin to add.
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-tp3}
+    \centering
+    \caption{Add or Remove Levels from Topic Group}
+\end{figure}
+
+Admins can access the repository through the Repository Link in the top navigation bar. Once on the repository page, admins can see a list of all levels created by all admins on the platform. From there admins can search and find any levels (set of questions for a single topic) which they can add into their topic group. 
+
+\begin{figure}[h!]
+    \includegraphics[scale=0.5]{gamification-repo}
+    \centering
+    \caption{Repository}
+\end{figure}
+
+\newpage
+
+\subsubsection{Purpose}
+Manage Topic Groups page allows admins to retrieve the topic groups from metalms that they need to actively manage. The topic group will help admins to make levels visible to students who have been enrolled into the topic group on the metalms. The repository acts as a centralised hub for all levels on the platform to be found, it allows any admin to search for levels which are set of questions for specific topics. This enables levels to be reused by admins.
+
+\subsubsection{What was Implemented}
+Importing of metadata on topic groups, assigning levels to topic groups and removal of topic groups from gamification (does not affect metalms). Repository displays all levels created with a search and sort function to allow admins to easily find and reuse content.
+
+\subsubsection{How it was Implemented}
+When selecting add new topic group, the platform pulls the latest list of topic groups available on the metalms. This is presented to user as a list of topic groups. Once user selected a topic group, the system will retrieve all metadata relating to the topic group based on the topic group id and it will appear on the topic groups page for users as a new tile with some metadata displayed. From the tile, admins are able to edit or delete the topic group (does not affect metalms). Clicking on edit levels will retrieve all the levels that the admin owns or have created. After selecting a level on this prompt, the platform uses the level id to identify if the level is already assigned to the topic group. If level has already been assigned, it will display a remove button instead of an add button. When user clicks on the add or remove button, the platform sends a request to add or remove level from topic groups using the level id and topic group id. Deleting topic group will send the topic group id to backend to remove topic group from gamification section of the database and this will not affect the topic group on the metalms. 
+
+\subsubsection{Considerations}
+\begin{itemize}
+    \item Destructive changes like delete of topic group will not affect metalms. This was a concious decision as deletion of topic groups should occur in the enrolment section on the main metalms page.
+    \item Initial design was to have both topic groups and levels in the repository but it was complex to provide visibility over both topic groups and levels at the same time. Ultimately implemented with levels which is the smallest module to increase flexibility for admins.
+\end{itemize}
 
 \newpage

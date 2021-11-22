@@ -1,140 +1,82 @@
-\section{Gamification}
-\subsection{Overview}
-Learning Management Systems (LMS) are often only used as tools to distribute course content in various forms and act as a communication tool between course staff and students. Many LMS do not provide features that actively engage, retain and influence students for a better academic outcome. Futhermore, many LMS do not have sufficient capability to ensure content is not lost, can be easily readapted or reused and provide academics a simple flow efficiently set up interactive content. This gamification feature will focus on addressing this lack of capability in the market to provide students and academics an immersive and engaging learning experience within a wider meta-lms where content can be easily reused, readapted and monitored.
-\newline
-
-Gamification of LMS can achieve this through an interactive and immersive approach by applying game-like mechanics, creating a fun learning experience for students within an integrated environment of the meta-lms where data is tightly connected to other parts of the lms (i.e. Course Page, Forums, Assessments).
-A Gamification feature must also link seamlessly into a wider meta-lms to ensure course content can be easily retrieved, reused and updated to provide a high-quality learning journey for students.
-
-\subsection{Introduction to LMS Gamification}
-Gamification of a Learning System is defined as implementing game thinking and game mechanics into core features of the platform to provide a more interactive learning experience for students. Gamification is built on three simple concepts: Objectives, Rewards and Competition. Objectives can be set by platform admins, aligning to specific course learning objectives. 
-These objectives provide students with a purpose to remain on the platform and ultimately achieve course learning outcomes. A reward system is a positive reinforcement for students and can be a driving factor for students to stay on the platform. In a well designed gamification experience, competitive interest pushes students to perform better and to gain more knowledge to attain a higher position than others. 
-Through these fairly simple concepts, the gamification feature in a learning management system can help students achieve course learning objectives in an immersive and rewarding manner.
-
 \newpage
+\section{Gamification}
+The gamification feature will be examined based on a framework to determine how well the implemented feature has achieved its intended purpose and its functionality. \\
 
-\subsection{Goal Of Gamification Feature}
-The goal of this feature is to form a crucial component in the meta-lms to provide a reusable, customisable and seamless experience for course admins as well as a fun, interactive and immersive learning experience for students using the platform. This feature aims to implement the 3 gamification concepts of Objectives, Rewards and Competition. 
-The gamification feature will be structured into levels with Core Knowledge modules providing clear objectives for students, Challenge modules providing practical hands on practice that when combined with the reward system create a competitive environment for students. These modules will provide a level of customisation based on wider lms permissions to academics. 
-\newline
-
-Academics can customise the questions and question types in each module, set the correct answers as well as set the achievement / rewards that students will earn on completion.
-The types of games in scope for development will be multiple-choice style (Timed and Untimed) games, True / False games and coding questions (Assessed on test suite). The feature will also enable academics to customise the levels and select the games they like to be included in their course run. The Gamification feature will be integrated into the larger meta-lms where the data is stored.
-
+The analysis includes four sections:\\
 \begin{itemize}
-    \item High Levels of Engagement and Retention on Platform
-    \item Present content with a fun and immersive approach
-    \item Better retention and improved proficiency through practice
-    \item Challenge and stimulate creativity
-    \item Trigger change in thinking
-    \item Influence positive behavioral change
+    \item Functional Requirements - does the gamification feature fulfil the functional requirements set out in the project approach?
+    \item Non-functional requirements - how well does the feature achieve the non functional requirements including performance and accessibility
+    \item Scalability - how well does the feature perform with many topic groups, levels and users accessing the feature concurrently?
+    \item Feedback from potential users of the feature - what do users such as lecturers, tutors and students think about the feature and how could it be improved?
 \end{itemize}
 
-\newpage
+\subsection{Functional requirements}
 
+The functional requirements of the feature were analysed for completedness for both students, admins and backend.
 
-\subsection{Functional Requirements}
-Since the backend for the Meta LMS is being built out independently to the individual features, the following contains a description of the ideal backend design for the forum component.
+\subsubsection{Requirements for Students}
+7 out of 8 functional requirements for students have been completed.
 
-\subsubsection{Learning Structure}
-\begin{figure}[h!]
-    \includegraphics[scale=1.5]{gamification-structure.png}
-    \centering
-    \caption{Learning Level Structure}
-\end{figure}
+\textbf{As a student, I need to be able to view all my enrolled topic groups and access weekly activities} - Incomplete requirement
 
-The above outlines the learning structure for the gamification feature. This includes Core Knowledge modules that can be set as objectives for the week. Academics can customise the content and the number of these core knowledge modules which should be broken down by topics (E.g. Variables, Arrays, Loops). The Challenge module allows academics to create challenging practical exercises for students to apply their knowledge learnt in core knowledge modules. Academics can set the rewards and achievements that students will earn in each of the different modules. These rewards will allow the system to automatically produce leaderboards and in game prompts to drive a competitive environment.
-
-\subsubsection{Core Knowledge Modules}
-Core Knowledge modules aims to present the fundumental knownledge topics in video, slides or pdf form and followed up with some simple practice to reinforce the new learnings for students.
-This sub feature will have functionality to add video content, content from webpage as well as pdf content. After these content, several game types can be added (MCQ, True/False, Coding Questions) to test the knowledge students just learnt. Core Knowledge modules can be set as prerequisite for challenges and allow the students to earn reward points as well. Core Knowledge modules will be used to introduce specific topics through short videos followed by questions to test the newly gained knowledge. 
-
-\subsubsection{Challenge Modules}
-Challenge modules aims to create interactive content that enables students to apply knowledge they learnt by providing an environment to develop their critical thinking skills.
-Challenges are more challenging timed games where students need to apply the core knowledge in various ways to earn points. This reinforces and simulates a review of the core knowledge. Challenges are timed levels with a higher difficulty level but provide students with the most rewards based on their performance (Time Taken and Accuracy Of Answers).
-
-\subsubsection{Reward System}
-The reward system aims to provide a mechanism for positive reinforcement, create a competitive environment and set some goals for students to achieve, ultimately increasing engagement and retention of students.
-In Core Knowledge and Challenge modules, students can earn points based on their accuracy in answering questions under time pressure. The number of points earned per activity can be customised by course admin. These points will be recorded for modules, weeks and all time to generate leaderboards. Based on points earned and certain criteria, the platform can issue an achievement that is unique and only be earned once per course. These achievements can be customised by the course admin. Students will be able to use the points earned to redeem items that will help them earn more points. Some examples: x2 points for 1 hour. 
-
-\subsubsection{Game Types}
-Game Types facilitate the assessment of student's knowledege in an interactive manner. These games should be extremely reusable and customisable.
-In scope are Timed or Untimed multiple choice questions, True / False questions as well as coding questions (through integrated text editor). The game type structures pull data from the meta-lms database that are related to their specific data structure. Course admins will be able to create, customise and choose reward parameters for each game type. This feature will be implemented to be easily modified to include more game types in the future.
-
-\subsubsection{Student Frontend Requirements}
-\begin{enumerate}
-    \item As a Student, I need to be able to access the gamification feature to navigate and complete modules for my course. (Permissions)
-    \item As a Student, I need to be able to complete Core Knowledge Modules. (Course)
-    \item As a Student, I need to be able to complete Challenge Modules. (Course)
-    \item As a Student, I need to be able to see a recap of my progress in level. (Course)
-    \item As a Student, I need to be able to view all my enrolled courses and access weekly activities. (Course)
-    \item As a Student, I need to be able to monitor my progress compared to other students. (Course)
-    \item As a Student, I need to be able to see my achievements and reward points. (Rewards)
-    \item As a Student, I need to be able to see my leaderboard rankings compared to my peers. (Rewards)
-\end{enumerate}
-
-\subsubsection{Academic Frontend Requirements}
-\begin{enumerate}
-    \item As an Academic, I need to be able to access the gamification feature to navigate, customise courses and set permissions for students. (Permissions)
-    \item As an Academic, I need to be able to create a new course run either new or clone from previous course. (Course Management)
-    \item As an Academic, I need to be able to customise content and number of questions for Core Knowledge Modules and Challenge Modules. (Course Management)
-    \item As an Academic, I need to be able to create new timed or untimed questions of types (MCQ, True / False, Coding). (Course Management)
-    \item As an Academic, I need to be able to monitor the leaderboards for the course and monitor course level statistics. (Course Management)
-    \item As an Academic, I need to be able to customise the rewards awarded to students on completion of questions in modules. (Rewards Management)
-\end{enumerate}
+The current implementation allows students to access the levels assigned to them through the topic groups they are enrolled in but it does not explicitly display the topic groups they are enrolled in on the gamification platform. The implementation of weekly activities was not completed as well due to time constraints.  This is a low priority requirement as it is an additional feature on top of the core functions of the platform. This would be classified under future work for the platform.
 
 \newpage
 
-\subsubsection{Backend Requirements}
-Gamification Feature will require some backend connections to the meta-lms to setup for integration of permissions, content and results.
-This feature will also need backend functions that will enable setup and customisation of courses, modules and student profiles.
+\subsubsection{Requirements for Academics}
+4 out of 6 functional requirements for academics have been fully completed with 1 functional requirement partially completed.
 
-\begin{enumerate}
-    \item Retrieve a list of students enrolled in course from meta-lms
-    \item Retrieve a list of all or courses in meta-lms
-    \item Retrieve a list of all or course games
-    \item Retrieve a list of levels in course
-    \item Retrieve individual post details for post page (including comments and responses)
-    \item Retrieve permissions for user
-    \item Store course
-    \item Store level
-    \item Store game
-    \item Update game
-    \item Update level
-    \item Update course
-    \item Update user rewards
-    \item Update permissions for user
-\end{enumerate}
+\textbf{As an Academic, I need to be able to create new timed questions of types (MCQ, True / False, Coding)} - Partially completed requirement
 
-\subsection{Software Development Approach}
-In this new gamification feature for the meta-lms, we will be using React as our frontend architecture. It is the most modern and widely used framework that will ensure the longevity of this feature.
-While React is used as a frontend framework, node js is used as a middle layer for data manipulation and api creation. Node js is a simple framework based on js that allows for quick development of REST APIs that are hosted on the web server. The data manipulation layer will interact with the PostgreSQL backend which will hold all the data for the meta-lms.
-Gamification feature will have its own suite of REST APIs developed that are specific to implementation of the 3 concepts.
+The question types of MCQ and True / False style questions have been implemented, however due to time constraints, the Coding type was not implemented. This was a decision made halfway through thesis C to omit this as it is a large complex piece of work but completion of other requirements was more important than this specific part of the requirement.
 
-\begin{enumerate}
-    \item Data Structure for Gamification will first be set up in the PostgreSQL. These include the SQL tables required and a UML diagram to outline how each table will interact with one another.
-    \item REST APIs created to facilitate interactions between frontend and backend.
-    \item Frontend Development
-    \item Testing of Gamification Feature
-    \item Integration to meta-lms
-\end{enumerate}
+\textbf{As an Academic, I need to be able to customise the rewards awarded to students on completion of questions in modules. (Rewards Management)} - Incomplete requirement
 
-\subsection{Evaluation}
-Before implementation, we need to understand our users (Academics and Students). In Term 2, we will provide several students and academics with a questionnaire surveying knowledge about gamification as well as popular features and use cases in a gamified LMS. Using the survey, we can test and refine our initial user stories to ensure we meet the end user’s needs.
+Currently implemented is only points awarded on completion of a level. This requirement relates to badges and achievements that admins can customise for their own topic groups. This requirement was not completed due to time constraints and would similarly be classified as future work for the platform.
 
-To evaluate the quality of the implementation, the gamification feature must be integrated into the wider meta-lms and pass various feature specific automated tests as well as meta-lms automated tests. These tests will ensure that the feature is performing to its specifications and that this remains through when operating it as an integrated feature in the meta-lms.
+\subsubsection{Requirements for Backend}
+8 out of 8 functional requirements for backend of gamification have been fully completed. All backend requirements support the frontend requirements and this was prioritised throughout the thesis to ensure that frontend requirements are able to be implemented.
 
-On completion of a working prototype of the meta-lms gamification feature, we will conduct user testing that will help to refine and iron out issues with the platform. The user testing will include hands-on interaction with the prototype running through various use cases on the gamified lms. Upon completion we will utilise the feedback from user testing to refine the platform. Success of the thesis will determine completion of the gamified LMS feature with positive user feedback for the platform.
+\subsection {Non functional requirements}
+\subsubsection {Performance and Accessibility}
 
-\newpage
+There is room for improvement in terms of performance in the platform's current implemented state. There are no major performance issues that users will be able to observe but rather slighly longer page load times due to some heavy overheads of javascript that is being loaded on the platform. This is placing unecessary stress on the system that could be cleaned up as part of future works. Code clean up has been limited due to the time constraints and in hindsight, more time should have been allocated to refine and ensure code base is as clean as possible to decrease loading times.
 
-\subsection{Project Timeline}
-Below is a rough guideline of some milestones that should be met throughout the year in order to complete this feature on time.
+The implemented platform scores well for accessibility due to the Chakra UI framework automatically adjusting to device size, allowing compatibility with screen readers and neatly tagging user interface elements approriately.
 
 \begin{figure}[h!]
-    \includegraphics[scale=1.5]{gamification-plan.png}
+    \includegraphics[scale=0.3]{gamification-accessibility}
     \centering
-    \caption{Term 2 and 3 Project Implementation Timeline}
+    \caption{Google Light House Report}
 \end{figure}
+
+\subsubsection{User Interface is easy to navigate}
+The gamification platform pages have been based on the same core fundumentals of listing items in a grid list. This makes every page feel familiar for users and provide a consistent experience throughout. It also provides the flexibility in displaying different data objects using customised tiles throughout the platform. Overall this has been a great design choice and has helped to create a simple and easy to understand journey for both students and admins.
+
+\subsubsection{Reusability}
+User Interface design elements have been reused extensively. Examples include the grid list interface that is used across topic groups, levels, student dashboard, shop and repository. This decision has reduced the amount of development effort can is easily extendable to other use cases on the platform. The edit question and edit level pages are based on the same reused elements, simplifying and standardizing the look and feel for form submissions. Prompts and alerts are also reused to reduce development efforts. The repository page was designed to directly support reusabilty of levels across the whole platform by allowing admins to search for levels and add it into their own topic groups. Overall, the reusability score for the gamification platform is high and it has helped greatly in maximising the requirements implemented in the amount of time available.
+
+\subsection{Scalability Testing}
+
+The gamification platform scales well, the user interface are setup with grid lists which have no limits. This means that there is no limit on how many levels, topic groups or shop items on the platform. The only potential bottleneck could be the backend api server but that can be easily fixed through extra deployment of backend docker containers for load balancing. 
+
+Similarly, if there was a bottleneck in the frontend when there are hundreds of users using the frontend concurrently, the platform can be scaled by increasing the number of docker containers and using nginx as load balancer to increase capacity. The features have been designed to support this form of scaling which is the industry standard. Each docker container can handle about 80 - 100 concurrent users and multiplying the number of docker containers will scale the platform up.
+
+\subsection{Feedback from Potential Users}
+\subsubsection{Students}
+
+"The gamification platform has been an interesting take on learning modules, it is more exciting and the competitive aspect is really awesome!"
+
+"The platform should limit how many times people can run through a level, that will increase competitiveness and sense of urgency."
+
+Overall, across the students I have explained the platform to, the feedback has been positive, there are small details that they like to see to make it more robust and more competitive.
+
+\subsubsection{Admins}
+
+"It provides tutors more ways to test knowledge while encouraging students to actively do their best"
+
+"This will definitely help to achieve learning outcomes especially in the online format."
+
+Overall, across the tutors and lecturers I have explained the platform to, the feedback has been positive, they believed that this would add a way of learning and admin customisation that currently does not exist.
 
 \newpage

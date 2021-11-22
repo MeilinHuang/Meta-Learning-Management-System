@@ -1,9 +1,8 @@
 \section{Assessments}
 
-\subsection{Quiz Creation}
-The Quiz creation page is where a staff member can add questions to a newly created quiz.
+\subsection{Creating a quiz}
 
-\subsubsection{Creating a quiz}
+\subsubsection{Design}
 A quiz can be created as a course lecturer or staff member while on a topic group page. That is the intended workflow, however the current implementation is not integrated with the topic group page. A button for adding a new quiz will be visible and once clicked, a modal will appear to initiate the quiz creation:
 
 \begin{figure}[h!]
@@ -21,8 +20,21 @@ After entering a quiz name and clicking the 'Add Quiz' button, the user will be 
 	\caption{Quiz creation page}
 \end{figure}
 
+\subsubsection{Purpose}
+Staff members are able to create quizzes quickly and get started on questions right away.
 
-\subsubsection{Adding a question}
+\subsubsection{What was implemented}
+Staff members can set the important details and settings for a quiz.
+
+\subsubsection{How it was implemented}
+It was implemented using dividers and modals.
+
+\subsubsection{Considerations}
+No considerations were made.
+
+\subsection{Adding a question}
+
+\subsubsection{Design}
 To add a question, the user can click on the 'New Question' button.
 
 \begin{figure}[h!]
@@ -55,8 +67,6 @@ The staff member can add an answer via the "Add Answer" button, as well as delet
 	\caption{Adding an explanation to a possible answer}
 \end{figure}
 
-These explanations describe why the specified answer is correct or incorrect, and will be viewable by students who attempted the quiz when they are on the submission review page for the quiz. These allow the staff members to help students understand the topic or concept better with a more detailed explanation than the lecture slides and can also be used as a 'sticky note' with advice by mentioning something like 'revise on Topic X' or 'refer to Lecture Slide X Page Y for a detailed explanation of this concept'. This saves time for the staff member and allows more immediate help for the students instead of them asking a question on the forums.
-
 Once the fields have been filled in, the staff member clicks on the "Add to Quiz" button to add the question to the questions section. By default, "Add to Question Bank" is ticked so all questions will automatically be saved in the question bank for future re-use.
 
 \begin{figure}[h!]
@@ -65,7 +75,7 @@ Once the fields have been filled in, the staff member clicks on the "Add to Quiz
 	\caption{Add To Quiz button}
 \end{figure}
 
-The question will appear in the question list and questions section. The question list displays the marks awarded and topic for each question and allows the staff member to quickly see whether they need to add more questions, keep track of marks for each question, and whether to add more or less questions for a particular topic. In the quiz details, the number of questions for a topic is also shown. In the below image, there is 1 question for the topic "Variables".
+The question will appear in the question list and questions section. In the quiz details, the number of questions for a topic is also shown. In the below image, there is 1 question for the topic "Variables".
 
 \begin{figure}[!hbpt]
 	\centering
@@ -81,9 +91,25 @@ To show fields of a particular question, you can expand it by clicking on its he
 	\caption{Question list and section}
 \end{figure}
 
+\subsubsection{Purpose}
+This feature allows staff members to create questions of different question types and provide explanations for each answer to benefit the students' learnings. 
 
-\subsubsection{Editing quiz details}
-The quiz name, open date, due date and time given can be modified in the Quiz Details column of the Quiz Creation page. Other details such as the number of questions and total marks are displayed. 
+\subsubsection{What was implemented}
+
+Staff members can create questions of 3 question types - multiple choice, checkbox and short answers. Along with this, they can add a desired number of answers, along with optional explanations to each answer. These explanations describe why the specified answer is correct or incorrect, and will be viewable by students who attempted the quiz when they are on the submission review page for the quiz. These allow the staff members to help students understand the topic or concept better with a more detailed explanation than the lecture slides and can also be used as a 'sticky note' with advice by mentioning something like 'revise on Topic X' or 'refer to Lecture Slide X Page Y for a detailed explanation of this concept'. This saves time for the staff member and allows more immediate help for the students instead of them asking a question on the forums.
+
+The question list displays the marks awarded and topic for each question and allows the staff member to quickly see whether they need to add more questions, keep track of marks for each question, and whether to add more or less questions for a particular topic. 
+
+\subsubsection{How it was implemented}
+The 'Create a Question' modal was created using the radio buttons, checkbox and textboxes provided in Chakra UI. The data structure for a question includes the fields shown in the "New Question data fields" figure, and a list of answers. 
+
+\subsubsection{Considerations}
+Key decisions made was mainly around the variety of question types. More question types were planned to be added, such as a fill in page, dragging terms from the left side to their definitions on the right side by connecting a line between them and a coding editor that you can compile your code answer in. This was not done due to lack of time.
+
+\subsection{Editing quiz details}
+
+\subsubsection{Design}
+The design is kept simple, aimed at being more easy to scan for particular fields. 
 
 \begin{figure}[h!]
 	\centering
@@ -91,9 +117,22 @@ The quiz name, open date, due date and time given can be modified in the Quiz De
 	\caption{Quiz details}
 \end{figure}
 
+\subsubsection{Purpose}
+This allows the staff member to quickly modify quiz details any time while they add or modify questions.
 
-\subsection{Quiz Usage}
-The Quiz Usage page is where students enrolled in a topic group can attempt a quiz that was made for the topic group. From left to right, the columns are the quiz progression column, the question itself, and the timer showing the time remaining for the quiz attempt. The quiz progression column indicates to the student which questions they've attempted or not attempted yet. A blue icon with a question mark represents an unattempted question while a green icon with a tick represents an attempted question. This allows the student to be always aware of which questions they'll need to go back to later. The student can also click on any of the question number icons to jump to that particular question. 
+\subsubsection{What was implemented}
+The quiz name, open date, due date and time given can be modified in the Quiz Details column of the Quiz Creation page. Other details such as the number of questions and total marks were also implemented.
+
+\subsubsection{How it was implemented}
+Variations of Chakra UI's box components were used to vertically and horizontally align the quiz details fields.
+
+\subsubsection{Considerations}
+Key decisions made was to keep the quiz details to only contain the most core fields to keep implementation more simple. There were considerations to add more settings.
+
+\subsection{Answering a question}
+
+\subsubsection{Design}
+The Quiz submission page is where students enrolled in a topic group can attempt a quiz that was made for the topic group. From left to right, the columns are the quiz progression column, the question itself, and the timer showing the time remaining for the quiz attempt. The quiz progression column indicates to the student which questions they've attempted or not attempted yet. A blue icon with a question mark represents an unattempted question while a green icon with a tick represents an attempted question. This allows the student to be always aware of which questions they'll need to go back to later. The student can also click on any of the question number icons to jump to that particular question. 
 
 \begin{figure}[h!]
 	\centering
@@ -101,7 +140,6 @@ The Quiz Usage page is where students enrolled in a topic group can attempt a qu
 	\caption{Quiz submission page}
 \end{figure}
 
-\subsubsection{Answering a question}
 The student can answer a question by clicking on one of the options (multiple choice), one or more of the options (checkbox), or by entering text into the textbox (short answer). 
 
 Once they've selected an answer, that counts as an attempt of the question and the question icon (in the quiz progression column) for that question will turn green with a tick as shown below.
@@ -112,8 +150,21 @@ Once they've selected an answer, that counts as an attempt of the question and t
 	\caption{Successful question attempt}
 \end{figure}
 
+\subsubsection{Purpose}
+This feature allows students to test their knowledge on a particular topic or topics, as well as allow staff members to know which topics may be good to revise on in future lectures.
 
-\subsubsection{Editing an answer}
+\subsubsection{What was implemented}
+The ability to answer questions, a quiz progression tool that allows students to see which questions have been attempted or not attempted as well as allow them to jump to a desired question. A timer is also visible for students to keep track of time. 
+
+\subsubsection{How it was implemented}
+This feature was implemented using many box components and the respective components for the three question types.
+
+\subsubsection{Considerations}
+There were considerations to re-design the interface to be different to existing learning management systems' quiz features but decided to stick to the common interface due to lack of time.
+
+\subsection{Editing an answer}
+
+\subsubsection{Design}
 To edit an answer, the student can select another possible answer and their new answer will be the updated answer to the question.
 
 \begin{figure}[h!]
@@ -122,8 +173,21 @@ To edit an answer, the student can select another possible answer and their new 
 	\caption{Editing an answer}
 \end{figure}
 
+\subsubsection{Purpose}
+This feature allows students to change their mind on an answer for a question at any time.
 
-\subsubsection{Submitting an attempt}
+\subsubsection{What was implemented}
+The ability for the student to change their answer.
+
+\subsubsection{How it was implemented}
+It was implemented by updating the data structure of the answer in a student answer object in JavaScript.
+
+\subsubsection{Considerations}
+No considerations were made.
+
+\subsection{Submitting an attempt}
+
+\subsubsection{Design}
 Once the student is satisfied with their submission, they can click on the "Submit answer" button below the Quiz Progression section to submit their quiz submission.
 
 \begin{figure}[h!]
@@ -148,8 +212,21 @@ After pressing the "Submit" button, a submission confirmation message will be sh
 	\caption{Successful quiz submission message}
 \end{figure}
 
+\subsubsection{Purpose}
+This feature allows students to submit their quiz attempt and allow the attempt to be marked automatically (for multiple choice and checkbox type questions), and manually for any short answer type questions that exists in the quiz.
 
-\subsection{Viewing quiz results and feedback}
+\subsubsection{What was implemented}
+A button to open the 'Submit answer' modal and a confirmation message.
+
+\subsubsection{How it was implemented}
+It was implemented using Chakra's modal components.
+
+\subsubsection{Considerations}
+No considerations were made.
+
+\subsection{Viewing correct answers against their answers}
+
+\subsubsection{Design}
 After a student has submitted their quiz attempt, their attempt has been marked and the due date has passed, the student can review their quiz submission on the Quiz Review Submission page.
 
 \begin{figure}[h!]
@@ -158,7 +235,6 @@ After a student has submitted their quiz attempt, their attempt has been marked 
 	\caption{Review submission page}
 \end{figure}
 
-\subsubsection{Viewing correct answers against their answers}
 The student can compare their answers with the correct answers. If they answered a question incorrectly, their selected answer's text will turn red and the correct answer's text will turn green.
 
 \begin{figure}[h!]
@@ -167,8 +243,21 @@ The student can compare their answers with the correct answers. If they answered
 	\caption{Compare correct answers against a student's answers}
 \end{figure}
 
+\subsubsection{Purpose}
+This feature allows students to compare their answers to the correct answers.
 
-\subsubsection{Viewing an explanation of the correct answer and incorrect answers}
+\subsubsection{What was implemented}
+Highlighting of the correct and incorrect answers texts (if the student selected an incorrect answer), as well as the answer explanations were implemented.
+
+\subsubsection{How it was implemented}
+It was implemented using the existing implementations of the question format displayed for the Quiz submission page, and the text colours were modified. 
+
+\subsubsection{Considerations}
+Considerations were made to re-design how to highlight which was the correct answer against the student's selected answer and whether their answers were incorrect or correct.
+
+\subsection{Viewing an explanation of the correct answer and incorrect answers}
+
+\subsubsection{Design}
 Below the possible answers will be the explanations, if the staff member has written any. Explanations for all the answers will be shown. This allows the student to understand why a particular answer is wrong or right.
 
 \begin{figure}[h!]
@@ -177,8 +266,19 @@ Below the possible answers will be the explanations, if the staff member has wri
 	\caption{View explanations for each answer to a question (if provided)}
 \end{figure}
 
+\subsubsection{Purpose}
+The 
 
-\subsection{User Interface Design}
+\subsubsection{What was implemented}
+The feature allows the students to read any explanations if they want to revise on particular topics or want to understand why an answer is correct or incorrect. The staff member is free to mention a particular lecture slide that the students can go onto to revise on the particular topic the question targets.
+
+\subsubsection{How it was implemented}
+The answer explanations are grabbed from the explanation strings stored in the answer objects of a question made during the quiz creation.
+
+\subsubsection{Considerations}
+Considerations were made to re-design the layout of the answer explanations as it somewhat blends in with the question, making it hard to differentiate and less readable.
+
+\subsection{Overview of User Interface Designs}
 The user interface is what the user relies on to complete tasks and thus it is important that the design is usable and easy to use. A few changes were made from the initial designs to support the added content that was not planned in earlier stages of the Assessments feature.
 
 \subsubsection{Final Designs}
@@ -214,6 +314,7 @@ There were significant changes to the initial designs in terms of button layouts
 
 Below, the initial and final designs next to each other to see the similarities and differences.
 
+\newpage
 Question creation:
 
 \begin{figure}[h!]
@@ -228,6 +329,7 @@ Question creation:
 	\caption{Final design of question creation}
 \end{figure}
 
+\newpage
 
 Quiz usage:
 
@@ -242,3 +344,5 @@ Quiz usage:
 	\includegraphics[scale=0.25]{assessments-quiz-submission}
 	\caption{Final design of quiz usage}
 \end{figure}
+
+\newpage
