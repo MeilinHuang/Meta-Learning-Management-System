@@ -21,7 +21,7 @@ Each row in the table includes the post title, date created, number of replies, 
     \caption{Forum overview page for a student.}
 \end{figure}
 
-Administrators have an additional button that allows them to pin and unpin posts.
+Staff have an additional button that allows them to pin and unpin posts.
 
 \begin{figure}[h!]
     \includegraphics[scale=0.2]{forum-overview-page-admin.png}
@@ -50,11 +50,42 @@ It also gives other students a place to write a response or ask questions based 
 \end{figure}
 
 If a forum post is unanswered, an admin is able to leave a response.
-The current idea is to restrict this so that only administrators can write responses to ensure that all responses are verified.
+The current idea is to restrict this so that only Staff can write responses to ensure that all responses are verified.
 It also ensures that forum posts aren't left unanswered if a student accidentally leaves a follow-up question in the responses area, instead of the comments section.
 This method of implementation may be reassessed if time allows.
 
-\subsection{Requirements}
+% potentially add stuff about the additional features added as a result of extra time
+\subsection{Additional Features}
+As a result of reaching major milestones quicker than expected when building the forum component, additional features were able to be implemented to enhance the functionality and usefulness of the forums.
+
+\subsubsection{Sortable Table}
+To provide more methods to help users with finding specific posts, sorting functionality was added to the post tables on the forum overview page.
+Users can click on the headings of each column in the table to toggle the sort order based on that heading.
+For students, they could use this functionality to find the oldest or latest post in the forums.
+Staff could sort the posts by number of replies to find which posts require their attention.
+By default, the table is sorted in reverse chronological order based on the date created for each post.
+
+\subsubsection{Upvotes}
+An upvote button and count was added to each of the posts on the forum overview page, as well as each individual post page.
+Upvoting allows users to like a post to assist in bringing attention to it.
+Students could use this functionality to like a post that asks a question that they have been thinking about.
+This could help in reducing the number of duplicate or similar posts asked to the forum.
+Staff could then sort the posts on the forum overview page by number of upvotes to see which posts are popular amongst students at the moment and require their attention.
+Student could also use the upvote count to work out which posts are more important than others.
+
+\subsubsection{Endorsed Posts}
+In cases where students leave a comment on a forum post with the correct answer, it was decided that there should be a way for staff to be able to mark this answer as verified so that they don't have to also reply to the post.
+An endorse button was added to each comment on the post page for a staff so that they could use it to endorse a comment.
+This results in the comment being marked with a green check mark.
+The ability for staff to endorse a whole post was also added.
+This provides staff with another way to draw attention to important posts.
+
+\subsubsection{Enhanced Filter}
+While a filter was always going to be included in the implementation of these forums, it only allowed users to filter posts by the pre-defined tags for the course.
+Additional filter options were added to the overall filter to provide users with more ways to find specific posts.
+The options added allowed users to filter by posts linked to announcements, answered and unanswered posts, and endorsed posts.
+
+\subsection{Finalised Requirements}
 The following features are prioritised using the MoSCoW method which assists in identifying the order in which to implement the requirements. \cite{moscow}
 It contains the following priorities
 
@@ -66,123 +97,291 @@ It contains the following priorities
 \end{itemize}
 
 \subsubsection{Functional Requirements}
-\begin{enumerate}
-    \item Users can view a list of forum posts (Must have)
-    \item Users can make posts to the forum (Must have)
-    \item Users can reply to forum posts (Must have)
-    \item Users can embed images and links in their posts (Should have)
-    \item Users can share forum posts (Should have)
-    \item Users can categorise forum posts (Should have)
-    \item Users can search forum posts (Should have)
-    \item Users can clearly see which posts have been read and actioned (Could have)
-    \item Administrators can pin important forum posts (Should have)
-    \item Administrators can link/embed materials to forum posts (Could have)
-    \item Administrators can curate forum questions into collections (Won't have)
-\end{enumerate}
-
-\newpage
-
-\subsection{Backend Assumptions}
-Since the backend for the Meta LMS is being built independently to the individual features, but will eventually need to cater for them, the following contains a description of the ideal backend design for the forum component.
-
-\subsubsection{Database}
-The main database table required for this component is one to store all the forum posts.
-This would include all the post details including author, title, description, date created and tags.
-It would also need to have a way to keep track of the replies and comments left on the forum post.
-This could either be done by having separate tables for replies and comments, or by storing a list of replies and comments within each forum post entry.
-For each of the forum posts, the author would need to be linked to a user in the user table of the database.
-
-\subsubsection{API}
-In terms of the backend API, the following functionality would be required in order to store, retrieve and update the appropriate data from the database.
 
 \begin{enumerate}
-    \item Retrieve a list of all forum posts
-    \item Retrieve a list of the pinned posts
-    \item Retrieve a list of posts related to search term
-    \item Retrieve a list of posts related to filter
-    \item Retrieve individual post details for post page (including comments and responses)
-    \item Store new post details
-    \item Store post responses
-    \item Store post comments
-    \item Update post details when author edits post
-    \item Update response when author edits response
-    \item Update pinned post list when admin pins/unpins posts
+    \item Forum Overview Page
 \end{enumerate}
 
-\subsection{Evaluation}
-In order to ensure that the needs of students and educators are met for this forum component, the following evaluation methods will be used.
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                    & User                                                                                           \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                               & View a list of forum posts                                                                     \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                 & I can see everything that has been posted to the forums.                                       \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                      \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Users can see all forum posts in a table (Must have)\\ - Users can see all pinned posts in a separate table (Must have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                        & Must have                                                                                      \\ \hline
+    \end{tabular}
+\end{table}
 
-\subsubsection{Functional Requirements}
-The first form of analysis that will be used to evaluate the forum component is to compare the completed product with the functional requirements defined during Thesis A.
-This will ensure that all of the essential requirements are covered.
-If there is enough time, it will also highlight any lower priority requirements that may be added to the component.
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                                                       & User                                                                                                                         \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                                                                  & Clearly see which posts have been read and actioned                                                                          \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                                                    & I can view posts that have an answer                                                                                         \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                                                                                       \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Users can easily find answered posts (Should have)\\ - Users can sort posts by number of replies or comments (Should have)\\ - Users can see which posts have been endorsed (Could have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                                                           & Should have                                                                                                                  \\ \hline
+    \end{tabular}
+\end{table}
 
-\subsubsection{Usability Testing}
-To test the usability of the system, usability tests will be run with various students and educators.
-A usability test typically consists of having participants who have never used the system before run through a scenario.
-In this case, it may be appropriate to test that a student is able to create and view a post.
-Similarly, an admin might be tested to see if they can easily find an unanswered post and respond to it.
-Different measures like number of errors and time it takes to complete a task can be used to quantitatively assess the usability of the system.
-Ethics clearance will need to be obtained in order to conduct these tests.
-As a result, usability testing will help to identify any areas of the system that may be confusing or difficult to use.
+\begin{enumerate}
+    \setcounter{enumi}{1}
+    \item Adding a post
+\end{enumerate}
 
-\subsubsection{Google Lighthouse}
-In order to test the performance and accessibility of the forum component, Google Lighthouse will be used.
-This runs tests on a site and produces a score out of 100 for each category tested.
-In this case, a score will be produced for the performance of the site and the accessibility.
-In addition to the score, Google Lighthouse also produces a report that gives more detail on ways the site could be improved to produce a higher score.
-These scores can be used to ensure that the forum component is accessible to all types of users.
-It can also be used to compare this forum with forums from other LMS.
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                                       & User                                                                                                                   \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                                                  & Add a post to the forum                                                                                                \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                                    & I can ask a question or make a comment related to the course                                                           \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                                                                 \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Users can add a post with a title and description (Must have)\\ - Users can format their post description (Should have)\\ - Users can optionally attach files (Should have)\\ - Users can optionally attach tags (Must have)\\ - Users can optionally attach links (Should have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                                           & Must have                                                                                                              \\ \hline
+    \end{tabular}
+\end{table}
 
-\subsection{Project Timeline}
-Below is a rough guideline of some milestones that should be met throughout the year in order to complete this feature on time.
+\begin{enumerate}
+    \setcounter{enumi}{2}
+    \item Search, filter and sort
+\end{enumerate}
 
-\subsubsection{Thesis A}
-The focus of Thesis A, Term 1 2021, is solely based around researching current learning management systems to get a good understanding of the desired features required for a meta LMS.
-It also includes more in-depth research of forums and planning out what this forum component should consist of.
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}             & User                                        \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}        & Be able to search for a forum post          \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}          & I can easily find the post I am looking for \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                            \\ \hline
+    \multicolumn{2}{|l|}{- Users can search a post's description or title (Must have)}            \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}} & Must have                                   \\ \hline
+    \end{tabular}
+\end{table}
 
-\begin{figure}[h!]
-    \includegraphics[scale=0.4]{forum-thesis-a.png}
-    \centering
-    \caption{Thesis A Timeline.}
-\end{figure}
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                                                                                                                                                      & User                                                                                                                                                                                                                \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                                                                                                                                                                 & Be able to filter through forum posts                                                                                                                                                                               \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                                                                                                                                                   & I can easily find the post I am looking for                                                                                                                                                                         \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                                                                                                                                                                                                                                                                             \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Users can filter forum posts using pre-defined tags (Must have)\\ - Users can filter forum posts by those linked to announcements (Could have)\\ - Users can filter forum posts by those that are answered (Should have)\\ - Users can filter forum posts by those that are unanswered (Should have)\\ - Users can filter forum posts by those that are endorsed (Should have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                                                                                                                                                          & Must have                                                                                                                                                                                                           \\ \hline
+    \end{tabular}
+\end{table}
 
-\newpage
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}              & User                                        \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}         & Be able to sort the forum posts             \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}           & I can easily find the post I am looking for \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                             \\ \hline
+    \multicolumn{2}{|l|}{- Users can sort forum posts by the different headings in the post table (Should have)} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}  & Should have                                 \\ \hline
+    \end{tabular}
+\end{table}
 
-\subsubsection{Thesis B}
-Thesis B, Term 2 2021, will hopefully consist of most of the implementation work for forums.
-It will start with some market research to get a good understanding of the wants and needs of students and educators.
-Analysis of these results will help to finalise the features and designs of the forum component.
+\begin{enumerate}
+    \setcounter{enumi}{3}
+    \item Forum Post Page
+\end{enumerate}
 
-Once the frontend and backend designs have been finalised, the forum overview page and post page will be implemented.
-This includes viewing posts, making posts and replying to posts.
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                                                                                                               & User                                                                                                                                                                                         \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                                                                                                                          & View the individual post details for a chosen post                                                                                                                                           \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                                                                                                            & I can see the post's description and all the comments and replies                                                                                                                                  \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                                                                                                                                                                                                               \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Users can navigate to a post page for an individual post (Must have)\\ - Users can easily see the post title, description, tags, author and date created (Must have)\\ - Users can see all the responses to the post (Must have)\\ - Users can see all the comments on the post (Must have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                                                                                                                   & Must have                                                                                                                                                                                    \\ \hline
+    \end{tabular}
+\end{table}
 
-The next focus is the searching and filtering functionalities.
-This includes searching the forum and filtering based on pre-defined tags.
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                       & User                                                                                            \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                                  & Share a forum posts with others                                                                  \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                    & Others don't miss out on important course information                                           \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                          \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Users can copy a link to a forum post (Must have)\\ - Users can directly share a forum post to other platforms (Could have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                           & Must have                                                                                       \\ \hline
+    \end{tabular}
+\end{table}
 
-Finally, in Thesis B, the ability to pin and share posts will be added.
-This should conclude the implementation of all the main features of the forum component.
+\begin{enumerate}
+    \setcounter{enumi}{4}
+    \item Upvotes
+\end{enumerate}
 
-\begin{figure}[h!]
-    \includegraphics[scale=0.4]{forum-thesis-b.png}
-    \centering
-    \caption{Thesis B Timeline.}
-\end{figure}
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                                                                        & User                                                                                                                  \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                                                                                   & Upvote a forum post                                                                                                   \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                                                                     & I can bring attention to it                                                                                           \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                                                                                                 \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Users can upvote a post on the forum overview page (Should have)\\ - Users can upvote a post on the forum post page (Should have)\\ - Users can see the number of upvotes a post has (Should have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                                                                            & Should have                                                                                                           \\ \hline
+    \end{tabular}
+\end{table}
 
-\subsubsection{Thesis C}
-Thesis C, Term 3 2021, is mainly centred around finalising the implementation and evaluating the solution.
-The first few weeks will consist of completing any unfinished features, cleaning up the UI and debugging any problems.
-If there is time, extra features could be implemented.
-Time will also be allocated to integrating the forum with the rest of the LMS.
+\begin{enumerate}
+    \setcounter{enumi}{5}
+    \item Editing and Deleting Posts
+\end{enumerate}
 
-The middle weeks of the term will focus on analysis and usability testing.
-This will help see if the users' needs have been met by the implemented solution.
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}             & User                             \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}        & Edit a post I have added         \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}          & I can make any necessary changes \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                 \\ \hline
+    \multicolumn{2}{|l|}{- User can edit a post after it has been posted (Must have)}  \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}} & Must have                        \\ \hline
+    \end{tabular}
+\end{table}
 
-The final few weeks will consist of any final improvements and testing.
-The results from the analysis will help to fix any problems with the forum component.
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}              & User                             \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}         & Delete a post I have added       \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}           & I can remove it from the forums  \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                  \\ \hline
+    \multicolumn{2}{|l|}{- User can delete a post after it has been posted (Must have)} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}  & Must have                        \\ \hline
+    \end{tabular}
+\end{table}
 
-\begin{figure}[h!]
-    \includegraphics[scale=0.4]{forum-thesis-c.png}
-    \centering
-    \caption{Thesis C Timeline.}
-\end{figure}
+\begin{enumerate}
+    \setcounter{enumi}{6}
+    \item Comments
+\end{enumerate}
+
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                                                                                 & User                                                                                                                                                               \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                                                                                            & Comment on a post                                                                                                                                                  \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                                                                              & I can try to answer the question or leave a follow-up question                                                                                                     \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                                                                                                                                                       \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Users can leave a comment on a forum post (Must have)\\ - Users can format their comment (Should have)\\ - Users can edit their comment after it has been posted (Should have)\\ - Users can delete their comment after it has been posted (Should have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                                                                                     & Must have                                                                                                                                                          \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{enumerate}
+    \setcounter{enumi}{7}
+    \item Staff - Manage Tags
+\end{enumerate}
+
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                                                      & Staff User                                                                                                                 \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                                                                 & Manage the tags for the topic group                                                                                        \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                                                   & I can add new tags or remove any unnecessary tags                                                                          \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                                                                                    \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Staff can add new tags (Must have)\\ - Staff can remove tags (Must have)\\ - Staff are unable to create duplicate tags (Must have)\\ - Students are unable to create tags (Must have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                                                          & Must have                                                                                                                  \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{enumerate}
+    \setcounter{enumi}{8}
+    \item Staff - Pin Posts
+\end{enumerate}
+
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                                                         & Staff User                                                                                                                 \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                                                                    & Pin posts to the top of the forums                                                                                         \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                                                      & I can bring the post to the students' attention                                                                            \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                                                                                       \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Staff can pin posts to the top of the forums (Should have)\\ - Staff can unpin posts to the top of the forums (Should have)\\ - Students are unable to pin and unpin post (Should have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                                                             & Should have                                                                                                                \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{enumerate}
+    \setcounter{enumi}{9}
+    \item Staff - Reply
+\end{enumerate}
+
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                                                                                           & Staff User                                                                                                                                       \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                                                                                                      & Reply to a forum post                                                                                                                            \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                                                                                        & I can answer the student's question                                                                                                              \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                                                                                                                                               \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Staff can leave a reply on a forum post (Must have)\\ - Staff can format their reply (Should have)\\ - Staff can edit their reply after it has been posted (Should have)\\ - Staff can delete their reply after it has been posted (Should have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                                                                                               & Must have                                                                                                                                        \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{enumerate}
+    \setcounter{enumi}{10}
+    \item Staff - Endorse
+\end{enumerate}
+
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                                              & Staff User                                                                                                                 \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                                                         & Endorse a post or comment                                                                                                  \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                                                           & Students can see that I have verified the post or comment                                                                  \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                                                                                            \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Staff can endorse a post (Could have)\\ - Staff can unendorse a post (Could have)\\ - Staff can endorse a comment (Could have)\\ - Staff can unendorse a comment (Could have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                                                  & Could have                                                                                                                 \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{enumerate}
+    \setcounter{enumi}{11}
+    \item Staff - Link Materials
+\end{enumerate}
+
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}                                                  & Staff User                                                                                \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}                                             & Directly link or embed materials to the forum post                                        \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}                                               & I can reference materials when I reply to a question                                      \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                                                                                               \\ \hline
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Staff can add a direct link to a reply (Could have)\\ - Staff can embed course materials in a reply (Could have)\end{tabular}} \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}}                                      & Could have                                                                                \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{enumerate}
+    \setcounter{enumi}{12}
+    \item Staff - Forum Collections
+\end{enumerate}
+
+\begin{table}[h!]
+    \begin{tabular}{|ll|}
+    \hline
+    \multicolumn{1}{|l|}{\textbf{As a}}             & Staff User                                              \\ \hline
+    \multicolumn{1}{|l|}{\textbf{I want to}}        & Curate forum questions into collections                 \\ \hline
+    \multicolumn{1}{|l|}{\textbf{So that}}          & I can categorise questions and share them with students \\ \hline
+    \multicolumn{2}{|l|}{\textbf{Acceptance Criteria}}                                                        \\ \hline
+    \multicolumn{2}{|l|}{- Staff can create a collection of related forum posts (Won't have)}                 \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Overall Priority}} & Won't have                                              \\ \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{Non-functional Requirements}
+
+\begin{enumerate}
+    \item \textbf{Usability} -  the forums component is easy for staff and students to use. All the features that are implemented should be useful and enhance the functionality of the forums.
+    \item \textbf{Accessibility} - the forums should be accessible to all users, including those with disabilities.
+    \item \textbf{Performance} - the forums component should be able to complete requests and tasks in a reasonable period of time.
+\end{enumerate}
