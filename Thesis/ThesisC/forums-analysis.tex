@@ -299,3 +299,126 @@ As a result, it is important that all images, forms and buttons have alternative
 The report shows that on the post page, some of the buttons do not contain this alternative text.
 In order to ensure that the button can be read out to users, an accessible name should be added to these buttons.
 Labels should also be added to each of the input fields on the page, including those in the "Add Post" modal and in the responses and comments section of the post page.
+
+\subsection{Usability Testing}
+
+Simple tests were run with tutors and students to evaluate the usability of the forums component and receive feedback on ways in which the system could be improved.
+
+\subsubsection{Audience}
+
+In order to get a wholistic understanding of the usability of the system, participants from various fields were used to test the student's perspective of the forums component.
+This is to test that the forums are appropriate for use in all types of courses. These fields included:
+
+\begin{itemize}
+    \item Engineering
+    \item Medicine
+    \item Science
+    \item Art and Design
+\end{itemize}
+
+\subsubsection{Student's Perspective}
+
+To test the forums from a student's perspective, student participants were first asked to look at the overview and post page and provide their initial thoughts.
+
+For the forum overview page, most participants stated that on first look, they liked the way in which the posts were laid out.
+They mentioned that the layout was pretty straight forward and easy to understand.
+They also liked that the pinned posts were separated and located at the top of the page.
+
+Some users, however, found that the page looked quite cluttered.
+This was mainly seen in the search and filter areas at the top of the page.
+This could be improved by making the search and filter areas collapsible so that students can hide them from view when not being used.
+They also mentioned that the indentation on the left of the post table looked weird and was a waste of horizontal space.
+When viewing the overview page from a staff perspective, this would be where the pin icon shows however this is not the case for students since they are unable to pin posts themselves.
+The indentation could easily be fixed by removing the spacing or by showing the pin buttons but not making them clickable for students.
+
+For the forum post page, all participants were initially confused by the responses and comments section.
+They were unable to understand, just from looking at the page, why there were two separate sections.
+When looking at a post that has some comments and replies, this confusion was cleared up a bit for some participants.
+Some users were also confused by how the comments were displayed, and were unsure if the input field was for creating a new comment or to reply to the comment above.
+They suggested adding placeholder text to the input field to make this clearer.
+
+The student participants were then given various scenarios to test out different features of the forums.
+For each of the scenarios, the students were asked to rate the process required to complete the task out of five, one being difficult and five being simple.
+
+The first scenario asked the students to add a new post with a tag to the forums.
+All participants found this process very simple and intuitive, giving the process a five out of five.
+Participants found that it was easy to work out how to add a post due to the large call-to-action on the overview page.
+They also liked that the button opened up a modal instead of making them navigate to a different page.
+One participant suggested moving the tag selection to the top of the "Add Post" modal since it is easy to miss when it is at the bottom of the form.
+This is something that will definitely be implemented in future iterations of this project.
+Additionally, some students noticed and interacted with the edit button on the newly created post.
+The main feedback that arose from this was that students would like to also be able to edit the title and tags for the post.
+
+The second scenario required participants to filter the posts by a specific tag.
+All participants found this process simple, giving it a five out of five for usability.
+Some students used the dropdown menu to find the tag to filter by while others typed the tag name into the filter bar.
+This shows that having both options is useful to users and it isn't redundant to have both.
+Some users liked the fact that the filter displayed at the top of the page and wasn't hidden away on the side or in a menu, while others thought it cluttered up the overview page a bit.
+Due to the way it was built, the filter does not persist between pages meaning that if a user filters by a tag and then goes through each of the results, they would have to re-filter the posts each time they return to the overview page.
+This frustrated some participants as they expect the filter to remain when they navigate back from a post.
+
+Participants were then asked to find a specific post and leave a reply.
+In order to complete this task, some participants used the search bar, some used the sort functionality in the table and some just scrolled until they found the post.
+This proves that users interact with the forums in different ways and shows that none of this functionality is useless.
+Despite the method they used to find the post, all users gave this process a five out of five.
+All participants also found it very easy to leave a comment and didn't have much feedback for that process.
+
+Participants were also asked to edit their previous comment.
+They all gave this process a five out of five for usability, with the size and positioning of the buttons making it easy to work out how to complete this process.
+The only feedback received for this was that the participant expected the timestamp on the comment to be updated to reflect when they made the change.
+
+Participants also found that it was extremely easy to upvote a post, with them all successfully completing the scenario and giving it a five out of five.
+They appreciated the fact that they didn't have to click into a post to upvote it if they didn't want to, they could just upvote it from the overview page.
+For this scenario, the participants were also asked about how they would rate the usefulness of this feature.
+This was to get an understanding of whether or not the feature would actually be beneficial to users.
+Pretty much all of the participants said that they personally would not upvote a post themselves however, they would definitely use the number of upvotes a post has to determine which ones were worth looking at.
+As a result, on average, they gave the upvoting feature a 4.5 out of five in terms of usefulness.
+
+Finally, the students were asked to share a post.
+Most users were easily able to complete this task but some were confused about the icon on the share button and expected it to have a different functionality to sharing.
+One user also didn't notice there was a share button and instead, copied the url from the url bar of the browser.
+As a result, this process was given an average score of 4.5 out of five for usability.
+When asked about the usefulness of this feature, most participants were unsure if it provided much value to the system since the url could just be copied from the browser.
+They suggested that implementing the ability to share posts to specific platforms would make it more useful.
+This is a feature that was planned however, was not achieved due to time constraints.
+
+Overall, all student participants found that the system was easy and intuitive to use.
+Most enjoyed the layout and design however, there is still improvements that could be made to please more users.
+
+\subsubsection{Staff's Perspective}
+
+Due to having limited time with the staff members, the usability tests for the staff-only features of the forum mainly consisted of showing the participants the overview and post pages and letting them interact with it whilst providing their thoughts and feedback.
+
+The feedback for the forum overview page was mainly positive from all participants.
+Most participants liked the fact that they could pin posts to the top, and mentioned that it was a feature that they would definitely use.
+Some participants commented on the pinned posts also showing in the list of all posts and while they personally did not like this concept, they said that it didn't hinder their understanding of which posts were and weren't pinned.
+
+There were some mixed reviews on upvotes with some participants saying that they liked the feature and would definitely use it to work out which posts require their attention first.
+Others said that they prefer to just scroll and answer posts chronologically and therefore, wouldn't use the feature.
+
+Some features that aren't included in the forums that participants said they would like to see included a "new" status on forum posts that they haven't seen yet.
+They said that this would be the most useful in working out which posts to look at first.
+Participants also suggested having a way to identify if a post on the overview page had been replied to by them or a different staff member.
+However, they also noted that while this would be a nice feature, they preferred the existing, clean interface of the post tables compared to one with too many columns.
+
+When it comes to tags, some participants liked the feature while some were impartial to it.
+Those who liked the tags thought that it was a good way to categorise and group posts together.
+Some participants, however, thought tags may be unnecessary if the search functionality of the forums is good enough.
+They were also concerned about whether or not students would actually use the tags, and whether they would be used correctly.
+
+Like the student participants, the staff were also initially confused about the difference between responses and comments.
+This issue could potentially be fixed by renaming the responses section to "Official Responses", or by adding a description of what each section means below the title.
+
+Participants also had mixed feelings about endorsing posts and comments.
+Some mentioned that it felt too easy to endorse a post and suggested adding a confirmation message to ensure that the staff member hasn't misclicked the button.
+Others were just unsure about how endorsing could be helpful to them however, once it was explained further, they were able to see the value of the feature.
+This shows that there needs to be more explanation around what it means to endorse a post and how this can benefit the user.
+This could be done by adding a tutorial tooltip to the endorse button when it is first clicked by the user.
+
+Overall, the staff participants were happy with the forums and liked all the functionality it provided.
+
+\subsection{Timeline}
+
+Throughout the duration of this project, many of the originally planned tasks were able to be completed ahead of schedule.
+This allowed for additional features like endorsed posts, enhanced filter and upvoting, to also be implemented.
+Overall, majority of the important features were completed with enough time to conduct sufficient analysis of the system.
