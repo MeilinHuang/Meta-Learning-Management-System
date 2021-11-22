@@ -115,3 +115,6 @@ Quiz Review Submission page:
 	\item Have a box around the Answer Explanations section to indicate that it is not part of the original question
 	\item Have a cross at the end of incorrect answers and a tick at the end of correct answers
 \end{itemize}
+
+\subsection{Challenges faced}
+The main challenges when implementing the Assessments feature was creating a generic data structure that allows multiple question types to be supported, and providing the ability to change the question type (when creating a question) without causing unexpected issues. This slowed down the progress and as a result, left no time in implementing the re-usability portion of the Quiz feature, and the Poll feature altogether. Due to this, the data structure was re-designed multiple times before it was finalised and was working consistently. This resulted in significant modifications to the Quiz API endpoints being done later than expected (roughly midway through Term 3) and due to technical issues with API requests always being rejected, there was not enough time to implement it into the final implementation.
