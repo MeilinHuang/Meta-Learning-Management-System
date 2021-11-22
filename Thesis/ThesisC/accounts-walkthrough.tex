@@ -1,259 +1,173 @@
 \section{Accounts and Enrollments}
 
 \subsection{Login and Sign Up}
-\textbf{Functional and Non-Functional Requirements}
+\textbf{Design}
 
-The requirements laid out in the project plan for the login and sign up feature were as follows:
-    \begin{enumerate}
-    \item Users can register and login \textcolor{Red}{High}
-    \item administrators can create accounts on behalf of students \textcolor{Blue}{Low}
-    \end{enumerate}
-The first requirement was achieved very early in the project as it was high priority, while the second was not completed as part of the Thesis, however will be listed to be completed in future work. It not completed due to the prioritisation of other advanced features such as the login code invite redirect causing this feature to be demoted in priority.
-
-\textbf{Usability Tests}
-
-There was one usability test conducted in relation to this feature. Three students and one teacher completed this and all the remainder of the tests for the accounts and enrollment feature.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Login and Sign up - Task 1}     & \textbf{Description}                                                                                                                                          \\ \hline
-\textit{Task}                           & Register for an account and sign in                                                                                                                           \\ \hline
-\textit{Starting State}                 & The login page                                                                                                                                                \\ \hline
-\textit{Successful Completion Criteria} & \begin{tabular}[c]{@{}l@{}}- Navigated to the sign up form from the login page\\ - Correctly fills all fields\\ - Submits the form once complete\end{tabular} \\ \hline
-\textit{Benchmark}                      & 30 seconds                                                                                                                                                    \\ \hline
-\end{tabular}
-\end{table}
-
-All four of the users were able to very easily complete this test within the allotted time. This can be attributed to the simple design that is comparable to other login and sign up flows that exist elsewhere on the internet.
-
-\textbf{Performance and Accessibility}
-
-Google Lighthouse was used to benchmark the performance and accessibility of all of the features within accounts and enrollments. Google lighthouse uses automated tests to asses the response time of the page, and then analyses the code executed to build the page to find what may be causing a page to take a long time to respond and render. It also uses this same analysis to determine whether best accessibility practices have been used such as using appropriate alt-tags and aria labels where possible, and ensuring that components have proper contrast.
+The login and sign up pages are the first pages the user will see when interacting with the Meta Learning Management System. As such, it needs to be easy to understand while also highly functional. To achieve this, a style that resembles what has become the standard login and sign up procedure across the entire web has been used. On the login screen, a user is prompted for their email address and password, and have a sign in button to submit these credentials for verification. As for the sign up page, the form is similar in format, except with more fields to take in the required information to create a new user account. In addition to requiring a user to enter their email and password, the sign up for also asks for a full name, their student ID, and a password confirmation to ensure that the password they are entering is correct.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.3]{images/accounts-login-lighthouse.jpg}
-    \caption{Google Lighthouse Results for the Login and Sign Up Page}
+    \includegraphics[scale=0.25]{images/accounts-login.png}
+    \caption{Login and Sign Up Forms}
 \end{figure}
 
-The login page scored a 52/100 for performance and a 92/100 for accessibility. The performance score is primarily due to the non-minified state of the JavaScript. Minifying JavaScript is a process whereby the files that make up a web-page are processed to reduce file size by removing white-space and reducing all the code down to one line. As the Meta LMS is still in development, minifying the JavaScript is not feasible, as it makes the code for the site non-human readable and thus non-editable. The other performance impact is unused JavaScript.
+\textbf{Purpose}
 
-The accessibility score was not a perfect 100 due to a HTML container that is used to control the spacing on the page having an incorrect aria label. This can cause users with screen readers to have a hard time navigating the web page, however this can be easily remedied by refactoring the page's code.
+By allowing users to create personal accounts within the LMS, it allows all of the other functionality of the LMS to be tailored specifically to that user. The accounts feature is what ties all of a user's progression within their courses to that users, and without it the rest of the LMS would not function.
 
-\textbf{Timeline}
+\textbf{What Was Implemented}
 
-From the timeline set out in the project plan, the login and sign up feature was planned to be finished by week 4 of term 2. The front-end component of this feature was completed by this time, however the back-end component of this feature took an additional 6 weeks to finish. The reasons for which will be discussed in the following challenges section.
+Two forms have been created, a log in form that asks for the users email and password, and a sign up form that asks for a name, email, student ID, password and password confirmation. The inputs on these two forms are text fields that automatically sanitise inputs to ensure they meet the correct formatting, and there is a submission button at the bottom of the form. There is also a hyperlink that allows the user to switch between the sign up and log in context.
 
-\textbf{Challenges Faced}
+\textbf{How It Was Implemented}
 
-The extended timeline for completing the login and sign up feature was due to unforeseen complexities that resulted from developing authentication features in parallel with the rest of the LMS, meaning that the ever changing specification of the other features caused the nature of the authentication process to need to change a number of times through development. This could have been resolved by developing authentication before any of the other features, however this would have caused delays for the other portions of the LMS.
+The log in for and sign up forms both contain a number of text fields for user input. For log in, the user fills in their log in credentials, their email and password, and submits them. The site then passes this data to the backend, which first searches for that email to confirm it exists within the database, then compares the submitted password to that users password to see if they got the correct credentials. In the case of a failure, it will return an error to the front-end, however on a successful login, it returns a token to the front-end which must then be used with all future requests to the backend to authorise said requests. This token is stored in the browsers storage alongside the users ID, which is also necessary for many of the requests.
 
+The sign up form operates very similarly, except instead of confirming the email already exists in the database, it instead confirms that the submitted email and student ID do not currently exists in the database, then confirms that both the password and confirm password fields both contain the same data. If all of these checks pass, the data is entered into the database, and an authorisation token and user ID are returned to the front-end, the same as the log in form. 
+
+\textbf{Considerations}
+
+A lot of detail was also put into creating intuitive error messages on the login form that are informative to the user, without compromising the security of the Meta LMS. For example, an error message will tell you when a field is missing/has been left blank, but if either the email or password is typed incorrectly, it will simply state "Incorrect email or password" so as to not reveal to a potential bad actor whether an email address they have entered is in our database or not.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.15]{images/accounts-login-errors.png}
+    \caption{Login Form Errors}
+\end{figure}
 
 \subsection{Account Management}
-\textbf{Functional and Non-Functional Requirements}
+\textbf{Design}
 
-The requirements laid out in the project plan for the login and sign up feature were as follows:
-    \begin{enumerate}
-    \item Users can view and update their details \textcolor{Red}{High}
-    \item administrators can manage users, roles and permissions \textcolor{Blue}{Low}
-    \item administrators can view other users account details \textcolor{Blue}{Low}
-    \end{enumerate}
-The first requirement was successfully achieved, however the second two were lowered in priority in favor of advanced enrollment features and were subsequently not completed. However, the current accounts system was developed with these features in mind, and it is very feasible for the current system to be updated to support this functionality with future work. 
-
-\textbf{Usability Tests}
-
-There was two usability tests conducted in relation to this feature. Three students and one teacher completed them.
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Account Management - Task 1}    & \textbf{Description}                                                                                                                                                                                                                           \\ \hline
-\textit{Task}                           & Change your email                                                                                                                                                                                                                              \\ \hline
-\textit{Starting State}                 & The Site Dashboard                                                                                                                                                                                                                             \\ \hline
-\textit{Successful Completion Criteria} & \begin{tabular}[c]{@{}l@{}}- Navigated to the account management screen from\\the dashboard\\ - Sets the account management page to edit mode\\ - Fills in the new email and current password\\ - Successfully submits the changes\end{tabular} \\ \hline
-\textit{Benchmark}                      & 90 seconds                                                                                                                                                                                                                                     \\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Account Management - Task 2}    & \textbf{Description}                                                                                                                                                                                                  \\ \hline
-\textit{Task}                           & Change your password                                                                                                                                                                                                  \\ \hline
-\textit{Starting State}                 & The account management page                                                                                                                                                                                           \\ \hline
-\textit{Successful Completion Criteria} & \begin{tabular}[c]{@{}l@{}}- Sets the account management page to edit mode\\ - Fills in the new password and confirm password fields\\ - Enters current password\\ - Successfully submits the changes\end{tabular} \\ \hline
-\textit{Benchmark}                      & 90 seconds                                                                                                                                                                                                            \\ \hline
-\end{tabular}
-\end{table}
-The purpose of test 1 was to determine whether users were easily able to find the account management page and then decipher the editing system. All 4 of the participants managed to successfully find the accounts page with no additional help, however one took considerably longer to find the drop-down menu on the dashboard. This can be attributed to the lack of an indication that clicking on the users name and image in the top right will display a drop-down menu, which can be rectified by adding a down arrow icon next to the text, or an underline to the text to indicate its clickable. Once on the account page, all users very quickly found the edit button and filled the email field. 3 of the 4 participants tried submitting the form without confirming their password which resulted in an error. All of the participants successfully completed the task, but 2 of the 4 did not finish within the benchmark time, due to not finding the drop-down and missing the confirm password portion of the form. The confirm password issue could be resolved with more visibility to the required nature of that field for the form, perhaps by adding a subheading above that input, as the current implementation of the red asterisks next to the text fields label was easily overlooked by participants.
-
-The second test was completed much more successfully by all participants. After having already used the edit feature, all participants correctly filled the form to change both fields, remembering to confirm their own password, and intrinsically understanding to confirm their new password before submitting. This speaks to the learn-ability of the account management feature.
-
-\textbf{Performance and Accessibility}
+The account management screen allows users to view and edit their account information easily within the Meta LMS. This page is accessed from the drop-down menu attached to the profile indicator in the top right of the home page. This drop-down also houses the log out button, which when pressed logs out a user and returns them to the log in screen.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.3]{images/accounts-accounts-lighthouse.jpg}
-    \caption{Google Lighthouse Results for the Account Management Page}
+    \includegraphics[scale=0.4]{images/accounts-account-dropdown.jpg}
+    \caption{Profile Drop-down}
 \end{figure}
-The accounts page received near identical scores to the login and sign up page, with the same criticisms for each of the criteria. The accessibility score was a 91/100 due to some divs in the page that were used for styling not having the correct aria labels, and the performance was mostly impacted by non-minified JavaScript. Both of these can be easily rectified.
 
-\textbf{Timeline}
+On the account management screen, a user is shown their full name, student ID and account type, either staff or student, in the page header. They are then show a list of fields that contain their other account information, such as email and profile image URL. Under these fields, is a table showing the courses they are currently enrolled in, in the form of a table showing the course code, course name and course outline. There is also an edit button attached to the account information fields that allows a user to edit their profile.
 
-The timeline originally defined when planning was that users would be able to view their account information by Week 6 Term 2, and edit it by Week 4 Term 3. However, both of these features were delayed to being worked on from between Week 2 Term 3 and Week 5 Term 3. This was done to ensure that the enrollment features that were more essential to the functionality of the LMS as a whole being were completed first.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.1]{images/accounts-account-management.png}
+    \caption{Account Management}
+\end{figure}
 
-\textbf{Challenges Faced}
+\textbf{Purpose}
 
-One of the primary challenges faced while developing this feature was the ability to add profile images. We did not want to store these images within the database, as that would increase the size of any payloads containing these images to be extremely large, causing the entire site to slow down, but we did not have the time or resources to develop a separate online storage for these images within the project. Thus, as a temporary measure, users are able to enter a link to an image to be used as their profile image. This is not a good solution from a user experience perspective, but it is functional for the time being. However, due to the nature of the current system pointing to a URL that stores an image, future work can be done to quite easily add an online store for images once more resources to fund online storage are available.
+The intention of the account management screen is to have a place within the LMS where the user can view all of the information associated with their account, as well as edit and update this information. By the inclusion of this feature, users have a quick and easy way to ensure all of their personal information is correct and up to date, increasing the user satisfaction as this allows the Meta LMS to remain personalised to the user. It is also a useful tool for quickly viewing all current courses a user is enrolled in or is managing.
+
+\textbf{What Was Implemented}
+
+The accounts screen not only displays all of a users information, there is also an edit button attached to these fields. When clicked, it changes these fields to mutable text boxes, and the edit button changes to a save and cancel button. To edit their account information, a user must mutate the field they wish to change, and also enter their current password to pass the security check required to make the changes. If a user wishes to change their password, they must enter their current password, their new password, then re-enter their new password to confirm it. To change their email, they must simply enter a correctly formatted email, and to change their profile image, they must enter a URL for an image. When these changes are saved, all of the information is quickly updated on the page to reflect these changes. 
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.1]{images/accounts-account-management-edit.png}
+    \caption{Account Editing}
+\end{figure}
+
+The current courses table allows users to at a glance view all important information regarding the courses they are currently enrolled in for student users, or managing for staff users. It shows the courses' course code, which is a hyperlink that when clicked, will take the user to that course's home page, the course's name, and the course outline, which is a brief description of what the course is about.
+
+\textbf{How It Was Implemented}
+
+When the page is loaded, the front-end sends a request to the back-end for all of the user's data. The back-end collects all of the personal information related to the user to send back. In the same response, it also looks at all of the courses the user is enrolled in, as the courses ID's are linked to the user's database entry. It then gathers the appropriate information for these courses and packages them into its response. This data is then reflected on the front-end.
+
+When the user clicks the edit button, it triggers a state change on the front-end to change it to the editing state. This makes all of the text fields in the user information section editable. After the user makes their changes and clicks the save button, the front-end optimistically updates to reflect the new information while simultaneously sending a request to the backend. If the security checks pass and no other errors occur (such as the user attempting to change their email to an email in use by another user), the backend will return success. Otherwise, the backend will return an error and revert its optimistic update to the previous state and display an error toast to the user.
+
+\textbf{Considerations}
+
+The primary consideration for this page was security. We do not want bad actors to maliciously change a users information, so major decisions were made to prevent this. First, any changes to a users information requires the user to resubmit their current password. Failing to get this password correct will cause any changes to not be made. When updating the users password, they must not only re-enter their old password, but also confirm their new password to ensure no input errors accidentally get saved to the database.
 
 \subsection{Enrollment Dashboard - Staff}
-\textbf{Functional and Non-Functional Requirements}
 
-The requirements laid out in the project plan for the staff enrollment dashboard feature were as follows:
-    \begin{enumerate}
-    \item administrators can enrol and un-enroll students on their behalf \textcolor{Red}{High}
-    \item administrators can generate course invite codes \textcolor{Red}{High}
-    \item administrators can set courses to be open enrolment or invite/code only \textcolor{Red}{High}
-    \item administrators can open and close enrolments for courses \textcolor{Orange}{Medium}
-    \end{enumerate}
-All 4 of these requirements were successfully completed. They were all made high priority once development commenced due to the importance of them to the functioning of the broader LMS.
+\textbf{Design}
 
-\textbf{Usability Tests}
-
-There were three usability tests conducted in relation to this feature. One teacher completed them.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Staff Enrollment Dashboard - Task 1} & \textbf{Description}                                                                                                                                                                                                                   \\ \hline
-\textit{Task}                                & \begin{tabular}[c]{@{}l@{}}Delete an existing invite code and generate a new one with\\ limited uses, then copy it to the clipboard\end{tabular}                                                                                       \\ \hline
-\textit{Starting State}                      & A course's dashboard                                                                                                                                                                                                                   \\ \hline
-\textit{Successful Completion Criteria}      & \begin{tabular}[c]{@{}l@{}}- Navigates to the enrollment dashboard\\ - Identifies the code to delete and deletes it\\ - Sets the number of uses for the new code\\ - Generates the new code and saves it to the clipboard\end{tabular} \\ \hline
-\textit{Benchmark}                           & 60 seconds                                                                                                                                                                                                                             \\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Staff Enrollment Dashboard - Task 2} & \textbf{Description}                                                                                           \\ \hline
-\textit{Task}                                & Set the state of the course to search-able                                                                      \\ \hline
-\textit{Starting State}                      & A course's enrollment dashboard                                                                                \\ \hline
-\textit{Successful Completion Criteria}      & \begin{tabular}[c]{@{}l@{}}- Identifies the search-ability toggle\\ - Set the course to search-able\end{tabular} \\ \hline
-\textit{Benchmark}                           & 10 seconds                                                                                                     \\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Staff Enrollment Dashboard - Task 3} & \textbf{Description}                                                                                                                                                                                    \\ \hline
-\textit{Task}                                & Manually enroll a student, un-enroll that student                                                                                                                                                        \\ \hline
-\textit{Starting State}                      & A course's enrollment dashboard                                                                                                                                                                         \\ \hline
-\textit{Successful Completion Criteria}      & \begin{tabular}[c]{@{}l@{}}- Identifies the manual enrollment box and enters a\\ students ID\\ - Identifies that same student in the student list\\ - Successfully un-enrolls that student\end{tabular} \\ \hline
-\textit{Benchmark}                           & 60 seconds                                                                                                                                                                                              \\ \hline
-\end{tabular}
-\end{table}
-
-Each of the tests were designed to test one of the three key enrollment features. Task 1 focuses on the invite code feature. The participant was easily able to navigate to the enrollment dashboard, and found the code to delete very quickly. They also very quickly identified the delete button and successfully deleted the code. They took a little while to analyse the code generation form and read the sub-headings, but generated the new code and copied it to clipboard with no difficulty. An interesting note was that they used the copy button from within the table list rather than the one at the top of the page next to the code. When asked why, they responded by saying that they did not realise the top one was there. This can be addressed by increasing the size of that button and perhaps making it a more visible color.
-
-Task 2 was completed very quickly. After a cursory screening of the page, the participant found and toggled the search-ability switch well within the benchmark time. Task 3 was also completed with ease, the participant very quickly found the text input, enrolled the student with the given ID, and were able to easily find the student with the corresponding student ID that was just enrolled, and used the un-enroll button to un-enroll them well within the benchmark time. A comment the participant made was that when they have a larger course size, it may be more difficult to find a student in the student list, and suggested perhaps a search bar or more advanced filtering for the student list.
-
-
-\textbf{Performance and Accessibility}
+For staff users, each course will have a dashboard screen that allows them to manage enrollments for that course. There are quite a few elements within the enrollment dashboard to allow staff to easily manage all enrollment features of a course from a single easy to use screen. The top portion of the page is dedicated to generating course invite codes. An invite code is a code or URL a teacher can pass onto students to allow them to enroll themselves into a course. Below that is a table that displays all currently active invite codes, how many uses they have, and how much time until they expire. It also gives action buttons that allow staff to either copy these codes to the clipboard for sharing, or to delete these codes. Beneath the table, there is a list of all currently enrolled students within the course, and all current staff of the course. There is buttons to allow staff members to manually un-enroll students. To the left of this, there is a text input form that allows staff to manually enter a students student ID and enroll them into the course. The last UI element is a toggle-able switch which sets whether a course is publicly search-able or not.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.3]{images/accounts-staff-lighthouse.jpg}
-    \caption{Google Lighthouse Results for the Staff Enrollment Dashboard}
+    \includegraphics[scale=0.1]{images/accounts-enrollment-dashboard.png}
+    \caption{Staff Enrollment Dashboard}
 \end{figure}
 
-The staff enrollment dashboard received near identical scores to the login and sign up page, with the same criticisms for each of the criteria. The accessibility score was a 91/100 due to some divs in the page that were used for styling not having the correct aria labels, and the performance was mostly impacted by non-minified JavaScript. Both of these can be easily rectified.
+\textbf{Purpose}
 
-\textbf{Timeline}
+It is important to the quality of the Meta LMS that staff have a large number of tools to quickly and view and manage enrollments within a course. Due to the nature of the structure of courses as a collection of topics, and how topics are pre-requisites for other topics and as such, other topic groups, it is important for staff to be able to make changes in enrollments quickly so as to not disrupt students' learning and progress. As such, by having one central dashboard for enrollments, it gives staff a very powerful tool to quickly manage all facets of the enrollment feature, from invite codes, to manual enrollments, to search-ability.
 
-In the original timeline, this was broken out into standard and advanced enrollment features, with the standard features being manual enrollment and advanced being everything else. Standard features were planned on being completed in Week 9 of Term 2, and was completed on schedule. Advanced features were planned on being finished in Week 4 of Term 3, by which the code enrollment was completed, but the search functionality wasn't completed until week 7.
+\textbf{What Was Implemented}
 
-\textbf{Challenges Faced}
+This screen contains all of the important controls for managing the enrollments for a course. It required the creation of three key enrollment features, the course invite code, course search-ability, and manual enrollment by student ID. The course invite codes requires a staff member to be able to create and manage course invite codes, and manage optional parameters for these codes such as the number of uses its valid for and the time its valid for. They are also able to easily share codes with the automatic copy functionality, and delete said codes from the code management table. The search feature is very easily managed through a simple toggle switch which toggles the course between public mode, or search-able mode, and private mode, or non-search-able mode. The manual enrollment feature simply requires the staff member managing enrollments to enter the student ID of a student they wish to enroll, and submitting it. This feature also encompasses the student list, where staff can view all currently enrolled students in the course, and manually un-enroll them if they so choose.
 
-This feature contained the bulk of the feature work for the accounts and enrollment feature, due to the fact that a lot of the back-end architecture for the student enrollment features had to be considered and developed as a part of the staff enrollment features. As a result, many decisions had to be made regarding the structure of the database, and how student and staff accounts would interact with entries for courses and topics. The eventual decision was to create a new table that contained the course id, the user id, the date enrolled and the users progress through the course to represent an enrollment. This format gives us the flexibility to be able to search enrollments per user, and per course, as well as gain some basic information about these enrollments very easily.
+\textbf{How It Was Implemented}
 
-Another challenge faced was the architecture for the invite code feature. It became difficult to ensure that none of the codes in the database were expired, leading to potential misleading information on the enrollment dashboard and potential erroneous enrollments. To combat this, every time an enrollment code is accessed, its validity is checked, and also, while the staff enrollment dashboard is open, the invite code table is reloaded every 5 minutes to force the back-end to check the validity of all the enroll codes and to give the front-end the most up to date information about the number of uses and time remaining for each of these codes.
+There are two options a staff member has when generating an invite code. First, they can set the number of uses a code has, with a range from zero to infinite. They can also set the time an invite code is valid for, also ranging from zero to infinite. Under the inputs for these two fields is a "Generate Link" button which when pressed packages the values set for the optional parameters, and sends them in a request to the back-end. The back-end receives this request, and inserts a new code object into the database. If the parameter for time remaining or uses are set to 0 when sent to the back-end, the back-end does not add these parameters to the data entered into the database and thus the code has infinite uses or infinite time remaining. After entering the data for the code into the database, the backend responds to the front-end with the usable code. The front-end then automatically appends this code to the URL of the site and displays this in the text-box at the top of the screen. It also adds the code to the enrollment codes table below.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.2]{images/accounts-staff-link.jpg}
+    \caption{Generate Invite Link}
+\end{figure}
+
+Below the code generation area is a table where all of the currently outstanding invite links can be viewed. The data for these codes are fetched whenever the page is loaded. First, the front-end requests the list of all invite codes for the course. The back-end then gets a list of all codes for that course from the database. It then checks this list for any which have 0 uses remaining, or have 0 time remaining and deletes them from the database. It then sends this updated list to the front-end to be displayed. For these codes in the table, if the user clicks the copy button, it copies the invite link corresponding to that code directly to the clipboard. There is also a delete button, that when pressed, optimistically updates the front-end to reflect the delete, and sends a delete request to the backend, which then deletes it from the database.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.2]{images/accounts-staff-table.jpg}
+    \caption{Invite Link Table}
+\end{figure}
+
+The next UI element is the search-ability toggle. On the page load, it reads the state of the search-ability of the course from the payload sent from the back-end that is requested when the page loads. It then sets the state of the search-ability toggle accordingly. When a user interacts with the toggle, the front-end optimistically updates, and sends a request to the back-end to change the state. The back-end then updates the state in the database, and sends a confirmation to the front end. 
+
+The final component is the enroll by student ID and student list section. The enroll by student ID feature allows a staff member to enter a student's ID into the text field and submit it to be enrolled into the course. When it is submitted, the front-end checks to see if the student ID is in a valid format, and if so, sends it to the back-end to enroll the student in the course. The back-end checks to see if the student exists, then if the student is already in the course. If both of those checks pass, the back-end enters the student into the course in the database, and sends an updated enrolled student list of the course to the front-end. Unlike many other components on this page, the manual enroll is not optimistically updated on the front-end due to the higher chance of failure due to a high reliance on user input. Thus, the front-end waits to receive the updated student list from the back-end to update the student list on the front-end. The student list is simply a list of all users enrolled in the course, with students separated out from staff. A staff member will also see a red x next to all the students in the course allowing them to manually un-enroll a student. When clicked, the front-end optimistically updates the list to remove the student, then sends the delete request to the back-end, which then removes that students enrollment from the database and sends a confirmation to the front-end.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.2]{images/accounts-staff-student.jpg}
+    \caption{Manual Invites and Student List}
+\end{figure}
+
+For the entire page, if at any point an error occurs, any optimistic updates will be reverted, and an error toast will be displayed to the user explaining what went wrong. This is by design, so that the information on the page is always correct, and errors are in a consistent and easy to understand format.
+
+\textbf{Considerations}
+
+The primary consideration made when designing and developing this dashboard was ease of use. As a result, the initial plan to separate these features into multiple pages, one for invite links, one for manual invites and one for monitoring student lists and managing search-ability, was decided to not be followed in favour of the current implementation, having it all in one place. This allows users to more quickly manage enrollments, and not have to waste time switching contexts.
 
 \subsection{Enrollment Dashboard - Student}
-\textbf{Functional and Non-Functional Requirements}
 
-The requirements laid out in the project plan for the student enrollment dashboard feature were as follows:
-    \begin{enumerate}
-    \item Students can enrol themselves in courses with a code \textcolor{Red}{High}
-    \item Students can search for open courses \textcolor{Red}{High}
-    \item Students can enrol themselves in an open course or topic \textcolor{Red}{High}
-    \end{enumerate}
-All 3 of these requirements were successfully completed. They were all made high priority once development commenced due to the importance of them to the functioning of the broader LMS.
+\textbf{Design}
 
-\textbf{Usability Tests}
-
-There were three usability tests conducted in relation to this feature. Three students completed them.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Student Enrollment Dashboard - Task 1} & \textbf{Description}                                                                                                                                  \\ \hline
-\textit{Task}                                  & Enroll with an invite code                                                                                                                            \\ \hline
-\textit{Starting State}                        & Site dashboard                                                                                                                                        \\ \hline
-\textit{Successful Completion Criteria}        & \begin{tabular}[c]{@{}l@{}}- Correctly navigates to the student enrollment\\dashboard\\ - Enters the invite code and successfully enrolls\end{tabular} \\ \hline
-\textit{Benchmark}                             & 60 seconds                                                                                                                                            \\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Student Enrollment Dashboard - Task 2} & \textbf{Description}                                                                                                                      \\ \hline
-\textit{Task}                                  & Search for and enroll in a course                                                                                                         \\ \hline
-\textit{Starting State}                        & Student enrollment dashboard                                                                                                              \\ \hline
-\textit{Successful Completion Criteria}        & \begin{tabular}[c]{@{}l@{}}- Enters a search term and searches successfully\\ - Uses search results to enroll in a course\end{tabular} \\ \hline
-\textit{Benchmark}                             & 30 seconds                                                                                                                                \\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Student Enrollment Dashboard - Task 2} & \textbf{Description}                                                                                                                                   \\ \hline
-\textit{Task}                                  & \begin{tabular}[c]{@{}l@{}}Creates a new account and enrolls in a course\\from an invite code\end{tabular}                                                                                      \\ \hline
-\textit{Starting State}                        & Browser new tab page                                                                                                                                   \\ \hline
-\textit{Successful Completion Criteria}        & \begin{tabular}[c]{@{}l@{}}- Uses the invite link to navigate to the site\\ - Successfully creates a new account\\ - Enrolls in the course\end{tabular} \\ \hline
-\textit{Benchmark}                             & 90 seconds                                                                                                                                             \\ \hline
-\end{tabular}
-\end{table}
-
-The first test was designed to determine the ease of finding the student enrollment page, and the ease of understanding of the invite code enrollment format. All 3 participants very quickly found the enrollment page, figured out where to enter the invite code, and enrolled the course well within the benchmark time. The second test, designed to perform the same analysis of the search, was also very successfully completed without any issues by all 3 participants. The third task was designed to test the user flow of a new user to the site. 2 of the 3 participants navigated to the site directly from the invite link, signed up and enrolled very easily, while the third instead first navigated to the site themselves, made a new account and once they had made a new account and logged in, went to the invite link and enrolled. When asked why they followed this path through the app instead of directly going to the invite link, they stated that they did not think it would work because they needed to make a new account. The time taken between the 2 approaches the participants took was not hugely different, and as such this test exposed the flexibility of the invite code system to the workflows of different users.
-
-\textbf{Performance and Accessibility}
+The student enrollment dashboard is split into two main areas, the join with invite code area, and the search for a course area. Both sides consist of two very basic UI elements, a text input, and a submit button. For the invite code side, students input a code given to them by a teacher, and submit that to be enrolled into a course. For the search side, students can enter either the course code, course name, or key words related to something they wish to learn about and submit it. This will then return matching courses in the form of cards, which say the courses name, code and course outline, and has a button they can press to enroll.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.3]{images/accounts-student-lighthouse.jpg}
-    \caption{Google Lighthouse Results for the Student Enrollment Dashboard}
+    \includegraphics[scale=0.1]{images/accounts-student-dash.jpg}
+    \caption{Student Enrollment Dashboard}
 \end{figure}
-The student enrollment dashboard received near identical scores to the login and sign up page, with the same criticisms for each of the criteria. The accessibility score was a 90/100 due to some divs in the page that were used for styling not having the correct aria labels, and the performance was mostly impacted by non-minified JavaScript. Both of these can be easily rectified.
 
-\textbf{Timeline}
+\textbf{Purpose}
 
-Due to the interconnected nature of the staff and student enrollment features, the student features were completed on the same timeline ass the staff features. In the original timeline, this was broken out into standard and advanced enrollment features, with the standard features being manual enrollment and advanced being everything else. Standard features were planned on being completed in Week 9 of Term 2, and was completed on schedule. Advanced features were planned on being finished in Week 4 of Term 3, by which the code enrollment was completed, but the search functionality wasn't completed until week 7.
+Due to the fast-paced nature of learning that comes from using the topic group approach, it is important that students have a high level of agency over their learning. As such, it is essential the tools students have access to that allow them to manage their enrollments are powerful enough to afford them this agency. This adds a tremendous amount of value to the Meta LMS as it gives students access to the full benefits of the topic group system.
 
-\textbf{Challenges Faced}
+\textbf{What Was Implemented}
 
-The primary challenge faced was creating an effective user-flow for both existing and new users to enroll using an invite code. It was found out very early during internal testing that although the invite codes worked very well for existing users, the process for a new user was less than ideal, as they would have to follow an invite link, then make an account, then re-enter the invite link in their browser. This process did not feel smooth and lead to a poor user experience. The solution was to implement a redirect system that allowed the login page to redirect to the student enrollment dashboard, if the link that took them to the login page was an invite link. This change greatly improved the new user experience.
+The two systems implemented are the student face of the invite code system, and the course searching system. The course invite system also encapsulates the login redirect feature, that allows students who are not currently logged in to the LMS to simply click an invite link, login or sign up, and then automatically be redirected to the student enrollment dashboard with the invite code pre-filled to quickly and easily begin using the LMS to learn.
 
-Another challenge was the quality of search results returned to student users. Initially, the search only compared itself to course names and course codes, however it was found that this method did not help students who did not know the exact name of the course they were looking for, as it did not allow for more general searching. To fix this, the search was expanded to also search course outlines. This allows the search to be more powerful and give better results, however the cost is that the search takes a lot longer to complete. Although the time for search is a downside, it was decided that it was a worthwhile trade-off due to how much it improved the quality of the search results.
+\textbf{How It Was Implemented}
+
+The course invite system works by allowing a user to input a course invite code, and submit it to enroll themselves into a course. This field will be blank on the page load if the user has navigated to the enrollment page manually, but will be pre-filled if the user has arrived to the page by using an invite link. This is done by reading the ID URL parameter of the invite link, and setting that as the default value of that text field. When the user submits an invite code, the front-end sends that code in a request to the back-end. The back-end first checks to see if the code exists in the database, then checks if the code is valid, that is, if it has time remaining, or uses remaining. If the code has become invalid, it deletes it from the database and sends an error to the front-end. If the code is valid, it then checks if the student is already enrolled in the course, and if they aren't, it enrolls them, and updates the remaining uses for that invite. If the student's enrollment causes this code to become invalid, it is then removes that code from the database. Once the enrollment is successful, its sends the confirmation payload to the front-end. This payload contains the information of the course the student was enrolled in, as well as the confirmation status. This information is then displayed to the user on the front-end in the form of a toast that confirms the enrollment was successful and the course they were enrolled in.
+
+The search for a course feature is much the same, the user inputs a string and sends it to the back-end. However, the string entered will correspond to either a course's code, a course title or details about a course. When the user submits this, the front-end sends a request to the back-end for results related to the user's query. The back-end then compares the query to the course codes, names and course outlines stored in the back-end, but only of courses that have been marked as search-able. It then assembles a list of results and sends that response back to the front-end. The front-end then displays this list to the user in the form of cards. These cards contain all the basic information about the course, and also have an enroll button. When the user clicks the enroll button, the front-end sends the enroll request to the back-end. The back-end then does checks to see if the user is already in the course, and if not, enrolls them in the course and sends confirmation back to the front-end. This successful enrollment is then displayed in the form of a toast.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.6]{images/accounts-login-redirect.jpg}
+    \caption{Invite Code Login Redirect}
+\end{figure}
+
+The feature that handles the redirect to the invite screen from the login page does so by storing the invite code from an invite link in the redirect URL parameter of the invite page. If this parameter is present, once a user has successfully logged in, it will redirect them to the invite page and pre-fill the code.
+
+\textbf{Considerations}
+
+The primary consideration for this feature was the redirect from the login screen, particularly for new users. To create as positive a user experience as possible, the sign up to enrollment process needs to be as seamless and friction-less as possible. Allowing users to simply input an invite code, create an account then automatically be redirected to the enrollment page with the code pre-filled makes this enrollment process as easy as possible for the user, allowing them to begin using the LMS to learn very quickly.

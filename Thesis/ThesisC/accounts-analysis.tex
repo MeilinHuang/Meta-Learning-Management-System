@@ -4,11 +4,31 @@
 \textbf{Functional and Non-Functional Requirements}
 
 The requirements laid out in the project plan for the login and sign up feature were as follows:
-    \begin{enumerate}
-    \item Users can register and login \textcolor{Red}{High}
-    \item administrators can create accounts on behalf of students \textcolor{Orange}{Medium}
-    \end{enumerate}
-The first requirement was achieved very early in the project as it was high priority, while the second was not completed as part of the Thesis, however will be listed to be completed in future work. It not completed due to the prioritisation of other advanced features such as the login code invite redirect causing this feature to be demoted in priority.
+
+Users can register and login \textcolor{Red}{High}
+\begin{center}
+    \begin{tabular}{|ll|}
+    \hline
+        \multicolumn{1}{|l|}{\textbf{AS A}}      & User \\ \hline
+        \multicolumn{1}{|l|}{\textbf{I WANT TO}} & Create a new account and log in to my existing account \\ \hline
+        \multicolumn{1}{|l|}{\textbf{SO THAT}}   & I can use the LMS \\ \hline
+        \multicolumn{2}{|l|}{\textbf{Acceptance Criteria:}} \\ \hline
+        \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- The user can successfully sign up to the LMS\\ - The user can use an account previously made to log in\end{tabular}} \\ \hline
+    \end{tabular}
+\end{center}
+
+Staff can create accounts on behalf of students \textcolor{Blue}{Low}
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+\multicolumn{1}{|l|}{\textbf{AS A}}                                    & Staff Member                                                                             \\ \hline
+\multicolumn{1}{|l|}{\textbf{I WANT TO}}                               & Create accounts on behalf of students                                                    \\ \hline
+\multicolumn{1}{|l|}{\textbf{SO THAT}}                                 & I can streamline the formation of a course for new students                              \\ \hline
+\multicolumn{2}{|l|}{\textbf{Acceptance Criteria:}}                                                                                                               \\ \hline
+\multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- The staff can create a batch of student accounts\\ - Students can use these accounts to log in\end{tabular}} \\ \hline
+\end{tabular}
+\end{center}
+The first requirement was achieved very early in the project to all acceptance criteria, as it was high priority, while the second was not completed as part of the Thesis, however will be listed to be completed in future work. It not completed due to the prioritisation of other advanced features such as the login code invite redirect causing this feature to be demoted in priority.
 
 \textbf{Usability Tests}
 
@@ -55,18 +75,37 @@ The extended timeline for completing the login and sign up feature was due to un
 \textbf{Functional and Non-Functional Requirements}
 
 The requirements laid out in the project plan for the login and sign up feature were as follows:
-    \begin{enumerate}
-    \item Users can view and update their details \textcolor{Red}{High}
-    \item administrators can manage users, roles and permissions \textcolor{Red}{Medium}
-    \item administrators can view other users account details \textcolor{Orange}{Medium}
-    \end{enumerate}
-The first requirement was successfully achieved, however the second two were lowered in priority in favor of advanced enrollment features and were subsequently not completed. However, the current accounts system was developed with these features in mind, and it is very feasible for the current system to be updated to support this functionality with future work. 
+
+Users can view and update their details \textcolor{Orange}{Medium}
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+\multicolumn{1}{|l|}{\textbf{AS A}}                                                    & User                                                                                    \\ \hline
+\multicolumn{1}{|l|}{\textbf{I WANT TO}}                                               & View and update my details                                                              \\ \hline
+\multicolumn{1}{|l|}{\textbf{SO THAT}}                                                 & I can ensure my information is up to date                                               \\ \hline
+\multicolumn{2}{|l|}{\textbf{Acceptance Criteria:}}                                                                                                                              \\ \hline
+\multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Users can access a page that shows their account information\\ - Users can edit their information from this page\end{tabular}} \\ \hline
+\end{tabular}
+\end{center}
+
+Staff can manage other users \textcolor{Blue}{Low}
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+\multicolumn{1}{|l|}{\textbf{AS A}}                                           & Staff member                                                                                        \\ \hline
+\multicolumn{1}{|l|}{\textbf{I WANT TO}}                                      & Manage other users                                                                                  \\ \hline
+\multicolumn{1}{|l|}{\textbf{SO THAT}}                                        & I can ensure student's accounts contain the correct information                                     \\ \hline
+\multicolumn{2}{|l|}{\textbf{Acceptance Criteria:}}                                                                                                                                 \\ \hline
+\multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Staff can access a page that shows a students account information\\ - They can edit this information from this page\end{tabular}} \\ \hline
+\end{tabular}
+\end{center}
+
+The first requirement was successfully achieved to all acceptance criteria, however the second was lowered in priority in favor of advanced enrollment features and was subsequently not completed. However, the current accounts system was developed with these features in mind, and it is very feasible for the current system to be updated to support this functionality with future work. 
 
 \textbf{Usability Tests}
 
 There was two usability tests conducted in relation to this feature. Three students and one teacher completed them.
-\begin{table}[h!]
-\centering
+\begin{center}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{Account Management - Task 1}    & \textbf{Description}                                                                                                                                                                                                                           \\ \hline
@@ -75,10 +114,9 @@ There was two usability tests conducted in relation to this feature. Three stude
 \textit{Successful Completion Criteria} & \begin{tabular}[c]{@{}l@{}}- Navigated to the account management screen from\\the dashboard\\ - Sets the account management page to edit mode\\ - Fills in the new email and current password\\ - Successfully submits the changes\end{tabular} \\ \hline
 \textit{Benchmark}                      & 90 seconds                                                                                                                                                                                                                                     \\ \hline
 \end{tabular}
-\end{table}
+\end{center}
 
-\begin{table}[h!]
-\centering
+\begin{center}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{Account Management - Task 2}    & \textbf{Description}                                                                                                                                                                                                  \\ \hline
@@ -87,7 +125,7 @@ There was two usability tests conducted in relation to this feature. Three stude
 \textit{Successful Completion Criteria} & \begin{tabular}[c]{@{}l@{}}- Sets the account management page to edit mode\\ - Fills in the new password and confirm password fields\\ - Enters current password\\ - Successfully submits the changes\end{tabular} \\ \hline
 \textit{Benchmark}                      & 90 seconds                                                                                                                                                                                                            \\ \hline
 \end{tabular}
-\end{table}
+\end{center}
 The purpose of test 1 was to determine whether users were easily able to find the account management page and then decipher the editing system. All 4 of the participants managed to successfully find the accounts page with no additional help, however one took considerably longer to find the drop-down menu on the dashboard. This can be attributed to the lack of an indication that clicking on the users name and image in the top right will display a drop-down menu, which can be rectified by adding a down arrow icon next to the text, or an underline to the text to indicate its clickable. Once on the account page, all users very quickly found the edit button and filled the email field. 3 of the 4 participants tried submitting the form without confirming their password which resulted in an error. All of the participants successfully completed the task, but 2 of the 4 did not finish within the benchmark time, due to not finding the drop-down and missing the confirm password portion of the form. The confirm password issue could be resolved with more visibility to the required nature of that field for the form, perhaps by adding a subheading above that input, as the current implementation of the red asterisks next to the text fields label was easily overlooked by participants.
 
 The second test was completed much more successfully by all participants. After having already used the edit feature, all participants correctly filled the form to change both fields, remembering to confirm their own password, and intrinsically understanding to confirm their new password before submitting. This speaks to the learn-ability of the account management feature.
@@ -113,32 +151,63 @@ One of the primary challenges faced while developing this feature was the abilit
 \textbf{Functional and Non-Functional Requirements}
 
 The requirements laid out in the project plan for the staff enrollment dashboard feature were as follows:
-    \begin{enumerate}
-    \item administrators can open and close enrolments for courses \textcolor{Red}{High}
-    \item administrators can enrol and un-enroll students on their behalf \textcolor{Red}{High}
-    \item administrators can generate course invite codes \textcolor{Red}{High}
-    \item administrators can set courses to be open enrolment or invite/code only \textcolor{Orange}{Medium}
-    \end{enumerate}
-All 4 of these requirements were successfully completed. They were all made high priority once development commenced due to the importance of them to the functioning of the broader LMS.
+
+Staff can enrol and un-enroll students on their behalf \textcolor{Red}{High}
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+\multicolumn{1}{|l|}{\textbf{AS A}}                                                                   & Staff member                                                                                                 \\ \hline
+\multicolumn{1}{|l|}{\textbf{I WANT TO}}                                                              & Enrol and un-enroll students from a course                                                               \\ \hline
+\multicolumn{1}{|l|}{\textbf{SO THAT}}                                                                & I can effectively manage a course's enrollments                                                              \\ \hline
+\multicolumn{2}{|l|}{\textbf{Acceptance Criteria:}}                                                                                                                                                                  \\ \hline
+\multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Staff can access a page that shows all students enrolled in a course\\ - They can enroll new students or un-enroll existing students from the course\end{tabular}} \\ \hline
+\end{tabular}
+\end{center}
+
+Staff can generate course invite codes \textcolor{Red}{High}
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+\multicolumn{1}{|l|}{\textbf{AS A}}                                                                                                                       & Staff member                                                                                                                                                     \\ \hline
+\multicolumn{1}{|l|}{\textbf{I WANT TO}}                                                                                                                  & Generate course invite codes                                                                                                                                     \\ \hline
+\multicolumn{1}{|l|}{\textbf{SO THAT}}                                                                                                                    & I can effectively manage a course's enrollments                                                                                                                  \\ \hline
+\multicolumn{2}{|l|}{\textbf{Acceptance Criteria:}}                                                                                                                                                                                                                                                                          \\ \hline
+\multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Staff can access a page that allows them to generate and manage course invite codes\\ - They can add restrictions to code like number of uses and time valid\\ - They can manage existing codes\\ - When a student uses the code they can enroll in a course\end{tabular}} \\ \hline
+\end{tabular}
+\end{center}
+
+Staff can set courses to be open enrolment or invite/code only \textcolor{Red}{High}
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+\multicolumn{1}{|l|}{\textbf{AS A}}                                                              & Staff member                                                                                                 \\ \hline
+\multicolumn{1}{|l|}{\textbf{I WANT TO}}                                                         & Set courses to be open enrolment or invite/code only                                                         \\ \hline
+\multicolumn{1}{|l|}{\textbf{SO THAT}}                                                           & I can effectively manage a course's enrollments                                                              \\ \hline
+\multicolumn{2}{|l|}{\textbf{Acceptance Criteria:}}                                                                                                                                                             \\ \hline
+\multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Staff can access a page that allows them to manage whether a course is publically search-able\\ - They can control whether a course is public\end{tabular}} \\ \hline
+\end{tabular}
+\end{center}
+
+All 3 of these requirements were successfully completed to all acceptance criteria. They were all made high priority once development commenced due to the importance of them to the functioning of the broader LMS.
 
 \textbf{Usability Tests}
 
 There were three usability tests conducted in relation to this feature. One teacher completed them.
 
-\begin{table}[h!]
-\centering
+
+\begin{center}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{Staff Enrollment Dashboard - Task 1} & \textbf{Description}                                                                                                                                                                                                                   \\ \hline
-\textit{Task}                                & \begin{tabular}[c]{@{}l@{}}Delete an existing invite code and generate a new one with\\ limited uses, then copy it to the clipboard\end{tabular}                                                                                       \\ \hline
+\textit{Task}                                & \begin{tabular}[c]{@{}l@{}}Delete an existing invite code and \\generate a new one with\\ limited uses, then copy it to the clipboard\end{tabular}                                                                                       \\ \hline
 \textit{Starting State}                      & A course's dashboard                                                                                                                                                                                                                   \\ \hline
-\textit{Successful Completion Criteria}      & \begin{tabular}[c]{@{}l@{}}- Navigates to the enrollment dashboard\\ - Identifies the code to delete and deletes it\\ - Sets the number of uses for the new code\\ - Generates the new code and saves it to the clipboard\end{tabular} \\ \hline
+\textit{Successful Completion Criteria}      & \begin{tabular}[c]{@{}l@{}}- Navigates to the enrollment dashboard\\ - Identifies the code to delete and deletes it\\ - Sets the number of uses for the new code\\ - Generates the new code and saves it to \\the clipboard\end{tabular} \\ \hline
 \textit{Benchmark}                           & 60 seconds                                                                                                                                                                                                                             \\ \hline
 \end{tabular}
-\end{table}
+\end{center}
 
-\begin{table}[h!]
-\centering
+
+\begin{center}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{Staff Enrollment Dashboard - Task 2} & \textbf{Description}                                                                                           \\ \hline
@@ -147,10 +216,10 @@ There were three usability tests conducted in relation to this feature. One teac
 \textit{Successful Completion Criteria}      & \begin{tabular}[c]{@{}l@{}}- Identifies the search-ability toggle\\ - Set the course to search-able\end{tabular} \\ \hline
 \textit{Benchmark}                           & 10 seconds                                                                                                     \\ \hline
 \end{tabular}
-\end{table}
+\end{center}
 
-\begin{table}[h!]
-\centering
+
+\begin{center}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{Staff Enrollment Dashboard - Task 3} & \textbf{Description}                                                                                                                                                                                    \\ \hline
@@ -159,7 +228,7 @@ There were three usability tests conducted in relation to this feature. One teac
 \textit{Successful Completion Criteria}      & \begin{tabular}[c]{@{}l@{}}- Identifies the manual enrollment box and enters a\\ students ID\\ - Identifies that same student in the student list\\ - Successfully un-enrolls that student\end{tabular} \\ \hline
 \textit{Benchmark}                           & 60 seconds                                                                                                                                                                                              \\ \hline
 \end{tabular}
-\end{table}
+\end{center}
 
 Each of the tests were designed to test one of the three key enrollment features. Task 1 focuses on the invite code feature. The participant was easily able to navigate to the enrollment dashboard, and found the code to delete very quickly. They also very quickly identified the delete button and successfully deleted the code. They took a little while to analyse the code generation form and read the sub-headings, but generated the new code and copied it to clipboard with no difficulty. An interesting note was that they used the copy button from within the table list rather than the one at the top of the page next to the code. When asked why, they responded by saying that they did not realise the top one was there. This can be addressed by increasing the size of that button and perhaps making it a more visible color.
 
@@ -190,19 +259,39 @@ Another challenge faced was the architecture for the invite code feature. It bec
 \textbf{Functional and Non-Functional Requirements}
 
 The requirements laid out in the project plan for the student enrollment dashboard feature were as follows:
-    \begin{enumerate}
-    \item Students can enrol themselves in courses with a code \textcolor{Red}{High}
-    \item Students can enrol themselves in an open course or topic \textcolor{Red}{High}
-    \item Students can search for open courses \textcolor{Blue}{Low}
-    \end{enumerate}
-All 3 of these requirements were successfully completed. They were all made high priority once development commenced due to the importance of them to the functioning of the broader LMS.
+
+Students can enrol themselves in courses with a code \textcolor{Red}{High}
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+\multicolumn{1}{|l|}{\textbf{AS A}}                                                                                       & Student                                                                                                              \\ \hline
+\multicolumn{1}{|l|}{\textbf{I WANT TO}}                                                                                  & Enrol myself in courses with a code                                                                                  \\ \hline
+\multicolumn{1}{|l|}{\textbf{SO THAT}}                                                                                    & I can enroll in a new course                                                                                         \\ \hline
+\multicolumn{2}{|l|}{\textbf{Acceptance Criteria:}}                                                                                                                                                                                              \\ \hline
+\multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Students have access to an enrollment page where they can enroll in a \\course with an invite code\\ - After submitting the code, they are enrolled in the corresponding course\end{tabular}} \\ \hline
+\end{tabular}
+\end{center}
+
+Students can search for open courses \textcolor{Red}{High}
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+\multicolumn{1}{|l|}{\textbf{AS A}}                                                                                                          & Student                                                                                                                          \\ \hline
+\multicolumn{1}{|l|}{\textbf{I WANT TO}}                                                                                                     & Search for open courses                                                                                                          \\ \hline
+\multicolumn{1}{|l|}{\textbf{SO THAT}}                                                                                                       & I can enroll in a new course                                                                                                     \\ \hline
+\multicolumn{2}{|l|}{\textbf{Acceptance Criteria:}}                                                                                                                                                                                                                             \\ \hline
+\multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}- Students have access to an enrollment page where they can search for courses\\ - After searching, a list of courses will be shown to the student\\ - Students can interact with this list to enroll in a course\end{tabular}} \\ \hline
+\end{tabular}
+\end{center}
+
+Both of these requirements were successfully completed to all acceptance criteria. They were all made high priority once development commenced due to the importance of them to the functioning of the broader LMS.
 
 \textbf{Usability Tests}
 
 There were three usability tests conducted in relation to this feature. Three students completed them.
 
-\begin{table}[h!]
-\centering
+
+\begin{center}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{Student Enrollment Dashboard - Task 1} & \textbf{Description}                                                                                                                                  \\ \hline
@@ -211,10 +300,10 @@ There were three usability tests conducted in relation to this feature. Three st
 \textit{Successful Completion Criteria}        & \begin{tabular}[c]{@{}l@{}}- Correctly navigates to the student enrollment\\dashboard\\ - Enters the invite code and successfully enrolls\end{tabular} \\ \hline
 \textit{Benchmark}                             & 60 seconds                                                                                                                                            \\ \hline
 \end{tabular}
-\end{table}
+\end{center}
 
-\begin{table}[h!]
-\centering
+
+\begin{center}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{Student Enrollment Dashboard - Task 2} & \textbf{Description}                                                                                                                      \\ \hline
@@ -223,10 +312,10 @@ There were three usability tests conducted in relation to this feature. Three st
 \textit{Successful Completion Criteria}        & \begin{tabular}[c]{@{}l@{}}- Enters a search term and searches successfully\\ - Uses search results to enroll in a course\end{tabular} \\ \hline
 \textit{Benchmark}                             & 30 seconds                                                                                                                                \\ \hline
 \end{tabular}
-\end{table}
+\end{center}
 
-\begin{table}[]
-\centering
+
+\begin{center}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{Student Enrollment Dashboard - Task 2} & \textbf{Description}                                                                                                                                   \\ \hline
@@ -235,7 +324,7 @@ There were three usability tests conducted in relation to this feature. Three st
 \textit{Successful Completion Criteria}        & \begin{tabular}[c]{@{}l@{}}- Uses the invite link to navigate to the site\\ - Successfully creates a new account\\ - Enrolls in the course\end{tabular} \\ \hline
 \textit{Benchmark}                             & 90 seconds                                                                                                                                             \\ \hline
 \end{tabular}
-\end{table}
+\end{center}
 
 The first test was designed to determine the ease of finding the student enrollment page, and the ease of understanding of the invite code enrollment format. All 3 participants very quickly found the enrollment page, figured out where to enter the invite code, and enrolled the course well within the benchmark time. The second test, designed to perform the same analysis of the search, was also very successfully completed without any issues by all 3 participants. The third task was designed to test the user flow of a new user to the site. 2 of the 3 participants navigated to the site directly from the invite link, signed up and enrolled very easily, while the third instead first navigated to the site themselves, made a new account and once they had made a new account and logged in, went to the invite link and enrolled. When asked why they followed this path through the app instead of directly going to the invite link, they stated that they did not think it would work because they needed to make a new account. The time taken between the 2 approaches the participants took was not hugely different, and as such this test exposed the flexibility of the invite code system to the workflows of different users.
 
