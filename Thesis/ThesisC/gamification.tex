@@ -63,23 +63,23 @@ In scope are Timed or Untimed multiple choice questions, True / False questions 
 
 \subsubsection{Student Frontend Requirements}
 \begin{enumerate}
-    \item As a Student, I need to be able to access the gamification feature to navigate and complete modules for my course. (Permissions)
-    \item As a Student, I need to be able to complete Core Knowledge Modules. (Course)
-    \item As a Student, I need to be able to complete Challenge Modules. (Course)
-    \item As a Student, I need to be able to see a recap of my progress in level. (Course)
-    \item As a Student, I need to be able to view all my enrolled courses and access weekly activities. (Course)
-    \item As a Student, I need to be able to monitor my progress compared to other students. (Course)
+    \item As a Student, I need to be able to access the gamification feature to navigate and complete levels for my topic group. (Permissions)
+    \item As a Student, I need to be able to complete Core Knowledge Modules. 
+    \item As a Student, I need to be able to complete Challenge Modules.
+    \item As a Student, I need to be able to see a recap of my progress in level.
+    \item As a Student, I need to be able to view all my enrolled topic groups and access weekly activities.
+    \item As a Student, I need to be able to monitor my progress compared to other students.
     \item As a Student, I need to be able to see my achievements and reward points. (Rewards)
     \item As a Student, I need to be able to see my leaderboard rankings compared to my peers. (Rewards)
 \end{enumerate}
 
 \subsubsection{Academic Frontend Requirements}
 \begin{enumerate}
-    \item As an Academic, I need to be able to access the gamification feature to navigate, customise courses and set permissions for students. (Permissions)
-    \item As an Academic, I need to be able to create a new course run either new or clone from previous course. (Course Management)
-    \item As an Academic, I need to be able to customise content and number of questions for Core Knowledge Modules and Challenge Modules. (Course Management)
-    \item As an Academic, I need to be able to create new timed or untimed questions of types (MCQ, True / False, Coding). (Course Management)
-    \item As an Academic, I need to be able to monitor the leaderboards for the course and monitor course level statistics. (Course Management)
+    \item As an Academic, I need to be able to access the gamification feature to navigate, customise levels and set permissions for students. (Permissions)
+    \item As an Academic, I need to be able to create a new topic group run either new or clone from previous topic groups.
+    \item As an Academic, I need to be able to customise content and number of questions for Core Knowledge Modules and Challenge Modules.
+    \item As an Academic, I need to be able to create new timed questions of types (MCQ, True / False, Coding).
+    \item As an Academic, I need to be able to monitor the leaderboards for the course and monitor course level statistics.
     \item As an Academic, I need to be able to customise the rewards awarded to students on completion of questions in modules. (Rewards Management)
 \end{enumerate}
 
@@ -90,20 +90,14 @@ Gamification Feature will require some backend connections to the meta-lms to se
 This feature will also need backend functions that will enable setup and customisation of courses, modules and student profiles.
 
 \begin{enumerate}
-    \item Retrieve a list of students enrolled in course from meta-lms
-    \item Retrieve a list of all or courses in meta-lms
-    \item Retrieve a list of all or course games
-    \item Retrieve a list of levels in course
-    \item Retrieve individual post details for post page (including comments and responses)
+    \item Retrieve a list of students enrolled in course from metalms
+    \item Retrieve a list of all or topic groups in metalms
     \item Retrieve permissions for user
-    \item Store course
+    \item Play through level
+    \item Store topic groups
     \item Store level
-    \item Store game
-    \item Update game
     \item Update level
-    \item Update course
-    \item Update user rewards
-    \item Update permissions for user
+    \item Update user points
 \end{enumerate}
 
 \subsection{Software Development Approach}
