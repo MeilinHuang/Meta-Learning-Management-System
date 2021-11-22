@@ -54,12 +54,23 @@ The accounts system is also in charge of governing the data of the different use
 
 The ID field has dual purposes, it both stores a users student ID, and is also a unique identifier for every student. The type field stores the account type of a user, such as student or administrator. We also need to be able to store a users personal information, such as their name, phone number and address so there are fields for that. The user needs to be able to log in so an email and password will also be stored. Finally a list of all of the topics a user has completed must also be stored so that their progress can be reflected in any courses they are enrolled in.\\
 
-This schema will likely change throughout Thesis B, as additional requirements for data to be attached to a user present themselves throughout development, but this design presents a starting point that covers a large portion of what will be the final representation of a user in the database.
+However, through development, it became apparent that this schema would not meet the needs of the LMS in terms of storing user data. This new schema was what was decided on:
+
+\begin{center}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|} 
+        \hline
+        id & type & name & email & password & studentID & staff & img\_url & last\_accessed\_topic \\ [0.5ex] 
+        \hline
+    \end{tabular}
+\end{center}
+The phone number and address fields were removed, as it became apparent that it was not necessary to store this information for the functionality of the LMS. The topic groups column was also removed as the notion of enrollment was moved to its own table to enhance functionality. The user's id was separated from their student ID, to prevent issues with storing data, and an img\_url field was added to store the user's profile picture. The last accessed topic field was also added so that this information could be stored to be displayed on a users dashboard to create a more personal user experience. 
 
 \subsection{Requirements}
 The initial requirements for the accounts and enrolment system are listed below, but are likely to change and become more specific throughout the following stages of the thesis. Each requirement has a priority that was measured by surveying the other thesis members. Higher priority items will be completed first, with medium and then low priority requirements to be implemented later in the project in their respective order.
 
 \subsection{Functional Requirements}
+
+The initial list of requirements were broken up into accounts and enrollments, and were as follows:
 \textbf{Accounts}
     \begin{enumerate}
     \item Users can register and login \textcolor{Red}{High}
@@ -80,46 +91,42 @@ The initial requirements for the accounts and enrolment system are listed below,
     \item Students can search for open courses \textcolor{Blue}{Low}
     \end{enumerate}
 
-\subsection{Timeline}
+However, as the project progressed, it became clear that it did not make sense to keep these requirements divided like this, and that some of the priorities were incorrect compared to the importance of the requirement to the LMS. The requirements were instead adjusted to be as follows:
 
-\begin{figure}[h!]
-  \centering
-  \includegraphics[scale=0.4]{accounts-thesis-a}
-  \caption{Thesis A Timeline.}
-\end{figure}
-Thesis A primarily focused on assessing the state-of-the-art through the literature review, and creating a plan for Thesis B and C, while also preparing this initial report and the initial presentation. It was also necessary to collaborate among the group to evenly split the workload and agree on a vision of what the future of the project was to look like, as well as on technical details such as the software stack.
+\textbf{Login and Sign Up}
+\begin{enumerate}
+    \item Users can register and login \textcolor{Red}{High}
+    \item administrators can create accounts on behalf of students \textcolor{Blue}{Low}
+\end{enumerate}
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[scale=0.4]{accounts-thesis-b}
-    \caption{Thesis B Timeline.}
-\end{figure}
-Thesis B's primary focus is to implement as much of the assessments and enrolments feature as possible, so that an adequate prototype can be demonstrated towards the end of term 2. During this time most of the core features of the accounts and enrolment systems will be implemented. It is important to implement the core of these features early, as many of the other features of our Meta LMS are dependent on the ability to create and manage user accounts.
+\textbf{Account Management}
+\begin{enumerate}
+    \item Users can view and update their details \textcolor{Red}{High}
+    \item administrators can manage users, roles and permissions \textcolor{Blue}{Low}
+    \item administrators can view other users account details \textcolor{Blue}{Low}
+\end{enumerate}
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[scale=0.4]{accounts-thesis-c}
-    \caption{Thesis C Timeline.}
-\end{figure}
-The goals of Thesis C are to finalize core features, add any extension features as time permits, and to test and polish these systems to ensure the best possible version of the project will be delivered. Thesis C is also when these systems will be analyzed and evaluated against the criteria to be specified below, to assess how well these features achieved their goals withing the Meta LMS.
+\textbf{Enrollment Dashboard - Staff}
+\begin{enumerate}
+    \item administrators can enrol and un-enroll students on their behalf \textcolor{Red}{High}
+    \item administrators can generate course invite codes \textcolor{Red}{High}
+    \item administrators can set courses to be open enrolment or invite/code only \textcolor{Red}{High}
+    \item administrators can open and close enrolments for courses \textcolor{Orange}{Medium}
+\end{enumerate}
 
-\subsection{Milestones}
-The major development milestones for the accounts and enrolments features are as follows:
-    \begin{enumerate}
-        \item Week 2 Term 2: Build the accounts database schema.
-        \item Week 4 Term 2: Build the accounts back-end endpoints.
-        \item Week 6 Term 2: Allow users to create an account, sign in, and view their account information.
-        \item Week 9 Term 2: Allow administrators to enrol students into a course.
-        \item Week 2 Term 3: Allow users to update their account information.
-        \item Week 4 Term 3: Allow administrators to generate an enrolment code, allow students to enrol themselves in open courses.
-        \item Weeks 5-11 Term 3: Analysis and Testing.
-    \end{enumerate}
+\textbf{Enrollment Dashboard - Student}
+\begin{enumerate}
+    \item Students can enrol themselves in courses with a code \textcolor{Red}{High}
+    \item Students can search for open courses \textcolor{Red}{High}
+    \item Students can enrol themselves in an open course or topic \textcolor{Red}{High}
+\end{enumerate}
+
+The priority of the enrollment features for both staff and students were all increased to high priority due to the discovery of their importance to the entire LMS during development and internal testing. Without these features, the LMS becomes non-functional and thus they needed to be included. The admin management of student accounts was lowered in priority, as it became clear that these features were not essential to the functionality of the LMS, and if they did not manage to be completed it would not affect the functionality of the overall LMS too greatly.
 
 \subsection{Evaluation}
 In addition to assessing how well the accounts and enrolments features meet the requirements specified above, it will also be evaluated on how well it meets the following criteria:
 \begin{enumerate}
     \item Performance - Whether it is quick to create an account or sign-up, and the responsiveness of the enrolment features.
     \item Accessibility - Can a wide array of users easily navigate account management areas and enrolment forms.
-    \item UI/UX - Are the features easy to use and attractive.
-    \item Errors - Are the features bug and error free.
 \end{enumerate}
+The software tool Google Lighthouse will be used to evaluate these metrics. Google lighthouse uses automated tests to asses the response time of the page, and then analyses the code executed to build the page to find what may be causing a page to take a long time to respond and render. It also uses this same analysis to determine whether best accessibility practices have been used such as using appropriate alt-tags and aria labels where possible, and ensuring that components have proper contrast.
