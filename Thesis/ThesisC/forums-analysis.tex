@@ -310,10 +310,10 @@ In order to get a wholistic understanding of the usability of the system, partic
 This is to test that the forums are appropriate for use in all types of courses. These fields included:
 
 \begin{itemize}
-    \item Engineering
-    \item Medicine
-    \item Science
-    \item Art and Design
+    \item Engineering;
+    \item Medicine;
+    \item Science; and,
+    \item Art and Design.
 \end{itemize}
 
 \subsubsection{Student's Perspective}
@@ -422,3 +422,22 @@ Overall, the staff participants were happy with the forums and liked all the fun
 Throughout the duration of this project, many of the originally planned tasks were able to be completed ahead of schedule.
 This allowed for additional features like endorsed posts, enhanced filter and upvoting, to also be implemented.
 Overall, majority of the important features were completed with enough time to conduct sufficient analysis of the system.
+
+\subsection{Challenges}
+
+Most of the challenges faced throughout this project occurred when working with third-party packages and libraries.
+
+The initial rich-text editor package for React was quite difficult to work with as there was poor documentation and plugins had to be added to handle some functionality.
+For example, one of the requirements for this feature was that users could embed links in their forum posts however, the original editor needed a plugin to make this possible.
+The lack of documentation made it difficult to get these plugins installed and working as expected.
+As a result, a different editor that had these functionalities already built in was used instead.
+
+Another package that was difficult to work with was \texttt{react-table}.
+Some of the columns in the table, like the upvote column and the pin column, displayed elements other than just text.
+At first, it was difficult to work out how to achieve this however, researching the issue revealed documentation that explained how to display custom elements in the body of the table.
+
+While most of the milestones for the forums component were able to be completed on time, there were some features that couldn't be fully implemented until close to the end of the development process due to dependencies on other LMS features.
+This meant that some of the analysis and evaluation processes had to also be delayed.
+This, however, is a challenge typically faced when developing a large system in parallel and was able to be overcome through open communication and discussion with other team members.
+Despite this, all the main requirements for the forums were eventually able to be completed before the due date.
+

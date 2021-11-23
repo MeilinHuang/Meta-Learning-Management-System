@@ -421,7 +421,7 @@ When the user clicks "Send", a backend call is made to store the reply in the da
 Editing and deleting a reply works exactly the same way as editing and deleting posts and comments.
 
 \subsubsection{Considerations}
-For the reasons behind separating responses from comments, please see Section 5.3.6.
+For the reasons behind separating responses from comments, please see Section 5.6.6.
 
 \subsection{Endorsed Posts and Comments}
 From the post page, staff users are able to endorse a comment or the whole post by clicking the endorse button.
@@ -443,7 +443,7 @@ Clicking this button will allow staff users to endorse a post, as denoted by the
 
 Similarly, a staff user can endorse a comment on a post page by clicking the endorse button for that comment.
 
-For more information on the endorse icon for posts and comments, please see Section 5.3.4.
+For more information on the endorse icon for posts and comments, please see Section 5.6.4.
 
 \subsubsection{How It Was Implemented}
 When a staff user clicks on the endorse button, it makes a backend call to set the \texttt{isEndorsed} flag to true for the current post.
@@ -460,6 +460,6 @@ The endorsed icon on the post or comment will be hidden immediately.
 \end{figure}
 
 \subsubsection{Considerations}
-For the reasons behind how the endorsed icon is displayed, please see Section 5.3.4.
+For the reasons behind how the endorsed icon is displayed, please see Section 5.6.4.
 
 It was decided that the ability to endorse responses was not required since they can only be left by staff in the first place and therefore, are already verified.
