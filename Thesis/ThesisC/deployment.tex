@@ -1,0 +1,15 @@
+\section{Deployment}
+\subsection{Continuous Integration}
+Throughout the thesis, we have an instance of Teamcity that polls our gitlab repository master branch for any updates. Once an update is detected, teamcity will trigger a build that creates a docker image and sends it to our technology stack in portainer to update on our product server at metalms.tech. We had 2 triggers, one for the backend and one for the frontend. Through this, any updates to the gitlab repository is on the live environment within 5 minutes. This proved to be useful especially for updating the backend apis which all the features are pointing towards. This continuous integration feature helped the team to iterate their features faster and allowed the team to work more efficiently.
+
+\subsection{Continuous Deployment}
+All of our frontend and backend services are bundled into a docker image which makes it modular and easily scalable.
+
+\subsubsection{Metalms Services}
+\begin{itemize}
+  \item Postgres Database at db.metalms.tech
+  \item Backend API at api.metalms.tech
+  \item Frontend interface at metalms.tech
+\end{itemize}
+
+The continuous integration helps us to iterate quickly and see changes live on the metalms environments. Our services are deployed on a linux machine in the sydney datacentre through OVH and is managed through portainer's user interface. If there is extra capacity required for the platform, we can simply multiply the number of services running the various docker images and have a load balancer manage the traffic coming into each service to ensure uptime.
