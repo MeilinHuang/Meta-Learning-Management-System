@@ -18,8 +18,16 @@ Topic groups themselves do not contain assessments, exams, or any other resource
 
 Each topic can have its own prerequisites, as discussed briefly previously. Some topics must be completed in order to complete the current topic. Prerequisites can be across topic groups as well. For example, Linked Lists in the ``Introduction to Programming" topic group must be completed in order to start Graphs in ``Data Structures and Algorithms". This improves reusability, as topics in other topic groups can be set as prerequisites eg. Git can be set a prerequisite for ``Web Front end Programming" instead.
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{topic-tree-example}
+    \caption{Example of a topic tree with Depth first search}
+\end{figure}
+
+In the above example, pointers, structs and discrete mathematics must be learned in order to learn graphs. Likewise, graphs and recursion is required to learn depth first search.\\
+
 \textbf{Reusability} \\
-The topic tree enables academics to easily reuse content - by setting specific topics, academics can reuse content instead of creating new content for the same topic in their own course. A good example of this is ``Web Front end Programming" at UNSW - Instead of creating new content for Git, academics can set Git as a prerequisite. However, to encourage reusability, a cloning feature is also provided where academics can clone a topic and its resources from another topic group and put it in its own topic group. This further enables reusability, demonstrating that there is no need to spend time creating new content.\\
+The topic tree enables academics to easily reuse content - by setting specific topics, academics can reuse content instead of creating new content for the same topic in their own course. A good example of this is ``Web Front end Programming" at UNSW - instead of creating new content for Git, academics can set Git as a prerequisite. However, to encourage reusability, a cloning feature is also provided where academics can clone a topic and its resources from another topic group and put it in its own topic group. This further enables reusability, demonstrating that there is no need to spend time creating new content.\\
 
 \textbf{Course Materials} \\
 The Meta Learning Management System also organises content into four sections:
@@ -31,14 +39,6 @@ The Meta Learning Management System also organises content into four sections:
 \end{itemize}
 
 These various sections were chosen as they fit many learning models, including UNSW's learning models as listed on their website \cite{learningModel}. Students are introduced to it in the content section, and then get to know more about it in the practice section, and try it out in the preparation and assessments sections. After receiving feedback, this cycle repeats again.\\
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[scale=0.4]{topic-tree-example}
-    \caption{Example of a topic tree with Depth first search}
-\end{figure}
-
-In the above example, pointers, structs and discrete mathematics must be learned in order to learn graphs. Likewise, graphs and recursion is required to learn depth first search.\\
 
 \subsection{Initial Designs}
 \begin{figure}[h!]
