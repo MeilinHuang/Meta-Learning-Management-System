@@ -1,0 +1,27 @@
+\section{Topic-Tree}
+The aims of this thesis as discussed in the introduction, to allow course instructors to easily curate and manage content. The topic tree allows instructors to do just this, by providing more structure to content, and by providing a method to create and manage topic groups and topics themselves. Instructors can easily view prerequisites between topics and reuse content by cloning topics from other topic groups and setting specific topics as prerequisites for other topics. All of these features improve the reusability and management of content for instructors.\\
+
+The main contributions of the topic tree include:
+\begin{enumerate}
+    \item A new method of creating and managing courses with the concept of topics and topic groups
+	\item Providing further structure to content by organising them by topics 
+	\item Improving reusability by allowing topics in other topic groups to be set as prerequisites and by introducing the cloning feature
+    \item Providing adaptability to many learning models with files separated into four key sections
+    \item A functioning proof of concept topic tree that is well integrated into an overall learning management system
+\end{enumerate}
+
+\subsection{Challenges}
+The main challenge of the topic tree included developing the graph interface. This interface uses the D3 library, which allows for greater flexibility in developing data graphs, but with little support or documentation online. This made it quite difficult to develop the topic tree.\\
+
+Other challenges included working with the rest of the team to integrate the topic tree with the rest of the system, as the rest of the team needed to know how topics and topic groups worked early on to develop their own features. Setting up topics and topic groups in the database was also quite difficult, due to the graph nature of the topic tree, as all this data had to be collated and loaded into the topic tree on first load with minimal impact to performance. \\
+
+\subsection{Future Work}
+Future work for the topic tree includes:
+
+\begin{enumerate}
+    \item Third party integration with YouTube, The Box, Moodle, etc.
+    \item Methods to export topic and topic group data to other platforms
+    \item Disciplines i.e. grouping topic groups together to improve performance and reduce information overload, especially as different schools or faculties mostly do not have prerequisites from other faculties
+    \item Graph performance and smoothness improvements
+\end{enumerate} 
+
