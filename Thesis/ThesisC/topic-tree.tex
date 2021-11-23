@@ -57,6 +57,7 @@ The above design is an initial design of the graph view of the topic tree. It wa
 
 Instead, the topic groups are all shown on one graph, and a simple toggle to switch between the list view and the graph view is displayed in the top right. There are more options to add topic groups or topics at the top, and the user can click a topic group to show the individual topics as shown below.
 
+
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.4]{topic-tree-expanded-design}
@@ -71,7 +72,7 @@ As shown, when a topic group is clicked, a hull in the background surrounds the 
     \caption{Topic Groups List UI Final Design}
 \end{figure}
 
-As shown above, the final design of the list view shows both topics and topic groups on the same page to improve performance and usability, as there is less of a need to click through different pages to view different topic groups. Users can click on a specific topic group to expand and show the topics inside it, and click Add Topic to add a specific topic. Topics can be clicked to view their prerequisites.
+The final design of the list view shows both topics and topic groups on the same page to improve performance and usability, as there is less of a need to click through different pages to view different topic groups. Users can click on a specific topic group to expand and show the topics inside it, and click Add Topic to add a specific topic. Topics can be clicked to view their prerequisites.
 
 \subsection{Requirements}
 Each requirement will have a priority: High, Medium or Low. High priority requirements will be completed first, and then medium and low priority requirements respectively. \\
@@ -79,9 +80,10 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \subsection{Functional Requirements}
 
 \textbf{Viewing Topics}
-
-\begin{table}[hp]
-\begin{tabular}{ll}
+\FloatBarrier
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+\hline
 \textit{As a}      & User                                                \\ \hline
 \textit{I want to} & View groups of topics                               \\ \hline
 \textit{So that}   & I can see how topic groups interact with each other \\ \hline
@@ -90,8 +92,10 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
-\begin{tabular}{ll}
+
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+\hline
 \textit{As a}      & User                                                \\ \hline
 \textit{I want to} & View topics within each topic group                 \\ \hline
 \textit{So that}   & I can see how topic groups interact with each other \\ \hline
@@ -100,8 +104,9 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
-\begin{tabular}{ll}
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+\hline
 \textit{As a}      & User                                                \\ \hline
 \textit{I want to} & View topics within each topic group                 \\ \hline
 \textit{So that}   & I can see how topic groups interact with each other \\ \hline
@@ -110,8 +115,9 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
-\begin{tabular}{ll}
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+\hline
 \textit{As a}      & User                                                           \\ \hline
 \textit{I want to} & Search for specific resources                                  \\ \hline
 \textit{So that}   & I can find other resources easily in the many topics available \\ \hline
@@ -120,8 +126,9 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
-\begin{tabular}{ll}
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+\hline
 \textit{As a}      & User                                                                            \\ \hline
 \textit{I want to} & View topic prerequisites                                                        \\ \hline
 \textit{So that}   & I can see which topics must be completed in order to complete the current topic \\ \hline
@@ -130,8 +137,9 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
-\begin{tabular}{ll}
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+\hline
 \textit{As a}      & User                                                   \\ \hline
 \textit{I want to} & view a graph of topics and their prerequisites         \\ \hline
 \textit{So that}   & The topics and their prerequisites are easily viewable \\ \hline
@@ -140,8 +148,9 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
-\begin{tabular}{ll}
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+\hline
 \textit{As a}      & User                                                              \\ \hline
 \textit{I want to} & view the topic tree with a traditional interface                  \\ \hline
 \textit{So that}   & topics can be viewed more easily using a less confusing interface \\ \hline
@@ -149,10 +158,13 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \textit{Status}    & Complete                                                          \\ \hline
 \end{tabular}
 \end{table}
+\FloatBarrier
 
 \textbf{Adding Topics and resources}
-\begin{table}[hp]
-\begin{tabular}{ll}
+\FloatBarrier
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+\hline
 \textit{As a}      & User                                           \\ \hline
 \textit{I want to} & add a new topic                                \\ \hline
 \textit{So that}   & I can edit the topic tree and add more content \\ \hline
@@ -161,8 +173,9 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
-\begin{tabular}{ll}
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+\hline
 \textit{As a}      & Academic                       \\ \hline
 \textit{I want to} & upload course material      \\ \hline
 \textit{So that}   & I can add content to topics       \\ \hline
@@ -171,7 +184,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
+\begin{table}[h!]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                                      \\ \hline
@@ -182,7 +195,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
+\begin{table}[h!]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                 \\ \hline
@@ -193,7 +206,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
+\begin{table}[h!]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                                      \\ \hline
@@ -203,10 +216,10 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \textit{Status}    & Complete                                                                  \\ \hline
 \end{tabular}
 \end{table}
-
+\FloatBarrier
 \textbf{Deleting Topics}
-
-\begin{table}[hp]
+\FloatBarrier
+\begin{table}[h!]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                 \\ \hline
@@ -217,7 +230,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
+\begin{table}[h!]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                 \\ \hline
@@ -228,7 +241,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
+\begin{table}[h!]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                    \\ \hline
@@ -238,10 +251,10 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \textit{Status}    & Complete                                                    \\ \hline
 \end{tabular}
 \end{table}
-
+\FloatBarrier
 \textbf{Topic Prequisites}
-
-\begin{table}[hp]
+\FloatBarrier
+\begin{table}[h!]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                                               \\ \hline
@@ -252,7 +265,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[hp]
+\begin{table}[h!]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                                               \\ \hline
@@ -262,10 +275,10 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \textit{Status}    & Complete                                                                               \\ \hline
 \end{tabular}
 \end{table}
-
+\FloatBarrier
 \textbf{Integration}
-
-\begin{table}[hp]
+\FloatBarrier
+\begin{table}[h!]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                  \\ \hline
@@ -275,10 +288,10 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \textit{Status}    & Not Complete                                              \\ \hline
 \end{tabular}
 \end{table}
-
+\FloatBarrier
 \textbf{Exporting}
-
-\begin{table}[hp]
+\FloatBarrier
+\begin{table}[h!]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                          \\ \hline
@@ -288,7 +301,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \textit{Status}    & Not Complete                                      \\ \hline
 \end{tabular}
 \end{table}
-
+\FloatBarrier
 \subsection{Non Functional requirements}
 The feature also has non functional requirements in order to better evaluate the completion of the feature. \\
 
