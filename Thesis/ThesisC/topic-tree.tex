@@ -40,6 +40,39 @@ These various sections were chosen as they fit many learning models, including U
 
 In the above example, pointers, structs and discrete mathematics must be learned in order to learn graphs. Likewise, graphs and recursion is required to learn depth first search.\\
 
+\subsection{Initial Designs}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{topic-tree-graph-view}
+    \caption{Topic Groups Graph UI}
+\end{figure}
+
+The above design is an initial design of the graph view of the topic tree. It was intended that there would only be topics when the topic tree was first designed, and the user could select a topic group to view the topic tree for that topic group. However, it was impossible to view prerequisites across topic groups with this design, and made it more difficult to view topics inside different topic groups. Therefore, a new design was chosen as follows.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{topic-tree-graph-view-final-design}
+    \caption{Topic Groups Graph UI Final Design}
+\end{figure}
+
+Instead, the topic groups are all shown on one graph, and a simple toggle to switch between the list view and the graph view is displayed in the top right. There are more options to add topic groups or topics at the top, and the user can click a topic group to show the individual topics as shown below.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{topic-tree-expanded-design}
+    \caption{Topic Groups Graph UI Expanded Topics}
+\end{figure}
+
+As shown, when a topic group is clicked, a hull in the background surrounds the topics to indicate they are part of the same group. Topics are shown in blue, and the individual prerequisites are shown with prerequisites pointing to topics in other topic groups as well. 
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.4]{topic-tree-list-view-final-design}
+    \caption{Topic Groups List UI Final Design}
+\end{figure}
+
+As shown above, the final design of the list view shows both topics and topic groups on the same page to improve performance and usability, as there is less of a need to click through different pages to view different topic groups. Users can click on a specific topic group to expand and show the topics inside it, and click Add Topic to add a specific topic. Topics can be clicked to view their prerequisites.
+
 \subsection{Requirements}
 Each requirement will have a priority: High, Medium or Low. High priority requirements will be completed first, and then medium and low priority requirements respectively. \\
 
@@ -47,98 +80,98 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 
 \textbf{Viewing Topics}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{ll}
-\textit{As a}      & User                                                \\
-\textit{I want to} & View groups of topics                               \\
-\textit{So that}   & I can see how topic groups interact with each other \\
-\textit{Priority}  & {\color[HTML]{FE996B} Medium}                         \\
-\textit{Status}    & Complete  
+\textit{As a}      & User                                                \\ \hline
+\textit{I want to} & View groups of topics                               \\ \hline
+\textit{So that}   & I can see how topic groups interact with each other \\ \hline
+\textit{Priority}  & {\color[HTML]{FE996B} Medium}                         \\ \hline
+\textit{Status}    & Complete                                            \\ \hline
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{ll}
-\textit{As a}      & User                                                \\
-\textit{I want to} & View topics within each topic group                 \\
-\textit{So that}   & I can see how topic groups interact with each other \\
-\textit{Priority}  & {\color[HTML]{FE0000} High}                         \\
-\textit{Status}    & Complete  
+\textit{As a}      & User                                                \\ \hline
+\textit{I want to} & View topics within each topic group                 \\ \hline
+\textit{So that}   & I can see how topic groups interact with each other \\ \hline
+\textit{Priority}  & {\color[HTML]{FE0000} High}                         \\ \hline
+\textit{Status}    & Complete                                            \\ \hline
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{ll}
-\textit{As a}      & User                                                \\
-\textit{I want to} & View topics within each topic group                 \\
-\textit{So that}   & I can see how topic groups interact with each other \\
-\textit{Priority}  & {\color[HTML]{FE0000} High}                         \\
-\textit{Status}    & Complete     
+\textit{As a}      & User                                                \\ \hline
+\textit{I want to} & View topics within each topic group                 \\ \hline
+\textit{So that}   & I can see how topic groups interact with each other \\ \hline
+\textit{Priority}  & {\color[HTML]{FE0000} High}                         \\ \hline
+\textit{Status}    & Complete                                            \\ \hline
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{ll}
-\textit{As a}      & User                                                           \\
-\textit{I want to} & Search for specific resources                                  \\
-\textit{So that}   & I can find other resources easily in the many topics available \\
-\textit{Priority}  & {\color[HTML]{FE0000} High}                                    \\
-\textit{Status}    & Not Complete                                                  
+\textit{As a}      & User                                                           \\ \hline
+\textit{I want to} & Search for specific resources                                  \\ \hline
+\textit{So that}   & I can find other resources easily in the many topics available \\ \hline
+\textit{Priority}  & {\color[HTML]{FE0000} High}                                    \\ \hline
+\textit{Status}    & Not Complete                                                   \\ \hline          
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{ll}
-\textit{As a}      & User                                                                            \\
-\textit{I want to} & View topic prerequisites                                                        \\
-\textit{So that}   & I can see which topics must be completed in order to complete the current topic \\
-\textit{Priority}  & {\color[HTML]{FE996B} Medium}                                                     \\
-\textit{Status}    & Complete                                                                       
+\textit{As a}      & User                                                                            \\ \hline
+\textit{I want to} & View topic prerequisites                                                        \\ \hline
+\textit{So that}   & I can see which topics must be completed in order to complete the current topic \\ \hline
+\textit{Priority}  & {\color[HTML]{FE996B} Medium}                                                     \\ \hline
+\textit{Status}    & Complete                                                                        \\ \hline                              
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{ll}
-\textit{As a}      & User                                                   \\
-\textit{I want to} & view a graph of topics and their prerequisites         \\
-\textit{So that}   & The topics and their prerequisites are easily viewable \\
-\textit{Priority}  & {\color[HTML]{FE0000} High}                            \\
-\textit{Status}    & Complete                                              
+\textit{As a}      & User                                                   \\ \hline
+\textit{I want to} & view a graph of topics and their prerequisites         \\ \hline
+\textit{So that}   & The topics and their prerequisites are easily viewable \\ \hline
+\textit{Priority}  & {\color[HTML]{FE0000} High}                            \\ \hline
+\textit{Status}    & Complete                                               \\ \hline      
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{ll}
-\textit{As a}      & User                                                              \\
-\textit{I want to} & view the topic tree with a traditional interface                  \\
-\textit{So that}   & topics can be viewed more easily using a less confusing interface \\
-\textit{Priority}  & {\color[HTML]{3166FF} Low}                                        \\
-\textit{Status}    & Complete                                                         
+\textit{As a}      & User                                                              \\ \hline
+\textit{I want to} & view the topic tree with a traditional interface                  \\ \hline
+\textit{So that}   & topics can be viewed more easily using a less confusing interface \\ \hline
+\textit{Priority}  & {\color[HTML]{3166FF} Low}                                        \\ \hline
+\textit{Status}    & Complete                                                          \\ \hline
 \end{tabular}
 \end{table}
 
 \textbf{Adding Topics and resources}
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{ll}
-\textit{As a}      & User                                           \\
-\textit{I want to} & add a new topic                                \\
-\textit{So that}   & I can edit the topic tree and add more content \\
-\textit{Priority}  & {\color[HTML]{FE0000} High}                    \\
-\textit{Status}    & Complete                                      
+\textit{As a}      & User                                           \\ \hline
+\textit{I want to} & add a new topic                                \\ \hline
+\textit{So that}   & I can edit the topic tree and add more content \\ \hline
+\textit{Priority}  & {\color[HTML]{FE0000} High}                    \\ \hline
+\textit{Status}    & Complete                                       \\ \hline              
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{ll}
-\textit{As a}      & Academic                       \\
-\textit{I want to} & upload course material      \\
-\textit{So that}   & I can add content to topics       \\
-\textit{Priority}  & {\color[HTML]{FE0000} High} \\
-\textit{Status}    & Complete                   
+\textit{As a}      & Academic                       \\ \hline
+\textit{I want to} & upload course material      \\ \hline
+\textit{So that}   & I can add content to topics       \\ \hline
+\textit{Priority}  & {\color[HTML]{FE0000} High} \\ \hline
+\textit{Status}    & Complete                    \\ \hline 
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                                      \\ \hline
@@ -149,7 +182,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                 \\ \hline
@@ -160,7 +193,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                                      \\ \hline
@@ -173,7 +206,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 
 \textbf{Deleting Topics}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                 \\ \hline
@@ -184,7 +217,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                 \\ \hline
@@ -195,7 +228,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                    \\ \hline
@@ -208,7 +241,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 
 \textbf{Topic Prequisites}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                                               \\ \hline
@@ -219,7 +252,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                                               \\ \hline
@@ -232,7 +265,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 
 \textbf{Integration}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                                  \\ \hline
@@ -245,7 +278,7 @@ Each requirement will have a priority: High, Medium or Low. High priority requir
 
 \textbf{Exporting}
 
-\begin{table}[]
+\begin{table}[hp]
 \begin{tabular}{|l|l|}
 \hline
 \textit{As a}      & Academic                                          \\ \hline
