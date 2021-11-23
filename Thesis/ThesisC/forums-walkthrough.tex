@@ -1,12 +1,11 @@
-\newpage
 \section{Forums}
-
-\newpage
 
 \subsection{Overview Page}
 The forums are accessible from the sidebar of a course page. Each topic group has a dedicated forum.
 
 When first opening the forums, the user would see the forum overview page.
+
+\newpage
 
 \begin{figure}[h!]
     \includegraphics[scale=0.2]{forums-walkthrough-overview-page.png}
@@ -15,17 +14,17 @@ When first opening the forums, the user would see the forum overview page.
 \end{figure}
 
 \subsubsection{Purpose}
-Show users an overview of all the posts that have been posted on the forum page.
+Shows users an overview of all the posts that have been posted on the forum page.
 
 \subsubsection{What Was Implemented}
 The forum overview page is split into two different tables, the pinned posts and all posts in reverse chronological order.
 Within each table, there are columns for the post title and description, date created, number of replies, number of comments, and upvotes.
 Posts that are endorsed are shown with a green check mark.
 A user can change the post order by clicking the heading of each table. This will toggle the column's order between decreasing and increasing.
-At the top of the forum overview, there is a button to add posts, a search bar and a filter menu.
+At the top of the forum overview page, there is a button to add posts, a search bar and a filter menu.
 
 \subsubsection{How It Was Implemented}
-The system uses the course code that is in the url of the site to get the correct forum data fom the backend.
+The system uses the course code that is in the url of the site to get the correct forum data from the backend.
 When the page loads, two backend calls are made to populate the post tables - one to grab all the posts, and another to grab the pinned posts.
 The React library, \texttt{react-table} was used to add the sorting functionality.
 It takes a list of column objects that define the heading and contents for the column.
@@ -75,6 +74,7 @@ Since screenshots are typically used to assist when asking a question on forums,
 \subsection{Search and Filter}
 The search and filter options sit at the top of the forum overview page, making it easily accessible for users.
 
+\newpage
 
 \begin{figure}[h!]
     \includegraphics[scale=0.2]{forums-walkthrough-search-filter-sort.png}
@@ -95,6 +95,8 @@ The search results are shown in a table and the "Pinned" posts table is hidden.
     \centering
     \caption{Search results when searching for "assignment"}
 \end{figure}
+
+\newpage
 
 Users have two options to filter the posts by, they can either use the tags that have been defined by course staff, or they can filter by the pre-defined filters.
 The pre-defined filters consist of posts linked to announcements, answered posts, unanswered posts and endorsed posts.
@@ -156,7 +158,7 @@ If users are unsure of what the green check mark means, they can hover over it f
 \end{figure}
 
 The post page is then split into three sections.
-The first is the post details which contains the author, date and time created and post description.
+The first is the post details which contains the author, date and time created, and post description.
 There are also buttons to upvote and share the post.
 The second and third sections contain all the responses and comments for the post.
 Similar to the post details section, each response and comment also displays the author and timestamp.
@@ -186,7 +188,7 @@ A toast element shows to confirm that the link has been clicked
 \end{figure}
 
 \subsubsection{Considerations}
-Initially, an endorsed post was marked by the messaging \textit{"This post has been endorsed by staff"} which showed under the post content.
+Initially, an endorsed post was marked by the messaging \textit{"This post is endorsed by staff"} which showed under the post content.
 
 \begin{figure}[h!]
     \includegraphics[scale=0.5]{forums-walkthrough-old-endorsed-messaging.png}
@@ -206,6 +208,8 @@ The comments section gives students a place to answer a post themselves or leave
 
 It was decided that the upvote button would only show the number of upvotes, and not the names of the upvoters, so that students can remain anonymous when liking a post.
 Hopefully, students will feel more comfortable using this feature since no one will know exactly who upvoted a post.
+
+\newpage
 
 \subsection{Edit and Delete Post}
 If the logged in user is the author of the post, they will see additional buttons on the post page to edit or delete their post.
@@ -255,6 +259,8 @@ It was decided that the editor would open in the post details section when editi
 \subsection{Comment}
 A user can click the input box in the comments section to open the rich text editor and leave a comment.
 
+\newpage
+
 \begin{figure}[h!]
     \includegraphics[scale=0.2]{forums-walkthrough-comment.png}
     \centering
@@ -290,7 +296,7 @@ Deleting a comment will ask for the user's confirmation before deleting the comm
 
 \subsubsection{How It Was Implemented}
 Similar to editing a post, the draft editor component is initialised when the simple input field is clicked.
-The user's input is stored as they type and sent to the backend once they hit enter.
+The user's input is stored as they type and sent to the backend once they hit "Send".
 This causes the frontend to re-render so that the comment instantly shows on the post page.
 
 Additionally, the implementation for editing and deleting a comment is the exact same as editing and deleting a post.
@@ -325,6 +331,8 @@ These are then displayed in a simple \texttt{table} component alongside a delete
 Deleting a tag follows a similar flow to deleting a post or comment.
 When the button is clicked, a confirmation message is displayed to ensure the user doesn't accidentally delete a tag.
 Once confirmed, the tag is deleted from the database and removed from this list.
+
+\newpage
 
 \begin{figure}[h!]
     \includegraphics[scale=0.5]{forums-walkthrough-manage-tag-delete.png}
@@ -402,7 +410,9 @@ Gives staff users a dedicated area to leave a response to a forum post.
 
 \subsubsection{What Was Implemented}
 Similar to comments, staff can click on the input field in the responses section to open the rich-text editor and leave their response.
-The rich-text editor allows staff to create a link so that they can add a link to specific resources or course material in their response.
+The rich-text editor allow staff to embed a link to specific resources or course material in their response.
+
+\newpage
 
 Authors of a response will also be able to see buttons for editing and deleting their reply.
 
@@ -422,6 +432,8 @@ Editing and deleting a reply works exactly the same way as editing and deleting 
 
 \subsubsection{Considerations}
 For the reasons behind separating responses from comments, please see Section 5.6.6.
+
+\newpage
 
 \subsection{Endorsed Posts and Comments}
 From the post page, staff users are able to endorse a comment or the whole post by clicking the endorse button.
