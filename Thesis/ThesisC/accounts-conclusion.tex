@@ -1,14 +1,23 @@
 \section{Accounts and Enrollments}
 
+The main contributions of the accounts and enrollment feature are the ability for all users to interact with the LMS in a way that is personal to them, so that they can have the best possible learning experience. It also provides tools to staff moderate their courses as efficiently and effectively as possible.
+
 \subsection{What would you have done differently}
-json web vs oauth
-account types
+
+The primary feature that I would implement differently would be the method of authentication for users. Currently, when a user is signed in, the back-end sends a JSON Web Token to the front-end to represent that user's session, and this is stored in the browsers local storage. While this is functional, it is not particularly secure as bad actors could easily intercept these payloads, or extract these tokens from the browsers storage quite easily. An alternate authentication method that I would employee instead would be using a standard such as OAuth 2 \cite{oauth2}. OAuth 2 is the current industry standard protocol for authentication, and it has a much higher focus on client developer simplicity, while also being far more secure than using JSON Web Tokens. Implementing this authentication method would greatly increase the security of the authentication system and thus the quality of the user experience. Choosing the OAuth 2 approach early in the design process would have benefited the LMS as a whole greatly.
+
+Another component of the accounts and enrollments feature that would be approached differently would be inclusion of more account types than just staff and student. Being able to assign account types per course rather than site wide would help allow for complex enrollment scenarios such, as a student who also tutors a course, or a staff member who lectures in one course and administrates another. Adding further depth to the account types by adding more roles and making them on a per-course basis rather than site wide would also allow for a more enriched permissions system, restricting access to certain parts of the LMS further while broadening access to other parts. For example, perhaps only course administrators should have access to the enrollments dashboard, while all staff from tutors to lecturers to the course administrator should be able to endorse comments on the forum. Considering these further depths of account types from earlier in the design and development process would have deeply enriched the functionality of the LMS.
 
 \subsection{Future work}
-student un-enroll
-account types
-upgrade to oauth
-staff/admin manage student accounts
-export/import course enrollment data (csv of students)
-download account information - privacy feature
-delete account - privacy feature
+
+Due to the time and resource restricted nature of the Thesis, while the core functionality of the accounts and enrollments system was completed, there are many potential future additions that would greatly increase the user experience with this feature. These features include:
+
+\begin{enumerate}
+    \item Allowing student users to un-enroll themselves from a course, rather than only staff being able to un-enroll students.
+    \item Allowing staff users to manage student accounts on behalf of the students.
+    \item Adding deeper enrollment features such as the ability to import/export a CSV list of students into or from a course to speed up the enrollment process.
+    \item Allowing users to download and delete all information relating to them from the LMS as a privacy tool.
+    \item Upgrading authentication to OAuth 2.
+    \item Modifying the current account types system to include more account types (Course administrator, lecturer, tutor).
+    \item Upgrading the current account type system to allow account types to be on a per-course basis rather than site-wide.
+\end{enumerate} 

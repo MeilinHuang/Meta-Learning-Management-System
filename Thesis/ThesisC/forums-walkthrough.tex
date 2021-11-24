@@ -49,7 +49,7 @@ Clicking this button will open up the add post modal.
 Allows any user to easily add their own forum post to ask a question or make a comment.
 
 \subsubsection{What Was Implemented}
-The modal that shows when a user clicks the "Add Post" button allows the user to input a title and description for their post.
+The modal that shows when a user clicks the ``Add Post" button allows the user to input a title and description for their post.
 They can also attach an image, as well as select tags that apply to the post. The tags help with categorising and filtering the posts.
 
 \subsubsection{How It Was Implemented}
@@ -58,7 +58,7 @@ For the details section, the React package \texttt{react-draft-wysiwyg} was used
 The attachments use Javascript's built-in \texttt{input} element and file handling.
 When the modal opens, a backend call is made to pull the tag data for the current course page.
 The list of tags are passed into the \texttt{react-select} component as options and the \texttt{isMulti} attribute is set to allow users to select multiple tags for their post.
-As the fields for title, details, images and tags are populated, the inputs are stored and sent to the backend when the user clicks "Save".
+As the fields for title, details, images and tags are populated, the inputs are stored and sent to the backend when the user clicks ``Save".
 Saving the post takes the user directly to the post page.
 
 \subsubsection{Considerations}
@@ -88,12 +88,12 @@ Allows users to easily search for a specific post or filter through posts.
 \subsubsection{What Was Implemented}
 The search bar is a simple input field that the users can use to search through posts.
 The search queries the title and descriptions of each post.
-The search results are shown in a table and the "Pinned" posts table is hidden.
+The search results are shown in a table and the ``Pinned" posts table is hidden.
 
 \begin{figure}[h!]
     \includegraphics[scale=0.2]{forums-walkthrough-search-results.png}
     \centering
-    \caption{Search results when searching for "assignment"}
+    \caption{Search results when searching for ``assignment"}
 \end{figure}
 
 \newpage
@@ -102,26 +102,26 @@ Users have two options to filter the posts by, they can either use the tags that
 The pre-defined filters consist of posts linked to announcements, answered posts, unanswered posts and endorsed posts.
 A user can also use one or more tags when filtering the posts.
 A user can either select their filter in the menu or by typing the filter into the filter bar.
-Similar to search, the filter results are shown in a table and the "Pinned" posts table is hidden.
+Similar to search, the filter results are shown in a table and the ``Pinned" posts table is hidden.
 
 \begin{figure}[h!]
     \includegraphics[scale=0.2]{forums-walkthrough-filter-results.png}
     \centering
-    \caption{Filter results when filtering by tags "Ass1" and "Intro"}
+    \caption{Filter results when filtering by tags ``Ass1" and ``Intro"}
 \end{figure}
 
 \subsubsection{How It Was Implemented}
-When the user types a search term and hits "enter", the search term is passed to the backend where a query to the database is made.
+When the user types a search term and hits ``enter", the search term is passed to the backend where a query to the database is made.
 Since it directly queries the database, the search functionality is very basic.
 If a user inputs more than one word, only posts that have a title or description that contains the exact search term will be returned.
-There is also a small bug where the user has to clear the search bar and hit "enter" again in order to re-render the original posts.
+There is also a small bug where the user has to clear the search bar and hit ``enter" again in order to re-render the original posts.
 
 The filter uses the same \texttt{react-select} library mentioned previously.
 If the user chooses to filter by tag, then the backend simply returns a list of all posts that have the corresponding tag.
 When filtering by multiple tags at once, the posts returned from the backend are those that have any of the tags chosen.
-For filtering by posts linked to announcements, the backend looks for posts with the "Announcement" tag.
+For filtering by posts linked to announcements, the backend looks for posts with the ``Announcement" tag.
 For the remainder of the pre-defined filters, the posts aren't explicitly tagged with them so there is logic built into the backend to handle these requests.
-When filtering by "answered" or "unanswered" posts, the backend queries the number of comments and replies each post has.
+When filtering by ``answered" or ``unanswered" posts, the backend queries the number of comments and replies each post has.
 For endorsed posts, the backend looks for posts with the \texttt{isEndorsed} flag.
 
 \subsubsection{Considerations}
@@ -188,7 +188,7 @@ A toast element shows to confirm that the link has been clicked
 \end{figure}
 
 \subsubsection{Considerations}
-Initially, an endorsed post was marked by the messaging \textit{"This post is endorsed by staff"} which showed under the post content.
+Initially, an endorsed post was marked by the messaging \textit{``This post is endorsed by staff"} which showed under the post content.
 
 \begin{figure}[h!]
     \includegraphics[scale=0.5]{forums-walkthrough-old-endorsed-messaging.png}
@@ -274,7 +274,7 @@ Gives students a dedicated area to answer forum posts themselves or leave follow
 By default, the page shows a simple input field in the comments section.
 When a user clicks on it, it opens the rich-text editor so that they have formatting options for their comment.
 A user can either close the rich-text editor to cancel leaving a comment, in which case the rich-text editor will close and be replaced with the simple input field.
-Otherwise, the comments section will automatically be updated with the user's comment when they hit "Save".
+Otherwise, the comments section will automatically be updated with the user's comment when they hit ``Save".
 
 \begin{figure}[h!]
     \includegraphics[scale=0.2]{forums-walkthrough-comments-inputs.png}
@@ -296,7 +296,7 @@ Deleting a comment will ask for the user's confirmation before deleting the comm
 
 \subsubsection{How It Was Implemented}
 Similar to editing a post, the draft editor component is initialised when the simple input field is clicked.
-The user's input is stored as they type and sent to the backend once they hit "Send".
+The user's input is stored as they type and sent to the backend once they hit ``Send".
 This causes the frontend to re-render so that the comment instantly shows on the post page.
 
 Additionally, the implementation for editing and deleting a comment is the exact same as editing and deleting a post.
@@ -306,7 +306,7 @@ The flow for editing and deleting a comment was kept as similar to editing and d
 By keeping the implementation relatively the same, and using icons that are typically associated with editing and deleting, users can easily work out how to complete these actions.
 
 \subsection{Manage Tags}
-Users who have a staff account will see a "Manage Tags" button on the top right corner that, when clicked, opens up the "Manage Tags" modal.
+Users who have a staff account will see a ``Manage Tags" button on the top right corner that, when clicked, opens up the ``Manage Tags" modal.
 
 \begin{figure}[h!]
     \includegraphics[scale=0.2]{forums-walkthrough-manage-tags.png}
@@ -319,10 +319,10 @@ Allows staff users to see all the tags for a course, create new tags and delete 
 Tags are useful for categorising and filtering through posts.
 
 \subsubsection{What Was Implemented}
-The "Manage Tags" button sits at the top of the forum overview page, next to the filter.
-When clicked, it opens the "Manage Tags" modal which contains a list of all the tags that have been created for the topic group.
+The ``Manage Tags" button sits at the top of the forum overview page, next to the filter.
+When clicked, it opens the ``Manage Tags" modal which contains a list of all the tags that have been created for the topic group.
 Next to each tag is a delete button that allows staff to delete the tag.
-At the bottom of the modal, staff can type the name of a new tag and click the "+" to add it to the list.
+At the bottom of the modal, staff can type the name of a new tag and click the ``+" to add it to the list.
 
 \subsubsection{How It Was Implemented}
 When the modal is opened, a backend call is made to get a list of all the tags.
@@ -340,7 +340,7 @@ Once confirmed, the tag is deleted from the database and removed from this list.
     \caption{Deleting a tag.}
 \end{figure}
 
-A staff user can create a new tag by typing its name into the input field and clicking "+".
+A staff user can create a new tag by typing its name into the input field and clicking ``+".
 This makes a backend call that adds the tag to the database and links it to the current topic group.
 If a staff user tries to create a duplicate tag, the backend will return an error and the user will be informed.
 
@@ -380,20 +380,20 @@ This assists in bringing these posts to the students' attention.
 
 \subsubsection{What Was Implemented}
 Each post in the table has a pin icon next to it.
-When a staff user clicks the pin icon for a post in the "Posts" table, that post will be added to the "Pinned" posts table.
-The pinned post will also continue to show in the regular "Posts" table but the pin icon will change to a filled pin icon.
+When a staff user clicks the pin icon for a post in the ``Posts" table, that post will be added to the ``Pinned" posts table.
+The pinned post will also continue to show in the regular ``Posts" table but the pin icon will change to a filled pin icon.
 
-Similarly, if a user clicks a filled pin icon, the post will be unpinned and removed from the "Pinned" post table.
+Similarly, if a user clicks a filled pin icon, the post will be unpinned and removed from the ``Pinned" post table.
 
 \subsubsection{How It Was Implemented}
 When a staff user clicks the button to pin a post, a backend call is made to set the \texttt{isPinned} flag for that post.
-This triggers the frontend to re-render so that the post immediately shows in the "Pinned" table.
+This triggers the frontend to re-render so that the post immediately shows in the ``Pinned" table.
 
 Similarly, when a staff user clicks the button to unpin a post, the \texttt{isPinned} flag is set to false and the frontend is re-rendered to reflect the change.
 
 \subsubsection{Considerations}
-When a post is pinned, it is still listed in the "Posts" table, but with a filled pin icon.
-By keeping the pinned post in the "Posts" table, it maintains the chronological order of all the posts.
+When a post is pinned, it is still listed in the ``Posts" table, but with a filled pin icon.
+By keeping the pinned post in the ``Posts" table, it maintains the chronological order of all the posts.
 This is mainly to ensure that no post is missed if a user is simply scrolling through the forum to catch up on new posts.
 
 \subsection{Reply}
@@ -426,7 +426,7 @@ For non-staff users, there is no input field visible for the responses section.
 
 \subsubsection{How It Was Implemented}
 Similar to posting a comment, clicking on the input field triggers the editor to be initialised.
-When the user clicks "Send", a backend call is made to store the reply in the database, and the frontend is re-rendered to immediately display the response.
+When the user clicks ``Send", a backend call is made to store the reply in the database, and the frontend is re-rendered to immediately display the response.
 
 Editing and deleting a reply works exactly the same way as editing and deleting posts and comments.
 
