@@ -18,14 +18,43 @@ some quality-of-life features such as a search bar, polished UI, and a feature t
 to achieve the aims outlined in the report.
 
 
-\subsection{What would we have done differently}
-This subsection will include alternate directions that would have been taken given an opportunity, these include:
+\subsection{What would we have done differently - DevOps}
+The primary issue that arose during development that we would have done differently if given the chance, would be to force more rigorous DevOps practices to ensure the project remains on track during the entire development, and that all developers are on the same page over the course of the development timeline. There are a number of key ways we could have improved this proccess and they are as follows:
 
 \begin{itemize}
-    \item Weekly team meetings for progress checks and assistance
-    \item Designating a DevOps individual/team to eliminate delays in production due to bugs
+    \item Adopting a specific agile development methodology such as the trunk based approach \cite{trunk}
+    \item Incorporating regular, development focused stand-ups into the development process
     \item Having a project management tool such as Jira or Trello to ensure a much more streamlined development of the project
 \end{itemize}
+
+\textbf{Trunk-based Development}
+
+A key area where we struggled during development was that due to the turbulent nature of the teams schedules, often development work would take long periods of time. An unfortunate side-effect of this is that this caused some feature branches to exist for a lot longer than expected, and by the time the feature work was completed and the branches merged back into the master branch, they were extremely out of date with other portions of the app, leading to a disproportionate amount of development time being spent resolving merge conflicts and performing testing within other modules, rather than on developing new features that enhance the LMS. The trunk-based development approach \cite{trunk} enforces guidelines that force feature branches to be smaller, and not exist for too long before being merged back into master. This means that feature work is done in small chunks over one or two days rather than in large components taking multiple weeks making them not only less likely to break the app on merge, but also making them much easier to test. Another core component of the trunk-based approach is the inclusion of pull requests (PRs) into the development cycle. By incorporating PRs in our development, it would allow for multiple team members to independently test and verify each feature, leading to less bugs and errors, as well as compatibility issues down the track. Using a development approach like this would have greatly increased the productivity of the team over the course of development, potentially leading to a more feature rich product.
+
+\textbf{Regular Stand-ups}
+
+Over the course of development, we had weekly meetings to discuss the overall progress of the project. While this was an extremely beneficial tool in ensuring consistent progress was being made, this meeting were not particularly development focused, and rather focused more holistically on the project. The inclusion of specifically development focused stand-ups in the development process may have allowed us to more efficiently allocate development time to certain features if they were falling behind, or identify potential application wide issues and make application wide decisions far early in the process. This may have allowed us to more efficiently manage our time and resources, and perhaps deliver a more feature rich and well integrated product.
+
+\textbf{Project Management Tools}
+
+The final area in which we would have done things differently is the use of a project management tool such as Jira to more clearly visualise both the progress of the project while it was in development, and the work still needing to be completed. Over the course of the project, we split the required work by feature. Instead of this, we could have treated these features as epic stories, and broken these epic stories into smaller user stories representing pieces of development work. These user stories could then very easily be catalogued within a tool such as Jira as tickets. This would have allowed us to then break up the work based on each team members skill sets, assigning tickets to people based on the type of development it involved rather than the feature they existed within. This may have potentially increased the speed of development due to less time needed to be spent up-skilling over the course of the project.
+
+
+\subsection{What would we have done differently - Technology}
+While the technology stack used successfully delivered a highly functional LMS, during development it became apparent that we made a few decisions on technologies to be used that while they were functional, were not the optimal solution for our requirements. These two main technology decisions we would change if we were to do the project again are as follows:
+
+\begin{itemize}
+    \item Using TypeScript instead of vanilla JavaScript for our primary programming language
+    \item Using MongoDB instead of PostgreSQL for our database
+\end{itemize}
+
+\textbf{Typescript}
+
+While the type-less nature of JavaScript makes it extremely flexible and easy to use, it also leaves it prone to many type errors that using other languages avoid. TypeScript, however, gives JavaScript the benefits of strict typing while still keeping the benefits of its ease of use and power on the web. By using TypeScript in our project, we could have greatly reduced the time spent fixing type related errors, while also being able to more strongly define the transfer of different types of data between the front-end and back-end using types. Although this approach would have required a lot of the team to spend time learning how to use TypeScript, this time would most likely be less than the time spent instead diagnosing and fixing type related errors over the course of the project, making TypeScript a great choice if we were to complete this project again.
+
+\textbf{MongoDB}
+
+Although PostgreSQL is a very powerful database and it worked effectively throughout the course of the project, a lot of development time on the back-end was spent formatting both the data we recieved from the database to be compatible with out JavaScript application, and formatting the data generated by our application to be compatible with the database. MongoDB, on the other hand, uses a JSON-like data format that is highly compatible with JavaScript applications that would have greatly reduced development time for database interactions. Much like TypeScript, the trade-off required for time spent up-skilling to use MongoDB instead of PostgreSQL would most likely have been less than the time it would save not having to spend time converting the data sent to and recieved from our PostgreSQL database, 
 
 \subsection{Additional features}
 The features listed in this section are are additional features that will be implemented in the future. These features have been compiled into a list as below: 

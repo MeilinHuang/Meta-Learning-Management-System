@@ -1,2 +1,15 @@
 \section{System Architecture}
 This section will outline the technology stack we used for the project. The system can be broken down into 3 layers. The presentation layer, the application layer and the data layer. Below we will highlight the different technologies used for each layer, and both the benefits we found and challenges we faced using these technologies.
+
+
+\subsection{Presentation Layer}
+
+The presentation layer was the area that had the most changes during development compared to the initial technology stack set out during the project plan. React was still chosen as the framework we would be using, but rather than using Material UI as our component library, we instead chose to use a framework called Chakra UI. The two main reasons for this choice were that some members of our team had created previous projects using Chakra UI which would be very easily incorporated into our Meta LMS, reducing development time. Rather than using both Chakra UI for the re-used parts of the project and Material UI for the rest, we decided to use Chakra for the whole project to ensure a consistent visual language throughout the product. The second reason was that as development continued, the team decided that the visual style of Material UI did not lend itself to the welcoming environment we wished to create for our LMS, as the aesthetic was too harsh and corporate for our vision. Chakra UI instead offered a much more pleasant design aesthetic and was far more conducive to the project, leading us to adopt it instead.
+
+\subsection{Application Layer}
+
+The application layer consisted of NodeJS and Express as laid out in the project plan, but also expanded to two other key technologies during development. The first of these is JSON Web Token, a tool for managing user authentication states throughout the app. JSON Web Tokens were chosen due to their ease of implementation which was crucial due to the time restrictions of the project, and they were also highly compatible with the JavaScript back-end we had created. The second of these technologies is Open API and Swagger UI. While these are not user facing tools, using Open API and Swagger UI to create an easy to use, visual representation of our API during development was invaluable developer tool. Open API allows us to create metadata to describe the structure of our RESTful API and all of its required input and potential outputs, while Swagger UI is a visualisation tool that takes in the metadata from Open API to create an interactive visual representation of the API to assist developers with testing, and implementation of the front-end environment.
+
+\subsection{Data Layer}
+
+The data layer was largely unchanged throughout the development process from what was decided during planning. We continued to use PostgreSQL for our database, and it adequately served our needs for quickly serving all of the data we needed, and had enough capacity for the level of scale we reached during testing and development.
