@@ -9,6 +9,7 @@ import ForumPostPage from "../pages/ForumPostPage";
 import CourseAnnouncementPage from "../pages/CourseAnnouncementPage";
 import LecturesPage from "./LecturesPage.js";
 import TutorialsPage from "./TutorialsPage.js";
+import Assessments from "../pages/Assessments";
 
 import { Switch, Route } from "react-router-dom";
 import { backend_url } from "../Constants.js";
@@ -35,10 +36,16 @@ function CoursePage() {
     {
       name: "Lectures",
       url: "/lectures",
-    },{
+    },
+    {
       name: "Tutorials",
       url: "/tutorials",
+    },
+    {
+      name: 'Assessments',
+      url: '/assessments',
     }
+    
   ];
   if (isStaff()) {
     links.push({

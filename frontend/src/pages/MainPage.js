@@ -22,12 +22,12 @@ function MainPage() {
       url: "/gamification",
     },
     {
-      name: "Topic Tree",
-      url: "/topictree",
+      name: 'Assessments',
+      url: '/assessments',
     },
     {
-      name: "Enrollment",
-      url: "/invite",
+      name: 'Topic Tree',
+      url: "/topictree",
     },
   ]);
   const smVariant = "drawer";

@@ -7,6 +7,10 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import TopicTree from "./components/topictree/TopicTree.js";
 import LoginForm from "./components/login/LoginForm";
 import TopicTreeList from "./components/topictree/TopicTreeList.js";
+import Assessments from "./pages/Assessments.js"
+import EditQuiz from "./components/edit-quiz/EditQuiz.js"
+import QuizUsage from "./components/quiz-usage/QuizUsage.js"
+import QuizViewSubmission from "./components/quiz-view-submission/QuizViewSubmission.js"
 
 function App() {
   return (
@@ -24,6 +28,18 @@ function App() {
           </Route>
           <Route path="/course-page/:code">
             <CoursePage />
+          </Route>
+          <Route exact path="/assessments">
+            <Assessments />
+          </Route>
+          <Route exact path="/assessments/quiz/edit/:quizName">
+            <EditQuiz />
+          </Route>
+          <Route exact path="/assessments/quiz/:quizId/submission">
+            <QuizUsage />
+          </Route>
+          <Route exact path="/assessments/quiz/view-submission">
+            <QuizViewSubmission />
           </Route>
           <Route path="/">
             <MainPage />
