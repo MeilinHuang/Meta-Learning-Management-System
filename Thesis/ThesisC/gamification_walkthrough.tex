@@ -160,7 +160,7 @@ At the results page, the platform retrieves the latest snapshot of a student's a
 \subsubsection{Considerations}
 \begin{itemize}
     \item Student's selected answers are recorded into the system immidiately when they select / change the answer. This deisgn inherently causes more requests to the backend api as students may change answers multiple times during the question compared to keeping the state locally and update backend at the end of the countdown. Ultimately decided with the frequent update due to increased reliability and ensure that changes just before the countdown ends are definitely captured correctly.
-    \item The points penalty system took alot of deliberation to design and implement. If there was no penalty to simply guessing the answers for the level, students may not take the levels seriously and make random guesses. However, the system must also be fair to ensure that students who are tryting but struggling are not negatively impacted but rather encouraged to do better. The final design was with the categories of less than or equal to 40\% correct inurring penalty, between 41\% and 60\% answers correct will not earn or lose points and greater than 60\% answers correct will earn points on the answers they got correct.
+    \item The points penalty system took alot of deliberation to design and implement. If there was no penalty to simply guessing the answers for the level, students may not take the levels seriously and make random guesses. However, the system must also be fair to ensure that students who are trying but struggling are not negatively impacted but rather encouraged to do better. The final design was with the categories of less than or equal to 40\% correct inurring penalty, between 41\% and 60\% answers correct will not earn or lose points and greater than 60\% answers correct will earn points on the answers they got correct.
 \end{itemize}
 
 \newpage
@@ -200,7 +200,7 @@ The shop feature allows students to spend their points on boosters to increase t
 There are 2 boosters available which are x2 points earned and x4 points earned with 10 minutes and 15 minutes duration respectively. These can be easily customised by platform admins and shop items are by default visible to all users on the gamification platform. Users can only buy 1 booster at a time and must use it immediately. Once a booster is used, there will be a banner on the top of the platform to notify users that the booster is in effect, this banner will remain until the effective duration is over. While the booster is in effect, the points that user earned will be multiplied by the multiplier of the booster used.
 
 \subsubsection{How it was Implemented}
-Within the backend server, we have a table setup with items. By default only 2 times with the attributes: item name, item type, item duration, item multiplier, item cost. These attributes will change how the booster behaves and the cost required to attain the booster. This information is retrieved when the user navigates to the shop page and the platform will display the items which are available for purchase in a grid list format with an option to buy. In the current implementation, the usage built is only on the item type = booster, it is possible to add other game item types to increase the variety of rewards for points.
+Within the backend server, we have a table setup with items. By default only 2 times with the attributes: item name, item type, item duration, item multiplier, item cost. These attributes will change how the booster behaves and the cost required to attain the booster. This information is retrieved when the user navigates to the shop page and the platform will display the items which are available for purchase in a grid list format with an option to buy. In the current implementation, the usage built is only on the item type is booster, it is possible to add other game item types to increase the variety of rewards for points.
 
 \subsubsection{Considerations}
 \begin{itemize}
@@ -352,7 +352,7 @@ When selecting add new topic group, the platform pulls the latest list of topic 
 
 \subsubsection{Considerations}
 \begin{itemize}
-    \item Destructive changes like delete of topic group will not affect metalms. This was a concious decision as deletion of topic groups should occur in the enrolment section on the main metalms page.
+    \item Destructive changes like delete of topic group will not affect metalms. This was a concious decision as deletion of topic groups should occur in the enrolment section on the main Metalms page.
     \item Initial design was to have both topic groups and levels in the repository but it was complex to provide visibility over both topic groups and levels at the same time. Ultimately implemented with levels which is the smallest module to increase flexibility for admins.
 \end{itemize}
 
