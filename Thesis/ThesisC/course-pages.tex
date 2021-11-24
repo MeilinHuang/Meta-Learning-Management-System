@@ -83,65 +83,339 @@ Without the course selection page, a user would not have the ability to transiti
 However with further development, the course outline page can be implemented.
 
 \subsection{Requirements}
-The requirements and use cases for the course pages are outlined below. These are subject to change as further developments within the project proceed.
+The requirements and use cases for the course pages are outlined below.
 These features are prioritiesed using the MoSCoW method which assists with identifying the order to implement requirements.
-It contains the following catergories:
-\begin{itemize}
-    \item \textbf{Must have} - vital features that are critical to the basic functionality of a project.
-    \item \textbf{Should have} - important features that aren't critical but add to the basic functionality of a project.
-    \item \textbf{Could have} - desired features that aren't necessary to the overall project but can provide a better user experience.
-    \item \textbf{Won't have} - low-priority features that likely won't be able to be completed in the given time-frame.
-\end{itemize}
 
 \subsubsection{Functional Requirements}
-\begin{enumerate}
-    \item Users can click on the links in the sidebar to be directed to the corresponding component (Must have)
-    \item Users can view the announcments within the dashboard (Must have)
-    \item Users can view the course content (Must have)
-    \item Users can view the course outline of a course (Must have)
-    \item Users can view their enrolled courses (Must have)
-    \item Users can select a course they wish to navigate to (Must have)
-    \item Administrators of the course can create announcments within the dashboard (Must have) 
-    \item Administrators can add course content into the page by selecting content from the topic tree (Must have)
-    \item Users can make comments on announcments (Should have)
-    \item Administrators can upload the course outline onto the course outline page (Should have)
-    \item Users can download the course content (Should have)
-    \item Users can view the most recent announcement for their enrolled courses (Should have)
-    \item Users can view the progress of their enrolled courses (Should have)
-    \item Users can view the most recently accessed topic (Could have)
-    \item Administrators can edit the sidebar to change what components are linked (Could have)
-    \item Course content is catergorised based on how the content is catergorised in the topic tree (Could have)
-    \item Administrators can edit the announcements made in the dashboard (Could have)
-    \item Users can intereact with widgets to enchance their experience with the LMS (Could have)
-    \item Users can toggle on or off specific widgets (Could have)
-\end{enumerate}
 
-\subsection{Timeline and Milestones}
-\begin{figure}[h]
-    \centering
-    \includegraphics[scale=0.5]{course-pages-thesisB}
-    \caption{Thesis B timeline.}
-\end{figure}
+\textbf{Course Selection Page}
+\FloatBarrier
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & View my enrolled courses \\ \hline
+        \textit{So that} & I can see what classes I am enrolled in \\ \hline
+        \textit{Priority} & {\color[HTML]{FE0000} High} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[scale=0.5]{course-pages-thesisC}
-    \caption{Thesis C timeline.}
-\end{figure}
-This section will outline the timeline and milestones for the course pages.
-Thesis A primarily focused on the analysis of other competitors in the literature review and the planning of features within each component in Thesis B and C.
-Thesis B will focus on the implementation of the course pages as it is a crucial component that will be utilised in other components.
-Thesis C will focus on the integration of the course pages with other components, such as the topic tree, forums, assessments, lectures and tutorials.
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Select a course I wish to navigate to \\ \hline
+        \textit{So that} & I can navigate to the course pages of the corresponding course and begin studying \\ \hline
+        \textit{Priority} & {\color[HTML]{FE0000} High} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
 
-The major milestones for the course pages feature also highlight specific points within the project that will convey important achievements to be completed.
-The important milestones for the course pages are:
-\begin{enumerate}
-    \item Complete Course Dashboard/Feed Page
-    \item Complete Course Content Page
-    \item Complete Course selection Page
-    \item Integrate Course Pages with other LMS components
-    \item Final Analysis and testing of LMS
-\end{enumerate}
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & View my progress for an enrolled course \\ \hline
+        \textit{So that} & I can determine any courses that I may need to complete\\ \hline
+        \textit{Priority} & {\color[HTML]{3166FF} Low} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & View the most recent announcements from my enrolled courses \\ \hline
+        \textit{So that} & I quickly see the most recent notification and be alert to any changes \\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to access my most recently accessed topic \\ \hline
+        \textit{So that} & I can quickly continue my studies without needing to navigate to the course page \\ \hline
+        \textit{Priority} & {\color[HTML]{3166FF} Low} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As an} & Administrator \\ \hline
+        \textit{I want to} & Be able to access the forums and enrollements of a course \\ \hline
+        \textit{So that} & I can quickly access these features without needing extra navigation \\ \hline
+        \textit{Priority} & {\color[HTML]{3166FF} Low} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\pagebreak
+\FloatBarrier
+\textbf{Course Dashboard Page}
+\FloatBarrier
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & View the announcements of a course \\ \hline
+        \textit{So that} & I can see any important notifications for a particular course \\ \hline
+        \textit{Priority} & {\color[HTML]{FE0000} High} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As an} & Administrator \\ \hline
+        \textit{I want to} & Be able to create announcements \\ \hline
+        \textit{So that} & I can notify enrolled students of important information \\ \hline
+        \textit{Priority} & {\color[HTML]{FE0000} High} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As an} & Administrator \\ \hline
+        \textit{I want to} & Be able to edit announcements \\ \hline
+        \textit{So that} & I can change an announcement if any information is out of date or has changed \\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able comment on an announcement \\ \hline
+        \textit{So that} & I can ask for clarification or ask a question about the announcement \\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able filter announcements \\ \hline
+        \textit{So that} & I can search for a specific announcement for information\\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\pagebreak
+\FloatBarrier
+\textbf{Course Content Page}
+\FloatBarrier
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to view topics and their corresponding topic files \\ \hline
+        \textit{So that} & I can view what content this topic group contains\\ \hline
+        \textit{Priority} & {\color[HTML]{FE0000} High} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to view and download topic files \\ \hline
+        \textit{So that} & I can save the content and complete it in my own time\\ \hline
+        \textit{Priority} & {\color[HTML]{FE0000} High} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able convey I have completed a topic file \\ \hline
+        \textit{So that} & I can determine what content I have not completed\\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to view the prerequisites of a topic \\ \hline
+        \textit{So that} & I can determine what content I will need to complete first before continuing\\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to filter topics \\ \hline
+        \textit{So that} & I can search for a particular topic I may want to complete\\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to filter topics \\ \hline
+        \textit{So that} & I can search for a particular topic I may want to complete\\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As an} & Administrator \\ \hline
+        \textit{I want to} & Be able to add topics or topic files to the content page \\ \hline
+        \textit{So that} & I can easily modify the content of the course \\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Not Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\pagebreak
+\FloatBarrier
+\textbf{Sidebar}
+\FloatBarrier
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to click on a link and navigate to the corresponding component \\ \hline
+        \textit{So that} & I can navigate within the MetaLMS\\ \hline
+        \textit{Priority} & {\color[HTML]{FE0000} High} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As an} & Administrator \\ \hline
+        \textit{I want to} & Be able to customise the links on the sidebar \\ \hline
+        \textit{So that} & I can create or delete certain components within the MetaLMS for a course\\ \hline
+        \textit{Priority} & {\color[HTML]{3166FF} Low} \\ \hline
+        \textit{Status} & Not Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\FloatBarrier
+\textbf{Widgets bar}
+\FloatBarrier
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to view reminders on a calendar \\ \hline
+        \textit{So that} & I can easily determine the number of days before an important date \\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to create reminders on the calendar \\ \hline
+        \textit{So that} & I can not down important dates so that I will not forget \\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to delete reminders on the calendar \\ \hline
+        \textit{So that} & I can remove unnecessary reminders \\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to edit reminders on the calendar \\ \hline
+        \textit{So that} & I can update the information of a reminder in case the important event has changed \\ \hline
+        \textit{Priority} & {\color[HTML]{3166FF} Low} \\ \hline
+        \textit{Status} & Not Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to view the progress of a particular course \\ \hline
+        \textit{So that} & I can easily see the amount of content I still need to complete \\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Not Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to customise what widgets are present on the widgets bar \\ \hline
+        \textit{So that} & I can determine what widgets are on my widgets bar \\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Low} \\ \hline
+        \textit{Status} & Not Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\pagebreak
+\FloatBarrier
+\textbf{Course Outline Page}
+\FloatBarrier
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As a} & User \\ \hline
+        \textit{I want to} & Be able to view the course outline of a particular course \\ \hline
+        \textit{So that} & I can determine the learning outcomes of a course \\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Not Complete \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{|l|l|}
+        \hline
+        \textit{As an} & Administrator \\ \hline
+        \textit{I want to} & Be able to upload a course outline to a particular course \\ \hline
+        \textit{So that} & I can provide learning outcomes for a course \\ \hline
+        \textit{Priority} & {\color[HTML]{FE996B} Medium} \\ \hline
+        \textit{Status} & Not Complete \\ \hline
+    \end{tabular}
+\end{table}
 
 \subsection{Evaluation}
 The evaluation of the course pages will depend on a set criteria.
