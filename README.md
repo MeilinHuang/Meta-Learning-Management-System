@@ -6,6 +6,7 @@ Git repository for the Meta LMS Thesis project.
 Run npm install in `backend/` folder - npm version is 6.14.11
 
 Next you need to set up the database, which uses PostgreSQL. `metalms.pgsql` contains a backup of the database. On Windows, you can set up Windows Subsystem for Linux and then follow this guide: https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ubuntu-20-04-quickstart
+You then need to restore the database using pg_dump and the metalms.pgsql file.
 
 Setting up the database may be a little difficult, there should be a user with username "metalms" and password "metalms".
 
