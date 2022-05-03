@@ -1,0 +1,64 @@
+/* Set default font-family */
+#editor-container {
+  font-family: "Aref Ruqaa";
+  font-size: 18px;
+  height: 375px;
+}
+
+/* Set content for font-families */
+.ql-font-arial, .ql-font span[data-value="arial"]::before {
+  font-family: Arial, sans-serif;
+}
+.ql-font-comic-sans, .ql-font span[data-value="comic-sans"]::before {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+}
+.ql-font-courier-new, .ql-font span[data-value="courier-new"]::before {
+  font-family: "Courier New";
+}
+.ql-font-georgia, .ql-font span[data-value="georgia"]::before {
+  font-family: Georgia, serif;
+}
+
+.ql-font-lucida, .ql-font span[data-value="lucida"]::before {
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+}
+
+[data-tooltip] {
+  content: attr(data-tooltip);
+  /* display: block; */
+}
+[data-tooltip] :hover {
+  background-color: red; 
+}
+
+.ql-timestamp {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+.ql-timestamp :hover{
+  cursor: pointer;
+}
+
+.ql-page {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+.ql-page :hover{
+  cursor: pointer;
+}
+
+button.ql-concept {
+  color: white;
+  font-weight: bold;
+  /* background-color: rgb(247, 212, 144); */
+  background-color: rgb(230, 110, 35);
+  padding: 3px 10px 3px 10px;
+  border: transparent solid 1px;
+  border-radius: 4px;
+  margin-left: 3px;
+  margin-right: 3px;
+  cursor: pointer;
+  transition: 0.3s;
+}
