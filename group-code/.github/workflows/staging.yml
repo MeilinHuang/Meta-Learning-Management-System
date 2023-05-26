@@ -1,0 +1,90 @@
+# This is a basic workflow to help you get started with Actions
+
+name: "Deploy to staging"
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  pull_request:
+    branches: [ "main" ]
+    types: ["closed"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+      
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # Check if the pull request was merged, otherwise don't run
+  check_merged:
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo The PR was merged
+  # Run tests
+  run_tests:
+    needs: check_merged
+    uses: ./.github/workflows/run_tests.yml
+  # Perform any migrations
+  perform_migrations:
+    needs: [run_tests]
+    uses: ./.github/workflows/perform_migrations.yml
+    secrets: inherit
+    with:
+      port: 5433
+      database: staging
+    
+  # Build image
+  build_backend:
+    needs: [run_tests] # TODO: Add 'perform_migrations' back in to this once we do switch to alembic
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+     - name: Set up QEMU
+       uses: docker/setup-qemu-action@v2
+     - name: Set up Docker Buildx
+       uses: docker/setup-buildx-action@v2
+     - name: Login to GitHub Container Registry
+       uses: docker/login-action@v2
+       with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+     - name: Build and push
+       uses: docker/build-push-action@v3
+       with:
+         context: "{{defaultContext}}:backend"
+         push: true
+         tags: ghcr.io/voyageriv/metalms/metalms_backend:latest
+  build_frontend:
+    needs: [run_tests]
+    runs-on: ubuntu-latest
+    steps:
+     - name: Set up QEMU
+       uses: docker/setup-qemu-action@v2
+     - name: Set up Docker Buildx
+       uses: docker/setup-buildx-action@v2
+     - name: Login to GitHub Container Registry
+       uses: docker/login-action@v2
+       with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+     - name: Build and push
+       uses: docker/build-push-action@v3
+       with:
+         context: "{{defaultContext}}:frontend"
+         push: true
+         tags: ghcr.io/voyageriv/metalms/metalms_frontend:latest
+  trigger_deployment:
+    needs: [build_backend, build_frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow Webhook Action
+        uses: distributhor/workflow-webhook@v2.0.4
+        env:
+          webhook_url: ${{ secrets.STAGING_WEBHOOK_URL }}
+          webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+
+    

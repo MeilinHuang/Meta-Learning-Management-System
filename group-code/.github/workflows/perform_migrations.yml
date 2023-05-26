@@ -1,0 +1,52 @@
+# This is a basic workflow to help you get started with Actions
+
+name: "Perform Database Migrations"
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      database:
+        required: true
+        type: string
+      port:
+        required: true
+        type: number
+    secrets:
+      POSTGRES_USERNAME:
+        required: true
+      POSTGRES_PASSWORD:
+        required: true
+      POSTGRES_ADDRESS:
+        required: true
+      
+      
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  migrate:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10.6
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10.6
+      - name: Install requirements
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run alembic
+        run: cd backend && alembic upgrade head
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_SERVER: "${{ secrets.POSTGRES_ADDRESS }}:${{ inputs.port }}"
+          POSTGRES_DB: ${{ inputs.database }}

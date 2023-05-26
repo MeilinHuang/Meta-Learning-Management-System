@@ -1,0 +1,14 @@
+{
+    "python.pythonPath": "backend\\venv\\Scripts\\python.exe",
+    "python.analysis.typeCheckingMode": "basic",
+    "cSpell.words": [
+        "checkvote",
+        "stickied",
+        "upvoted",
+        "upvotes"
+    ],
+    // Default (format when you paste)
+    "editor.formatOnPaste": true,
+    // Default (format when you save)
+    "editor.formatOnSave": true,
+}
