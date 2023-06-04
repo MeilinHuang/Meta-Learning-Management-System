@@ -255,7 +255,7 @@ export default function SignupPage() {
                 >
                   {same && haveConfirmPs
                     ? 'Confirm Password*'
-                    : 'Please type same passwrod again*'}
+                    : 'Please type same password again*'}
                 </label>
                 <div className="mt-1">
                   <input

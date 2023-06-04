@@ -119,6 +119,14 @@ def usernameNotexists(db: Session, username: str):
         return False
     return True
 
+def emailNotexists(db: Session, email: str):
+    email_name_exists = db.query(exists().where(
+        models.User.email == email))
+    if db.execute(email_name_exists).scalar():
+        return False
+    return True
+
+
 
 def check_permission(db: Session, user: models.User, topic: models.Topic, permission_flag):
     if user.superuser:

@@ -81,7 +81,12 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
             detail="User name already exists",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
+    elif (helper.emailNotexists(db, details.email) == False):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email already exists",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     token = helper.create_user(
         db, details.username, details.password, details.email, details.full_name)
     user = helper.get_user_by_username(db, details.username)
