@@ -11,8 +11,9 @@ Perform these steps the first time you clone the repository to set up a virtual 
 2. Create a virtual environment.  
    `python3 -m venv venv`
 3. Activate the virtual environment.  
-   `source venv/bin/activate`
-4. Install dependencies from requirements.txt.  
+   - Linux: `source venv/bin/activate`
+   - Windows: `venv/Scripts/activate.bat`
+4. Install dependencies from requirements.txt.
    `python3 -m pip install -r requirements.txt`
 
 ### Start backend server
@@ -22,7 +23,7 @@ Perform these steps every time you want to use the backend server.
 1. Navigate to the root folder.
 2. Activate your existing virtual environment.  
    `source backend/venv/bin/activate`
-3. Start the backend server.  
+3. Start the backend server. (make sure you're in th `group-code/` directory)
    `uvicorn backend.app.main:app --reload`
 
 ### Update dependencies
