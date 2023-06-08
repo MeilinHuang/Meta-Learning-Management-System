@@ -73,6 +73,8 @@ class User(Base):
     threads = relationship("Thread", back_populates="author")
     posts = relationship("Post", back_populates="author")
     superuser = Column(Boolean, default=False)
+    vEmail = Column(Text)
+    lastOtp = Column(Text)
 
 
 # === Topic Tree === #

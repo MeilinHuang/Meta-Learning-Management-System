@@ -9,3 +9,4 @@ python-multipart
 faker
 passlib[bcrypt]
 pydantic
+pyotp

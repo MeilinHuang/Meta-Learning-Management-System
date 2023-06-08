@@ -15,6 +15,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 import shutil
 import smtplib
+import pyotp
 
 from . import models, schemas
 
@@ -68,17 +69,6 @@ def verify_user(db: Session, token):
     if user.auth_token != decoded["auth_token"]:
         return False, None
     return True, user
-
-# def verifyEmail(db: Session, receiveEmail: str, message: str):
-#     server = smtplib.SMTP("smtp.gmail.com", 587)
-#     server.starttls()
-#     server.login('metalmsserviceteam@outlook.com', "Abc111111")
-#     email_message = message
-#     server.sendmail('metalmsserviceteam@outlook.com', receiveEmail, email_message)
-#     server.quit()
-#     print("Email sent successfully")
-#     return {"email": receiveEmail}
-
 
 def extract_user(db: Session, token):
     decoded = jwt.decode(token, TOKEN_SECRET, algorithms=["HS256"])
@@ -2241,3 +2231,30 @@ def create_test_data_converstion(engine: Engine, db: Session):
     create_conversation(db, user1.username, user2.username, user1.id, user2.id)
 
     db.commit()
+
+# MetaLMS 23T2
+
+# sends otp to user email
+def getVerifyEmail(db: Session, user: models.User):
+    server = smtplib.SMTP("smtp-mail.outlook.com", 587)
+    server.starttls()
+    server.login('metalmsserviceteam@outlook.com', "Abc111111")
+    otp = pyotp.TOTP('base32secret3232')
+    otpnumber = str(otp.now())
+    setattr(user, "lastOtp", otpnumber)
+    db.commit()
+    db.refresh(user)
+    message = f"Hi {user.full_name},\nYour email verification code is {otpnumber}. Please enter this code in the prompt on Meta LMS."
+    server.sendmail('metalmsserviceteam@outlook.com', user.email, f"Subject: Meta LMS email verification code\n\n{message}")
+    server.quit()
+    print("Email sent successfully")
+    return {"email": user.email}
+
+def putOtp(db: Session, user: models.User, inputOtp: str):
+    if user.lastOtp == inputOtp:
+        setattr(user, "vEmail", user.email)
+        setattr(user, "lastOtp", None)
+        db.commit()
+        db.refresh(user)
+        return True
+    return False
