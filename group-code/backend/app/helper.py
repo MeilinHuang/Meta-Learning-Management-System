@@ -2247,8 +2247,8 @@ def getVerifyEmail(db: Session, user: models.User):
     message = f"Hi {user.full_name},\nYour email verification code is {otpnumber}. Please enter this code in the prompt on Meta LMS."
     server.sendmail('metalmsserviceteam@outlook.com', user.email, f"Subject: Meta LMS email verification code\n\n{message}")
     server.quit()
-    print("Email sent successfully")
-    return {"email": user.email}
+    print(f"Sent OTP {otpnumber} to {user.email}")
+    return {"message", "success"}
 
 def putOtp(db: Session, user: models.User, inputOtp: str):
     if user.lastOtp == inputOtp:
@@ -2256,5 +2256,5 @@ def putOtp(db: Session, user: models.User, inputOtp: str):
         setattr(user, "lastOtp", None)
         db.commit()
         db.refresh(user)
-        return True
-    return False
+        return {"verified", "true"}
+    return {"verified", "false"}

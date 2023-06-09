@@ -53,6 +53,8 @@ class User(BaseModel):
     introduction: str
     friends: List[Conversation]
     superuser: bool
+    vEmail: str
+    lastOtp: str
 
     class Config:
         orm_mode = True

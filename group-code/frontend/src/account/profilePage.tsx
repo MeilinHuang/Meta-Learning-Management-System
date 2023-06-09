@@ -127,6 +127,15 @@ export default function ProfilePage() {
             change password
           </button>
           </Link>
+          <Link to="/vEmail"
+          >
+          <button
+            className="mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+            onClick={editOrProfile}
+          >
+            Verify email
+          </button>
+          </Link>
         </div>
       </div>
 
@@ -139,7 +148,7 @@ export default function ProfilePage() {
       >
         <div className="px-4 py-5 sm:px-6">
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            Chnage Your Profile
+            Change Your Profile
           </h3>
         </div>
         <div className="border-t border-gray-200">

@@ -1546,3 +1546,10 @@ async def test_forum(db: Session = Depends(get_db)):
     print(replies[0].replies[0].replies)
     print(replies[0].replies[0].replies[0].replies)
     return thread
+
+# Meta LMS 23T2
+
+@app.post("/vEmail")
+async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
+    user = helper.get_user_by_id(db, details.id)
+    helper.getVerifyEmail(db, user)
