@@ -2256,5 +2256,5 @@ def putOtp(db: Session, user: models.User, inputOtp: str):
         setattr(user, "lastOtp", None)
         db.commit()
         db.refresh(user)
-        return {"verified", "true"}
-    return {"verified", "false"}
+        return {"message", "true"}
+    return {"message", "false"}

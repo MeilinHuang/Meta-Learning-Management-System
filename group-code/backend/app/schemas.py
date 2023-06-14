@@ -534,3 +534,7 @@ class Assessment(BaseModel):
 
 class testTopicEnrollment(BaseModel):
     enroll_id: int
+
+class userOtp(BaseModel):
+    id: str
+    inputOtp: str

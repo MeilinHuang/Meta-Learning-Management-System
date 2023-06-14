@@ -1553,3 +1553,8 @@ async def test_forum(db: Session = Depends(get_db)):
 async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
     user = helper.get_user_by_id(db, details.id)
     helper.getVerifyEmail(db, user)
+
+@app.post("/putOtp")
+async def vEmail(details: schemas.userOtp, db: Session = Depends(get_db)):
+    user = helper.get_user_by_id(db, details.id)
+    return helper.putOtp(db, user, details.inputOtp)
