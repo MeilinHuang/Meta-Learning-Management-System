@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "5.0",
     "baseUrl": "src",
     "target": "es5",
     "lib": [
@@ -22,7 +21,8 @@
     "noEmit": true,
     "jsx": "preserve",
     "suppressImplicitAnyIndexErrors": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "ignoreDeprecations": "5.0",
   },
   "include": [
     "src"
