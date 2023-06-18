@@ -12,23 +12,13 @@ import AccountService from './AccountService';
 import { PaperClipIcon } from '@heroicons/react/20/solid';
 
 export default function VEmail() {
-  const [errorMessage, setErrorMessage] = useState('');
-  const [sendOTPBlock, setSendOTP] = useState(true);
-  const [inputOTPBlock, setInputOTP] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('Email Not Sent.');
   const [userInputOTP, setUserOTP] = useState('');
-
   const handleInputOTP = (event: ChangeEvent<HTMLInputElement>) => {
     setUserOTP(event.target.value);
   };
+  const [rClass, setrClass] = useState("text-left text-sm font-medium text-black");
 
-  const sendOrInput = () => {
-    if (sendOTPBlock) {
-      setSendOTP(false);
-    } else {
-      setInputOTP(true);
-    }
-  };
-  
   return (
     <>
       <div className="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -58,8 +48,9 @@ export default function VEmail() {
                       .then((response: any) => {
                         console.log(response)
                         setErrorMessage(
-                          'Email Sent'
+                          'Email Sent.'
                         );
+                        setrClass('text-left text-sm font-medium text-black');
                       })
                       .catch((error) => {
                         console.log(error);
@@ -74,6 +65,9 @@ export default function VEmail() {
                   Please enter the code from your email below.
                 </p>
               </div>
+              <div className={rClass}>
+                {errorMessage}
+              </div>
               <div className="flex gap-4">
                 <div className="mt-6">
                   <input
@@ -82,7 +76,6 @@ export default function VEmail() {
                     onChange={handleInputOTP}
                   ></input>
                 </div>
-  
                 <button
                   className="mt-6 items-center flex basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
                   onClick={() => {
@@ -92,8 +85,21 @@ export default function VEmail() {
                     };
                     AccountService.inputOtp(param)
                       .then((response) => {
-                        console.log(response.data);
-                        console.log('here');
+                        if (response.data.message == "true") {
+                          localStorage.setItem(
+                            'vEmail',
+                            response.data.vEmail
+                          );
+                          setrClass('text-left text-sm font-medium text-green-500');
+                          setErrorMessage(
+                            'Email Verified.'
+                          );
+                        } else {
+                          setrClass('text-left text-sm font-medium text-red-500');
+                          setErrorMessage(
+                            'Invalid Entry.'
+                          );
+                        }
                       })
                       .catch((error) => {
                         console.log(error);

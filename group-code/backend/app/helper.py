@@ -2241,6 +2241,8 @@ def getVerifyEmail(db: Session, user: models.User):
     server.login('metalmsserviceteam@outlook.com', "Abc111111")
     otp = pyotp.TOTP('base32secret3232')
     otpnumber = str(otp.now())
+    if usernameNotexists(db, user.username):
+        return {"message": "Username doesn't exist"}
     setattr(user, "lastOtp", otpnumber)
     db.commit()
     db.refresh(user)
@@ -2248,13 +2250,15 @@ def getVerifyEmail(db: Session, user: models.User):
     server.sendmail('metalmsserviceteam@outlook.com', user.email, f"Subject: Meta LMS email verification code\n\n{message}")
     server.quit()
     print(f"Sent OTP {otpnumber} to {user.email}")
-    return {"message", "success"}
+    return {"message": "success"}
 
 def putOtp(db: Session, user: models.User, inputOtp: str):
+    if usernameNotexists(db, user.username):
+        return {"message", "Username doesn't exist"}
     if user.lastOtp == inputOtp:
         setattr(user, "vEmail", user.email)
         setattr(user, "lastOtp", None)
         db.commit()
         db.refresh(user)
-        return {"message", "true"}
-    return {"message", "false"}
+        return {"message": "true", "vEmail": user.email}
+    return {"message": "false"}
