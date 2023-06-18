@@ -15,11 +15,12 @@ import { PaperClipIcon } from '@heroicons/react/20/solid';
 export default function ProfilePage() {
   const [profileBlock, setProfileBlock] = useState(true);
   const [editBlock, setEditBlock] = useState(false);
+  const [emailStr, setEmailStr] = useState('Email address');
+
   const [new_full_name, setNew_full_name] = useState(
     localStorage.getItem('full_name')
   );
   const [new_intro, setNew_intro] = useState(localStorage.getItem('intro'));
-  const [topicsShow, setTopicsShow] = useState(false);
 
   const handleChangeFullName = (event: ChangeEvent<HTMLInputElement>) => {
     //alert("New Email value: " + event.target.value);
@@ -37,6 +38,19 @@ export default function ProfilePage() {
       setProfileBlock(true);
     }
   };
+
+
+  const checkvEmail = () => {
+    if (localStorage.getItem('vEmail') == null) {
+      return true;
+    } else {
+      setEmailStr('Email address (Verified)')
+      return false;
+    }
+  };
+
+  const [isEmailVerified, setIsEmailV] = useState(checkvEmail);
+  
 
   return (
     <div>
@@ -92,7 +106,7 @@ export default function ProfilePage() {
             </div>
             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt className="text-sm font-medium text-gray-500">
-                Email address
+                {emailStr}
               </dt>
               <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {localStorage.getItem('email')}
@@ -130,10 +144,14 @@ export default function ProfilePage() {
           <Link to="/vEmail"
           >
           <button
-            className="mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+            className={
+              isEmailVerified
+              ? 'mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3'
+              : 'hidden'
+            }
             onClick={editOrProfile}
           >
-            Verify email
+            Verify Email
           </button>
           </Link>
         </div>
