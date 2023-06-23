@@ -538,3 +538,8 @@ class testTopicEnrollment(BaseModel):
 class userOtp(BaseModel):
     id: str
     inputOtp: str
+
+class recoverPass(BaseModel):
+    email: str
+    inputOtp: str
+    newPassword: str

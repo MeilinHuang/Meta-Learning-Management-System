@@ -20,6 +20,7 @@ import ProfilePage from 'account/profilePage';
 import ConversationPage from 'account/ConversationPage';
 import CustomProfilePage from 'account/CustomProfilePage';
 import VEmail from 'account/vEmail';
+import RecoverPass from 'account/recoverPass';
 import TopicPage from 'content/TopicPage';
 import Forum from 'forum/Forum';
 import AssessmentMain from 'assessment/assessmentMain';
@@ -55,6 +56,7 @@ root.render(
         <Route path="pwchang" element={<ChangePassword />} />
         <Route path="vEmail" element={<VEmail />} />
         <Route path="welcome" element={<WelcomePage />} />
+        <Route path="recoverPass" element={<RecoverPass />} />
         {/* Routes with navbar layout */}
         <Route element={<LayoutNoPadding />}>
           <Route path="test-forum" element={<Forum />} />

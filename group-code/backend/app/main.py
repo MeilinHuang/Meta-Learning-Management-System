@@ -1558,3 +1558,8 @@ async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
 async def vEmail(details: schemas.userOtp, db: Session = Depends(get_db)):
     user = helper.get_user_by_id(db, details.id)
     return helper.putOtp(db, user, details.inputOtp)
+
+@app.post("/recoverPass")
+async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db)):
+    user = helper.get_user_by_email(db, details.email)
+    return helper.recoveryAcc(db, user, details.inputOtp, details.newPassword)

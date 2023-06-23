@@ -266,6 +266,8 @@ def edit_password(db: Session, user: models.User, newpassword):
 def get_user_by_username(db: Session, username: str):
     return db.query(models.User).filter_by(username=username).first()
 
+def get_user_by_email(db: Session, email: str):
+    return db.query(models.User).filter_by(email=str).first()
 
 def get_all_user_list(db: Session):
     query = db.query(models.User).all()
@@ -2246,8 +2248,8 @@ def getVerifyEmail(db: Session, user: models.User):
     setattr(user, "lastOtp", otpnumber)
     db.commit()
     db.refresh(user)
-    message = f"Hi {user.full_name},\nYour email verification code is {otpnumber}. Please enter this code in the prompt on Meta LMS."
-    server.sendmail('metalmsserviceteam@outlook.com', user.email, f"Subject: Meta LMS email verification code\n\n{message}")
+    message = f"Hi {user.full_name},\nYour code is {otpnumber}. Please enter this code in the prompt on Meta LMS."
+    server.sendmail('metalmsserviceteam@outlook.com', user.email, f"Subject: Meta LMS verification code\n\n{message}")
     server.quit()
     print(f"Sent OTP {otpnumber} to {user.email}")
     return {"message": "success"}
@@ -2261,4 +2263,12 @@ def putOtp(db: Session, user: models.User, inputOtp: str):
         db.commit()
         db.refresh(user)
         return {"message": "true", "vEmail": user.email}
+    return {"message": "false"}
+
+def recoveryAcc(db: Session, user: models.User, inputOtp: str, newPass: str):
+    if usernameNotexists(db, user.username):
+        return {"message", "Username doesn't exist"}
+    if user.lastOtp == inputOtp:
+        edit_password(db,user,inputOtp)
+        return {"message": "true"}
     return {"message": "false"}

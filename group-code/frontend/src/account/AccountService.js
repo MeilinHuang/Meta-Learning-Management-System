@@ -197,6 +197,17 @@ class AccountService {
     })
   }
 
+  recoverPass(param) {
+    console.log(param)
+    return axios.post(`${API_URL}/recoverPass`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: param.access_token
+      }
+    })
+  }
+
 }
 
 export default new AccountService();
