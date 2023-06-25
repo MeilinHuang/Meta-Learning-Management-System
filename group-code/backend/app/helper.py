@@ -2238,13 +2238,13 @@ def create_test_data_converstion(engine: Engine, db: Session):
 
 # sends otp to user email
 def getVerifyEmail(db: Session, user: models.User):
+    if user == None or usernameNotexists(db, user.username):
+        return {"message": "Username doesn't exist"}
     server = smtplib.SMTP("smtp-mail.outlook.com", 587)
     server.starttls()
     server.login('metalmsserviceteam@outlook.com', "Abc111111")
     otp = pyotp.TOTP('base32secret3232')
     otpnumber = str(otp.now())
-    if usernameNotexists(db, user.username):
-        return {"message": "Username doesn't exist"}
     setattr(user, "lastOtp", otpnumber)
     db.commit()
     db.refresh(user)
@@ -2255,7 +2255,7 @@ def getVerifyEmail(db: Session, user: models.User):
     return {"message": "success"}
 
 def putOtp(db: Session, user: models.User, inputOtp: str):
-    if usernameNotexists(db, user.username):
+    if user == None or usernameNotexists(db, user.username):
         return {"message", "Username doesn't exist"}
     if user.lastOtp == inputOtp:
         setattr(user, "vEmail", user.email)
@@ -2266,9 +2266,11 @@ def putOtp(db: Session, user: models.User, inputOtp: str):
     return {"message": "false"}
 
 def recoveryAcc(db: Session, user: models.User, inputOtp: str, newPass: str):
-    if usernameNotexists(db, user.username):
+    if user == None:
+        print(f"user is {user}")
         return {"message", "Username doesn't exist"}
     if user.lastOtp == inputOtp:
+        print(f"pass for {user.username} changed to {newPass}")
         edit_password(db,user,inputOtp)
         return {"message": "true"}
     return {"message": "false"}

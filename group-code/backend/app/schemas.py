@@ -540,6 +540,6 @@ class userOtp(BaseModel):
     inputOtp: str
 
 class recoverPass(BaseModel):
-    email: str
+    username: str
     inputOtp: str
     newPassword: str
