@@ -53,6 +53,8 @@ class User(BaseModel):
     introduction: str
     friends: List[Conversation]
     superuser: bool
+    vEmail: str
+    lastOtp: str
 
     class Config:
         orm_mode = True
@@ -532,3 +534,12 @@ class Assessment(BaseModel):
 
 class testTopicEnrollment(BaseModel):
     enroll_id: int
+
+class userOtp(BaseModel):
+    id: str
+    inputOtp: str
+
+class recoverPass(BaseModel):
+    username: str
+    inputOtp: str
+    newPassword: str
