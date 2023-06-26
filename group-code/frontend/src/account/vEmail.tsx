@@ -17,7 +17,7 @@ export default function VEmail() {
   const handleInputOTP = (event: ChangeEvent<HTMLInputElement>) => {
     setUserOTP(event.target.value);
   };
-  const [rClass, setrClass] = useState("text-left text-sm font-medium text-black");
+  const [rClass, setrClass] = useState("py-4 text-center text-sm font-medium text-black");
 
   return (
     <>
@@ -43,14 +43,14 @@ export default function VEmail() {
                 className="mt-6 flex w-full justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
                 onClick={() => {
                   if (true) {
-                    const param = {username: localStorage.getItem("user_name")};
+                    const param = {id: localStorage.getItem("user_name")};
                     AccountService.vEmail(param)
                       .then((response: any) => {
                         console.log(response)
                         setErrorMessage(
                           'Email Sent.'
                         );
-                        setrClass('text-left text-sm font-medium text-black');
+                        setrClass('py-4 text-center text-sm font-medium text-black');
                       })
                       .catch((error) => {
                         console.log(error);
@@ -64,9 +64,6 @@ export default function VEmail() {
                 <p className="text-sm text-black-500 text-align:left">
                   Please enter the code from your email below.
                 </p>
-              </div>
-              <div className={rClass}>
-                {errorMessage}
               </div>
               <div className="flex gap-4">
                 <div className="mt-6">
@@ -90,12 +87,12 @@ export default function VEmail() {
                             'vEmail',
                             response.data.vEmail
                           );
-                          setrClass('text-left text-sm font-medium text-green-500');
+                          setrClass('py-4 text-center text-sm font-medium text-green-500');
                           setErrorMessage(
                             'Email Verified.'
                           );
                         } else {
-                          setrClass('text-left text-sm font-medium text-red-500');
+                          setrClass('py-4 text-center text-sm font-medium text-red-500');
                           setErrorMessage(
                             'Invalid Entry.'
                           );
@@ -108,6 +105,9 @@ export default function VEmail() {
                 >
                   Confirm Code
                 </button>
+              </div>
+              <div className={rClass}>
+                {errorMessage}
               </div>
             </div>
           </div>

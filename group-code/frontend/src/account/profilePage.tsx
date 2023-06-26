@@ -41,11 +41,11 @@ export default function ProfilePage() {
 
 
   const checkvEmail = () => {
-    if (localStorage.getItem('vEmail') == null) {
-      return true;
-    } else {
+    if (localStorage.getItem('vEmail')?.includes('@')) {
       setEmailStr('Email address (Verified)')
       return false;
+    } else {
+      return true;
     }
   };
 
@@ -86,7 +86,7 @@ export default function ProfilePage() {
             Your Profile
           </h3>
           <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            Personal details.
+            Personal details
           </p>
         </div>
 

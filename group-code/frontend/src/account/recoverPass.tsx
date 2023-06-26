@@ -15,24 +15,56 @@ import { match } from 'assert';
 export default function recoverPass() {
   const [errorMessage, setErrorMessage] = useState('');
   const [userInputOTP, setUserOTP] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [newPasswordRep, setNewPasswordRep] = useState('');
+  const [password, setPassword] = useState('');
+  const [havePassword, setHavePassword] = useState(true);
+  const [confirmPs, setConfirmPs] = useState('');
+  const [haveConfirmPs, setHaveConfirmPs] = useState(true);
+  const [same, setSame] = useState(true);
+  const [userName, setUserName] = useState('');
+  const [haveUserName, setHaveUserName] = useState(true);
   const handleInputOTP = (event: ChangeEvent<HTMLInputElement>) => {
     setUserOTP(event.target.value);
   };
   const [rClass, setrClass] = useState("text-center text-sm font-medium text-black");
   const [username, setUsername] = useState('');
 
-  const handleChangeId = (event: ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
+  const handleChangePassword = (event: ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+    if (event.target.value != '' && event.target.value.length >= 6) {
+      setHavePassword(true);
+    } else {
+      setHavePassword(false);
+    }
+    if (event.target.value == confirmPs) {
+      setSame(true);
+    } else {
+      setSame(false);
+    }
   };
 
-  const handleNewPassword = (event: ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
+  const handleChangeConfirmPassword = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    setConfirmPs(event.target.value);
+    if (event.target.value != '') {
+      setHaveConfirmPs(true);
+    } else {
+      setHaveConfirmPs(false);
+    }
+    if (event.target.value == password) {
+      setSame(true);
+    } else {
+      setSame(false);
+    }
   };
 
-  const handleNewPasswordRep = (event: ChangeEvent<HTMLInputElement>) => {
-    setNewPasswordRep(event.target.value);
+  const handleChangeUserName = (event: ChangeEvent<HTMLInputElement>) => {
+    setUserName(event.target.value);
+    if (event.target.value != '') {
+      setHaveUserName(true);
+    } else {
+      setHaveUserName(false);
+    }
   };
 
   return (
@@ -63,14 +95,14 @@ export default function recoverPass() {
                   autoComplete="email"
                   required
                   className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                  onChange={handleChangeId}
+                  onChange={handleChangeUserName}
                 />
               </div>
               <button
                 type="submit"
                 className="mt-6 flex w-full justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
                 onClick={() => {
-                  const param = {id: username};
+                  const param = {id: userName};
                   AccountService.vEmail(param)
                   .then((response: any) => {
                     console.log(response)
@@ -95,7 +127,7 @@ export default function recoverPass() {
               </button>
               <div className="py-4">
                 <p className="text-sm text-black-500 text-align:left">
-                  Please enter the code from your email and your new password below.
+                  Please enter the code from your email and your new password below. Passwords must be atleast 6 characters.
                 </p>
               </div>
               <div>
@@ -106,42 +138,78 @@ export default function recoverPass() {
                     className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     onChange={handleInputOTP}
                   ></input>
-                  <input className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                    placeholder="New Password"
-                    required
-                    id="password"
-                    name="password"
-                    type="password"
-                    onChange={handleNewPassword}
-                  ></input>
-                  
-                  <input className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                    placeholder="Repeat New Password"
-                    required
-                    id="password"
-                    name="password"
-                    type="password"
-                    onChange={handleNewPasswordRep}
-                  ></input>
+                  <div>
+                    <label
+                      htmlFor="password"
+                      className={
+                        havePassword
+                          ? 'block text-sm font-medium text-gray-700'
+                          : 'block text-sm font-medium text-red-700'
+                      }
+                    >
+                      {havePassword ? 'Password*' : 'Please enter a password*'}
+                    </label>
+                    <div className="mt-1">
+                      <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="Password"
+                        autoComplete="current-password"
+                        required
+                        className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                        onChange={handleChangePassword}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="confirmPassword"
+                      className={
+                        same && haveConfirmPs
+                          ? 'block text-sm font-medium text-gray-700'
+                          : 'block text-sm font-medium text-red-700'
+                      }
+                    >
+                      {same && haveConfirmPs
+                        ? 'Confirm Password*'
+                        : 'Please type same password again*'}
+                    </label>
+                    <div className="mt-1">
+                      <input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        placeholder="Repeat Password"
+                        autoComplete="current-password"
+                        required
+                        className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                        onChange={handleChangeConfirmPassword}
+                      />
+                    </div>
+                  </div>
                 </div>
                 
               </div>
               <button
                   className="mt-6 flex w-full justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+                  type="submit"
                   onClick={() => {
-                    if (newPassword == newPasswordRep) {
+                    if (password == '') {
+                      setHavePassword(false);
+                    }
+                    if (confirmPs != password) {
+                      setSame(false);
+                    }
+                    if (same && havePassword && haveConfirmPs) {
                       const param = {
-                        username: username,
+                        username: userName,
                         inputOtp: userInputOTP,
-                        newPassword: newPassword
+                        newPassword: password
                       };
                       AccountService.recoverPass(param)
                       .then((response) => {
                         if (response.data.message == "true") {
-                          localStorage.setItem(
-                            'vEmail',
-                            response.data.vEmail
-                          );
                           setrClass('text-center text-sm font-medium text-green-500');
                           setErrorMessage(
                             'Password Changed, please Login.'
@@ -158,7 +226,7 @@ export default function recoverPass() {
                       });
                     } else {
                       setErrorMessage(
-                        'Passwords don\'t match.'
+                        'Invalid Password.'
                       );
                       setrClass('text-center text-sm font-medium text-red-500');
                     }

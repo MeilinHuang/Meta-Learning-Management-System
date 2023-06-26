@@ -186,7 +186,16 @@ export default function LoginPage() {
                           localStorage.setItem(
                             'admin',
                             response.data.admin
-                          )
+                          );
+                          localStorage.setItem(
+                            'vEmail',
+                            response.data.vEmail,     
+                          );
+                          localStorage.setItem(
+                            'lastOtp',
+                            response.data.lastOtp,     
+                          );
+                          
                           if(response.data.admin == true) {
                             localStorage.setItem(
                             'userAddress',
