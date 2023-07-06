@@ -195,6 +195,10 @@ export default function LoginPage() {
                             'lastOtp',
                             response.data.lastOtp,     
                           );
+                          localStorage.setItem(
+                            'mfa',
+                            response.data.mfa,     
+                          );
                           
                           if(response.data.admin == true) {
                             localStorage.setItem(

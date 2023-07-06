@@ -124,10 +124,11 @@ async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
         admin = user.superuser
         vEmailv = user.vEmail
         lastOtp = user.lastOtp
+        mfa = user.mfa
         res = {"access_token": token, "token_type": "Bearer",
                "user_name": username, "email": email, "user_id": userid,
                "full_name": fullname, "introduction": introduction,
-               "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp}
+               "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp, "mfa": mfa}
         return res
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -1565,3 +1566,8 @@ async def putOtp(details: schemas.userOtp, db: Session = Depends(get_db)):
 async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     return helper.recoveryAcc(db, user, details.inputOtp, details.newPassword)
+
+@app.post("/setMFA")
+async def recoverPass(details: schemas.setMFA, db: Session = Depends(get_db)):
+    user = helper.get_user_by_id(db, details.id)
+    return helper.setMFA(db, user, details.mfa)

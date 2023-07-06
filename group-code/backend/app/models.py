@@ -75,6 +75,7 @@ class User(Base):
     superuser = Column(Boolean, default=False)
     vEmail = Column(Text)
     lastOtp = Column(Text)
+    mfa = Column(Text)
 
 
 # === Topic Tree === #

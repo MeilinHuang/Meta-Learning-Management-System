@@ -2251,7 +2251,6 @@ def getVerifyEmail(db: Session, user: models.User):
     message = f"Hi {user.full_name},\nYour code is {otpnumber}. Please enter this code in the prompt on Meta LMS."
     server.sendmail('metalmsserviceteam@outlook.com', user.email, f"Subject: Meta LMS verification code\n\n{message}")
     server.quit()
-    print(f"Sent OTP {otpnumber} to {user.email}")
     return {"message": "success"}
 
 def putOtp(db: Session, user: models.User, inputOtp: str):
@@ -2267,13 +2266,19 @@ def putOtp(db: Session, user: models.User, inputOtp: str):
 
 def recoveryAcc(db: Session, user: models.User, inputOtp: str, newPass: str):
     if user == None:
-        print(f"user is {user}")
         return {"message", "Username doesn't exist"}
     if user.lastOtp == inputOtp:
         setattr(user, "lastOtp", None)
         db.commit()
         db.refresh(user)
-        print(f"pass for {user.username} changed to {newPass}")
         edit_password(db,user,newPass)
+        return {"message": "true"}
+    return {"message": "false"}
+
+def setMFA(db: Session, user: models.User, mfa: str):
+    if user != None:
+        setattr(user, "mfa", mfa)
+        db.commit()
+        db.refresh(user)
         return {"message": "true"}
     return {"message": "false"}

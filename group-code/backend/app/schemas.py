@@ -55,6 +55,7 @@ class User(BaseModel):
     superuser: bool
     vEmail: str
     lastOtp: str
+    emailAuth: str
 
     class Config:
         orm_mode = True
@@ -531,7 +532,6 @@ class Assessment(BaseModel):
     status: str
     timeRange: str
 
-
 class testTopicEnrollment(BaseModel):
     enroll_id: int
 
@@ -543,3 +543,7 @@ class recoverPass(BaseModel):
     username: str
     inputOtp: str
     newPassword: str
+
+class setMFA(BaseModel):
+    id: str
+    mfa: str

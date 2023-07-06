@@ -16,6 +16,12 @@ export default function ProfilePage() {
   const [profileBlock, setProfileBlock] = useState(true);
   const [editBlock, setEditBlock] = useState(false);
   const [emailStr, setEmailStr] = useState('Email address');
+  const [mfaStr, setMfaStr] = useState( () => {
+    if (localStorage.getItem('mfa') == 'email') {
+      return 'Disable MFA'
+    } 
+    return 'Enable MFA'
+  });
 
   const [new_full_name, setNew_full_name] = useState(
     localStorage.getItem('full_name')
@@ -50,7 +56,6 @@ export default function ProfilePage() {
   };
 
   const [isEmailVerified, setIsEmailV] = useState(checkvEmail);
-  
 
   return (
     <div>
@@ -124,13 +129,13 @@ export default function ProfilePage() {
           </dl>
         </div>
         <div
-        className='flex flex-row-reverse gap-4'
+        className='flex flex-row-reverse gap-4 pb-4 px-4'
         >
           <button
             className="mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
             onClick={editOrProfile}
           >
-            edit
+            Edit
           </button>
           <Link to="/pwchang"
           >
@@ -138,7 +143,7 @@ export default function ProfilePage() {
             className="mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
             onClick={editOrProfile}
           >
-            change password
+            Change Password
           </button>
           </Link>
           <Link to="/vEmail"
@@ -154,6 +159,35 @@ export default function ProfilePage() {
             Verify Email
           </button>
           </Link>
+          <button
+            className='mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3'
+            onClick={() => {
+              const param = {
+                id: localStorage.getItem('user_id'),
+                mfa: 'email'
+              };
+              if (localStorage.getItem('mfa') == 'email') {
+                param.mfa = ''
+              };
+              AccountService.setMFA(param)
+                .then((response) => {
+                  if (response.data.message == "true") {
+                    if (localStorage.getItem('mfa') == 'email') {
+                      setMfaStr('Enable MFA')
+                      localStorage.setItem('mfa', '')
+                    } else {
+                      setMfaStr('Disable MFA')
+                      localStorage.setItem('mfa', 'email')
+                    }
+                  } 
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }}
+          >
+            {mfaStr}
+          </button>
         </div>
       </div>
 
