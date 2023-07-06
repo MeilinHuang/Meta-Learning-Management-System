@@ -2270,7 +2270,10 @@ def recoveryAcc(db: Session, user: models.User, inputOtp: str, newPass: str):
         print(f"user is {user}")
         return {"message", "Username doesn't exist"}
     if user.lastOtp == inputOtp:
+        setattr(user, "lastOtp", None)
+        db.commit()
+        db.refresh(user)
         print(f"pass for {user.username} changed to {newPass}")
-        edit_password(db,user,inputOtp)
+        edit_password(db,user,newPass)
         return {"message": "true"}
     return {"message": "false"}

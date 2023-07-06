@@ -122,10 +122,12 @@ async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
         fullname = user.full_name
         introduction = user.introduction
         admin = user.superuser
+        vEmailv = user.vEmail
+        lastOtp = user.lastOtp
         res = {"access_token": token, "token_type": "Bearer",
                "user_name": username, "email": email, "user_id": userid,
                "full_name": fullname, "introduction": introduction,
-               "admin": admin}
+               "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp}
         return res
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

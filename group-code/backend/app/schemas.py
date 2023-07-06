@@ -536,7 +536,7 @@ class testTopicEnrollment(BaseModel):
     enroll_id: int
 
 class userOtp(BaseModel):
-    id: str
+    username: str
     inputOtp: str
 
 class recoverPass(BaseModel):
