@@ -12,6 +12,8 @@ from .auth import JWTBearer
 from pathlib import Path
 from io import BytesIO
 import os
+import re
+emailReg = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -85,6 +87,12 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email already exists",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    elif not re.fullmatch(emailReg, details.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email not valid",
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = helper.create_user(
