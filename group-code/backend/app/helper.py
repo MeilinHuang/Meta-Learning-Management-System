@@ -2282,3 +2282,28 @@ def setMFA(db: Session, user: models.User, mfa: str):
         db.refresh(user)
         return {"message": "true"}
     return {"message": "false"}
+
+def verifyMFA(db: Session, user: models.User, mfa: str):
+    if user == None or usernameNotexists(db, user.username):
+        return {"message", "Username doesn't exist"}
+    if user.lastOtp == mfa:
+        setattr(user, "lastOtp", None)
+        return loginUser(db, user)
+    return {"message": "false"}
+
+def loginUser(db: Session, user: models.User):
+    mfa = user.mfa
+    token = give_token(db, user)
+    username = user.username
+    email = user.email
+    userid = user.id
+    fullname = user.full_name
+    introduction = user.introduction
+    admin = user.superuser
+    vEmailv = user.vEmail
+    lastOtp = user.lastOtp
+    res = {"access_token": token, "token_type": "Bearer",
+            "user_name": username, "email": email, "user_id": userid,
+            "full_name": fullname, "introduction": introduction,
+            "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp, "mfa": mfa, "message": "true"}
+    return res

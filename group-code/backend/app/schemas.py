@@ -56,7 +56,8 @@ class User(BaseModel):
     vEmail: str
     lastOtp: str
     emailAuth: str
-
+    mfa: str
+    
     class Config:
         orm_mode = True
 

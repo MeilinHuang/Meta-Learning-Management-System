@@ -163,7 +163,7 @@ export default function ProfilePage() {
             className='mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3'
             onClick={() => {
               const param = {
-                id: localStorage.getItem('user_id'),
+                id: localStorage.getItem('user_name'),
                 mfa: 'email'
               };
               if (localStorage.getItem('mfa') == 'email') {

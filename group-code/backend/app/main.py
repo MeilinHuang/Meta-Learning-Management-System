@@ -13,7 +13,7 @@ from pathlib import Path
 from io import BytesIO
 import os
 import re
-emailReg = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+EMAILREG = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -89,7 +89,7 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
             detail="Email already exists",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    elif not re.fullmatch(emailReg, details.email):
+    elif not re.fullmatch(EMAILREG, details.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email not valid",
@@ -123,27 +123,12 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
 async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     if (user is not None and helper.verify_password(details.password, user.password)):
-        token = helper.give_token(db, user)
-        username = user.username
-        email = user.email
-        userid = user.id
-        fullname = user.full_name
-        introduction = user.introduction
-        admin = user.superuser
-        vEmailv = user.vEmail
-        lastOtp = user.lastOtp
-        mfa = user.mfa
-        res = {"access_token": token, "token_type": "Bearer",
-               "user_name": username, "email": email, "user_id": userid,
-               "full_name": fullname, "introduction": introduction,
-               "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp, "mfa": mfa}
-        return res
+        return helper.loginUser(db,user)
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Unauthorised",
         headers={"WWW-Authenticate": "Bearer"},
     )
-
 
 @app.post("/logout")
 async def logout(details:schemas.OnlyToken, db: Session = Depends(get_db)):
@@ -1576,6 +1561,42 @@ async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db
     return helper.recoveryAcc(db, user, details.inputOtp, details.newPassword)
 
 @app.post("/setMFA")
-async def recoverPass(details: schemas.setMFA, db: Session = Depends(get_db)):
-    user = helper.get_user_by_id(db, details.id)
+async def setMFA(details: schemas.setMFA, db: Session = Depends(get_db)):
+    user = helper.get_user_by_username(db, details.id)
+    print(details)
     return helper.setMFA(db, user, details.mfa)
+
+@app.post("/getMFA")
+async def getMFA(details: schemas.onlyId, db: Session = Depends(get_db)):
+    user = helper.get_user_by_username(db, details.id)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    mfaStr = ""
+    if user.mfa != None:
+        mfaStr = user.mfa
+    return {"mfa": mfaStr}
+
+@app.post("/verifyMFA")
+async def verifyMFA(details: schemas.userOtp, db: Session = Depends(get_db)):
+    user = helper.get_user_by_username(db, details.username)
+    return helper.verifyMFA(db, user, details.inputOtp)
+        
+@app.post("/credAuth")
+async def credAuth(details: schemas.UserLogin, db: Session = Depends(get_db)):
+    user = helper.get_user_by_username(db, details.username)
+    if (user is not None and helper.verify_password(details.password, user.password)):
+        if user.mfa == "email":
+            helper.getVerifyEmail(db, user)
+            return {"mfa": user.mfa, "username": user.username}
+        else:
+            return helper.loginUser(db, user)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
