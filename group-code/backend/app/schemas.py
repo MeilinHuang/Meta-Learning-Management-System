@@ -537,6 +537,7 @@ class testTopicEnrollment(BaseModel):
     enroll_id: int
 
 class userOtp(BaseModel):
+    token: str
     username: str
     inputOtp: str
 
@@ -546,5 +547,10 @@ class recoverPass(BaseModel):
     newPassword: str
 
 class setMFA(BaseModel):
+    token: str
     id: str
     mfa: str
+
+class idToken(BaseModel):
+    id: str
+    token: str

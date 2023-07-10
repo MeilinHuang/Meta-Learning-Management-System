@@ -118,26 +118,6 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
 
 # }
 
-
-@app.post("/login")
-async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
-    """
-    Meta LMS 23T2
-    Functioned updated to allow mfa
-    """
-    user = helper.get_user_by_username(db, details.username)
-    if (user is not None and helper.verify_password(details.password, user.password)):
-        if user.mfa == "email":
-            helper.getVerifyEmail(db, user)
-            return {"mfa": user.mfa, "username": user.username}
-        else:
-            return helper.loginUser(db, user)
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Unauthorised",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
 @app.post("/logout")
 async def logout(details:schemas.OnlyToken, db: Session = Depends(get_db)):
     print("loging out")
@@ -1553,6 +1533,24 @@ async def test_forum(db: Session = Depends(get_db)):
 
 # Meta LMS 23T2
 
+@app.post("/login")
+async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
+    """
+    Function updated to allow mfa
+    """
+    user = helper.get_user_by_username(db, details.username)
+    if (user is not None and helper.verify_password(details.password, user.password)):
+        if user.mfa == "email":
+            helper.getVerifyEmail(db, user)
+            return {"mfa": user.mfa, "username": user.username}
+        else:
+            return helper.loginUser(db, user)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
 @app.post("/vEmail")
 async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.id)
@@ -1560,8 +1558,14 @@ async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
 
 @app.post("/putOtp")
 async def putOtp(details: schemas.userOtp, db: Session = Depends(get_db)):
-    user = helper.get_user_by_username(db, details.username)
-    return helper.putOtp(db, user, details.inputOtp)
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.username:
+        return helper.putOtp(db, user, details.inputOtp)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 @app.post("/recoverPass")
 async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db)):
@@ -1570,23 +1574,14 @@ async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db
 
 @app.post("/setMFA")
 async def setMFA(details: schemas.setMFA, db: Session = Depends(get_db)):
-    user = helper.get_user_by_username(db, details.id)
-    print(details)
-    return helper.setMFA(db, user, details.mfa)
-
-@app.post("/getMFA")
-async def getMFA(details: schemas.onlyId, db: Session = Depends(get_db)):
-    user = helper.get_user_by_username(db, details.id)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorised",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    mfaStr = ""
-    if user.mfa != None:
-        mfaStr = user.mfa
-    return {"mfa": mfaStr}
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.id:
+        return helper.setMFA(db, user, details.mfa)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 @app.post("/verifyMFA")
 async def verifyMFA(details: schemas.userOtp, db: Session = Depends(get_db)):
