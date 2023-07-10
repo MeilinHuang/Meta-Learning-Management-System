@@ -81,7 +81,12 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
             detail="User name already exists",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
+    elif (helper.emailNotexists(db, details.email) == False):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email already exists",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     token = helper.create_user(
         db, details.username, details.password, details.email, details.full_name)
     user = helper.get_user_by_username(db, details.username)
@@ -117,10 +122,12 @@ async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
         fullname = user.full_name
         introduction = user.introduction
         admin = user.superuser
+        vEmailv = user.vEmail
+        lastOtp = user.lastOtp
         res = {"access_token": token, "token_type": "Bearer",
                "user_name": username, "email": email, "user_id": userid,
                "full_name": fullname, "introduction": introduction,
-               "admin": admin}
+               "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp}
         return res
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -1541,3 +1548,20 @@ async def test_forum(db: Session = Depends(get_db)):
     print(replies[0].replies[0].replies)
     print(replies[0].replies[0].replies[0].replies)
     return thread
+
+# Meta LMS 23T2
+
+@app.post("/vEmail")
+async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
+    user = helper.get_user_by_username(db, details.id)
+    return helper.getVerifyEmail(db, user)
+
+@app.post("/putOtp")
+async def putOtp(details: schemas.userOtp, db: Session = Depends(get_db)):
+    user = helper.get_user_by_username(db, details.username)
+    return helper.putOtp(db, user, details.inputOtp)
+
+@app.post("/recoverPass")
+async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db)):
+    user = helper.get_user_by_username(db, details.username)
+    return helper.recoveryAcc(db, user, details.inputOtp, details.newPassword)

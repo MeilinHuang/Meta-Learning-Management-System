@@ -135,7 +135,7 @@ export default function SignupPage() {
             alt="Your Company"
           />
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            Sign up by your email
+            Sign up with your email
           </h2>
         </div>
 
@@ -255,7 +255,7 @@ export default function SignupPage() {
                 >
                   {same && haveConfirmPs
                     ? 'Confirm Password*'
-                    : 'Please type same passwrod again*'}
+                    : 'Please type same password again*'}
                 </label>
                 <div className="mt-1">
                   <input
@@ -415,7 +415,7 @@ export default function SignupPage() {
                 {code == 201 ? <Navigate to="/adminuser"></Navigate> : ""}
 
                 <div className="mt-6 flex items-start justify-center text-gray-500">
-                  -----already have an account? try login in----
+                  Already have an account? Try login in.
                 </div>
 
                 <Link to="/login">

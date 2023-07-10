@@ -55,7 +55,7 @@ export default function LoginPage() {
             alt="Your Company"
           />
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            Log in by your email
+            MetaLMS Login
           </h2>
         </div>
 
@@ -186,7 +186,16 @@ export default function LoginPage() {
                           localStorage.setItem(
                             'admin',
                             response.data.admin
-                          )
+                          );
+                          localStorage.setItem(
+                            'vEmail',
+                            response.data.vEmail,     
+                          );
+                          localStorage.setItem(
+                            'lastOtp',
+                            response.data.lastOtp,     
+                          );
+                          
                           if(response.data.admin == true) {
                             localStorage.setItem(
                             'userAddress',
@@ -226,7 +235,7 @@ export default function LoginPage() {
                     }
                   }}
                 >
-                  Log in
+                  Log In
                 </button>
 
                 {code == 200 ? <Navigate to="/user"></Navigate> : ""}
@@ -234,7 +243,7 @@ export default function LoginPage() {
               </div>
 
               <div className="mt-6 flex items-start justify-center text-gray-500">
-                -----does not have an account? try register----
+                Don't have an account? Register below.
               </div>
 
               <div>
@@ -243,7 +252,21 @@ export default function LoginPage() {
                     type="submit"
                     className="mt-6 flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
                   >
-                    register
+                    Register
+                  </button>
+                </Link>
+              </div>
+              <div className="mt-6 flex items-start justify-center text-gray-500">
+                Forgot password? Recover account below.
+              </div>
+
+              <div>
+                <Link to="/recoverPass">
+                  <button
+                    type="submit"
+                    className="mt-6 flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+                  >
+                    Recover Account
                   </button>
                 </Link>
               </div>
