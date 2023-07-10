@@ -1,13 +1,14 @@
 # MetaLMS
 For developer documentation, please see the [Frontend Docs](./documentation/FRONTEND-DOCS.md) and [Backend Docs](./documentation/BACKEND-DOCS.md).
 
-## Running with Docker (recommended)
+## Running with Docker
 Make sure you have Docker installed on your machine. Then, run the following commands from the root directory of the project:
 
 ```
 docker-compose up
 ```
-NOTE: The first will always take longer as Docker downloads and builds the container images.
+
+NOTE: The first run will always take longer as Docker downloads and builds the container images.
 
 If you make changes to your application, simply turn off the containers with `Ctrl+C` and run the command again.
 
