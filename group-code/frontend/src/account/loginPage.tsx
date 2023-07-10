@@ -231,7 +231,7 @@ export default function LoginPage() {
                   onClick={() => {
                     if (username != '' && password != '') {
                       const param = { username: username, password: password };
-                      AccountService.credAuth(param)
+                      AccountService.login(param)
                         .then((response: any) => {
                           if (response.data.mfa == 'email') {
                             setMfaAcc(response.data.username)

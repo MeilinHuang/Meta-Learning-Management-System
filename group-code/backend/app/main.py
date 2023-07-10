@@ -121,9 +121,17 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @app.post("/login")
 async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
+    """
+    Meta LMS 23T2
+    Functioned updated to allow mfa
+    """
     user = helper.get_user_by_username(db, details.username)
     if (user is not None and helper.verify_password(details.password, user.password)):
-        return helper.loginUser(db,user)
+        if user.mfa == "email":
+            helper.getVerifyEmail(db, user)
+            return {"mfa": user.mfa, "username": user.username}
+        else:
+            return helper.loginUser(db, user)
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Unauthorised",
@@ -1584,19 +1592,3 @@ async def getMFA(details: schemas.onlyId, db: Session = Depends(get_db)):
 async def verifyMFA(details: schemas.userOtp, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     return helper.verifyMFA(db, user, details.inputOtp)
-        
-@app.post("/credAuth")
-async def credAuth(details: schemas.UserLogin, db: Session = Depends(get_db)):
-    user = helper.get_user_by_username(db, details.username)
-    if (user is not None and helper.verify_password(details.password, user.password)):
-        if user.mfa == "email":
-            helper.getVerifyEmail(db, user)
-            return {"mfa": user.mfa, "username": user.username}
-        else:
-            return helper.loginUser(db, user)
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Unauthorised",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
