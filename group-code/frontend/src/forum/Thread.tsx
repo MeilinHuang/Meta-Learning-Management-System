@@ -20,6 +20,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkToc from 'remark-toc';
 import rehypeHighlight from 'rehype-highlight';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import PostReply from './PostReply';
 
 import {
@@ -279,8 +281,8 @@ export default function Thread(props: any) {
       <ReactMarkdown
         className="prose xs: prose-sm sm:prose-sm md:prose-base max-w-none"
         children={props.content}
-        remarkPlugins={[remarkGfm, remarkToc]}
-        rehypePlugins={[rehypeHighlight]}
+        remarkPlugins={[remarkGfm, remarkToc, remarkMath]}
+        rehypePlugins={[rehypeHighlight, rehypeKatex]}
       />
       <hr className="px-5 my-5" />
       <PostReply

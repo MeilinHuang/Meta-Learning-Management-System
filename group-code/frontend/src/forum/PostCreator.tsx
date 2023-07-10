@@ -4,6 +4,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkToc from 'remark-toc';
 import rehypeHighlight from 'rehype-highlight';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import { useState } from 'react';
 import { useCreateThreadMutation } from 'features/api/apiSlice';
 import PostCreatorError from './PostCreatorError';
@@ -142,8 +144,8 @@ export default function PostCreator(props: PostCreatorProps) {
                         <Tab.Panel className="-m-0.5 rounded-lg p-0.5">
                           <div className="border-b prose">
                             <ReactMarkdown
-                              remarkPlugins={[remarkGfm, remarkToc]}
-                              rehypePlugins={[rehypeHighlight]}
+                              remarkPlugins={[remarkGfm, remarkToc, remarkMath]}
+                              rehypePlugins={[rehypeHighlight, rehypeKatex]}
                             >
                               {content}
                             </ReactMarkdown>

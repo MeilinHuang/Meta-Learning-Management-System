@@ -22,6 +22,8 @@ import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkToc from 'remark-toc';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 
 import { useCreatePostMutation } from '../features/api/apiSlice';
@@ -138,8 +140,8 @@ export default function PostReply(props: any) {
               <Tab.Panel className="-m-0.5 rounded-lg p-0.5">
                 <div className="border-b prose prose-sm">
                   <ReactMarkdown
-                    remarkPlugins={[remarkGfm, remarkToc]}
-                    rehypePlugins={[rehypeHighlight]}
+                    remarkPlugins={[remarkGfm, remarkToc, remarkMath]}
+                    rehypePlugins={[rehypeHighlight, rehypeKatex]}
                   >
                     {reply}
                   </ReactMarkdown>
