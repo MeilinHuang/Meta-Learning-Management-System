@@ -2,11 +2,14 @@
 For developer documentation, please see the [Frontend Docs](./documentation/FRONTEND-DOCS.md) and [Backend Docs](./documentation/BACKEND-DOCS.md).
 
 ## Running with Docker
-Make sure you have Docker installed on your machine. Then, run the following commands from the root directory of the project:
+### Frontend and Backend
+Make sure you have Docker installed on your machine. Then, run the following commands from the root directory of the project to start the `Dev` environment, where hot-reloading is enabled:
 
 ```
 docker-compose up
 ```
+
+Front-end is accessible via `localhost:3000` and backend via `localhost:8000`.
 
 NOTE: The first run will always take longer as Docker downloads and builds the container images.
 
@@ -16,6 +19,12 @@ If you make changes to the Dockerfile, you will need to rebuild the images with 
 
 ```
 docker-compose up --build
+```
+
+If you want to run the `Prod` environment (frontend uses Nginx with static file compilation), run the following command:
+
+```
+docker-compose -f docker-compose.prod.yml up
 ```
 
 ## Running Manually
@@ -44,8 +53,9 @@ Perform these steps every time you want to use the backend server.
 1. Navigate to the root folder.
 2. Activate your existing virtual environment.  
    `source backend/venv/bin/activate`
-3. Start the backend server. (make sure you're in th `group-code/` directory)
-   `uvicorn backend.app.main:app --reload`
+3. Start the backend server. (make sure you're in th `group-code/` directory):
+   - Linux: `uvicorn backend.app.main:app --reload`
+   - Windows: `python3 -m uvicorn backend.app.main:app --reload`
 
 #### Update dependencies
 
