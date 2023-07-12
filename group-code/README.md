@@ -1,32 +1,6 @@
 # MetaLMS
 For developer documentation, please see the [Frontend Docs](./documentation/FRONTEND-DOCS.md) and [Backend Docs](./documentation/BACKEND-DOCS.md).
 
-## Running with Docker
-### Frontend and Backend
-Make sure you have Docker installed on your machine. Then, run the following commands from the root directory of the project to start the `Dev` environment, where hot-reloading is enabled:
-
-```
-docker-compose up
-```
-
-Front-end is accessible via `localhost:3000` and backend via `localhost:8000`.
-
-NOTE: The first run will always take longer as Docker downloads and builds the container images.
-
-If you make changes to your application, simply turn off the containers with `Ctrl+C` and run the command again.
-
-If you make changes to the Dockerfile, you will need to rebuild the images with the following command:
-
-```
-docker-compose up --build
-```
-
-If you want to run the `Prod` environment (frontend uses Nginx with static file compilation), run the following command:
-
-```
-docker-compose -f docker-compose.prod.yml up
-```
-
 ## Running Manually
 These steps are if you want to install and run frontend and backend manually.
 
@@ -74,3 +48,29 @@ Every time you install a new python module in your virtual environment, update t
 #### Start frontend server
 
 To start the frontend server, navigate to the frontend folder and run `npm start`.
+
+## Running with Docker
+### Frontend and Backend
+Make sure you have Docker installed on your machine. Then, run the following commands from the root directory of the project to start the `Dev` environment, where hot-reloading is enabled:
+
+```
+docker-compose up
+```
+
+Front-end is accessible via `localhost:3000` and backend via `localhost:8000`.
+
+NOTE: The first run will always take longer as Docker downloads and builds the container images.
+
+If you make changes to your application, simply turn off the containers with `Ctrl+C` and run the command again.
+
+If you make changes to the Dockerfile, you will need to rebuild the images with the following command:
+
+```
+docker-compose up --build
+```
+
+If you want to run the `Prod` environment (frontend uses Nginx with static file compilation), run the following command:
+
+```
+docker-compose -f docker-compose.prod.yml up
+```
