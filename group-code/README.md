@@ -6,6 +6,10 @@ These steps are if you want to install and run frontend and backend manually.
 
 ### Backend
 
+Windows CMD: use `start-backend.bat`.
+
+Otherwise, follow the steps below:
+
 #### Setup
 
 Perform these steps the first time you clone the repository to set up a virtual environment and install dependencies.
