@@ -545,5 +545,4 @@ class recoverPass(BaseModel):
     newPassword: str
 
 class GenerativeAI_SendMessage(BaseModel):
-    conversation_id: str
     message: str
