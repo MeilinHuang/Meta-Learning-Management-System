@@ -20,10 +20,16 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 #################
 # PUBLIC  FUNCS #
 #################
-def send_message(past_messages: List[Message], message: str, model=DEFAULT_MODEL):
+def send_message(message: str, past_messages: List[Message] = [], model=DEFAULT_MODEL):
     """
     Appends the user's message to the past messages, and queries `/chat/completions`, returning the raw JSON response.
     """
+    if len(past_messages) == 0:
+        past_messages = [{"role": "system", "content": DEFAULT_SYSTEM_PROMPT}]
+
+    # TODO: Automatically remove messages to stay under token limit by using token calculations.
+    # TODO: Handle and parse ChatGPT response to keep track of tokens used.
+
     user_message: Message = { "role": "user", "content": message }
     messages = past_messages + [user_message]
     return query_chat_completion(messages, model)

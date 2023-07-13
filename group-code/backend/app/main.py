@@ -1572,15 +1572,12 @@ async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db
 @app.post("/generativeai/sendMessage")
 # async def generativeai_send_message(details: schemas.GenerativeAI_SendMessage, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
 async def generativeai_send_message(details: schemas.GenerativeAI_SendMessage):
-    print(details)
+    # TODO: Authenticate user
     # user = helper.extract_user(db, token)
 
+    # TODO: Get current conversation for user given conversation_id
     print("sussy")
-    # Get current conversation
-    dummy_messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
-    ]
 
     # Query OpenAI with conversation history
-    response = chatgpt_send_message(dummy_messages, details.message)
+    response = chatgpt_send_message(details.message)
     print(f"ChatGPT Response: {response}")
