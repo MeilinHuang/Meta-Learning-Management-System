@@ -4,7 +4,7 @@ For developer documentation, please see the [Frontend Docs](./documentation/FRON
 ## Environment Variable Setup
 1. In Project Root (`group-code/`), create a file called `.env` that contains the following:
 ```bash
-OPENAI_TOKEN=<YOUR-OPENAI-TOKEN-HERE>
+OPENAI_API_KEY=<YOUR-OPENAI-TOKEN-HERE>
 ```
 
 ## Running Manually
