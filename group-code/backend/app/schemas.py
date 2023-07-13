@@ -543,3 +543,7 @@ class recoverPass(BaseModel):
     username: str
     inputOtp: str
     newPassword: str
+
+class GenerativeAI_SendMessage(BaseModel):
+    conversation_id: str
+    message: str
