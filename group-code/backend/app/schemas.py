@@ -72,6 +72,7 @@ class UserCreate(BaseModel):
 
 
 class UserEdit(BaseModel):
+    token: str
     username: str
     full_name: str
     introduction: str

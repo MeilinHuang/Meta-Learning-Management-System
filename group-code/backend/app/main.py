@@ -134,16 +134,15 @@ async def logout(details:schemas.OnlyToken, db: Session = Depends(get_db)):
 
 @app.post("/editProfile")
 async def editProfile(details: schemas.UserEdit, db: Session = Depends(get_db)):
-    # print("edit in main")
-    # print(details)
-    user = helper.get_user_by_username(db, details.username)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorised",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return helper.edit_profile(db, user, details)
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.username:
+        return helper.edit_profile(db, user, details)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
 
 
 @app.post("/changePassword")
