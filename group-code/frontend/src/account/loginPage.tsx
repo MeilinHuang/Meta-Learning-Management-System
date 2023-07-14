@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [havePassword, setHavePassword] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [mfaErrorMessage, setMfaErrorMessage] = useState('');
   const [code, setCode] = useState(-1);
   const [mfaAcc, setMfaAcc] = useState('');
   const [loginOrMfa, setloginOrMfa] = useState(false);
@@ -329,12 +330,12 @@ export default function LoginPage() {
                       if (response.data.message == "true") {
                         saveToLocal(response)
                         setrClass('py-4 text-center text-sm font-medium text-green-500');
-                        setErrorMessage(
+                        setMfaErrorMessage(
                           'Logging in.'
                         );
                       } else {
                         setrClass('py-4 text-center text-sm font-medium text-red-500');
-                        setErrorMessage(
+                        setMfaErrorMessage(
                           'Invalid Entry.'
                         );
                       }
@@ -350,7 +351,7 @@ export default function LoginPage() {
               {code == 201 ? <Navigate to="/adminuser"></Navigate> : ""}
             </div>
             <div className={rClass}>
-              {errorMessage}
+              {mfaErrorMessage}
             </div>
           </div>
         </div>
