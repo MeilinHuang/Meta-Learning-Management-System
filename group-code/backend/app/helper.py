@@ -2249,15 +2249,15 @@ def getVerifyEmail(db: Session, user: models.User):
     db.commit()
     db.refresh(user)
     message = f"Hi {user.full_name},\nYour code is {otpnumber}. Please enter this code in the prompt on Meta LMS."
-    """
+
     # Unquote to send real emails, quoted as email quota reached on outlook account
     server = smtplib.SMTP("smtp-mail.outlook.com", 587)
     server.starttls()
     server.login('metalmsserviceteam@outlook.com', "Abc111111")
     server.sendmail('metalmsserviceteam@outlook.com', user.email, f"Subject: Meta LMS verification code\n\n{message}")
     server.quit()
-    """
-    print(f"Email Sent to {user.email}\n{message}")
+    
+    #print(f"Email Sent to {user.email}\n{message}")
     return {"message": "success"}
 
 def putOtp(db: Session, user: models.User, inputOtp: str):
