@@ -208,6 +208,27 @@ class AccountService {
     })
   }
 
+  setMFA(param) {
+    console.log(param)
+    return axios.post(`${API_URL}/setMFA`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: param.access_token
+      }
+    })
+  }
+
+  verifyMFA(param) {
+    console.log(param)
+    return axios.post(`${API_URL}/verifyMFA`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: param.access_token
+      }
+    })
+  }
 }
 
 export default new AccountService();

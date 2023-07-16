@@ -12,6 +12,8 @@ from .auth import JWTBearer
 from pathlib import Path
 from io import BytesIO
 import os
+import re
+EMAILREG = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -87,6 +89,12 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
             detail="Email already exists",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    elif not re.fullmatch(EMAILREG, details.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email not valid",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     token = helper.create_user(
         db, details.username, details.password, details.email, details.full_name)
     user = helper.get_user_by_username(db, details.username)
@@ -110,32 +118,6 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
 
 # }
 
-
-@app.post("/login")
-async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
-    user = helper.get_user_by_username(db, details.username)
-    if (user is not None and helper.verify_password(details.password, user.password)):
-        token = helper.give_token(db, user)
-        username = user.username
-        email = user.email
-        userid = user.id
-        fullname = user.full_name
-        introduction = user.introduction
-        admin = user.superuser
-        vEmailv = user.vEmail
-        lastOtp = user.lastOtp
-        res = {"access_token": token, "token_type": "Bearer",
-               "user_name": username, "email": email, "user_id": userid,
-               "full_name": fullname, "introduction": introduction,
-               "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp}
-        return res
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Unauthorised",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
-
 @app.post("/logout")
 async def logout(details:schemas.OnlyToken, db: Session = Depends(get_db)):
     print("loging out")
@@ -152,16 +134,15 @@ async def logout(details:schemas.OnlyToken, db: Session = Depends(get_db)):
 
 @app.post("/editProfile")
 async def editProfile(details: schemas.UserEdit, db: Session = Depends(get_db)):
-    # print("edit in main")
-    # print(details)
-    user = helper.get_user_by_username(db, details.username)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorised",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return helper.edit_profile(db, user, details)
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.username:
+        return helper.edit_profile(db, user, details)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
 
 
 @app.post("/changePassword")
@@ -1551,6 +1532,24 @@ async def test_forum(db: Session = Depends(get_db)):
 
 # Meta LMS 23T2
 
+@app.post("/login")
+async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
+    """
+    Function updated to allow mfa
+    """
+    user = helper.get_user_by_username(db, details.username)
+    if (user is not None and helper.verify_password(details.password, user.password)):
+        if user.mfa == "email":
+            helper.getVerifyEmail(db, user)
+            return {"mfa": user.mfa, "username": user.username}
+        else:
+            return helper.loginUser(db, user)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
 @app.post("/vEmail")
 async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.id)
@@ -1558,10 +1557,32 @@ async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
 
 @app.post("/putOtp")
 async def putOtp(details: schemas.userOtp, db: Session = Depends(get_db)):
-    user = helper.get_user_by_username(db, details.username)
-    return helper.putOtp(db, user, details.inputOtp)
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.username:
+        return helper.putOtp(db, user, details.inputOtp)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 @app.post("/recoverPass")
 async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     return helper.recoveryAcc(db, user, details.inputOtp, details.newPassword)
+
+@app.post("/setMFA")
+async def setMFA(details: schemas.setMFA, db: Session = Depends(get_db)):
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.id:
+        return helper.setMFA(db, user, details.mfa)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+@app.post("/verifyMFA")
+async def verifyMFA(details: schemas.userOtp, db: Session = Depends(get_db)):
+    user = helper.get_user_by_username(db, details.username)
+    return helper.verifyMFA(db, user, details.inputOtp)
