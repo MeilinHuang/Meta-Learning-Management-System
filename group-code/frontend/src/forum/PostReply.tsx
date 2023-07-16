@@ -46,6 +46,7 @@ export default function PostReply(props: any) {
         parent_id: props.parentId,
         content: reply
       });
+      setReply('');
       setCancel(true);
     } catch (err) {
       console.error('Failed to create post: ' + err);
@@ -132,7 +133,7 @@ export default function PostReply(props: any) {
                     id="comment"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     placeholder="Add your comment..."
-                    defaultValue={reply}
+                    value={reply}
                     onChange={(e) => setReply(e.target.value)}
                   />
                 </div>
@@ -157,6 +158,7 @@ export default function PostReply(props: any) {
           type="button"
           onClick={() => {
             setCancel(true);
+            setReply('');
           }}
         >
           Cancel

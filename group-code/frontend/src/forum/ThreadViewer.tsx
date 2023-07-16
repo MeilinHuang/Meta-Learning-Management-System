@@ -4,7 +4,7 @@ import Thread from './Thread';
 
 import jwt_decode from 'jwt-decode';
 
-import { Thread as ThreadType, Post as PostType } from './forum.types';
+import { Thread as ThreadType, Post as PostType, ResultParams } from './forum.types';
 
 import {
   useGetPostsQuery,
@@ -15,6 +15,8 @@ type ThreadViewerProps = {
   thread: ThreadType;
   createNewThreadCallback: () => void;
   topicId: number;
+  reloadProps: object;
+  selectedThreadCallback: (thread: ThreadType) => void;
 };
 
 export default function ThreadViewer(props: ThreadViewerProps) {
@@ -97,6 +99,9 @@ export default function ThreadViewer(props: ThreadViewerProps) {
         permissions={permissions}
         reported={props.thread.reported}
         viewerId={userId}
+        reloadProps={props.reloadProps}
+        selectedThreadCallback={props.selectedThreadCallback}
+        thread={props.thread}
       />
       {postsToRender}
     </div>

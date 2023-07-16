@@ -32,4 +32,11 @@ type Thread = {
   reported: boolean;
 };
 
-export type {Post, Thread}
+type ResultParams = {
+  offset: number;
+  limit: number;
+  sectionId: number | undefined;
+  reRender?: number;
+};
+
+export type { Post, Thread, ResultParams };

@@ -23,6 +23,7 @@ import rehypeHighlight from 'rehype-highlight';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import PostReply from './PostReply';
+import { LIMIT, BATCH_SIZE } from './constants';
 
 import {
   useUpvoteThreadMutation,
@@ -289,7 +290,24 @@ export default function Thread(props: any) {
         parentId={null}
         threadId={props.id}
         cancelCallback={() => {
-          console.log('Blank Function');
+          props.reloadProps.setLastResultParams({
+            offset: props.reloadProps.currentBatch * BATCH_SIZE - 20,
+            limit: LIMIT,
+            sectionId: props.reloadProps.selectedSection,
+            reRender: Math.random()
+          });
+          props.reloadProps.setCurrentResultParams({
+            offset: props.reloadProps.currentBatch * BATCH_SIZE,
+            limit: LIMIT,
+            sectionId: props.reloadProps.selectedSection,
+            reRender: Math.random()
+          });
+          props.reloadProps.setNextResultParams({
+            offset: props.reloadProps.currentBatch * BATCH_SIZE + 20,
+            limit: LIMIT,
+            sectionId: props.reloadProps.selectedSection,
+            reRender: Math.random()
+          });
         }}
       />
     </div>
