@@ -2240,7 +2240,7 @@ def create_test_data_converstion(engine: Engine, db: Session):
 # MetaLMS 23T2
 
 # sends otp to user email
-def getVerifyEmail(db: Session, user: models.User):
+def getVerifyEmail(db: Session, user: models.User, sendEmail: bool):
     if user == None or usernameNotexists(db, user.username):
         return {"message": "Username doesn't exist"}
     otp = pyotp.TOTP('base32secret3232')
@@ -2250,13 +2250,14 @@ def getVerifyEmail(db: Session, user: models.User):
     db.refresh(user)
     message = f"Hi {user.full_name},\nYour code is {otpnumber}. Please enter this code in the prompt on Meta LMS."
 
-    # Unquote to send real emails, quoted as email quota reached on outlook account
+    if not sendEmail:
+        print(f"Email Sent to {user.email}\n{message}")
+        return {"message": "success", "text": f"Subject: Meta LMS verification code\n\n{message}", "recipient": f"{user.email}", "otp":f"{otpnumber}"}
     server = smtplib.SMTP("smtp-mail.outlook.com", 587)
     server.starttls()
     server.login('metalmsserviceteam@outlook.com', "Abc111111")
     server.sendmail('metalmsserviceteam@outlook.com', user.email, f"Subject: Meta LMS verification code\n\n{message}")
     server.quit()
-    
     #print(f"Email Sent to {user.email}\n{message}")
     return {"message": "success"}
 

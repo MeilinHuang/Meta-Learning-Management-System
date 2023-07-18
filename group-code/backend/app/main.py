@@ -1540,7 +1540,7 @@ async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     if (user is not None and helper.verify_password(details.password, user.password)):
         if user.mfa == "email":
-            helper.getVerifyEmail(db, user)
+            helper.getVerifyEmail(db, user, True)
             return {"mfa": user.mfa, "username": user.username}
         else:
             return helper.loginUser(db, user)
@@ -1553,7 +1553,7 @@ async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
 @app.post("/vEmail")
 async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.id)
-    return helper.getVerifyEmail(db, user)
+    return helper.getVerifyEmail(db, user, True)
 
 @app.post("/putOtp")
 async def putOtp(details: schemas.userOtp, db: Session = Depends(get_db)):
