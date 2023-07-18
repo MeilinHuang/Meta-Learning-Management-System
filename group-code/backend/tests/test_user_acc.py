@@ -6,6 +6,10 @@ from sqlalchemy.orm import Session
 import os
 import re
 import os
+"""
+Run tests with "python3 -m tests.test_user_acc" from the backend dir 
+or "pytest".
+"""
 def getNewdb():
     """
     Caution, this deletes exisiting test_local_db.db.
@@ -24,12 +28,11 @@ class TestUserAcc(unittest.TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.db = next(getNewdb())
+        helper.create_user(self.db, "kai1", "kai12345", "kai@gmail.com", "kai")
 
     def test_vEmail_valid(self):
-        db = self.db
-        helper.create_user(db, "kai1", "kai12345", "kai@gmail.com", "kai")
-        user1 = helper.get_user_by_username(db,"kai1")
-        rtnMsg = helper.getVerifyEmail(db, user1, False)
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        rtnMsg = helper.getVerifyEmail(self.db, user1, False)
         self.assertEqual(rtnMsg["recipient"], "kai@gmail.com")
         expRtn = f"""Subject: Meta LMS verification code
 
@@ -41,7 +44,22 @@ Your code is {rtnMsg["otp"]}. Please enter this code in the prompt on Meta LMS."
 
     def test_vEmail_None(self):
         self.assertEqual(helper.getVerifyEmail(self.db, None, False)["message"], "Username doesn't exist")
-  
-        
+    
+    def test_putOtp_invalid(self):
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertEqual(helper.putOtp(self.db, user1, "123213")["message"],"false")
+    
+    def test_putOtp_None(self):
+       self.assertEqual(helper.putOtp(self.db, None, "123213")["message"], "Username doesn't exist")
+    
+    def test_putOtp_valid(self):
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        helper.getVerifyEmail(self.db, user1, False)
+        rtnMsg = helper.putOtp(self.db, user1, user1.lastOtp)
+        self.assertEqual(rtnMsg["message"],"true")
+        self.assertEqual(rtnMsg["vEmail"],"kai@gmail.com")
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertEqual(user1.lastOtp, None)
+
 if __name__ == '__main__':
     unittest.main()

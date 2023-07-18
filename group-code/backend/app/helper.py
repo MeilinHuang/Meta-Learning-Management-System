@@ -2251,7 +2251,7 @@ def getVerifyEmail(db: Session, user: models.User, sendEmail: bool):
     message = f"Hi {user.full_name},\nYour code is {otpnumber}. Please enter this code in the prompt on Meta LMS."
 
     if not sendEmail:
-        print(f"Email Sent to {user.email}\n{message}")
+        #print(f"Email Sent to {user.email}\n{message}")
         return {"message": "success", "text": f"Subject: Meta LMS verification code\n\n{message}", "recipient": f"{user.email}", "otp":f"{otpnumber}"}
     server = smtplib.SMTP("smtp-mail.outlook.com", 587)
     server.starttls()
@@ -2262,8 +2262,9 @@ def getVerifyEmail(db: Session, user: models.User, sendEmail: bool):
     return {"message": "success"}
 
 def putOtp(db: Session, user: models.User, inputOtp: str):
+    print(inputOtp)
     if user == None or usernameNotexists(db, user.username):
-        return {"message", "Username doesn't exist"}
+        return {"message": "Username doesn't exist"}
     if useOtp(db, user, inputOtp):
         setattr(user, "vEmail", user.email)
         db.commit()
