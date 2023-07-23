@@ -61,5 +61,40 @@ Your code is {rtnMsg["otp"]}. Please enter this code in the prompt on Meta LMS."
         user1 = helper.get_user_by_username(self.db,"kai1")
         self.assertEqual(user1.lastOtp, None)
 
+    def test_recovery_Acc_invalid(self):
+        rtnMsg = helper.recoveryAcc(self.db, None, "123456", "kai12345")
+        self.assertEqual(rtnMsg["message"], "Username doesn't exist")
+
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        rtnMsg = helper.recoveryAcc(self.db, user1, "123456", "kai12345")
+        self.assertEqual(rtnMsg["message"], "false")
+
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        rtnMsg = helper.getVerifyEmail(self.db, user1, False)
+        self.assertEqual(rtnMsg["recipient"], "kai@gmail.com")
+        
+        rtnMsg = helper.recoveryAcc(self.db, user1, "123456", "kai12345")
+        self.assertEqual(rtnMsg["message"], "false")
+
+        rtnMsg = helper.recoveryAcc(self.db, user1, "", "kai12345")
+        self.assertEqual(rtnMsg["message"], "false")
+
+        rtnMsg = helper.recoveryAcc(self.db, user1, "", "")
+        self.assertEqual(rtnMsg["message"], "false")
+
+        rtnMsg = helper.recoveryAcc(self.db, None, user1.lastOtp, "12345")
+        self.assertEqual(rtnMsg["message"], "Username doesn't exist")
+
+    def test_recovery_Acc_valid(self):
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        rtnMsg = helper.getVerifyEmail(self.db, user1, False)
+        self.assertEqual(rtnMsg["recipient"], "kai@gmail.com")
+        self.assertTrue(helper.verify_password("kai12345", user1.password))
+        rtnMsg = helper.recoveryAcc(self.db, user1, user1.lastOtp, "kai123456")
+        self.assertEqual(rtnMsg["message"], "true")
+
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertTrue(helper.verify_password("kai123456", user1.password))
+
 if __name__ == '__main__':
     unittest.main()

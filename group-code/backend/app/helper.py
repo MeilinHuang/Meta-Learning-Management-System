@@ -106,15 +106,13 @@ def create_user(db: Session, username: str, password: str, email: str, name: str
 
 
 def usernameNotexists(db: Session, username: str):
-    user_name_exists = db.query(exists().where(
-        models.User.username == username))
+    user_name_exists = select(models.User).where(models.User.username == username)
     if db.execute(user_name_exists).scalar():
         return False
     return True
 
 def emailNotexists(db: Session, email: str):
-    email_name_exists = db.query(exists().where(
-        models.User.email == email))
+    email_name_exists = select(models.User).where(models.User.email == email)
     if db.execute(email_name_exists).scalar():
         return False
     return True
@@ -263,7 +261,7 @@ def edit_password(db: Session, user: models.User, newpassword):
     setattr(user, "password", hash_password(newpassword))
     db.commit()
     db.refresh(user)
-    return {"message", "successed"}
+    return {"message": "successed"}
 
 
 def get_user_by_username(db: Session, username: str):
@@ -2251,7 +2249,7 @@ def getVerifyEmail(db: Session, user: models.User, sendEmail: bool):
     message = f"Hi {user.full_name},\nYour code is {otpnumber}. Please enter this code in the prompt on Meta LMS."
 
     if not sendEmail:
-        #print(f"Email Sent to {user.email}\n{message}")
+        print(f"Email Sent to {user.email}\n{message}")
         return {"message": "success", "text": f"Subject: Meta LMS verification code\n\n{message}", "recipient": f"{user.email}", "otp":f"{otpnumber}"}
     server = smtplib.SMTP("smtp-mail.outlook.com", 587)
     server.starttls()
@@ -2262,7 +2260,6 @@ def getVerifyEmail(db: Session, user: models.User, sendEmail: bool):
     return {"message": "success"}
 
 def putOtp(db: Session, user: models.User, inputOtp: str):
-    print(inputOtp)
     if user == None or usernameNotexists(db, user.username):
         return {"message": "Username doesn't exist"}
     if useOtp(db, user, inputOtp):
@@ -2274,7 +2271,7 @@ def putOtp(db: Session, user: models.User, inputOtp: str):
 
 def recoveryAcc(db: Session, user: models.User, inputOtp: str, newPass: str):
     if user == None:
-        return {"message", "Username doesn't exist"}
+        return {"message": "Username doesn't exist"}
     if useOtp(db, user, inputOtp):
         edit_password(db, user, newPass)
         return {"message": "true"}
@@ -2290,7 +2287,7 @@ def setMFA(db: Session, user: models.User, mfa: str):
 
 def verifyMFA(db: Session, user: models.User, inputOtp: str):
     if user == None or usernameNotexists(db, user.username):
-        return {"message", "Username doesn't exist"}
+        return {"message": "Username doesn't exist"}
     if useOtp(db, user, inputOtp):
         return loginUser(db, user)
     return {"message": "false"}

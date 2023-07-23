@@ -1,6 +1,5 @@
-import { Verify } from 'crypto';
-import React, { ChangeEvent, MouseEventHandler, FC, useState } from 'react';
-import { isPropertySignature } from 'typescript';
+import React, { ChangeEvent, useState } from 'react';
+import AccountService from './AccountService';
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,8 +7,6 @@ import {
   Link,
   Navigate
 } from 'react-router-dom';
-import AccountService from './AccountService';
-import { PaperClipIcon } from '@heroicons/react/20/solid';
 
 export default function VEmail() {
   const [errorMessage, setErrorMessage] = useState('Email Not Sent.');
@@ -104,6 +101,7 @@ export default function VEmail() {
                 >
                   Confirm Code
                 </button>
+                {errorMessage == 'Email Verified.' ? <Navigate to="/profile#"></Navigate> : ""}
               </div>
               <div className={rClass}>
                 {errorMessage}
