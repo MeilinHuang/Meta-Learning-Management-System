@@ -47,10 +47,10 @@ Your code is {rtnMsg["otp"]}. Please enter this code in the prompt on Meta LMS."
     
     def test_putOtp_invalid(self):
         user1 = helper.get_user_by_username(self.db,"kai1")
-        self.assertEqual(helper.putOtp(self.db, user1, "123213")["message"],"false")
+        self.assertEqual(helper.putOtp(self.db, user1, "12321")["message"],"false")
     
     def test_putOtp_None(self):
-       self.assertEqual(helper.putOtp(self.db, None, "123213")["message"], "Username doesn't exist")
+       self.assertEqual(helper.putOtp(self.db, None, "12321")["message"], "Username doesn't exist")
     
     def test_putOtp_valid(self):
         user1 = helper.get_user_by_username(self.db,"kai1")
@@ -62,18 +62,18 @@ Your code is {rtnMsg["otp"]}. Please enter this code in the prompt on Meta LMS."
         self.assertEqual(user1.lastOtp, None)
 
     def test_recovery_Acc_invalid(self):
-        rtnMsg = helper.recoveryAcc(self.db, None, "123456", "kai12345")
+        rtnMsg = helper.recoveryAcc(self.db, None, "12345", "kai12345")
         self.assertEqual(rtnMsg["message"], "Username doesn't exist")
 
         user1 = helper.get_user_by_username(self.db,"kai1")
-        rtnMsg = helper.recoveryAcc(self.db, user1, "123456", "kai12345")
+        rtnMsg = helper.recoveryAcc(self.db, user1, "12345", "kai12345")
         self.assertEqual(rtnMsg["message"], "false")
 
         user1 = helper.get_user_by_username(self.db,"kai1")
         rtnMsg = helper.getVerifyEmail(self.db, user1, False)
         self.assertEqual(rtnMsg["recipient"], "kai@gmail.com")
         
-        rtnMsg = helper.recoveryAcc(self.db, user1, "123456", "kai12345")
+        rtnMsg = helper.recoveryAcc(self.db, user1, "12345", "kai12345")
         self.assertEqual(rtnMsg["message"], "false")
 
         rtnMsg = helper.recoveryAcc(self.db, user1, "", "kai12345")
@@ -94,7 +94,79 @@ Your code is {rtnMsg["otp"]}. Please enter this code in the prompt on Meta LMS."
         self.assertEqual(rtnMsg["message"], "true")
 
         user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertEqual(user1.lastOtp, None)
         self.assertTrue(helper.verify_password("kai123456", user1.password))
+
+    def test_setMFA_invalid(self):
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertEqual(user1.mfa, None)
+        rtnMsg = helper.setMFA(self.db, None, "")
+        self.assertEqual(rtnMsg["message"], "false")
+        rtnMsg = helper.setMFA(self.db, user1, "123")
+        self.assertEqual(rtnMsg["message"], "false")
+
+    def test_setMFA_valid(self):
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertEqual(user1.mfa, None)
+        rtnMsg = helper.setMFA(self.db, user1, "mfa")
+        self.assertEqual(rtnMsg["message"], "true")
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertEqual(user1.mfa, "mfa")
+
+        rtnMsg = helper.setMFA(self.db, user1, "")
+        self.assertEqual(rtnMsg["message"], "true")
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertEqual(user1.mfa, "")
+
+    def test_verifyMFA_invalid(self):
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertEqual(user1.lastOtp, None)
+        rtnMsg = helper.verifyMFA(self.db, None, None)
+        self.assertEqual(rtnMsg["message"], "Username doesn't exist")
+
+        rtnMsg = helper.verifyMFA(self.db, user1, None)
+        self.assertEqual(rtnMsg["message"], "false")
+
+        rtnMsg = helper.verifyMFA(self.db, user1, "123456")
+        self.assertEqual(rtnMsg["message"], "false")
+
+    def test_verifyMFA_valid(self):
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        rtnMsg = helper.getVerifyEmail(self.db, user1, False)
+        self.assertEqual(rtnMsg["recipient"], "kai@gmail.com")
+
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        rtnMsg = helper.verifyMFA(self.db, user1, user1.lastOtp)
+        self.assertEqual(rtnMsg["message"], "true")
+        self.assertEqual(rtnMsg["user_name"], "kai1")
+
+    def test_useOtp_invalid(self):
+        self.assertEqual(helper.useOtp(self.db, None, None), False)
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertEqual(user1.lastOtp, None)
+        self.assertEqual(helper.useOtp(self.db, user1, None), False)
+        self.assertEqual(helper.useOtp(self.db, user1, ""), False)
+        self.assertEqual(helper.useOtp(self.db, user1, "12345"), False)
+
+        helper.getVerifyEmail(self.db, user1, False)
+
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertNotEqual(user1.lastOtp, None)
+        self.assertEqual(helper.useOtp(self.db, user1, None), False)
+        self.assertEqual(helper.useOtp(self.db, user1, ""), False)
+        self.assertEqual(helper.useOtp(self.db, user1, "12345"), False)
+
+    def test_useOtp_valid(self):
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        helper.getVerifyEmail(self.db, user1, False)
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertNotEqual(user1.lastOtp, None)
+        self.assertEqual(helper.useOtp(self.db, user1, user1.lastOtp), True)
+        user1 = helper.get_user_by_username(self.db,"kai1")
+        self.assertEqual(user1.lastOtp, None)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

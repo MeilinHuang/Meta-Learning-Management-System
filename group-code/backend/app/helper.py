@@ -2278,7 +2278,7 @@ def recoveryAcc(db: Session, user: models.User, inputOtp: str, newPass: str):
     return {"message": "false"}
 
 def setMFA(db: Session, user: models.User, mfa: str):
-    if user != None:
+    if user != None and (mfa == "mfa" or mfa == ""):
         setattr(user, "mfa", mfa)
         db.commit()
         db.refresh(user)
@@ -2310,7 +2310,7 @@ def loginUser(db: Session, user: models.User):
     return res
 
 def useOtp(db: Session, user: models.User, inputOtp: str):
-    if user.lastOtp != None and user.lastOtp == inputOtp:
+    if user != None and user.lastOtp != None and user.lastOtp == inputOtp:
         setattr(user, "lastOtp", None)
         db.commit()
         db.refresh(user)
