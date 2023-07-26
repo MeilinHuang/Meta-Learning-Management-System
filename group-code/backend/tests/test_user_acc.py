@@ -108,10 +108,10 @@ Your code is {rtnMsg["otp"]}. Please enter this code in the prompt on Meta LMS."
     def test_setMFA_valid(self):
         user1 = helper.get_user_by_username(self.db,"kai1")
         self.assertEqual(user1.mfa, None)
-        rtnMsg = helper.setMFA(self.db, user1, "mfa")
+        rtnMsg = helper.setMFA(self.db, user1, "email")
         self.assertEqual(rtnMsg["message"], "true")
         user1 = helper.get_user_by_username(self.db,"kai1")
-        self.assertEqual(user1.mfa, "mfa")
+        self.assertEqual(user1.mfa, "email")
 
         rtnMsg = helper.setMFA(self.db, user1, "")
         self.assertEqual(rtnMsg["message"], "true")

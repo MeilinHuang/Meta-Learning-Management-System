@@ -2278,7 +2278,7 @@ def recoveryAcc(db: Session, user: models.User, inputOtp: str, newPass: str):
     return {"message": "false"}
 
 def setMFA(db: Session, user: models.User, mfa: str):
-    if user != None and (mfa == "mfa" or mfa == ""):
+    if user != None and (mfa == "email" or mfa == ""):
         setattr(user, "mfa", mfa)
         db.commit()
         db.refresh(user)
