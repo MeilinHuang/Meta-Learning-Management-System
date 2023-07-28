@@ -80,6 +80,7 @@ export default function AssessmentEditTestDetail() {
   const [editQuestionId, setEditQuestionId] = useState('');
   const [deleteQuestionId, setDeleteQuestionId] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'add' | 'edit'>('add');
 
   const handleChangeAddType = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAddType(event.target.value);
@@ -199,6 +200,8 @@ export default function AssessmentEditTestDetail() {
         isOpen={isModalOpen}
         setIsOpen={setIsModalOpen}
         id={param.assessmentId}
+        modalType={modalType}
+        probShow={probShow}
       />
       <div>
         {/* Static sidebar for desktop */}
@@ -340,8 +343,8 @@ export default function AssessmentEditTestDetail() {
                             type="button"
                             className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                             onClick={() => {
-                              setEdit(!edit);
-                              setEditQuestionId(probShow.questionID);
+                              setModalType('edit');  
+                              setIsModalOpen(true);
                             }}
                           >
                             {edit ? 'Edit' : 'Close'}
@@ -366,6 +369,7 @@ export default function AssessmentEditTestDetail() {
                         type="button"
                         className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         onClick={() => {
+                          setModalType('add');  
                           setIsModalOpen(true);
                         }}
                       >

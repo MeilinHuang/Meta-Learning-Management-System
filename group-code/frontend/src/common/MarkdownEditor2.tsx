@@ -93,7 +93,7 @@ const MarkdownEditor2: React.FC<any> = ({MDContent, setMDContent}) => {
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 placeholder="Add your comment..."
                 value={MDContent}
-                onChange={(e) => setMDContent(e.target.value)}
+                onChange={(e) => {setMDContent(e.target.value)}}
               />
             </div>
           </Tab.Panel>

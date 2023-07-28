@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Modal, Form, Input, Select, Space, message } from 'antd';
 import MarkdownEditor2 from 'common/MarkdownEditor2';
@@ -8,18 +8,32 @@ type AssessmentEditTestModalType = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   id: string | undefined;
+  modalType: 'add' | 'edit';
+  probShow: {
+    type: string;
+    problemDescription: string;
+    questionID: string;
+  };
 };
 
 const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [questionType, setQuestionType] = useState('singleChoice');
+  const [selectedType, setSelectedType] = useState(
+    props.modalType === 'edit' ? props.probShow.type : 'singleChoice'
+  );
 
   const [form] = Form.useForm();
-
+  console.log(props.modalType === 'edit', props.probShow.problemDescription);
   const [description, setDescription] = useState('');
   const [descFullScreen, setDescFullScreen] = useState(false);
 
   const [messageApi, contextHolder] = message.useMessage();
+
+  useEffect(() => {
+    if (props.modalType === 'edit') {
+      setDescription(props.probShow.problemDescription);
+    }
+  }, [props.isOpen])
 
   const errorChecking = (formValues: any) => {
     if (description === '') {
@@ -29,7 +43,7 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
       });
       return false;
     }
-    if (questionType !== 'Essay' && formValues.choices?.length < 2) {
+    if (selectedType !== 'Essay' && formValues.choices?.length < 2) {
       messageApi.open({
         type: 'error',
         content: 'Number of choices must be greater than 1.'
@@ -37,7 +51,7 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
       return false;
     }
     if (
-      questionType !== 'Essay' &&
+      selectedType !== 'Essay' &&
       new Set(formValues.choices).size !== formValues.choices?.length
     ) {
       messageApi.open({
@@ -47,7 +61,7 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
       return false;
     }
     if (
-      questionType === 'singleChoice' &&
+      selectedType === 'singleChoice' &&
       !formValues.choices?.includes(formValues.answer)
     ) {
       messageApi.open({
@@ -57,7 +71,7 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
       return false;
     }
     if (
-      questionType === 'multipleChoice' &&
+      selectedType === 'multipleChoice' &&
       !formValues.answer.every((ans: string) =>
         formValues.choices.includes(ans)
       )
@@ -81,12 +95,11 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
       choices: formValues.choices as Array<string> | ['']
     });
     const answerParam = JSON.stringify({
-      answer: (questionType === 'singleChoice'
+      answer: (selectedType === 'singleChoice'
         ? [formValues?.answer]
         : formValues?.answer) as Array<string> | ['']
     });
     const params = {
-      assessment_id: props.id,
       type: formValues.type,
       question_description: description,
       choices: choiceParam,
@@ -94,7 +107,21 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
     };
     console.log(params);
     try {
-      const res = await AssessmentService.addNewQuestionInAssessment(params);
+      let res;
+      if (props.modalType === 'edit') {
+        const paramsWithQuestionId = {
+          ...params,
+          question_id: parseInt(props.probShow.questionID)
+        };
+        res = await AssessmentService.updateQuestionInAssessment(
+          paramsWithQuestionId
+        );
+      } else {
+        const paramsWithAssessmentId = { ...params, assessment_id: props.id };
+        res = await AssessmentService.addNewQuestionInAssessment(
+          paramsWithAssessmentId
+        );
+      }
       console.log(res.data);
       props.setIsOpen(false);
       alert('success');
@@ -118,7 +145,7 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
     { label: 'Essay', value: 'Essay' }
   ];
 
-  console.log(questionType);
+  console.log(props.modalType);
 
   return (
     <>
@@ -143,11 +170,11 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
             name="type"
             label="Type"
             rules={[{ required: true, message: 'Please choose type' }]}
-            initialValue="singleChoice"
+            initialValue={selectedType}
           >
             <Select
               options={assessmentTypes}
-              onChange={(value) => setQuestionType(value)}
+              onChange={(value) => setSelectedType(value)}
             />
           </Form.Item>
           <Form.Item name="description" label="Description">
@@ -156,7 +183,7 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
               setMDContent={setDescription}
             />
           </Form.Item>
-          {questionType !== 'Essay' && (
+          {selectedType !== 'Essay' && (
             <Form.List name="choices">
               {(fields, { add, remove }) => (
                 <>
@@ -190,7 +217,7 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
               )}
             </Form.List>
           )}
-          {questionType === 'multipleChoice' && (
+          {selectedType === 'multipleChoice' && (
             <Form.List name="answer">
               {(fields, { add, remove }) => (
                 <>
@@ -224,7 +251,7 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
               )}
             </Form.List>
           )}
-          {questionType === 'singleChoice' && (
+          {selectedType === 'singleChoice' && (
             <Form.Item
               label="Answer"
               name="answer"
