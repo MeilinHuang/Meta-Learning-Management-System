@@ -11,7 +11,6 @@ import {
 export default function UpdatePicture() {
   const [username, setusername] = useState(localStorage.getItem('user_name'));
   const [errorMessage, setErrorMessage] = useState('');
-  const [rClass, setrClass] = useState("py-4 text-center text-sm font-medium text-black");
   const [dataUrl, setDataUrl] = useState('')
   
   const uploadPicture = () => {
@@ -28,12 +27,10 @@ export default function UpdatePicture() {
             'Picture updated.'
           );
           localStorage.setItem('profilePic', dataUrl);
-          setrClass('py-4 text-center text-sm font-medium text-green-500');
         })
         .catch((error) => {
           setErrorMessage('Image failed to upload')
 
-          setrClass('py-4 text-center text-sm font-medium text-red-500');
           console.log(error);
         });
     }
@@ -41,12 +38,20 @@ export default function UpdatePicture() {
   
   function handleFileSelect(e: any) {
     const file = e.target.files.item(0);
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.addEventListener("load", () => {
-      const dataUrl = reader.result as string;
-      setDataUrl(dataUrl);
-    });
+    console.log(file.type);
+    if (file.size <= 300000 && 
+      (file.type == "image/webp" || file.type == "image/png" || file.type == "image/jpeg")) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.addEventListener("load", () => {
+        const dataUrl = reader.result as string;
+        setDataUrl(dataUrl);
+      });
+    } else if (file.size <= 300000) {
+      setErrorMessage('Type not supported, try one of the above image types.')
+    } else {
+      setErrorMessage('Image greater than 300KB.')
+    }
   }
 
   return (
@@ -65,7 +70,7 @@ export default function UpdatePicture() {
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <p className="text-sm text-black-500 text-align:left mb-4">
-              Please select your new profile picture below. Supported image types are JPEG, PNG, and WEBP.
+              Please select your new profile picture below. Supported image types are JPEG, PNG, and WEBP. Max image size is 300KB.
             </p>
             <div className="flex text-sm text-gray-600">
               <label
@@ -85,18 +90,29 @@ export default function UpdatePicture() {
               
               </label>
             </div>
-            <button
-              type="submit"
+            <div
               className={
                 (dataUrl == '')
                 ? 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
-                : "mt-6 flex w-full justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+                : ''
               }
-                onClick={uploadPicture}
             >
-              Update Profile Picture
-            </button>
-            <div className={rClass}>
+              <img
+                className="h-30 w-30 rounded-full content-center mt-6 justify-center flexbox mx-auto flex"
+                
+                src={dataUrl}
+                alt=""
+              />
+              <button
+                type="submit"
+                className="mt-6 flex w-full justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+                
+                  onClick={uploadPicture}
+              >
+                Update Profile Picture
+              </button>
+            </div>
+            <div className="py-4 text-center text-sm font-medium text-red-500">
               {errorMessage}
               {errorMessage == 'Picture updated.' ? <Navigate to="/profile#"></Navigate> : ""}
             </div>
