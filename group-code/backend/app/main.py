@@ -1586,3 +1586,15 @@ async def setMFA(details: schemas.setMFA, db: Session = Depends(get_db)):
 async def verifyMFA(details: schemas.userOtp, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     return helper.verifyMFA(db, user, details.inputOtp)
+
+@app.post("/putPicture")
+async def putPicture(details: schemas.userImage, db: Session = Depends(get_db)):
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.id:
+        return helper.putPicture(user, details.image)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+

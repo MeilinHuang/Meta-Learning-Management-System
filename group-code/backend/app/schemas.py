@@ -555,3 +555,8 @@ class setMFA(BaseModel):
 class idToken(BaseModel):
     id: str
     token: str
+
+class userImage(BaseModel):
+    id: str
+    token: str
+    image: Any

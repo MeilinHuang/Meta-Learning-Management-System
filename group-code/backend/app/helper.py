@@ -1,6 +1,6 @@
 import random
 import string
-
+from fastapi import Form, File, UploadFile
 from re import L
 from typing import List, Optional, TypedDict
 import os
@@ -2306,7 +2306,7 @@ def loginUser(db: Session, user: models.User):
     res = {"access_token": token, "token_type": "Bearer",
             "user_name": username, "email": email, "user_id": userid,
             "full_name": fullname, "introduction": introduction,
-            "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp, "mfa": mfa, "message": "true"}
+            "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp, "mfa": mfa, "message": "true", "profilePic": getPicture(user)}
     return res
 
 def useOtp(db: Session, user: models.User, inputOtp: str):
@@ -2316,3 +2316,22 @@ def useOtp(db: Session, user: models.User, inputOtp: str):
         db.refresh(user)
         return True
     return False
+
+def putPicture(user: models.User, image: str):
+    with open(f"static/userPics/{user.username}", "w+") as file:
+        file.write(image)
+    return {"message": "true"}
+
+
+def getPicture(user: models.User):
+    try:
+        with open(f"static/userPics/{user.username}", "r") as file:
+            image = file.read()
+            file.close()
+            return image
+    except Exception as e:
+        return ""
+ 
+
+
+
