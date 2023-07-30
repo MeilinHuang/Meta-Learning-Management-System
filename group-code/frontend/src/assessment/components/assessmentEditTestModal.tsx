@@ -13,27 +13,41 @@ type AssessmentEditTestModalType = {
     type: string;
     problemDescription: string;
     questionID: string;
+    choice?: Array<string>;
+    answer?: Array<string>;
   };
 };
 
 const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [selectedType, setSelectedType] = useState(
-    props.modalType === 'edit' ? props.probShow.type : 'singleChoice'
-  );
-
-  const [form] = Form.useForm();
-  console.log(props.modalType === 'edit', props.probShow.problemDescription);
+  console.log(props.modalType)
+  const [selectedType, setSelectedType] = useState('singleChoice');
   const [description, setDescription] = useState('');
-  const [descFullScreen, setDescFullScreen] = useState(false);
+  const [choice, setChoice] = useState<Array<string> | undefined>(undefined);
+  const [answer, setAnswer] = useState<Array<string> | undefined>(undefined);
+  const [form] = Form.useForm();
+
 
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (props.modalType === 'edit') {
       setDescription(props.probShow.problemDescription);
+      setSelectedType(props.probShow.type);
+      setChoice(props.probShow.choice);
+      if (props.probShow.type === 'multipleChoice') {
+        setAnswer(props.probShow.answer);
+      }
+    } else {
+      setDescription('');
+      setSelectedType('singleChoice');
+      setChoice(undefined);
+      setAnswer(undefined);
     }
-  }, [props.isOpen])
+  }, [props.isOpen, props.modalType]);
+
+  useEffect(() => (form.setFieldValue(['type'], selectedType)), [selectedType]);
+  useEffect(() => (form.setFieldValue(['choices'], choice)), [choice]);
+  useEffect(() => (form.setFieldValue(['answer'], answer)), [answer]);
 
   const errorChecking = (formValues: any) => {
     if (description === '') {
@@ -145,14 +159,14 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
     { label: 'Essay', value: 'Essay' }
   ];
 
-  console.log(props.modalType);
+  console.log(props.probShow);
+  
 
   return (
     <>
       <Modal
         title="Title"
         open={props.isOpen}
-        confirmLoading={confirmLoading}
         footer={[]}
         onCancel={handleCancel}
       >
@@ -184,7 +198,10 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
             />
           </Form.Item>
           {selectedType !== 'Essay' && (
-            <Form.List name="choices">
+            <Form.List
+              name="choices"
+              initialValue={choice}
+            >
               {(fields, { add, remove }) => (
                 <>
                   {fields.map((field) => (
@@ -218,7 +235,10 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
             </Form.List>
           )}
           {selectedType === 'multipleChoice' && (
-            <Form.List name="answer">
+            <Form.List
+              name="answer"
+              initialValue={answer}
+            >
               {(fields, { add, remove }) => (
                 <>
                   {fields.map((field) => (
