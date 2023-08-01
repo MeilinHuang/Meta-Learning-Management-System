@@ -11,7 +11,8 @@ import {
 export default function UpdatePicture() {
   const [username, setusername] = useState(localStorage.getItem('user_name'));
   const [errorMessage, setErrorMessage] = useState('');
-  const [dataUrl, setDataUrl] = useState('')
+  const [dataUrl, setDataUrl] = useState('');
+  const maxImageSize = 200000;
   
   const uploadPicture = () => {
     if (dataUrl && username) {
@@ -39,7 +40,7 @@ export default function UpdatePicture() {
   function handleFileSelect(e: any) {
     const file = e.target.files.item(0);
     console.log(file.type);
-    if (file.size <= 300000 && 
+    if (file.size <= maxImageSize && 
       (file.type == "image/webp" || file.type == "image/png" || file.type == "image/jpeg")) {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -47,10 +48,10 @@ export default function UpdatePicture() {
         const dataUrl = reader.result as string;
         setDataUrl(dataUrl);
       });
-    } else if (file.size <= 300000) {
+    } else if (file.size <= maxImageSize) {
       setErrorMessage('Type not supported, try one of the above image types.')
     } else {
-      setErrorMessage('Image greater than 300KB.')
+      setErrorMessage('Image greater than 200KB.')
     }
   }
 
@@ -70,7 +71,7 @@ export default function UpdatePicture() {
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <p className="text-sm text-black-500 text-align:left mb-4">
-              Please select your new profile picture below. Supported image types are JPEG, PNG, and WEBP. Max image size is 300KB.
+              Please select your new profile picture below. Supported image types are JPEG, PNG, and WEBP. Max image size is 200KB.
             </p>
             <div className="flex text-sm text-gray-600">
               <label

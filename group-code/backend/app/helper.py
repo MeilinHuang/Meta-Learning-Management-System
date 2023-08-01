@@ -270,13 +270,32 @@ def get_user_by_username(db: Session, username: str):
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter_by(email=str).first()
 
-def get_all_user_list(db: Session):
+def get_all_user_list(db: Session, admin: bool):
     query = db.query(models.User).all()
+    for user in query:
+        if not admin:
+            user.email = ""
+            user.full_name = ""
+            user.auth_token = ""
+            user.password = ""
+            user.mfa = ""
+        user.profilePic = getPicture(user)
     return query
 
 
-def get_user_by_id(db: Session, user_id: int):
-    return db.query(models.User).filter_by(id=user_id).one()
+def get_user_by_id(db: Session, user_id: int, admin: bool):
+    try:
+        user = db.query(models.User).filter_by(id=user_id).one()
+        if not admin:
+            user.email = ""
+            user.full_name = ""
+            user.auth_token = ""
+            user.password = ""
+            user.mfa = ""
+        user.profilePic = getPicture(user)
+        return user
+    except:
+        return None
 
 
 def promote_user(db: Session, target: models.User, authenticator: models.User) -> bool:
@@ -2331,7 +2350,3 @@ def getPicture(user: models.User):
             return image
     except Exception as e:
         return ""
- 
-
-
-

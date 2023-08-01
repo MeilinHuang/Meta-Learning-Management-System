@@ -65,11 +65,12 @@ class AccountService {
     return axios.post(`${API_URL}/loadAssessmentMain`, param);
   }
 
-  loadUsers() {
+  loadUsers(param) {
     return axios.get(`${API_URL}/loadUsers`, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': 'true',
+        Authorization: param.access_token
       }
     });
   }
@@ -80,6 +81,7 @@ class AccountService {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': 'true',
+        Authorization: param.access_token
       }
     });
   }
@@ -241,6 +243,15 @@ class AccountService {
     })
   }
 
+  getPicture(param) {
+    console.log(param);
+    return axios.get(`${API_URL}/getPicture/${param.id}`, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+      }
+    });
+  }
 }
 
 export default new AccountService();

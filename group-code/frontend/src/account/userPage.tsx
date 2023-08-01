@@ -37,6 +37,8 @@ import CustomProfilePage from './CustomProfilePage';
 import axios from 'axios';
 import EnrolledTopics from '../content/EnrolledTopics';
 import CreatedResources from '../content/CreatedResources';
+import defaultImg from '../default.jpg';
+import { response } from 'express';
 
 // import Detail from '@/Detail';
 
@@ -72,6 +74,16 @@ export default function UserPage() {
   const routeChange = (path: To) => {
     //let path = `newPath`;
     navigate(path);
+  };
+
+  const getProfilePic = (id: any) => {
+    AccountService.getPicture({"id":id}).then((response) => {
+      const dp = response.data
+      if (dp != "" && dp != null) {
+        return dp;
+      } 
+    });
+    return defaultImg;
   };
 
   useEffect(() => {
@@ -223,6 +235,12 @@ export default function UserPage() {
                 <li className="p-3" key={usersList[i].id}>
                   {usersList[i].username}
                 </li>
+                {/*<img
+                  className="h-8 w-8 rounded-full"
+                  src={getProfilePic(usersList[i].id)}
+                  alt=""
+                />
+                */}
               </Link>
             </div>
           );
@@ -420,7 +438,7 @@ export default function UserPage() {
                       : 'text-white hover:bg-indigo-600 w-48 group flex items-center px-2 py-2 text-sm font-medium rounded-md'
                   }
                   onClick={() => {
-                    AccountService.loadUsers()
+                    AccountService.loadUsers({access_token:localStorage.getItem('access_token')})
                       .then((response) => {
                         console.log('users got: ');
                         console.log(response.data);

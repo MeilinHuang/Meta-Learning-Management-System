@@ -159,10 +159,20 @@ async def editPassword(details: schemas.UserPassword, db: Session = Depends(get_
 
 
 @app.get("/loadUsers")
-async def loadUsers(db: Session = Depends(get_db)):
-    users = helper.get_all_user_list(db)
-    print(users)
-    return users
+async def loadUsers(request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user = helper.extract_user(db, token)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if user.superuser == 1:
+        return helper.get_all_user_list(db, True)
+    
+    return helper.get_all_user_list(db, False)
 
 
 @app.get("/is_superuser")
@@ -172,16 +182,19 @@ async def is_superuser(token: str = Depends(JWTBearer(db_generator=get_db())), d
 
 
 @app.get("/user/{id}")
-async def getOneUser(id: int, db: Session = Depends(get_db)):
-    print(id)
-    user = helper.get_user_by_id(db, id)
+async def getOneUser(request: Request, id: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user = helper.extract_user(db, token)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return {"user": user}
+    elif user.superuser == 1:
+        return {"user": helper.get_user_by_id(db, id, True)}
+    else:
+        return {"user": helper.get_user_by_id(db, id, False)}
 
 
 @app.get("/authed")
@@ -1598,3 +1611,10 @@ async def putPicture(details: schemas.userImage, db: Session = Depends(get_db)):
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+@app.get("/getPicture/{id}")
+async def getPicture(id: int, db: Session = Depends(get_db)):
+    user = helper.get_user_by_id(db, id)
+    if user:
+        return helper.getPicture(user)
+    return ""
+    
