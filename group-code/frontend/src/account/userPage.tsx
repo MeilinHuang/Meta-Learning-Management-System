@@ -438,7 +438,7 @@ export default function UserPage() {
                       : 'text-white hover:bg-indigo-600 w-48 group flex items-center px-2 py-2 text-sm font-medium rounded-md'
                   }
                   onClick={() => {
-                    AccountService.loadUsers({access_token:localStorage.getItem('access_token')})
+                    AccountService.loadUsers()
                       .then((response) => {
                         console.log('users got: ');
                         console.log(response.data);

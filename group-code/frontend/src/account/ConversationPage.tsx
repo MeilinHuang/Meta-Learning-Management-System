@@ -38,7 +38,7 @@ export default function ConversationPage(props: any) {
 
         });
 
-        AccountService.loadUsers({access_token:localStorage.getItem('access_token')})
+        AccountService.loadUsers()
         .then((response) => {
             console.log('users got: ');
             console.log(response.data);

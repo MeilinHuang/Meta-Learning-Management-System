@@ -70,7 +70,7 @@ class AccountService {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': 'true',
-        Authorization: param.access_token
+        Authorization: localStorage.getItem('access_token')
       }
     });
   }
@@ -81,7 +81,7 @@ class AccountService {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': 'true',
-        Authorization: param.access_token
+        Authorization: localStorage.getItem('access_token')
       }
     });
   }
@@ -182,8 +182,7 @@ class AccountService {
     return axios.post(`${API_URL}/vEmail`, param, {
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': 'true',
-        Authorization: param.access_token
+        'Access-Control-Allow-Credentials': 'true'
       }
     })
   }
@@ -193,8 +192,7 @@ class AccountService {
     return axios.post(`${API_URL}/putOtp`, param, {
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': 'true',
-        Authorization: param.access_token
+        'Access-Control-Allow-Credentials': 'true'
       }
     })
   }
@@ -204,8 +202,7 @@ class AccountService {
     return axios.post(`${API_URL}/recoverPass`, param, {
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': 'true',
-        Authorization: param.access_token
+        'Access-Control-Allow-Credentials': 'true'
       }
     })
   }
@@ -215,8 +212,7 @@ class AccountService {
     return axios.post(`${API_URL}/setMFA`, param, {
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': 'true',
-        Authorization: param.access_token
+        'Access-Control-Allow-Credentials': 'true'
       }
     })
   }
@@ -226,8 +222,7 @@ class AccountService {
     return axios.post(`${API_URL}/verifyMFA`, param, {
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': 'true',
-        Authorization: param.access_token
+        'Access-Control-Allow-Credentials': 'true'
       }
     })
   }
@@ -237,8 +232,7 @@ class AccountService {
     return axios.post(`${API_URL}/putPicture`, param, {
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': 'true',
-        Authorization: param.access_token
+        'Access-Control-Allow-Credentials': 'true'
       }
     })
   }
