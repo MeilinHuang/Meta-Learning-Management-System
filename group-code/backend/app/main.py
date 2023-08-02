@@ -1265,8 +1265,6 @@ async def get_resource_section(resource_id, db: Session = Depends(get_db)):
     return section
 
 # === CONTENT ===
-
-
 @app.get("/user_resources")
 async def get_created_resources(db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
