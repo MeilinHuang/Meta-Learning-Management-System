@@ -90,9 +90,10 @@ export default function AssessmentOverviewEdit() {
     return (
         <div className="px-4 sm:px-6 lg:px-8">
             <div className="sm:flex sm:items-center">
-                <div className="sm:flex-auto">
-                    <h1 className="text-xl font-semibold text-gray-900">Topic</h1>
-                    <p className="mt-2 text-sm text-gray-700">Topic overview</p>
+                <div className="sm:flex sm:items-center flex-auto">
+                    <div className="sm:flex-auto py-10">
+                        <h1 className="text-xl font-semibold text-gray-900">Topic Overview</h1>
+                    </div>
                 </div>
                 <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
                     <input
@@ -114,7 +115,7 @@ export default function AssessmentOverviewEdit() {
                     <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
                         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                             <table className="min-w-full divide-y divide-gray-300">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-gray-50 uppercase">
                                     <tr>
                                         <th
                                             scope="col"
@@ -138,7 +139,7 @@ export default function AssessmentOverviewEdit() {
                                             scope="col"
                                             className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                                         >
-                                            detail
+                                            <span className="sr-only">Detail</span>
                                         </th>
                                     </tr>
                                 </thead>
@@ -148,10 +149,10 @@ export default function AssessmentOverviewEdit() {
                                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                                                 {topic.id}
                                             </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 capitalize">
                                                 {topic.topic_name}
                                             </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500  normal-case">
                                                 {topic.description}
                                             </td>
                                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
