@@ -53,7 +53,11 @@ class User(BaseModel):
     introduction: str
     friends: List[Conversation]
     superuser: bool
-
+    vEmail: str
+    lastOtp: str
+    emailAuth: str
+    mfa: str
+    
     class Config:
         orm_mode = True
 
@@ -68,6 +72,7 @@ class UserCreate(BaseModel):
 
 
 class UserEdit(BaseModel):
+    token: str
     username: str
     full_name: str
     introduction: str
@@ -529,6 +534,24 @@ class Assessment(BaseModel):
     status: str
     timeRange: str
 
-
 class testTopicEnrollment(BaseModel):
     enroll_id: int
+
+class userOtp(BaseModel):
+    token: str
+    username: str
+    inputOtp: str
+
+class recoverPass(BaseModel):
+    username: str
+    inputOtp: str
+    newPassword: str
+
+class setMFA(BaseModel):
+    token: str
+    id: str
+    mfa: str
+
+class idToken(BaseModel):
+    id: str
+    token: str

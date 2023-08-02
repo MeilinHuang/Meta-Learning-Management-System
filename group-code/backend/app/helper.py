@@ -15,6 +15,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 import shutil
 import smtplib
+import pyotp
 
 from . import models, schemas
 
@@ -69,21 +70,13 @@ def verify_user(db: Session, token):
         return False, None
     return True, user
 
-# def verifyEmail(db: Session, receiveEmail: str, message: str):
-#     server = smtplib.SMTP("smtp.gmail.com", 587)
-#     server.starttls()
-#     server.login('metalmsserviceteam@outlook.com', "Abc111111")
-#     email_message = message
-#     server.sendmail('metalmsserviceteam@outlook.com', receiveEmail, email_message)
-#     server.quit()
-#     print("Email sent successfully")
-#     return {"email": receiveEmail}
-
-
 def extract_user(db: Session, token):
-    decoded = jwt.decode(token, TOKEN_SECRET, algorithms=["HS256"])
-    query = db.query(models.User).get(decoded['user_id'])
-    return query
+    try: 
+        decoded = jwt.decode(token, TOKEN_SECRET, algorithms=["HS256"])
+        query = db.query(models.User).get(decoded['user_id'])
+        return query
+    except:
+        return None
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -118,6 +111,14 @@ def usernameNotexists(db: Session, username: str):
     if db.execute(user_name_exists).scalar():
         return False
     return True
+
+def emailNotexists(db: Session, email: str):
+    email_name_exists = db.query(exists().where(
+        models.User.email == email))
+    if db.execute(email_name_exists).scalar():
+        return False
+    return True
+
 
 
 def check_permission(db: Session, user: models.User, topic: models.Topic, permission_flag):
@@ -268,6 +269,8 @@ def edit_password(db: Session, user: models.User, newpassword):
 def get_user_by_username(db: Session, username: str):
     return db.query(models.User).filter_by(username=username).first()
 
+def get_user_by_email(db: Session, email: str):
+    return db.query(models.User).filter_by(email=str).first()
 
 def get_all_user_list(db: Session):
     query = db.query(models.User).all()
@@ -2233,3 +2236,84 @@ def create_test_data_converstion(engine: Engine, db: Session):
     create_conversation(db, user1.username, user2.username, user1.id, user2.id)
 
     db.commit()
+
+# MetaLMS 23T2
+
+# sends otp to user email
+def getVerifyEmail(db: Session, user: models.User):
+    if user == None or usernameNotexists(db, user.username):
+        return {"message": "Username doesn't exist"}
+    otp = pyotp.TOTP('base32secret3232')
+    otpnumber = str(otp.now())
+    setattr(user, "lastOtp", otpnumber)
+    db.commit()
+    db.refresh(user)
+    message = f"Hi {user.full_name},\nYour code is {otpnumber}. Please enter this code in the prompt on Meta LMS."
+
+    # Unquote to send real emails, quoted as email quota reached on outlook account
+    server = smtplib.SMTP("smtp-mail.outlook.com", 587)
+    server.starttls()
+    server.login('metalmsserviceteam@outlook.com', "Abc111111")
+    server.sendmail('metalmsserviceteam@outlook.com', user.email, f"Subject: Meta LMS verification code\n\n{message}")
+    server.quit()
+    
+    #print(f"Email Sent to {user.email}\n{message}")
+    return {"message": "success"}
+
+def putOtp(db: Session, user: models.User, inputOtp: str):
+    if user == None or usernameNotexists(db, user.username):
+        return {"message", "Username doesn't exist"}
+    if useOtp(db, user, inputOtp):
+        setattr(user, "vEmail", user.email)
+        db.commit()
+        db.refresh(user)
+        return {"message": "true", "vEmail": user.email}
+    return {"message": "false"}
+
+def recoveryAcc(db: Session, user: models.User, inputOtp: str, newPass: str):
+    if user == None:
+        return {"message", "Username doesn't exist"}
+    if useOtp(db, user, inputOtp):
+        edit_password(db, user, newPass)
+        return {"message": "true"}
+    return {"message": "false"}
+
+def setMFA(db: Session, user: models.User, mfa: str):
+    if user != None:
+        setattr(user, "mfa", mfa)
+        db.commit()
+        db.refresh(user)
+        return {"message": "true"}
+    return {"message": "false"}
+
+def verifyMFA(db: Session, user: models.User, inputOtp: str):
+    if user == None or usernameNotexists(db, user.username):
+        return {"message", "Username doesn't exist"}
+    if useOtp(db, user, inputOtp):
+        return loginUser(db, user)
+    return {"message": "false"}
+
+def loginUser(db: Session, user: models.User):
+    mfa = user.mfa
+    token = give_token(db, user)
+    username = user.username
+    email = user.email
+    userid = user.id
+    fullname = user.full_name
+    introduction = user.introduction
+    admin = user.superuser
+    vEmailv = user.vEmail
+    lastOtp = user.lastOtp
+    res = {"access_token": token, "token_type": "Bearer",
+            "user_name": username, "email": email, "user_id": userid,
+            "full_name": fullname, "introduction": introduction,
+            "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp, "mfa": mfa, "message": "true"}
+    return res
+
+def useOtp(db: Session, user: models.User, inputOtp: str):
+    if user.lastOtp != None and user.lastOtp == inputOtp:
+        setattr(user, "lastOtp", None)
+        db.commit()
+        db.refresh(user)
+        return True
+    return False

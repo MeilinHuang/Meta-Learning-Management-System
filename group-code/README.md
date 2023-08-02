@@ -1,8 +1,16 @@
 # MetaLMS
+For developer documentation, please see the [Frontend Docs](./documentation/FRONTEND-DOCS.md) and [Backend Docs](./documentation/BACKEND-DOCS.md).
 
-## Backend
+## Running Manually
+These steps are if you want to install and run frontend and backend manually.
 
-### Setup
+### Backend
+
+Windows CMD: use `start-backend.bat`.
+
+Otherwise, follow the steps below:
+
+#### Setup
 
 Perform these steps the first time you clone the repository to set up a virtual environment and install dependencies.
 
@@ -11,61 +19,62 @@ Perform these steps the first time you clone the repository to set up a virtual 
 2. Create a virtual environment.  
    `python3 -m venv venv`
 3. Activate the virtual environment.  
-   `source venv/bin/activate`
-4. Install dependencies from requirements.txt.  
+   - Linux: `source venv/bin/activate`
+   - Windows: `venv/Scripts/activate.bat`
+4. Install dependencies from requirements.txt.
    `python3 -m pip install -r requirements.txt`
 
-### Start backend server
+#### Start backend server
 
 Perform these steps every time you want to use the backend server.
 
 1. Navigate to the root folder.
 2. Activate your existing virtual environment.  
    `source backend/venv/bin/activate`
-3. Start the backend server.  
-   `uvicorn backend.app.main:app --reload`
+3. Start the backend server. (make sure you're in th `group-code/` directory):
+   - Linux: `uvicorn backend.app.main:app --reload`
+   - Windows: `python3 -m uvicorn backend.app.main:app --reload`
 
-### Update dependencies
+#### Update dependencies
 
 Every time you install a new python module in your virtual environment, update the `requirements.txt` file by running this command.  
 `python3 -m pip freeze > requirements.txt`
 
-## Frontend
+### Frontend
 
-### Setup
+#### Setup
 
 1. From the root folder, navigate to the frontend folder.  
    `cd frontend`
 2. Install node modules.  
    `npm install`
 
-### Start frontend server
+#### Start frontend server
 
 To start the frontend server, navigate to the frontend folder and run `npm start`.
 
-### Tailwind CSS
+## Running with Docker
+### Frontend and Backend
+Make sure you have Docker installed on your machine. Then, run the following commands from the root directory of the project to start the `Dev` environment, where hot-reloading is enabled:
 
-https://tailwindcss.com/docs/installation
+```
+docker-compose up
+```
 
-Tailwind CSS works by giving users a set of classes they can use to add styles. For example,  
-`<p className="text-black">This text is black</p>`
-is equivalent to making this CSS class in your stylesheet:  
-`.text-black {
-    color: rgb(0 0 0); 
-}`
+Front-end is accessible via `localhost:3000` and backend via `localhost:8000`.
 
-These predefined classes make it easier to write CSS and make styles more consistent. After adding a new Tailwind class to your components, run this command to add the corresponding CSS class to your stylesheet.  
-`npx tailwindcss -i ./src/index.css -o ./public/output.css`
+NOTE: The first run will always take longer as Docker downloads and builds the container images.
 
-For convenience, run the frontend server from step in one terminal, then open another terminal and run this command:  
-`npx tailwindcss -i ./src/index.css -o ./public/output.css --watch`
+If you make changes to your application, simply turn off the containers with `Ctrl+C` and run the command again.
 
-This will automatically rebuild the CSS as you edit your classes so you don't need to run the command every time.
+If you make changes to the Dockerfile, you will need to rebuild the images with the following command:
 
-The site has a list of available classes with their corresponding CSS. The quick search is very useful in finding relevant classes.
+```
+docker-compose up --build
+```
 
-### Tailwind UI
+If you want to run the `Prod` environment (frontend uses Nginx with static file compilation), run the following command:
 
-Tailwind UI components are just normal React components that have Tailwind CSS classes added to them. To use Tailwind UI, sign in to https://tailwindui.com/ from VLAB, go to Components from the top nav bar, find the component you need, copy and paste the code they provide and edit the code to customise.
-
-To find the Tailwind CSS documentation in this website: https://tailwindcss.com/docs/installation
+```
+docker-compose -f docker-compose.prod.yml up
+```
