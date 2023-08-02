@@ -11,7 +11,9 @@ from .database import SessionLocal, engine
 from .auth import JWTBearer
 from pathlib import Path
 from io import BytesIO
+from .chatgpt.chatgpt import send_message as chatgpt_send_message
 import os
+import logging
 import re
 EMAILREG = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
@@ -20,6 +22,7 @@ models.Base.metadata.create_all(bind=engine)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
+logging.basicConfig(level=logging.INFO)
 
 if (not os.path.exists("static")):
     os.mkdir("static")
@@ -1243,8 +1246,6 @@ async def get_resource_section(resource_id, db: Session = Depends(get_db)):
     return section
 
 # === CONTENT ===
-
-
 @app.get("/user_resources")
 async def get_created_resources(db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
@@ -1571,6 +1572,23 @@ async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db
     user = helper.get_user_by_username(db, details.username)
     return helper.recoveryAcc(db, user, details.inputOtp, details.newPassword)
 
+@app.post("/chatgpt/sendMessage")
+async def chatgpt_api_send_message(details: schemas.GenerativeAI_SendMessage):
+    response = chatgpt_send_message(details.message)
+    print(f"ChatGPT Response: {response}")
+
+@app.post("/generativeai/sendMessage")
+# async def generativeai_send_message(details: schemas.GenerativeAI_SendMessage, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
+async def generativeai_send_message(details: schemas.GenerativeAI_SendMessage):
+    # RYAN TODO: Authenticate user
+    # user = helper.extract_user(db, token)
+
+    # RYAN TODO: Get current conversation for user given conversation_id
+
+    # Query OpenAI with conversation history
+    response = chatgpt_send_message(details.message)
+    print(f"ChatGPT Response: {response}")
+
 @app.post("/setMFA")
 async def setMFA(details: schemas.setMFA, db: Session = Depends(get_db)):
     user = helper.extract_user(db, details.token)
@@ -1586,3 +1604,4 @@ async def setMFA(details: schemas.setMFA, db: Session = Depends(get_db)):
 async def verifyMFA(details: schemas.userOtp, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     return helper.verifyMFA(db, user, details.inputOtp)
+

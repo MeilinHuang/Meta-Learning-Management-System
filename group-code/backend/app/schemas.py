@@ -547,6 +547,9 @@ class recoverPass(BaseModel):
     inputOtp: str
     newPassword: str
 
+class GenerativeAI_SendMessage(BaseModel):
+    message: str
+
 class setMFA(BaseModel):
     token: str
     id: str
