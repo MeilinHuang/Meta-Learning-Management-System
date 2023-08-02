@@ -1,6 +1,12 @@
 # MetaLMS
 For developer documentation, please see the [Frontend Docs](./documentation/FRONTEND-DOCS.md) and [Backend Docs](./documentation/BACKEND-DOCS.md).
 
+## Environment Variable Setup
+1. In Project Root (`group-code/`), create a file called `.env` that contains the following:
+```bash
+OPENAI_API_KEY=<YOUR-OPENAI-TOKEN-HERE>
+```
+
 ## Running Manually
 These steps are if you want to install and run frontend and backend manually.
 
