@@ -132,6 +132,7 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
           paramsWithQuestionId
         );
       } else {
+        console.log(params)
         const paramsWithAssessmentId = { ...params, assessment_id: props.id };
         res = await AssessmentService.addNewQuestionInAssessment(
           paramsWithAssessmentId

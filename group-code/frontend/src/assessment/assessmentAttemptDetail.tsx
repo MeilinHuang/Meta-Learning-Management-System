@@ -26,7 +26,7 @@ export default function AssessmentAttemptDetail() {
     //let path = `newPath`;
     navigate(path);
   };
-  const [isActive, setIsActive] = useState('-1');
+  const [isActive, setIsActive] = useState(1);
   const [mark, setMark] = useState('0');
   const [feedback, setFeedback] = useState('');
   const [problem, setProblem] = useState([
@@ -120,7 +120,7 @@ export default function AssessmentAttemptDetail() {
   useEffect(() => {
     //console.log("After update" + JSON.stringify(problem))
     setProbShow(problem[0]);
-    setIsActive(problem[0].questionID);
+    setIsActive(1);
     //console.log("probShow: " + JSON.stringify(probShow))
   }, [loaded]);
 
@@ -141,17 +141,17 @@ export default function AssessmentAttemptDetail() {
                     className="group flex items-center px-2 py-2 text-sm font-medium rounded-md"
                     style={{
                       backgroundColor:
-                        prob.questionID == isActive ? 'green' : ''
+                      problem.indexOf(prob) + 1 == isActive ? 'green' : ''
                     }}
                   >
                     <button
                       onClick={() => {
-                        setIsActive(prob.questionID);
+                        setIsActive(problem.indexOf(prob) + 1);
                         //console.log('selectProblemID: ' + isActive);
                         setProbShow(prob);
                       }}
                     >
-                      {'Question' + (problem.indexOf(prob) + 1)}
+                      {'Question ' + (problem.indexOf(prob) + 1)}
                     </button>
                   </div>
                 ))}
@@ -166,7 +166,7 @@ export default function AssessmentAttemptDetail() {
               <div className="py-6">
                 <div className="px-4 sm:px-6 md:px-0">
                   <h1 className="text-2xl font-semibold text-gray-900">
-                    {'Question' + probShow.questionID}
+                    {'Question ' + isActive}
                   </h1>
                 </div>
                 <div className="px-4 sm:px-6 md:px-0">
