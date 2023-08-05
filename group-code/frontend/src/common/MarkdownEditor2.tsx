@@ -2,7 +2,8 @@ import { Tab } from '@headlessui/react';
 import {
   AtSymbolIcon,
   CodeBracketIcon,
-  LinkIcon
+  LinkIcon,
+  ListBulletIcon
 } from '@heroicons/react/20/solid';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -54,6 +55,7 @@ const MarkdownEditor2: React.FC<any> = ({MDContent, setMDContent}) => {
                 <button
                   type="button"
                   className="-m-2.5 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
+                  onClick={() => {setMDContent(MDContent + '[<Link Text>](<URL>)')}}
                 >
                   <span className="sr-only">Insert link</span>
                   <LinkIcon className="h-5 w-5" aria-hidden="true" />
@@ -63,6 +65,7 @@ const MarkdownEditor2: React.FC<any> = ({MDContent, setMDContent}) => {
                 <button
                   type="button"
                   className="-m-2.5 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
+                  onClick={() => {setMDContent(MDContent + '\n```\n<insert code here>\n```')}}
                 >
                   <span className="sr-only">Insert code</span>
                   <CodeBracketIcon className="h-5 w-5" aria-hidden="true" />
@@ -72,9 +75,10 @@ const MarkdownEditor2: React.FC<any> = ({MDContent, setMDContent}) => {
                 <button
                   type="button"
                   className="-m-2.5 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
+                  onClick={() => {setMDContent(MDContent + '\n- First Item\n- Second Item\n- Third Item')}}
                 >
-                  <span className="sr-only">Mention someone</span>
-                  <AtSymbolIcon className="h-5 w-5" aria-hidden="true" />
+                  <span className="sr-only">Unordered List</span>
+                  <ListBulletIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
             </div>

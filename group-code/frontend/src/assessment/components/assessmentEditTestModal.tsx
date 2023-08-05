@@ -16,6 +16,7 @@ type AssessmentEditTestModalType = {
     choice?: Array<string>;
     answer?: Array<string>;
   };
+  questionIndex: number;
 };
 
 const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
@@ -146,7 +147,6 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
         content: 'Submission failed.'
       });
     }
-    console.log('Clicked cancel button');
   };
 
   const handleCancel = () => {
@@ -159,13 +159,10 @@ const AssessmentEditTestModal = (props: AssessmentEditTestModalType) => {
     { label: 'Essay', value: 'Essay' }
   ];
 
-  console.log(props.probShow);
-  
-
   return (
     <>
       <Modal
-        title="Title"
+        title={props.modalType === 'add' ? 'Add new question' : `Edit Question ${props.questionIndex}`}
         open={props.isOpen}
         footer={[]}
         onCancel={handleCancel}
