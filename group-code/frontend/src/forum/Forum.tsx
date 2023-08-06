@@ -58,7 +58,7 @@ export default function Forum() {
     limit: LIMIT,
     sectionId: selectedSection
   });
-  
+
   // useEffect to initialise the parameter states.
   useEffect(() => {
     setLastResultParams({
@@ -87,7 +87,7 @@ export default function Forum() {
     setNextResultParams
   };
 
-  const [selectedThread, setSelectedThread] = useState<Thread>({
+  const emptyThread: Thread = {
     id: -1,
     author: {
       name: 'Please select a thread',
@@ -102,7 +102,9 @@ export default function Forum() {
     posts: [],
     stickied: false,
     reported: false
-  });
+  };
+
+  const [selectedThread, setSelectedThread] = useState<Thread>(emptyThread);
 
   const {
     data: forum,
@@ -157,6 +159,7 @@ export default function Forum() {
         )}
         onClick={() => {
           setSelectedSection(item.id);
+          setSelectedThread(emptyThread);
           navigate(`/forum/${topic}/${item.id}`);
         }}
       >
@@ -177,10 +180,11 @@ export default function Forum() {
   }
 
   const selectedThreadCallback = (thread: Thread) => {
+    console.log(thread);
     setSwitchOrder(true);
     setSelectedThread(thread);
     setShowPostCreator(false);
-  }
+  };
 
   return (
     <>
