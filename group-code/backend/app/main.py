@@ -1587,7 +1587,7 @@ async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db
 @app.post("/setMFA")
 async def setMFA(details: schemas.setMFA, db: Session = Depends(get_db)):
     user = helper.extract_user(db, details.token)
-    if user != None and user.username == details.id:
+    if user != None and user.username == details.id and user.vEmail == user.email:
         return helper.setMFA(db, user, details.mfa)
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

@@ -29,6 +29,7 @@ class TestUserAcc(unittest.TestCase):
         super().__init__(methodName)
         self.db = next(getNewdb())
         helper.create_user(self.db, "kai1", "kai12345", "kai@gmail.com", "kai")
+        helper.create_user(self.db, "kai2", "kai12345", "kai2@gmail.com", "kai2")
 
     def test_vEmail_valid(self):
         user1 = helper.get_user_by_username(self.db,"kai1")
@@ -119,7 +120,7 @@ Your code is {rtnMsg["otp"]}. Please enter this code in the prompt on Meta LMS."
         self.assertEqual(user1.mfa, "")
 
     def test_verifyMFA_invalid(self):
-        user1 = helper.get_user_by_username(self.db,"kai1")
+        user1 = helper.get_user_by_username(self.db,"kai2")
         self.assertEqual(user1.lastOtp, None)
         rtnMsg = helper.verifyMFA(self.db, None, None)
         self.assertEqual(rtnMsg["message"], "Username doesn't exist")
