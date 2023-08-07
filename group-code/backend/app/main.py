@@ -162,10 +162,20 @@ async def editPassword(details: schemas.UserPassword, db: Session = Depends(get_
 
 
 @app.get("/loadUsers")
-async def loadUsers(db: Session = Depends(get_db)):
-    users = helper.get_all_user_list(db)
-    print(users)
-    return users
+async def loadUsers(request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user = helper.extract_user(db, token)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if user.superuser == 1:
+        return helper.get_all_user_list(db, True)
+    
+    return helper.get_all_user_list(db, False)
 
 
 @app.get("/is_superuser")
@@ -175,16 +185,19 @@ async def is_superuser(token: str = Depends(JWTBearer(db_generator=get_db())), d
 
 
 @app.get("/user/{id}")
-async def getOneUser(id: int, db: Session = Depends(get_db)):
-    print(id)
-    user = helper.get_user_by_id(db, id)
+async def getOneUser(request: Request, id: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user = helper.extract_user(db, token)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return {"user": user}
+    elif user.superuser == 1:
+        return {"user": helper.get_user_by_id(db, id, True)}
+    else:
+        return {"user": helper.get_user_by_id(db, id, False)}
 
 
 @app.get("/authed")
@@ -1541,7 +1554,7 @@ async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     if (user is not None and helper.verify_password(details.password, user.password)):
         if user.mfa == "email":
-            helper.getVerifyEmail(db, user)
+            helper.getVerifyEmail(db, user, False)
             return {"mfa": user.mfa, "username": user.username}
         else:
             return helper.loginUser(db, user)
@@ -1554,7 +1567,7 @@ async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
 @app.post("/vEmail")
 async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.id)
-    return helper.getVerifyEmail(db, user)
+    return helper.getVerifyEmail(db, user, False)
 
 @app.post("/putOtp")
 async def putOtp(details: schemas.userOtp, db: Session = Depends(get_db)):
@@ -1592,7 +1605,7 @@ async def generativeai_send_message(details: schemas.GenerativeAI_SendMessage):
 @app.post("/setMFA")
 async def setMFA(details: schemas.setMFA, db: Session = Depends(get_db)):
     user = helper.extract_user(db, details.token)
-    if user != None and user.username == details.id:
+    if user != None and user.username == details.id and user.vEmail == user.email:
         return helper.setMFA(db, user, details.mfa)
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -1605,3 +1618,21 @@ async def verifyMFA(details: schemas.userOtp, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     return helper.verifyMFA(db, user, details.inputOtp)
 
+@app.post("/putPicture")
+async def putPicture(details: schemas.userImage, db: Session = Depends(get_db)):
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.id:
+        return helper.putPicture(user, details.image)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+@app.get("/getPicture/{id}")
+async def getPicture(id: int, db: Session = Depends(get_db)):
+    user = helper.get_user_by_id(db, id)
+    if user:
+        return helper.getPicture(user)
+    return ""
+    

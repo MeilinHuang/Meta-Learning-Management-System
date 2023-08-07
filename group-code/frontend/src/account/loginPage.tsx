@@ -89,6 +89,11 @@ export default function LoginPage() {
       response.data.mfa,     
     );
     
+    localStorage.setItem(
+      'profilePic',
+      response.data.profilePic
+    );
+
     if(response.data.admin == true) {
       localStorage.setItem(
       'userAddress',

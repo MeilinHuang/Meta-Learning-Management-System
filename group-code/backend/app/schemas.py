@@ -57,6 +57,7 @@ class User(BaseModel):
     lastOtp: str
     emailAuth: str
     mfa: str
+    profilePic: str
     
     class Config:
         orm_mode = True
@@ -558,3 +559,9 @@ class setMFA(BaseModel):
 class idToken(BaseModel):
     id: str
     token: str
+
+class userImage(BaseModel):
+    id: str
+    token: str
+    image: Any
+
