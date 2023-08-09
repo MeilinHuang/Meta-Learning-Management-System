@@ -7,67 +7,107 @@ import Dropdown from 'react-dropdown';
 export default function AssessmentMain() {
   const [topics, setTopics] = useState([
     {
-      topic: 'c++',
-      year: '2022',
-      term: 'Term3',
-      mark: 'N/A',
-      topic_id: '2',
-      enroll_id: '1'
+      topic: "",
+      year: "",
+      term: "",
+      mark: "",
+      topic_id: "",
+      enroll_id: "",
     },
-    {
-      topic: 'Advanced algorithm',
-      year: '2022',
-      term: 'Term2',
-      mark: '89',
-      topic_id: '3',
-      enroll_id: '2'
-    }
   ]);
+  // const [topics, setTopics] = useState([
+  //   {
+  //     topic: 'C++',
+  //     year: '2022',
+  //     term: 'Term3',
+  //     mark: 'N/A',
+  //     topic_id: '2',
+  //     enroll_id: '1'
+  //   },
+  //   {
+  //     topic: 'Advanced algorithm',
+  //     year: '2022',
+  //     term: 'Term2',
+  //     mark: '89',
+  //     topic_id: '3',
+  //     enroll_id: '2'
+  //   }
+  // ]);
   const [searchedTopics, setsearchedTopics] = useState([
     {
-      topic: 'c++',
-      year: '2022',
-      term: 'Term3',
-      mark: 'N/A',
-      topic_id: '2',
-      enroll_id: '1'
+      topic: "",
+      year: "",
+      term: "",
+      mark: "",
+      topic_id: "",
+      enroll_id: "",
     }
   ]);
-  const [year, setYear] = useState("");
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setYear(event.target.value);
-  };
-  const handleClick = () => {
-    //go search service function here
-    const re = new RegExp("^.*" + year + ".*$", 'i')
+  // const [searchedTopics, setsearchedTopics] = useState([
+  //   {
+  //     topic: 'C++',
+  //     year: '2022',
+  //     term: 'Term3',
+  //     mark: 'N/A',
+  //     topic_id: '2',
+  //     enroll_id: '1'
+  //   }
+  // ]);
+  // const [year, setYear] = useState("");
+  const [searchVal, setSearchVal] = useState("");
 
-    if (year == "") {
-      setsearchedTopics(topics)
-    }
-    else {
-      const arr = []
-      for (let index = 0; index < topics.length; index++) {
-        if (topics[index].year.match(re)) {
-          const item = {
-            topic: "",
-            year: "",
-            term: "",
-            mark: "",
-            topic_id: "",
-            enroll_id: ""
-          }
-          item["topic"] = topics[index].topic
-          item["year"] = topics[index].year
-          item["term"] = topics[index].term
-          item["mark"] = topics[index].mark
-          item["topic_id"] = topics[index].topic_id
-          item["enroll_id"] = topics[index].enroll_id
-          arr.push(item)
-        }
-      }
-      setsearchedTopics(arr)
-    }
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchVal(event.target.value);
   };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  }
+
+  const handleSearch = () => {
+    if (searchVal == "") {
+      setsearchedTopics(topics);
+      return;
+    }
+    const filteredTopics = topics.filter(topic =>
+      Object.values(topic).some(value => value.toString().toLowerCase().includes(searchVal.toLowerCase()))
+    );
+    setsearchedTopics(filteredTopics);
+  }
+
+  // const handleClick = () => {
+  //   //go search service function here
+  //   const re = new RegExp("^.*" + year + ".*$", 'i')
+
+  //   if (year == "") {
+  //     setsearchedTopics(topics)
+  //   }
+  //   else {
+  //     const arr = []
+  //     for (let index = 0; index < topics.length; index++) {
+  //       if (topics[index].year.match(re)) {
+  //         const item = {
+  //           topic: "",
+  //           year: "",
+  //           term: "",
+  //           mark: "",
+  //           topic_id: "",
+  //           enroll_id: ""
+  //         }
+  //         item["topic"] = topics[index].topic
+  //         item["year"] = topics[index].year
+  //         item["term"] = topics[index].term
+  //         item["mark"] = topics[index].mark
+  //         item["topic_id"] = topics[index].topic_id
+  //         item["enroll_id"] = topics[index].enroll_id
+  //         arr.push(item)
+  //       }
+  //     }
+  //     setsearchedTopics(arr)
+  //   }
+  // };
   //const [state, setState] = useState([]);
   useEffect(() => {
     //use this to handle change
@@ -76,7 +116,7 @@ export default function AssessmentMain() {
     //console.log(param)
     AssessmentService.loadMain(param)
       .then(res => {
-        //console.log(res.data)
+        // console.log(res.data)
         const arr = []
         for (let index = 0; index < res.data.length; index++) {
           //const element = res.data[index];
@@ -97,6 +137,24 @@ export default function AssessmentMain() {
           console.log(item)
           arr.push(item)
         }
+        const newData = [{
+          topic: 'C++',
+          year: '2022',
+          term: 'Term 3',
+          mark: 'N/A',
+          topic_id: '2',
+          enroll_id: '1'
+        },
+        {
+          topic: 'Advanced algorithm',
+          year: '2022',
+          term: 'Term 2',
+          mark: '89',
+          topic_id: '3',
+          enroll_id: '2'
+        }]
+        arr.push(newData[0])
+        arr.push(newData[1])
         //console.log(arr)
         setTopics(arr)
         setsearchedTopics(arr)
@@ -120,7 +178,7 @@ export default function AssessmentMain() {
           <div className='relative flex items-stretch overflow-x-auto'>
             <div className="relative max-w-xs">
               <label htmlFor="hs-table-search" className="sr-only">Search</label>
-              <input type="text" name="hs-table-search" id="hs-table-search" className="p-3 pl-10 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400" placeholder="Search by Year" onChange={handleChange} />
+              <input type="text" name="hs-table-search" id="hs-table-search" className="p-3 pl-10 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400" placeholder="Search" onChange={handleChange} onKeyPress={handleKeyPress}/>
               {/* Search Icon */}
               <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
                 <svg className="h-3.5 w-3.5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -130,7 +188,8 @@ export default function AssessmentMain() {
             </div>
             {/* Search Button */}
             <button
-              onClick={handleClick}
+              // onClick={handleClick}
+              onClick={handleSearch}
               type="button"
               className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 ml-5 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
             >

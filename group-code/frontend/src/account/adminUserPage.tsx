@@ -188,13 +188,16 @@ export default function AdminUserPage() {
       <div className="z-50 md:fixed md:top-16 md:bottom-0 md:flex md:w-64 md:flex-col">
         <div className="flex flex-grow flex-col overflow-y-auto bg-indigo-500 pt-5">
           <div className="flex flex-shrink-0 items-center px-4">
-            <img
+            {/* <img
               className="h-8 w-auto"
               src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
               alt="Your Company"
-            />
+            /> */}
           </div>
-          <div className="mt-5 flex flex-1 flex-col">
+          <div className="flex flex-init1ial flex-col overflow-y-auto">
+            <div className="flex-1 space-y-1 px-2 pb-4">
+              <button>Menu</button>
+            </div>
             <div className="flex-1 space-y-1 px-2 pb-4">
               <button>
                 <div

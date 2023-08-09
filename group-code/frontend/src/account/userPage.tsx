@@ -251,18 +251,15 @@ export default function UserPage() {
         {localStorage.getItem("admin") == "true" ? <Navigate to="/adminuser"></Navigate> : ""}
         <div className="flex flex-grow flex-col overflow-y-auto bg-indigo-500 pt-5">
           <div className="flex flex-shrink-0 items-center px-4">
-            <img
+            {/* <img
               className="h-8 w-auto"
               src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
               alt="Your Company"
-            />
+            /> */}
           </div>
 
-          <div className="mt-5 flex flex-1 flex-col">
-            
-            
-
-
+          <div className="flex flex-initial flex-col">
+          
             <div className="flex-1 space-y-1 px-2 pb-4">
               <button>
                 <div

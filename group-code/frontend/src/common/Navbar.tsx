@@ -49,11 +49,11 @@ export default function Navbar() {
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex flex-shrink-0 items-center">
-                  <img
+                  {/* <img
                     className="block h-8 w-auto lg:hidden"
                     src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
                     alt="MetaLMS"
-                  />
+                  /> */}
                   <img
                     className="hidden h-8 w-auto lg:block"
                     src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
@@ -100,7 +100,7 @@ export default function Navbar() {
                     }
                     to="/assessmentOverviewEdit"
                   >
-                    AssessmentsEdit
+                    Assessments Edit
                   </Link>
                   {/* <Link
                     className={
@@ -243,7 +243,7 @@ export default function Navbar() {
                     : 'block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700'
                 }
               >
-                <Link to="/assessmentOverviewEdit">AssessmentsEdit</Link>
+                <Link to="/assessmentOverviewEdit">Assessments Edit</Link>
               </Disclosure.Button>
               {/* <Disclosure.Button
                 as="a"
