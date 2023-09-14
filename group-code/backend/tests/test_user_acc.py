@@ -30,6 +30,7 @@ class TestUserAcc(unittest.TestCase):
         self.db = next(getNewdb())
         helper.create_user(self.db, "kai1", "kai12345", "kai@gmail.com", "kai")
         helper.create_user(self.db, "kai2", "kai12345", "kai2@gmail.com", "kai2")
+        helper.create_user(self.db, "joe", "kai12345", "joe@gmail.com", "joe")
 
     def test_vEmail_valid(self):
         user1 = helper.get_user_by_username(self.db,"kai1")
@@ -166,7 +167,13 @@ Your code is {rtnMsg["otp"]}. Please enter this code in the prompt on Meta LMS."
         user1 = helper.get_user_by_username(self.db,"kai1")
         self.assertEqual(user1.lastOtp, None)
 
+    def test_db_search(self):
+        rtn = helper.get_users_search(self.db, "ka", True)
+        self.assertEqual(rtn[0].username, "kai1")
+        self.assertEqual(rtn[1].username, "kai2")
 
+        rtn = helper.get_users_search(self.db, "jo", True)
+        self.assertEqual(rtn[0].username, "joe")
 
 
 if __name__ == '__main__':

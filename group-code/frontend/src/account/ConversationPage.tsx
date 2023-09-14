@@ -38,7 +38,7 @@ export default function ConversationPage(props: any) {
 
         });
 
-        AccountService.loadUsers()
+        AccountService.loadUsers({search: ""})
         .then((response) => {
             console.log('users got: ');
             console.log(response.data);

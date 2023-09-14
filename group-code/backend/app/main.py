@@ -16,7 +16,7 @@ import os
 import logging
 import re
 EMAILREG = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
-
+USERREG = r'\b^[a-zA-Z0-9_]+$\b'
 models.Base.metadata.create_all(bind=engine)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -83,19 +83,25 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
     if (helper.usernameNotexists(db, details.username) == False):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name already exists",
+            detail="User name already exists.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     elif (helper.emailNotexists(db, details.email) == False):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Email already exists",
+            detail="Email already exists.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     elif not re.fullmatch(EMAILREG, details.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email not valid",
+            detail="Email not valid.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    elif not re.fullmatch(USERREG, details.username):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username can only contain alphanumericals and underscores.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = helper.create_user(
@@ -161,8 +167,8 @@ async def editPassword(details: schemas.UserPassword, db: Session = Depends(get_
     )
 
 
-@app.get("/loadUsers")
-async def loadUsers(request: Request, db: Session = Depends(get_db)):
+@app.get("/loadUsers/{search}")
+async def loadUsers(request: Request, search: str, db: Session = Depends(get_db)):
     token = request.headers.get('Authorization')
     user = helper.extract_user(db, token)
     if user is None:
@@ -172,10 +178,12 @@ async def loadUsers(request: Request, db: Session = Depends(get_db)):
             headers={"WWW-Authenticate": "Bearer"},
         )
     
+    isSuper = False
     if user.superuser == 1:
-        return helper.get_all_user_list(db, True)
-    
-    return helper.get_all_user_list(db, False)
+        isSuper = True
+    if search != "@":
+        return helper.get_users_search(db,search, isSuper)
+    return helper.get_all_user_list(db, isSuper)
 
 
 @app.get("/is_superuser")
@@ -194,10 +202,9 @@ async def getOneUser(request: Request, id: int, db: Session = Depends(get_db)):
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    elif user.superuser == 1:
-        return {"user": helper.get_user_by_id(db, id, True)}
-    else:
-        return {"user": helper.get_user_by_id(db, id, False)}
+ 
+    return {"user": helper.get_user_by_id(db, id, user.superuser == 1)}
+
 
 
 @app.get("/authed")
@@ -1636,3 +1643,16 @@ async def getPicture(id: int, db: Session = Depends(get_db)):
         return helper.getPicture(user)
     return ""
     
+@app.get("/mutalTopicsRoles/{id2}")
+async def mutalTopicsRoles(request: Request, id2: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    user2 = helper.get_user_by_id(db, id2,user1.superuser == 1)
+    if user1 is None or user2 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    return helper.mutalTopicRoles(db, user1, user2)

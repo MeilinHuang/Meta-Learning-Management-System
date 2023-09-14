@@ -66,7 +66,7 @@ class AccountService {
   }
 
   loadUsers(param) {
-    return axios.get(`${API_URL}/loadUsers`, {
+    return axios.get(`${API_URL}/loadUsers/${param.search}`, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': 'true',
@@ -246,6 +246,14 @@ class AccountService {
       }
     });
   }
+  mutalTopicsRoless(param) {
+    return axios.get(`${API_URL}/mutalTopicsRoles/${param.id2}`, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
+      }
+    });
+  }
 }
-
 export default new AccountService();

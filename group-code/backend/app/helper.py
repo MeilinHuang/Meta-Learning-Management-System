@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 import shutil
 import smtplib
 import pyotp
-
+from .database import SessionLocal, engine
 from . import models, schemas
 
 TOKEN_SECRET = "1fa35d8e94b996509dde52942120251b02ed236abad89b5c347d849849ee3d4c"
@@ -2350,3 +2350,46 @@ def getPicture(user: models.User):
             return image
     except Exception as e:
         return ""
+
+def get_users_search(db: Session, search: str, admin: bool):
+    query = db.query(models.User).filter(models.User.username.like(f"{search}%")).all()
+    for user in query:
+        if not admin:
+            user.email = ""
+            user.full_name = ""
+            user.auth_token = ""
+            user.password = ""
+            user.mfa = ""
+        user.profilePic = getPicture(user)
+    return query
+
+def mutalTopicRoles(db: Session, user1: models.User, user2: models.User):
+    mutalRoles = {}
+    for topic1 in user1.enrollments:
+        for topic2 in user2.enrollments:
+            if topic1.topic_id == topic2.topic_id:
+                if len(topic2.roles) != 0:
+                    for role in topic2.roles:
+                        if role.role_name in mutalRoles:
+                            mutalRoles[role.role_name] += [topic2.topic.topic_name]
+                        else:
+                            mutalRoles[role.role_name] = [topic2.topic.topic_name]
+                elif "Member" in mutalRoles:
+                    mutalRoles["Member"] += [topic1.topic.topic_name]
+                else:
+                    mutalRoles["Member"] = [topic1.topic.topic_name]
+    return mutalRoles
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+    
+
+if __name__ == "__main__":
+    db = next(get_db())
+    user1 = get_user_by_username(db,"admin")
+    user2 = get_user_by_username(db,"student")
+    print(mutalTopicRoles(db, user1, user2))

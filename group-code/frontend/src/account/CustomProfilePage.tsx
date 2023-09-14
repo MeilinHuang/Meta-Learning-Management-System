@@ -22,6 +22,9 @@ import { format } from 'date-fns';
 import { PaperClipIcon } from '@heroicons/react/20/solid';
 import { parseDateString } from 'react-ymd-date-select/dist/cjs/date-string';
 import { parse } from 'path';
+import memberImg from '../Icons/member.png';
+import studentImg from '../Icons/student.png';
+import teacherImg from '../Icons/teacher.png';
 
 export default function CustomProfilePage(props: any) {
   const [sendBlock, setSendBlock] = useState(false);
@@ -33,6 +36,8 @@ export default function CustomProfilePage(props: any) {
     introduction: '',
     profilePic: ''
   });
+
+  const [mutalRoles, setMutalRoles] = useState({});
   const { id } = useParams(); // :id 是这个id
   const [conversation_name, setConversation_name] = useState('');
   const navigate = useNavigate();
@@ -45,6 +50,46 @@ export default function CustomProfilePage(props: any) {
     }
   };
 
+  const roleToImg = (role: String) => {
+      if (role == "Creator") {
+        return teacherImg
+      } else if (role == "Student") {
+        return studentImg
+      } else {
+        return memberImg;
+      }
+
+  }
+
+  const loadMutalRoles = () => {
+    const res = [];
+    let i = 0;
+    var keys = Object.keys(mutalRoles);
+    while (i < keys.length) {
+      var topics = mutalRoles[keys[i]];
+      let j = 0;
+      while (j < topics.length) {
+        res.push(
+          <div className="px-1 justify-center">
+            <img
+              className="h-7 w-7"
+              src={roleToImg(keys[i])}
+              alt=""
+            />
+            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              {topics[j]}
+            </dd>
+          </div>
+        );
+        topics[j]
+        j += 1;
+      }
+      i += 1;
+    }
+    return res;
+  };
+
+
   useEffect(() => {
     console.log(id);
     AccountService.getOneUser({ 
@@ -53,6 +98,13 @@ export default function CustomProfilePage(props: any) {
     }).then((response) => {
       setUser(response.data.user);
       console.log(response.data);
+    });
+
+    AccountService.mutalTopicsRoless({
+      id2: id,
+      access_token: localStorage.getItem('access_token') 
+    }).then((response) => {
+      setMutalRoles(response.data);
     });
   }, []);
 
@@ -126,6 +178,21 @@ export default function CustomProfilePage(props: any) {
                       src={user.profilePic}
                       alt=""
                     />
+                  </dd>
+                </div>
+                <div className={
+                  (Object.keys(mutalRoles).length != 0)
+                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                }
+                >
+                  <dt className="text-sm font-medium text-gray-500">
+                    Mutal Roles
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 flex">
+                    
+                    {loadMutalRoles()}
+        
                   </dd>
                 </div>
               </dl>
