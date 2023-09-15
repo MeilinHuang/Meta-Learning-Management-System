@@ -25,6 +25,7 @@ import { parse } from 'path';
 import memberImg from '../Icons/member.png';
 import studentImg from '../Icons/student.png';
 import teacherImg from '../Icons/teacher.png';
+import forumStaffImg from '../Icons/forumStaff.png'
 
 export default function CustomProfilePage(props: any) {
   const [sendBlock, setSendBlock] = useState(false);
@@ -52,9 +53,11 @@ export default function CustomProfilePage(props: any) {
 
   const roleToImg = (role: String) => {
       if (role == "Creator") {
-        return teacherImg
+        return teacherImg;
       } else if (role == "Student") {
-        return studentImg
+        return studentImg;
+      } else if (role == "Forum Staff") {
+        return forumStaffImg;
       } else {
         return memberImg;
       }
@@ -67,23 +70,23 @@ export default function CustomProfilePage(props: any) {
     var keys = Object.keys(mutalRoles);
     while (i < keys.length) {
       var topics = mutalRoles[keys[i]];
-      let j = 0;
-      while (j < topics.length) {
-        res.push(
-          <div className="px-1 justify-center">
-            <img
-              className="h-7 w-7"
-              src={roleToImg(keys[i])}
-              alt=""
-            />
-            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              {topics[j]}
-            </dd>
-          </div>
-        );
-        topics[j]
-        j += 1;
+      var roleName = keys[i]
+      if (roleName == null || roleName == "null") {
+        roleName = "Member"
       }
+      var roleText = `${roleName} in ${topics.join(', ')}.`; 
+      res.push(
+        <div className="px-1 flex">
+          <img
+            className="h-7 w-7"
+            src={roleToImg(keys[i])}
+            alt=""
+          />
+          <dd className="mt-1.5 text-sm text-gray-900 sm:col-span-2 sm:mt-0 ml-2">
+            {roleText}
+          </dd>
+        </div>
+      );
       i += 1;
     }
     return res;
