@@ -22,6 +22,8 @@ import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkToc from 'remark-toc';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 
 import { useCreatePostMutation } from '../features/api/apiSlice';
@@ -44,6 +46,7 @@ export default function PostReply(props: any) {
         parent_id: props.parentId,
         content: reply
       });
+      setReply('');
       setCancel(true);
     } catch (err) {
       console.error('Failed to create post: ' + err);
@@ -130,7 +133,7 @@ export default function PostReply(props: any) {
                     id="comment"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     placeholder="Add your comment..."
-                    defaultValue={reply}
+                    value={reply}
                     onChange={(e) => setReply(e.target.value)}
                   />
                 </div>
@@ -138,8 +141,8 @@ export default function PostReply(props: any) {
               <Tab.Panel className="-m-0.5 rounded-lg p-0.5">
                 <div className="border-b prose prose-sm">
                   <ReactMarkdown
-                    remarkPlugins={[remarkGfm, remarkToc]}
-                    rehypePlugins={[rehypeHighlight]}
+                    remarkPlugins={[remarkGfm, remarkToc, remarkMath]}
+                    rehypePlugins={[rehypeHighlight, rehypeKatex]}
                   >
                     {reply}
                   </ReactMarkdown>
@@ -155,6 +158,7 @@ export default function PostReply(props: any) {
           type="button"
           onClick={() => {
             setCancel(true);
+            setReply('');
           }}
         >
           Cancel

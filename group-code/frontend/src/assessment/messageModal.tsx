@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 //import 'bootstrap/dist/css/bootstrap.min.css';
-import { Modal } from 'react-bootstrap';
+// import { Modal } from 'react-bootstrap';
+import { Modal } from 'antd';
 
 const MessageModal = (props: { show: any; close: any; message: any }) => {
   return (
     <>
-      <Modal
+      <Modal title="Error" open={props.show} footer={[]} onCancel={props.close}>
+        <h4 className="text-lg font-medium leading-6 text-gray-900">
+          {props.message}
+        </h4>
+      </Modal>
+      {/* <Modal
         show={props.show}
         cancel={props.close}
         className="fixed inset-0 z-10 overflow-y-auto"
@@ -25,7 +31,7 @@ const MessageModal = (props: { show: any; close: any; message: any }) => {
             </button>
           </Modal.Footer>
         </div>
-      </Modal>
+      </Modal> */}
     </>
   );
 };
