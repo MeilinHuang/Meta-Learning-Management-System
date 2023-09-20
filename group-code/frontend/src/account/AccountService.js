@@ -125,6 +125,7 @@ class AccountService {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
       }
     });
   }

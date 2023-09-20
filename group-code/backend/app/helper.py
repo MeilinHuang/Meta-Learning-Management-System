@@ -18,6 +18,7 @@ import smtplib
 import pyotp
 from .database import SessionLocal, engine
 from . import models, schemas
+from datetime import datetime
 
 TOKEN_SECRET = "1fa35d8e94b996509dde52942120251b02ed236abad89b5c347d849849ee3d4c"
 
@@ -146,7 +147,7 @@ def create_group_member(db: Session, user_id: int, conversation_id: int):
     if exist is not None:
         return None
     new_group_member = models.Group_member(
-        user_id=user_id, conversation_id=conversation_id)
+        user_id=user_id, conversation_id=conversation_id, lastSeen=datetime.now())
     db.add(new_group_member)
     db.commit()
     db.refresh(new_group_member)
@@ -2380,7 +2381,20 @@ def mutalTopicRoles(db: Session, user1: models.User, user2: models.User):
                     mutalRoles["Member"] = [topic1.topic.topic_name]
     return mutalRoles
 
-def get_db():
+def updateLastSeen(db: Session, user1: models.User, convo: models.Conversation):
+    print("updateLastSeen")
+    gm = models.Group_member
+    db.query(gm).filter(
+        gm.user_id == user1.id, gm.conversation_id == convo.id
+    ).update(
+        {
+            "lastSeen" : datetime.now()
+        }
+    )
+  
+    db.commit()
+
+def get_db_test():
     db = SessionLocal()
     try:
         yield db
@@ -2389,7 +2403,7 @@ def get_db():
     
 
 if __name__ == "__main__":
-    db = next(get_db())
+    db = next(get_db_test())
     user1 = get_user_by_username(db,"admin")
     user2 = get_user_by_username(db,"student")
     print(mutalTopicRoles(db, user1, user2))

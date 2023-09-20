@@ -404,3 +404,4 @@ class Group_member(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     conversation_id = Column(Integer, ForeignKey("conversation.id"))
+    lastSeen = Column(DateTime)

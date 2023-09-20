@@ -43,6 +43,7 @@ export default function ConversationPage(props: any) {
 
         AccountService.getOneConversation({"conversation_name": id})
         .then((response) => {
+            console.log(response.data.conversation)
             setConversation(response.data.conversation);
             setMessageList(response.data.mlist);
 

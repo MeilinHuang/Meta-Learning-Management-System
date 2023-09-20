@@ -16,7 +16,7 @@ import os
 import logging
 import re
 EMAILREG = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
-USERREG = r'\b^[a-zA-Z0-9_]+$\b'
+USERREG = r'\b^[a-zA-Z0-9]+$\b'
 models.Base.metadata.create_all(bind=engine)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -101,7 +101,7 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
     elif not re.fullmatch(USERREG, details.username):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username can only contain alphanumericals and underscores.",
+            detail="Username can only contain alphanumericals.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = helper.create_user(
@@ -497,11 +497,21 @@ async def addUserToConversation(details: schemas.addNameToConversation, db: Sess
 
 
 @app.get("/api/items/{conversation_name}")
-async def get_One_conversation(conversation_name, db: Session = Depends(get_db)):
+async def get_One_conversation(request: Request, conversation_name, db: Session = Depends(get_db)):
     print(conversation_name)
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 == None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     conver = helper.getOneConversation(db, conversation_name=conversation_name)
     # print(conver)
     if conver is not None:
+        helper.updateLastSeen(db, user1, conver)
         # user1, user2 = helper.getBothSidesName(db, conversation_id=conver.id)
         messages = helper.getMessagesOnCon(db, conversation_id=conver.id)
         return {"conversation": conver, "mlist": messages}
