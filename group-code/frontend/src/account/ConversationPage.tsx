@@ -22,7 +22,6 @@ export default function ConversationPage(props: any) {
     const [usersList, setUsersList] = useState<any[]>([]);
     const getProfilePic = (dp: any) => {
         if (dp != "" && dp != null && dp.profilePic != "") {
-            console.log(dp.profilePic)
             return dp.profilePic;
         } 
         return defaultImg;
@@ -91,6 +90,15 @@ export default function ConversationPage(props: any) {
         
     }
 
+    const formatDate = (dateTime: string ) => {
+        if (dateTime) {
+            const date = dateTime.split('T')[0];
+            const time = dateTime.split('T')[1].split(":");
+
+            return date + " " + time.slice(0,2).join(":");
+        }
+        return dateTime
+    }
     const getUsers = (idss: any) => {
         const idsss = idss.split("_");
         const newidss = idss.replace(/_/g, ' ')
@@ -182,7 +190,7 @@ export default function ConversationPage(props: any) {
                                                 >{oneMessage.sender_name}</div>
                                             </div>
                                             <div className='text-slate-400 text-2xs'
-                                            >{oneMessage.time_created}</div>
+                                            >{formatDate(oneMessage.time_created)}</div>
                                             <div className='bg-indigo-300 max-w-xl break-words rounded-md p-1'
                                             >{oneMessage.content}</div>
                                             
@@ -208,21 +216,20 @@ export default function ConversationPage(props: any) {
                                 <button
                                     className='inline-flex items-center rounded-md border border-transparent bg-white px-4 py-2 text-base font-medium text-indigo-400 hover:bg-gray-50 border-dashed border-gray-200'
                                     onClick={() => {
-                                        const now = new Date();
-                                        const nowStr = format(now, "yyyy-MM-dd HH:mm:ss");
-                                        const filter = new BadWords();
-                                        const param = {"conversation_id": conversation.id, "content": filter.clean(message), "sender_name": localStorage.getItem("user_name"), "time_created": nowStr} 
-                                        AccountService.sendMessage(param)
-                                        .then((response:any)=>{
-                                            AccountService.getOneConversation({"conversation_name": id})
-                                            .then((response) => {
-                                                setConversation(response.data.conversation);
-                                                setMessageList(response.data.mlist);
-                                            });
+                                        if (message.length != 0) {
+                                            const filter = new BadWords();
+                                            const param = {"conversation_id": conversation.id, "content": filter.clean(message), "sender_name": localStorage.getItem("user_name"), "time_created": ""} 
+                                            AccountService.sendMessage(param)
+                                            .then((response:any)=>{
+                                                AccountService.getOneConversation({"conversation_name": id})
+                                                .then((response) => {
+                                                    setConversation(response.data.conversation);
+                                                    setMessageList(response.data.mlist);
+                                                });
 
-                                            setMessage("");
-                                        })
-                                        
+                                                setMessage("");
+                                            })
+                                        } 
                                     }}
                                 >
                                     send

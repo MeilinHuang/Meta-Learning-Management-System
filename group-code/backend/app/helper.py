@@ -132,9 +132,9 @@ def check_permission(db: Session, user: models.User, topic: models.Topic, permis
     return False
 
 
-def create_message(db: Session, conversation_id: int, content: str, time_created: str, sender_name: str):
+def create_message(db: Session, conversation_id: int, content: str, sender_name: str):
     new_message = models.Message(
-        conversation_id=conversation_id, content=content, sender_name=sender_name)
+        conversation_id=conversation_id, content=content, time_created=datetime.now(),sender_name=sender_name)
     db.add(new_message)
     db.commit()
     db.refresh(new_message)
@@ -167,20 +167,12 @@ def create_conversation(db: Session, sender: str, receiver: str, sender_id: int,
 
 def findConversations(db: Session, user_id: str):
     # return all the conversation related to this user.
-    print("getting conversation")
     group_members = db.query(models.Group_member).filter_by(
         user_id=user_id).all()
-    print("group_members:")
-    print(group_members)
     res = []
     for group_member in group_members:
-        print(group_member)
-        print(group_member.user_id)
-        print(group_member.id)
-        print(group_member.conversation_id)
         conversation = db.query(models.Conversation).filter_by(
             id=group_member.conversation_id).first()
-        print(conversation)
         if conversation is not None:
             group_member2 = db.query(models.Group_member).filter_by(
                 conversation_id=conversation.id).all()
@@ -191,7 +183,6 @@ def findConversations(db: Session, user_id: str):
             if user0 is not None and user1 is not None:
                 res.append({"conver": conversation,
                            "user0": user0.username, "user1": user1.username})
-        print(res)
     return res
 
 
@@ -2382,7 +2373,6 @@ def mutalTopicRoles(db: Session, user1: models.User, user2: models.User):
     return mutalRoles
 
 def updateLastSeen(db: Session, user1: models.User, convo: models.Conversation):
-    print("updateLastSeen")
     gm = models.Group_member
     db.query(gm).filter(
         gm.user_id == user1.id, gm.conversation_id == convo.id
@@ -2391,8 +2381,30 @@ def updateLastSeen(db: Session, user1: models.User, convo: models.Conversation):
             "lastSeen" : datetime.now()
         }
     )
-  
     db.commit()
+
+def getNotifications(db: Session, user1: models.User):
+    notifications = []
+    gm = models.Group_member
+    msg = models.Message
+    convo = models.Conversation
+    currTime = datetime.now()
+    chats = db.query(gm).filter(gm.user_id == user1.id).all()
+    for chat in chats:
+        lastmessage = db.query(msg).filter(
+            msg.conversation_id == chat.conversation_id
+        ).order_by(msg.id.desc()).first()
+        print(datetime.now())
+        if lastmessage:
+            print(f"{chat.conversation_id} | {chat.lastSeen} < {lastmessage.time_created}")
+        if lastmessage and chat.lastSeen < lastmessage.time_created:
+            convoName = db.query(convo).filter(convo.id==chat.conversation_id).first()
+            notification = {"conversation_name":convoName.conversation_name}
+
+            notifications.append(notification)
+    print(notifications)
+    return {"notifications":notifications}
+
 
 def get_db_test():
     db = SessionLocal()
@@ -2401,9 +2413,7 @@ def get_db_test():
     finally:
         db.close()
     
-
 if __name__ == "__main__":
     db = next(get_db_test())
     user1 = get_user_by_username(db,"admin")
-    user2 = get_user_by_username(db,"student")
-    print(mutalTopicRoles(db, user1, user2))
+    getNotifications(db, user1)

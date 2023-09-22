@@ -12,6 +12,7 @@ from .auth import JWTBearer
 from pathlib import Path
 from io import BytesIO
 from .chatgpt.chatgpt import send_message as chatgpt_send_message
+from datetime import datetime
 import os
 import logging
 import re
@@ -521,7 +522,7 @@ async def get_One_conversation(request: Request, conversation_name, db: Session 
 @app.post("/sendMessage")
 async def send_message(details: schemas.SendMessage, db: Session = Depends(get_db)):
     new_nessage = helper.create_message(
-        db, details.conversation_id, details.content, details.time_created, details.sender_name)
+        db, details.conversation_id, details.content, details.sender_name)
     if new_nessage is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -1664,5 +1665,21 @@ async def mutalTopicsRoles(request: Request, id2: int, db: Session = Depends(get
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     return helper.mutalTopicRoles(db, user1, user2)
+
+@app.get("/notifications")
+async def notifications(request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return helper.getNotifications(db, user1)
+
+
+if __name__ == "__main__":
+    print(datetime.now())

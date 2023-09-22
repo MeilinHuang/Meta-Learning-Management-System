@@ -256,5 +256,15 @@ class AccountService {
       }
     });
   }
+
+  notifications(param) {
+    return axios.get(`${API_URL}/notifications`, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
+      }
+    });
+  }
 }
 export default new AccountService();
