@@ -94,7 +94,7 @@ export default function AdminUserPage() {
       });
   };
 
-  const updateUserList = (search: String) => {
+  const updateUserList = (search: string) => {
     const param = { search: search };
     AccountService.loadUsers(param)
       .then((response) => {

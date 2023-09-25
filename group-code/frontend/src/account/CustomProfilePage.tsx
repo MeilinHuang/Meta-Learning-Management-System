@@ -38,6 +38,8 @@ export default function CustomProfilePage(props: any) {
     profilePic: ''
   });
 
+  const [activityStatus, setActivityStatus] = useState({status:'Offline', delta:-1});
+  const [statusColour, setStatusColour] = useState(" text-gray-500")
   const [mutalRoles, setMutalRoles] = useState({});
   const { id } = useParams(); // :id 是这个id
   const [conversation_name, setConversation_name] = useState('');
@@ -51,7 +53,7 @@ export default function CustomProfilePage(props: any) {
     }
   };
 
-  const roleToImg = (role: String) => {
+  const roleToImg = (role: string) => {
       if (role == "Creator") {
         return teacherImg;
       } else if (role == "Student") {
@@ -67,14 +69,14 @@ export default function CustomProfilePage(props: any) {
   const loadMutalRoles = () => {
     const res = [];
     let i = 0;
-    var keys = Object.keys(mutalRoles);
+    const keys = Object.keys(mutalRoles);
     while (i < keys.length) {
-      var topics = mutalRoles[keys[i]];
-      var roleName = keys[i]
+      const topics = mutalRoles[keys[i]];
+      let roleName = keys[i]
       if (roleName == null || roleName == "null") {
         roleName = "Member"
       }
-      var roleText = `${roleName} in ${topics.join(', ')}.`; 
+      const roleText = `${roleName} in ${topics.join(', ')}.`; 
       res.push(
         <div className="px-1 flex">
           <img
@@ -109,7 +111,23 @@ export default function CustomProfilePage(props: any) {
     }).then((response) => {
       setMutalRoles(response.data);
     });
+
+    AccountService.activityStatus({
+      id: id
+    }).then((response) => {
+      setActivityStatus(response.data);
+      if (response.data) {
+        if (response.data.status == "Online") {
+          setStatusColour(" bg-green-500");
+        } else if (response.data.status == "Away") {
+          setStatusColour(" bg-orange-500");
+        } else {
+          setStatusColour(" bg-gray-500");
+        }
+      }
+    })
   }, []);
+
 
   return (
     <div>
@@ -117,9 +135,12 @@ export default function CustomProfilePage(props: any) {
         <div className=" py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
             <div className="px-4 py-5 sm:px-6">
-              <h3 className="text-lg font-medium leading-6 text-gray-900">
-                {user?.username}'s Profile
-              </h3>
+              <div className ="flex">
+                <h3 className="text-lg font-medium leading-6 text-gray-900">
+                  {user?.username}'s Profile
+                </h3>
+                <dd className={"w-4 h-4 rounded-full ml-2 mt-1" + statusColour}></dd>
+              </div>
               <p className="mt-1 max-w-2xl text-sm text-gray-500">
                 Personal details.
               </p>
@@ -196,6 +217,17 @@ export default function CustomProfilePage(props: any) {
                     
                     {loadMutalRoles()}
         
+                  </dd>
+                </div>
+                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+>
+                  <dt className="text-sm font-medium text-gray-500">
+                    Activity status
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 flex">
+                    <dd>
+                      {activityStatus.status}
+                    </dd>
                   </dd>
                 </div>
               </dl>

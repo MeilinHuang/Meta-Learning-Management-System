@@ -565,3 +565,9 @@ class userImage(BaseModel):
     token: str
     image: Any
 
+class log(BaseModel):
+    id: int
+    user_id: int
+    time: datetime
+    details: str
+

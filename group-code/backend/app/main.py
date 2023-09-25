@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException, Request, status, Query, Form, UploadFile, File
+from fastapi import Depends, FastAPI, HTTPException, Request, status, Query, Form, UploadFile, File, BackgroundTasks
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -248,7 +248,6 @@ async def list_non_super_users(db: Session = Depends(get_db)):
     #         headers={"WWW-Authenticate": "Bearer"},
     #     )
     res = helper.get_non_superuser_list(db)
-    print(res)
     return res
 
 
@@ -1678,8 +1677,23 @@ async def notifications(request: Request, db: Session = Depends(get_db)):
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    helper.updateLog(db, user1, "notification")
     return helper.getNotifications(db, user1)
 
+@app.get("/activityStatus/{id}")
+async def activityStatus(request: Request, id: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    user2 = helper.get_user_by_id(db, id, True)
+
+    if user1 is None or user2 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return helper.getActivityStatus(db, user2)
 
 if __name__ == "__main__":
     print(datetime.now())

@@ -2394,9 +2394,6 @@ def getNotifications(db: Session, user1: models.User):
         lastmessage = db.query(msg).filter(
             msg.conversation_id == chat.conversation_id
         ).order_by(msg.id.desc()).first()
-        print(datetime.now())
-        if lastmessage:
-            print(f"{chat.conversation_id} | {chat.lastSeen} < {lastmessage.time_created}")
         if lastmessage and chat.lastSeen < lastmessage.time_created:
             convoName = db.query(convo).filter(convo.id==chat.conversation_id).first()
             notification = {"conversation_name":convoName.conversation_name}
@@ -2405,6 +2402,32 @@ def getNotifications(db: Session, user1: models.User):
     print(notifications)
     return {"notifications":notifications}
 
+def updateLog(db: Session, user: models.User, activity: str):
+    log = getUserLog(db, user)
+    if log:
+        setattr(log, "time_created", datetime.now())
+        setattr(log, "details", activity)
+    else:
+        log = models.Log(user_id=user.id, time_created=datetime.now(), details=activity)
+        db.add(log)
+    db.commit()
+    db.refresh(log)
+
+def getUserLog(db: Session, user: models.User):
+    ml = models.Log
+    return db.query(ml).filter(ml.user_id==user.id).first()
+
+def getActivityStatus(db: Session, user: models.User):
+    delta = -1
+    status = "Offline"
+    log = getUserLog(db, user)
+    if log:
+        delta = (datetime.now() - log.time_created).total_seconds() / 60
+        if delta <= 5:
+            status = "Online"
+        elif delta <= 30:
+            status = "Away"
+    return {"status": status, "delta": delta}
 
 def get_db_test():
     db = SessionLocal()

@@ -405,3 +405,10 @@ class Group_member(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     conversation_id = Column(Integer, ForeignKey("conversation.id"))
     lastSeen = Column(DateTime)
+
+class Log(Base):
+    __tablename__ = "log"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    time_created = Column(DateTime(timezone=True))
+    details = Column(Text) 
