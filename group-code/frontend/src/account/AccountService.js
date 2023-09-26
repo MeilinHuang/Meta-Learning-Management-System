@@ -276,5 +276,25 @@ class AccountService {
       }
     });
   }
+
+  setPrivacy(param) {
+    return axios.post(`${API_URL}/setPrivacy`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
+      }
+    })
+  }
+
+  getPrivacy(param) {
+    return axios.get(`${API_URL}/getPrivacy/${param.id}`, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
+      }
+    });
+  }
 }
 export default new AccountService();

@@ -412,3 +412,12 @@ class Log(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     time_created = Column(DateTime(timezone=True))
     details = Column(Text) 
+
+class Privacy(Base):
+    __tablename__ = "privacy"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    full_name = Column(Boolean, default=False)
+    email = Column(Boolean, default=False)
+    recent_activity = Column(Boolean, default=False)
+    invisible = Column(Boolean, default=False)

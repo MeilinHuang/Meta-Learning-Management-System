@@ -1695,5 +1695,36 @@ async def activityStatus(request: Request, id: int, db: Session = Depends(get_db
 
     return helper.getActivityStatus(db, user2)
 
+@app.post("/setPrivacy")
+async def setPrivacy(request: Request, details: schemas.privacy, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    privUser = models.Privacy(user_id=user1.id, full_name=details.full_name, email=details.email,
+                              recent_activity=details.recent_activity,invisible=details.invisible)
+    setPrivacy(db, user1, privUser)
+    return {"message":"Updated"}
+
+@app.get("getPrivacy/{id}")
+async def getPrivacy(request: Request, id: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    user2 = helper.get_user_by_id(db, id, True)
+
+    if user1 is None or user2 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    return getPrivacy(db, user2)
+
 if __name__ == "__main__":
     print(datetime.now())

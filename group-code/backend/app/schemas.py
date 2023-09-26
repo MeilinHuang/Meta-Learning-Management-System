@@ -58,7 +58,6 @@ class User(BaseModel):
     emailAuth: str
     mfa: str
     profilePic: str
-    
     class Config:
         orm_mode = True
 
@@ -571,3 +570,8 @@ class log(BaseModel):
     time: datetime
     details: str
 
+class privacy(BaseModel):
+    full_name: bool
+    email: bool
+    recent_activity: bool
+    invisible: bool

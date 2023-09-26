@@ -2411,7 +2411,6 @@ def updateLog(db: Session, user: models.User, activity: str):
         log = models.Log(user_id=user.id, time_created=datetime.now(), details=activity)
         db.add(log)
     db.commit()
-    db.refresh(log)
 
 def getUserLog(db: Session, user: models.User):
     ml = models.Log
@@ -2429,6 +2428,24 @@ def getActivityStatus(db: Session, user: models.User):
             status = "Away"
     return {"status": status, "delta": delta}
 
+def setPrivacy(db: Session, user: models.User, privacySet: models.Privacy):
+    ps = models.Privacy
+    existingSet = db.query(ps).filter(ps.user_id==user.id)
+    if existingSet:
+        existingSet.update({
+            "full_name": privacySet.full_name,
+            "email": privacySet.email,
+            "recent_activity": privacySet.recent_activity,
+            "invisible": privacySet.invisible
+        })
+    else:
+        db.add(privacySet)
+    db.commit()
+
+def getPrivacy(db: Session, user: models.User):
+    ps = models.Privacy
+    return db.query(ps).filter(ps.user_id==user.id).first()
+
 def get_db_test():
     db = SessionLocal()
     try:
@@ -2439,4 +2456,7 @@ def get_db_test():
 if __name__ == "__main__":
     db = next(get_db_test())
     user1 = get_user_by_username(db,"admin")
-    getNotifications(db, user1)
+    mp = models.Privacy
+    privUser = mp(user_id=user1.id, full_name=True, email=False, recent_activity=True, invisible=True)
+    setPrivacy(db, user1, privUser)
+    print(getPrivacy(db,user1).email)
