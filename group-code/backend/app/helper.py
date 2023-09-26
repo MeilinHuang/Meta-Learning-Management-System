@@ -15,6 +15,8 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 import shutil
 import smtplib
+from mdtex2html import convert
+from weasyprint import HTML
 
 from . import models, schemas
 
@@ -1295,16 +1297,11 @@ def replace_resource(db: Session, prev_path: str, topic_id: str, section: str, f
 
 def upload_markdown(db: Session, topic_id: str, section: str, file_name: str, content: str):
     file_name = file_name.replace(' ', '-')
-    path = f"static/{topic_id}/{section}/{file_name}"
-    md_file = path + ".md"
-    with open(md_file, "w") as file:
-        file.write(content)
+    path = f"static/{topic_id}/{section}/{file_name}.pdf"
+    text = convert(content)
+    HTML(string=text).write_pdf(path)
 
-    # Convert to PDF
-    os.system(
-        f"node backend/node_modules/.bin/md-to-pdf static/{topic_id}/{section}/{file_name}.md")
-
-    return f"/{path}.pdf"
+    return f"/{path}"
 
 
 def replace_zip(topic_id: str, section: str):

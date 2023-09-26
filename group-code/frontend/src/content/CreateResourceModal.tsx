@@ -3,7 +3,7 @@ import { Transition, Menu, Dialog } from '@headlessui/react';
 import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import 'katex/dist/katex.css';
-import MarkdownEditor from 'common/MarkdownEditor';
+import MarkdownEditor2 from 'common/MarkdownEditor2';
 
 import {
   ResourceIcon,
@@ -641,11 +641,9 @@ export default function CreateResForm({
                               />
                             )}
                             {/* The preview component can be changed: https://github.com/uiwjs/react-md-editor/issues/429 */}
-                            <MarkdownEditor
+                            <MarkdownEditor2
                               MDContent={markdown}
                               setMDContent={setMarkdown}
-                              MDfullscreen={MDfullscreen}
-                              setMDFullscreen={setMDFullscreen}
                             />
                           </div>
                         )}
