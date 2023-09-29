@@ -2431,7 +2431,8 @@ def getActivityStatus(db: Session, user: models.User):
 def setPrivacy(db: Session, user: models.User, privacySet: models.Privacy):
     ps = models.Privacy
     existingSet = db.query(ps).filter(ps.user_id==user.id)
-    if existingSet:
+    if existingSet.first():
+        print(existingSet)
         existingSet.update({
             "full_name": privacySet.full_name,
             "email": privacySet.email,
@@ -2439,6 +2440,7 @@ def setPrivacy(db: Session, user: models.User, privacySet: models.Privacy):
             "invisible": privacySet.invisible
         })
     else:
+        print("no")
         db.add(privacySet)
     db.commit()
 

@@ -1705,13 +1705,13 @@ async def setPrivacy(request: Request, details: schemas.privacy, db: Session = D
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+    print(f"id: {user1.id}, full_name: {details.full_name}, email: {details.email}, recent: {details.recent_activity}, invisible: {details.invisible}")
     privUser = models.Privacy(user_id=user1.id, full_name=details.full_name, email=details.email,
                               recent_activity=details.recent_activity,invisible=details.invisible)
-    setPrivacy(db, user1, privUser)
+    helper.setPrivacy(db, user1, privUser)
     return {"message":"Updated"}
 
-@app.get("getPrivacy/{id}")
+@app.get("/getPrivacy/{id}")
 async def getPrivacy(request: Request, id: int, db: Session = Depends(get_db)):
     token = request.headers.get('Authorization')
     user1 = helper.extract_user(db, token)
@@ -1723,8 +1723,10 @@ async def getPrivacy(request: Request, id: int, db: Session = Depends(get_db)):
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
-    return getPrivacy(db, user2)
+    priv = helper.getPrivacy(db, user2)
+    if priv:
+        return {"email": priv.email, "recent_activity": priv.recent_activity, "invisible": priv.invisible, "full_name": priv.full_name}
+    return None
 
 if __name__ == "__main__":
     print(datetime.now())

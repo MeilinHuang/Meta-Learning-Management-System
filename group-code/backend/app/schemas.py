@@ -571,7 +571,7 @@ class log(BaseModel):
     details: str
 
 class privacy(BaseModel):
-    full_name: bool
     email: bool
     recent_activity: bool
     invisible: bool
+    full_name: bool
