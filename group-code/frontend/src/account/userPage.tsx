@@ -87,7 +87,7 @@ export default function UserPage() {
     updateUserList("@");
   }
 
-  const updateUserList = (search: String) => {
+  const updateUserList = (search: string) => {
     const param = { search: search };
     AccountService.loadUsers(param)
       .then((response) => {
@@ -100,16 +100,6 @@ export default function UserPage() {
       .catch((error) => {
         console.log('error');
       });
-  };
-
-  const getProfilePic = (id: any) => {
-    AccountService.getPicture({"id":id}).then((response) => {
-      const dp = response.data
-      if (dp != "" && dp != null) {
-        return dp;
-      } 
-    });
-    return defaultImg;
   };
 
   useEffect(() => {

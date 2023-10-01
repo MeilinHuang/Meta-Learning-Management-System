@@ -190,6 +190,7 @@ async def loadUsers(request: Request, search: str, db: Session = Depends(get_db)
 @app.get("/is_superuser")
 async def is_superuser(token: str = Depends(JWTBearer(db_generator=get_db())), db: Session = Depends(get_db)):
     user = helper.extract_user(db, token)
+    helper.updateLog(db, user, "")
     return {'is_superuser': user.superuser}
 
 
@@ -573,7 +574,7 @@ async def loadAssessmentMain(token: schemas.UserToken, db: Session = Depends(get
             detail="Not login"
         )
     result = helper.get_assessment_overview(db, user.id)
-
+    helper.updateLog(db, user, "Browsing Assessments")
     return result
 
 
@@ -587,6 +588,7 @@ async def assessmentEditOverview(token: schemas.UserToken, db: Session = Depends
             detail="Not login"
         )
     result = helper.get_assessment_edit_overview(db=db)
+    helper.updateLog(db, user, "Editing Assessments")
     return result
 
 
@@ -1280,6 +1282,7 @@ async def get_resource_section(resource_id, db: Session = Depends(get_db)):
 async def get_created_resources(db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
     if user:
+        helper.updateLog(db, user, "Browsing Resources")
         return helper.get_created_resources(db, user.id)
 
 
@@ -1305,6 +1308,19 @@ async def get_topic_info(topic_id: int, db: Session = Depends(get_db)):
 async def get_resources(topic_id: int, section: str, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
     resources = helper.get_resources(db, user.id, section, topic_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not resources:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Resource not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    helper.updateLog(db, user, f"Browsing {resources.title}'s {resources.section}")
     return {"resources": resources}
 
 
@@ -1657,7 +1673,7 @@ async def getPicture(id: int, db: Session = Depends(get_db)):
 async def mutalTopicsRoles(request: Request, id2: int, db: Session = Depends(get_db)):
     token = request.headers.get('Authorization')
     user1 = helper.extract_user(db, token)
-    user2 = helper.get_user_by_id(db, id2,user1.superuser == 1)
+    user2 = helper.get_user_by_id(db, id2,user1.superuser)
     if user1 is None or user2 is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -1677,7 +1693,6 @@ async def notifications(request: Request, db: Session = Depends(get_db)):
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    helper.updateLog(db, user1, "notification")
     return helper.getNotifications(db, user1)
 
 @app.get("/activityStatus/{id}")
@@ -1693,7 +1708,7 @@ async def activityStatus(request: Request, id: int, db: Session = Depends(get_db
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return helper.getActivityStatus(db, user2)
+    return helper.getActivityStatus(db, user2, user1.superuser)
 
 @app.post("/setPrivacy")
 async def setPrivacy(request: Request, details: schemas.privacy, db: Session = Depends(get_db)):

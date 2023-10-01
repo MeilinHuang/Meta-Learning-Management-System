@@ -38,7 +38,12 @@ export default function CustomProfilePage(props: any) {
     profilePic: ''
   });
 
-  const [activityStatus, setActivityStatus] = useState({status:'Offline', delta:-1});
+  const [activityStatus, setActivityStatus] = useState({
+    status:'Offline', 
+    delta:-1,
+    details: ""
+  });
+
   const [statusColour, setStatusColour] = useState(" text-gray-500")
   const [mutalRoles, setMutalRoles] = useState({});
   const { id } = useParams(); // :id 是这个id
@@ -115,6 +120,7 @@ export default function CustomProfilePage(props: any) {
     AccountService.activityStatus({
       id: id
     }).then((response) => {
+      console.log(response.data);
       setActivityStatus(response.data);
       if (response.data) {
         if (response.data.status == "Online") {
@@ -147,6 +153,23 @@ export default function CustomProfilePage(props: any) {
             </div>
             <div className="border-t border-gray-200">
               <dl>
+                <div className={
+                  (user.profilePic != "")
+                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                }
+                >
+                  <dt className="text-sm font-medium text-gray-500">
+                    Profile Picture
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                    <img
+                      className="h-12 w-12 rounded-full"
+                      src={user.profilePic}
+                      alt=""
+                    />
+                  </dd>
+                </div>
                 <div className={
                   (user.full_name != "")
                   ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
@@ -188,23 +211,6 @@ export default function CustomProfilePage(props: any) {
                   </dd>
                 </div>
                 <div className={
-                  (user.profilePic != "")
-                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
-                }
-                >
-                  <dt className="text-sm font-medium text-gray-500">
-                    Profile Picture
-                  </dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                    <img
-                      className="h-12 w-12 rounded-full"
-                      src={user.profilePic}
-                      alt=""
-                    />
-                  </dd>
-                </div>
-                <div className={
                   (Object.keys(mutalRoles).length != 0)
                   ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
                   : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
@@ -219,15 +225,25 @@ export default function CustomProfilePage(props: any) {
         
                   </dd>
                 </div>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
->
+                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                   <dt className="text-sm font-medium text-gray-500">
                     Activity status
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 flex">
-                    <dd>
-                      {activityStatus.status}
-                    </dd>
+                    {activityStatus.status}
+                  </dd>
+                </div>
+                <div className={
+                  (activityStatus.details != "")
+                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                }
+                >
+                  <dt className="text-sm font-medium text-gray-500">
+                    Recent Activity
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 flex">
+                    {activityStatus.details}
                   </dd>
                 </div>
               </dl>

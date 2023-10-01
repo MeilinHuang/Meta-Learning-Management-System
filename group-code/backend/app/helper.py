@@ -279,8 +279,11 @@ def get_user_by_id(db: Session, user_id: int, admin: bool):
     try:
         user = db.query(models.User).filter_by(id=user_id).one()
         if not admin:
-            user.email = ""
-            user.full_name = ""
+            privSet = getPrivacy(db, user)
+            if not privSet.email:
+                user.email = ""
+            if not privSet.full_name:
+                user.full_name = ""
             user.auth_token = ""
             user.password = ""
             user.mfa = ""
@@ -1197,7 +1200,6 @@ def get_resources(db: Session, user_id: int, section: str, topic_id: int):
         else:
             resource_res["complete"] = False
         res.append(resource_res)
-
     return res
 
 
@@ -2399,14 +2401,16 @@ def getNotifications(db: Session, user1: models.User):
             notification = {"conversation_name":convoName.conversation_name}
 
             notifications.append(notification)
-    print(notifications)
     return {"notifications":notifications}
 
 def updateLog(db: Session, user: models.User, activity: str):
     log = getUserLog(db, user)
     if log:
-        setattr(log, "time_created", datetime.now())
-        setattr(log, "details", activity)
+        newTime = datetime.now()
+        delta = (newTime - log.time_created).total_seconds() / 60
+        if not (delta <= 30 and activity == ""):
+            setattr(log, "details", activity)
+        setattr(log, "time_created", newTime)
     else:
         log = models.Log(user_id=user.id, time_created=datetime.now(), details=activity)
         db.add(log)
@@ -2416,23 +2420,32 @@ def getUserLog(db: Session, user: models.User):
     ml = models.Log
     return db.query(ml).filter(ml.user_id==user.id).first()
 
-def getActivityStatus(db: Session, user: models.User):
+def getActivityStatus(db: Session, user: models.User, isAdmin: bool):
     delta = -1
     status = "Offline"
+    details = ""
+    privSet = getPrivacy(db,user)
     log = getUserLog(db, user)
+
     if log:
         delta = (datetime.now() - log.time_created).total_seconds() / 60
         if delta <= 5:
             status = "Online"
         elif delta <= 30:
             status = "Away"
-    return {"status": status, "delta": delta}
+    
+    if log and log.details and status != "Offline":
+        details = log.details
+
+    if not isAdmin and privSet.invisible:
+        return {"status": "Offline", "delta": -1, "details": ""}
+    
+    return {"status": status, "delta": delta, "details": details}
 
 def setPrivacy(db: Session, user: models.User, privacySet: models.Privacy):
     ps = models.Privacy
     existingSet = db.query(ps).filter(ps.user_id==user.id)
     if existingSet.first():
-        print(existingSet)
         existingSet.update({
             "full_name": privacySet.full_name,
             "email": privacySet.email,
@@ -2440,14 +2453,15 @@ def setPrivacy(db: Session, user: models.User, privacySet: models.Privacy):
             "invisible": privacySet.invisible
         })
     else:
-        print("no")
         db.add(privacySet)
     db.commit()
 
 def getPrivacy(db: Session, user: models.User):
     ps = models.Privacy
-    return db.query(ps).filter(ps.user_id==user.id).first()
-
+    privSet = db.query(ps).filter(ps.user_id==user.id).first()
+    if privSet:
+        return privSet
+    return models.Privacy(user_id=user.id)
 def get_db_test():
     db = SessionLocal()
     try:
@@ -2457,8 +2471,6 @@ def get_db_test():
     
 if __name__ == "__main__":
     db = next(get_db_test())
-    user1 = get_user_by_username(db,"admin")
+    user1 = get_user_by_username(db,"student123")
     mp = models.Privacy
-    privUser = mp(user_id=user1.id, full_name=True, email=False, recent_activity=True, invisible=True)
-    setPrivacy(db, user1, privUser)
-    print(getPrivacy(db,user1).email)
+    print(getPrivacy(db, user1).user_id)
