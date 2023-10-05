@@ -332,7 +332,7 @@ async def get_user_roles(user_id: int, topic_id: int = Query(None), db: Session 
     authenticator = helper.extract_user(db, token)
     topic = db.query(models.Topic).filter_by(id=topic_id).one()
     if helper.check_permission(db, authenticator, topic, "can_view_topic_roles"):
-        return helper.get_user_roles(db, helper.get_user_by_id(db, user_id), topic)
+        return helper.get_user_roles(db, helper.get_user_by_id(db, user_id, True), topic)
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Unauthorised",
@@ -1320,7 +1320,12 @@ async def get_resources(topic_id: int, section: str, db: Session = Depends(get_d
             detail="Resource not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    helper.updateLog(db, user, f"Browsing {resources.title}'s {resources.section}")
+    
+    try:
+        helper.updateLog(db, user, f"Browsing {resources.title}'s {resources.section}")
+    except:
+        helper.updateLog(db, user, f"Browsing Topic Resources")
+    
     return {"resources": resources}
 
 

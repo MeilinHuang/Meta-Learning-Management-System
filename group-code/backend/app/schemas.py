@@ -575,3 +575,8 @@ class privacy(BaseModel):
     recent_activity: bool
     invisible: bool
     full_name: bool
+
+class requestExport(BaseModel):
+    topicId: int
+    features: list
+

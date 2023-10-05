@@ -66,6 +66,9 @@ class AccountService {
   }
 
   loadUsers(param) {
+    if (param.search == "") {
+      param = {search: "@"}
+    }
     return axios.get(`${API_URL}/loadUsers/${param.search}`, {
       headers: {
         'Access-Control-Allow-Origin': '*',

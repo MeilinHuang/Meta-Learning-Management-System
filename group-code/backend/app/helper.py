@@ -274,8 +274,7 @@ def get_all_user_list(db: Session, admin: bool):
         user.profilePic = getPicture(user)
     return query
 
-
-def get_user_by_id(db: Session, user_id: int, admin: bool):
+def get_user_by_id(db: Session, user_id: int, admin=False):
     try:
         user = db.query(models.User).filter_by(id=user_id).one()
         if not admin:
@@ -2404,6 +2403,8 @@ def getNotifications(db: Session, user1: models.User):
     return {"notifications":notifications}
 
 def updateLog(db: Session, user: models.User, activity: str):
+    if not user:
+        return
     log = getUserLog(db, user)
     if log:
         newTime = datetime.now()
@@ -2462,6 +2463,57 @@ def getPrivacy(db: Session, user: models.User):
     if privSet:
         return privSet
     return models.Privacy(user_id=user.id)
+
+def topicExport(db: Session, topicId: int, features: [str]):
+    tp = models.Topic
+    rsc = models.Resource
+    fr = models.Forum
+    sc = models.Section
+    thrd = models.Thread
+    pst = models.Post
+    ass = models.Assessment
+    qst = models.Question
+    rtnDict = {}
+    topic = db.query(tp).filter(tp.id==topicId).first()
+    if not topic:
+        return None
+    
+    rtnDict["topic"] = topic.__dict__
+    rtnDict["resources"] = []
+
+    if "content" in features:
+        content = db.query(rsc).filter(rsc.topic_id==topicId, rsc.section=="content").all()
+        rtnDict["resources"] += map(lambda x: x.__dict__, content)
+    if "preparation" in features:
+        content = db.query(rsc).filter(rsc.topic_id==topicId, rsc.section=="preparation").all()
+        rtnDict["resources"] += map(lambda x: x.__dict__, content)
+    if "forum" in features:
+        forum = db.query(fr).filter(fr.id==topicId).first().__dict__
+        forum["sections"] = []
+        sections = db.query(sc).filter(sc.forum_id==forum["id"]).all()
+        for section in sections:
+            sectionD = section.__dict__
+            sectionD["threads"] = []
+            threads = db.query(thrd).filter(thrd.section_id==sectionD["id"]).all()
+            for thread in threads:
+                threadD = thread.__dict__
+                posts = db.query(pst).filter(pst.thread_id==threadD["id"]).all()
+                threadD["posts"] = map(lambda x: x.__dict__, posts)
+                sectionD["threads"] += [threadD.copy()]
+            forum["sections"] += [sectionD.copy()]
+        rtnDict["forum"] = forum
+    if "assessments" in features:
+        assList = []
+        assessments = db.query(ass).filter(ass.topic_id==topicId).all()
+        for assessment in assessments:
+            assessmentD = assessment.__dict__
+            questions = db.query(qst).filter(qst.assessment_id==assessmentD["id"]).all()
+            assessmentD["questions"] = map(lambda x: x.__dict__, questions)
+            assList += [assessmentD]
+        rtnDict["assessments"] = assList
+    return rtnDict
+
+
 def get_db_test():
     db = SessionLocal()
     try:
@@ -2471,6 +2523,4 @@ def get_db_test():
     
 if __name__ == "__main__":
     db = next(get_db_test())
-    user1 = get_user_by_username(db,"student123")
-    mp = models.Privacy
-    print(getPrivacy(db, user1).user_id)
+    print(topicExport(db, 8, ["assessments"]))
