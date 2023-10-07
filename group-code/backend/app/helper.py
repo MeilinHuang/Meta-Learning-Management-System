@@ -2516,8 +2516,38 @@ def exportForum(db: Session, topicId):
     rtnDict["forum"] = forum
     return rtnDict
 
-def topicImport(db: Session, fileStr: str):
-    pass
+def topicImport(db: Session, fileStr: str, userID):
+    ass = models.Assessment
+    qst = models.Question
+    resources = []
+    assessments = []
+    questions = []
+    #try:
+        
+    fd = json.loads(fileStr)
+    tpd = fd["topic"]
+    resources = []
+    assessments = []
+    questions = []
+    topic = create_topic(db, topic_name=tpd["topic_name"], topic_group_id=tpd["topic_group_id"], 
+                         image_url=tpd["image_url"], created_by=userID, archived=tpd["archived"], description=tpd["description"])
+    topicId = topic.id
+    for rscd in fd["resources"]:
+        resource = create_resource(db, resource_type=rscd["resource_type"], title=rscd["title"], server_path=rscd["server_path"], url=rscd["url"],
+                                      duration=rscd["duration"], section=rscd["section"], description=rscd["description"], topic_id=topic.id, creator_id=rscd["creator_id"])
+    for assd in fd["assessments"]:
+        assessment = add_new_assessment(db, topic.id, assd["type"], assd["assessmentName"], assd["proportion"], assd["status"], assd["timeRange"])
+        assId = assessment.id
+        for questd in assd["questions"]:
+            question = add_new_question_to_assessment(db, assessment.id,
+                                   questd["type"],questd["question_description"],
+                                   questd["choices"], questd["answer"])
+
+
+
+    return {"message":"success", "topic":topic}
+    #except:
+    #    return {"message":"failure"}
 
 
 def modelToDict(model):
@@ -2534,4 +2564,5 @@ def get_db_test():
     
 if __name__ == "__main__":
     db = next(get_db_test())
-    print(topicExport(db, 8))
+    user1 = get_user_by_id(db,1,True)
+    print(topicImport(db,topicExport(db, 1)[0], user1))
