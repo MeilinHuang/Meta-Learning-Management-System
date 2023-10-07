@@ -83,7 +83,7 @@ export default function TopicSettings() {
             }}
           >
             <TrashIcon className="w-4 h-4 mr-2" />
-            <span>Archive/Delete</span>
+            <span>Export/Archive/Delete</span>
           </button>
         </div>
       )}

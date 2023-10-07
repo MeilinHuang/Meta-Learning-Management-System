@@ -1748,5 +1748,25 @@ async def getPrivacy(request: Request, id: int, db: Session = Depends(get_db)):
         return {"email": priv.email, "recent_activity": priv.recent_activity, "invisible": priv.invisible, "full_name": priv.full_name}
     return None
 
+@app.get("/exportTopic/{topicId}")
+async def exportTopic(request: Request, topicId: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    topic = helper.topicExport(db, topicId)
+    if topic is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Topic not found"
+        )
+    
+    return {"topic":topic[0], "topic_name":topic[1]}
+
 if __name__ == "__main__":
     print(datetime.now())

@@ -576,7 +576,3 @@ class privacy(BaseModel):
     invisible: bool
     full_name: bool
 
-class requestExport(BaseModel):
-    topicId: int
-    features: list
-

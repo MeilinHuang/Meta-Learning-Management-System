@@ -2464,13 +2464,9 @@ def getPrivacy(db: Session, user: models.User):
         return privSet
     return models.Privacy(user_id=user.id)
 
-def topicExport(db: Session, topicId: int, features: [str]):
+def topicExport(db: Session, topicId: int):
     tp = models.Topic
     rsc = models.Resource
-    fr = models.Forum
-    sc = models.Section
-    thrd = models.Thread
-    pst = models.Post
     ass = models.Assessment
     qst = models.Question
     rtnDict = {}
@@ -2478,41 +2474,56 @@ def topicExport(db: Session, topicId: int, features: [str]):
     if not topic:
         return None
     
-    rtnDict["topic"] = topic.__dict__
+    rtnDict["topic"] = modelToDict(topic)
     rtnDict["resources"] = []
 
-    if "content" in features:
-        content = db.query(rsc).filter(rsc.topic_id==topicId, rsc.section=="content").all()
-        rtnDict["resources"] += map(lambda x: x.__dict__, content)
-    if "preparation" in features:
-        content = db.query(rsc).filter(rsc.topic_id==topicId, rsc.section=="preparation").all()
-        rtnDict["resources"] += map(lambda x: x.__dict__, content)
-    if "forum" in features:
-        forum = db.query(fr).filter(fr.id==topicId).first().__dict__
-        forum["sections"] = []
-        sections = db.query(sc).filter(sc.forum_id==forum["id"]).all()
-        for section in sections:
-            sectionD = section.__dict__
-            sectionD["threads"] = []
-            threads = db.query(thrd).filter(thrd.section_id==sectionD["id"]).all()
-            for thread in threads:
-                threadD = thread.__dict__
-                posts = db.query(pst).filter(pst.thread_id==threadD["id"]).all()
-                threadD["posts"] = map(lambda x: x.__dict__, posts)
-                sectionD["threads"] += [threadD.copy()]
-            forum["sections"] += [sectionD.copy()]
-        rtnDict["forum"] = forum
-    if "assessments" in features:
-        assList = []
-        assessments = db.query(ass).filter(ass.topic_id==topicId).all()
-        for assessment in assessments:
-            assessmentD = assessment.__dict__
-            questions = db.query(qst).filter(qst.assessment_id==assessmentD["id"]).all()
-            assessmentD["questions"] = map(lambda x: x.__dict__, questions)
-            assList += [assessmentD]
-        rtnDict["assessments"] = assList
+    content = db.query(rsc).filter(rsc.topic_id==topicId, rsc.section=="content").all()
+    rtnDict["resources"] += list(map(lambda x: modelToDict(x), content))
+
+    content = db.query(rsc).filter(rsc.topic_id==topicId, rsc.section=="preparation").all()
+    rtnDict["resources"] += list(map(lambda x: modelToDict(x), content))
+
+    assList = []
+    assessments = db.query(ass).filter(ass.topic_id==topicId).all()
+    for assessment in assessments:
+        assessmentD = modelToDict(assessment)
+        questions = db.query(qst).filter(qst.assessment_id==assessmentD["id"]).all()
+        assessmentD["questions"] = list(map(lambda x: modelToDict(x), questions))
+        assList += [assessmentD.copy()]
+    rtnDict["assessments"] = assList
+    return [json.dumps(rtnDict), topic.topic_name]
+
+def exportForum(db: Session, topicId):
+    fr = models.Forum
+    sc = models.Section
+    thrd = models.Thread
+    pst = models.Post
+    rtnDict = {}
+    forum = db.query(fr).filter(fr.id==topicId).first()
+    forum = modelToDict(forum)
+    forum["sections"] = []
+    sections = db.query(sc).filter(sc.forum_id==forum["id"]).all()
+    for section in sections:
+        sectionD = modelToDict(section)
+        sectionD["threads"] = []
+        threads = db.query(thrd).filter(thrd.section_id==sectionD["id"]).all()
+        for thread in threads:
+            threadD = modelToDict(thread)
+            posts = db.query(pst).filter(pst.thread_id==threadD["id"]).all()
+            threadD["posts"] = list(map(lambda x: modelToDict(x), posts))
+            sectionD["threads"] += [threadD.copy()]
+        forum["sections"] += [sectionD.copy()]
+    rtnDict["forum"] = forum
     return rtnDict
 
+def topicImport(db: Session, fileStr: str):
+    pass
+
+
+def modelToDict(model):
+    model = model.__dict__
+    model.pop('_sa_instance_state')
+    return model
 
 def get_db_test():
     db = SessionLocal()
@@ -2523,4 +2534,4 @@ def get_db_test():
     
 if __name__ == "__main__":
     db = next(get_db_test())
-    print(topicExport(db, 8, ["assessments"]))
+    print(topicExport(db, 8))
