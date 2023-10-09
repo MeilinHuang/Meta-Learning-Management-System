@@ -19,6 +19,7 @@ import pyotp
 from .database import SessionLocal, engine
 from . import models, schemas
 from datetime import datetime
+from base64 import b64decode
 
 TOKEN_SECRET = "1fa35d8e94b996509dde52942120251b02ed236abad89b5c347d849849ee3d4c"
 
@@ -2516,39 +2517,43 @@ def exportForum(db: Session, topicId):
     rtnDict["forum"] = forum
     return rtnDict
 
-def topicImport(db: Session, fileStr: str, userID):
+def topicImport(db: Session, fileStr: str, user: models.User):
     ass = models.Assessment
     qst = models.Question
     resources = []
     assessments = []
-    questions = []
-    #try:
-        
-    fd = json.loads(fileStr)
-    tpd = fd["topic"]
-    resources = []
-    assessments = []
-    questions = []
-    topic = create_topic(db, topic_name=tpd["topic_name"], topic_group_id=tpd["topic_group_id"], 
-                         image_url=tpd["image_url"], created_by=userID, archived=tpd["archived"], description=tpd["description"])
-    topicId = topic.id
-    for rscd in fd["resources"]:
-        resource = create_resource(db, resource_type=rscd["resource_type"], title=rscd["title"], server_path=rscd["server_path"], url=rscd["url"],
-                                      duration=rscd["duration"], section=rscd["section"], description=rscd["description"], topic_id=topic.id, creator_id=rscd["creator_id"])
-    for assd in fd["assessments"]:
-        assessment = add_new_assessment(db, topic.id, assd["type"], assd["assessmentName"], assd["proportion"], assd["status"], assd["timeRange"])
-        assId = assessment.id
-        for questd in assd["questions"]:
-            question = add_new_question_to_assessment(db, assessment.id,
-                                   questd["type"],questd["question_description"],
-                                   questd["choices"], questd["answer"])
+    questions = []  
+    try:
+        fileStr = decodeFile(fileStr)
+    
+        fd = json.loads(fileStr)
+        tpd = fd["topic"]
+        resources = []
+        assessments = []
+        questions = []
+        topic = create_topic(db, topic_name=tpd["topic_name"], topic_group_id=tpd["topic_group_id"], 
+                            image_url=tpd["image_url"], created_by=user, archived=tpd["archived"], description=tpd["description"])
 
+        topicId = topic.id
+        for rscd in fd["resources"]:
+            resource = create_resource(db, resource_type=rscd["resource_type"], title=rscd["title"], server_path=rscd["server_path"], url=rscd["url"],
+                                        duration=rscd["duration"], section=rscd["section"], description=rscd["description"], topic_id=topic.id, creator_id=rscd["creator_id"])
+        for assd in fd["assessments"]:
+            assessment = add_new_assessment(db, topic.id, assd["type"], assd["assessmentName"], assd["proportion"], assd["status"], assd["timeRange"])
+            assId = assessment.id
+            for questd in assd["questions"]:
+                question = add_new_question_to_assessment(db, assessment.id,
+                                    questd["type"],questd["question_description"],
+                                    questd["choices"], questd["answer"])
 
+        return {"message":"success", "topic": topic}
+    except Exception as e:
+        return {"message":"failure", "topic": None, "exception":e}
 
-    return {"message":"success", "topic":topic}
-    #except:
-    #    return {"message":"failure"}
-
+def decodeFile(dataUrl: str):
+    encoded = dataUrl.split("base64,", 1)
+    fileStr = b64decode(encoded[1])
+    return fileStr
 
 def modelToDict(model):
     model = model.__dict__

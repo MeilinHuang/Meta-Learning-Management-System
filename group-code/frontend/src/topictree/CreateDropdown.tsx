@@ -8,6 +8,7 @@ function classNames(...classes: any) {
 
 type PathwayDropdownProps = {
   setShowTopicModal: any;
+  setShowTopicImportModal: any;
   setShowGroupModal: any;
   setShowPrereqModal: any;
   setShowPathwayModal: any;
@@ -15,6 +16,7 @@ type PathwayDropdownProps = {
 
 export default function PathwayDropdown({
   setShowTopicModal,
+  setShowTopicImportModal,
   setShowGroupModal,
   setShowPrereqModal,
   setShowPathwayModal
@@ -52,6 +54,22 @@ export default function PathwayDropdown({
                   onClick={() => setShowTopicModal(true)}
                 >
                   Topic
+                </a>
+              )}
+            </Menu.Item>
+            <Menu.Item>
+              {({ active }) => (
+                <a
+                  href="#"
+                  className={classNames(
+                    active
+                      ? 'bg-gray-100 text-gray-900 cursor-pointer'
+                      : 'text-gray-700',
+                    'block px-4 py-2 text-sm'
+                  )}
+                  onClick={() => setShowTopicImportModal(true)}
+                >
+                  Upload Topic
                 </a>
               )}
             </Menu.Item>

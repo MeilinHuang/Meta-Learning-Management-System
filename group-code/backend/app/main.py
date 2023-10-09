@@ -1768,5 +1768,18 @@ async def exportTopic(request: Request, topicId: int, db: Session = Depends(get_
     
     return {"topic":topic[0], "topic_name":topic[1]}
 
+@app.post("/importTopic")
+async def importTopic(request: Request, details: schemas.importTopic, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    return helper.topicImport(db, details.file, user1)
+
 if __name__ == "__main__":
     print(datetime.now())
