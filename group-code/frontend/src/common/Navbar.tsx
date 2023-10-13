@@ -202,14 +202,16 @@ export default function Navbar() {
                               AccountService.logout({"access_token": localStorage.getItem("access_token")})
                               .then((response)=>{
                                 console.log(response)
+
                               })
                               .catch((error)=>{
                                 console.log(error)
-                              })
+                              });
 
                               localStorage.clear();
                               logout(null);
                               navigate('/welcome');
+                              location.reload();
                             }}
                           >
                             Sign out

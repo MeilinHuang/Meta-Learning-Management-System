@@ -529,7 +529,7 @@ def get_assessment_overview(db: Session, user_id: int):
     result = []
     for ele in overview:
         res_dict = {}
-        res_dict["topic"] = ele.topic
+        res_dict["topic"] = modelToDict(ele.topic)
         res_dict["year"] = str(ele.year)
         res_dict["term"] = str(ele.term)
         mark = 0

@@ -12,7 +12,7 @@ import {
   HomeIcon,
   InboxIcon,
   UsersIcon,
-  XMarkIcon
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import {
@@ -479,7 +479,7 @@ export default function UserPage() {
                     console.log('here1');
                   }}
                 >
-                  <ChartBarIcon
+                  <UsersIcon
                     className="mr-3 h-6 w-6 flex-shrink-0 text-indigo-300"
                     aria-hidden="true"
                   />
