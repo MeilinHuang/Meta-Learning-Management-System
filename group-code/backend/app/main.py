@@ -190,7 +190,7 @@ async def loadUsers(request: Request, search: str, db: Session = Depends(get_db)
 @app.get("/is_superuser")
 async def is_superuser(token: str = Depends(JWTBearer(db_generator=get_db())), db: Session = Depends(get_db)):
     user = helper.extract_user(db, token)
-    helper.updateLog(db, user, "")
+    #helper.updateLog(db, user, "")
     return {'is_superuser': user.superuser}
 
 
@@ -574,7 +574,8 @@ async def loadAssessmentMain(token: schemas.UserToken, db: Session = Depends(get
             detail="Not login"
         )
     result = helper.get_assessment_overview(db, user.id)
-    helper.updateLog(db, user, "Browsing Assessments")
+    #helper.updateLog(db, user, "Browsing Assessments")
+    #print(result[1]['topic'].topic_name)
     return result
 
 
@@ -588,7 +589,7 @@ async def assessmentEditOverview(token: schemas.UserToken, db: Session = Depends
             detail="Not login"
         )
     result = helper.get_assessment_edit_overview(db=db)
-    helper.updateLog(db, user, "Editing Assessments")
+    #helper.updateLog(db, user, "Editing Assessments")
     return result
 
 
@@ -1282,7 +1283,7 @@ async def get_resource_section(resource_id, db: Session = Depends(get_db)):
 async def get_created_resources(db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
     if user:
-        helper.updateLog(db, user, "Browsing Resources")
+        #helper.updateLog(db, user, "Browsing Resources")
         return helper.get_created_resources(db, user.id)
 
 
@@ -1322,9 +1323,11 @@ async def get_resources(topic_id: int, section: str, db: Session = Depends(get_d
         )
     
     try:
-        helper.updateLog(db, user, f"Browsing {resources.title}'s {resources.section}")
+        pass
+        #helper.updateLog(db, user, f"Browsing {resources.title}'s {resources.section}")
     except:
-        helper.updateLog(db, user, f"Browsing Topic Resources")
+        #helper.updateLog(db, user, f"Browsing Topic Resources")
+        pass
     
     return {"resources": resources}
 

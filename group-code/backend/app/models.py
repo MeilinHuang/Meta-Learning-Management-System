@@ -421,3 +421,10 @@ class Privacy(Base):
     email = Column(Boolean, default=False)
     recent_activity = Column(Boolean, default=False)
     invisible = Column(Boolean, default=False)
+
+class topicExportLog(Base):
+    __tablename__ = "topicExportLog"
+    id = Column(Integer, primary_key=True, index=True)
+    auth_token = Column(String(16), nullable=True)
+    checksum = Column(Text)
+    topic_name = Column(String(32))

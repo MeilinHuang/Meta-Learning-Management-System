@@ -20,7 +20,7 @@ from .database import SessionLocal, engine
 from . import models, schemas
 from datetime import datetime
 from base64 import b64decode
-
+import hashlib
 TOKEN_SECRET = "1fa35d8e94b996509dde52942120251b02ed236abad89b5c347d849849ee3d4c"
 
 # ===== Auth =====
@@ -2472,6 +2472,7 @@ def topicExport(db: Session, topicId: int):
     qst = models.Question
     rtnDict = {}
     topic = db.query(tp).filter(tp.id==topicId).first()
+    topic_name = topic.topic_name
     if not topic:
         return None
     
@@ -2492,7 +2493,11 @@ def topicExport(db: Session, topicId: int):
         assessmentD["questions"] = list(map(lambda x: modelToDict(x), questions))
         assList += [assessmentD.copy()]
     rtnDict["assessments"] = assList
-    return [json.dumps(rtnDict), topic.topic_name]
+
+    token = logTopicExport(db, [json.dumps(rtnDict), topic_name])
+
+    rtnDict["token"] = token
+    return [json.dumps(rtnDict), topic_name]
 
 def exportForum(db: Session, topicId):
     fr = models.Forum
@@ -2518,33 +2523,27 @@ def exportForum(db: Session, topicId):
     return rtnDict
 
 def topicImport(db: Session, fileStr: str, user: models.User):
-    ass = models.Assessment
-    qst = models.Question
-    resources = []
-    assessments = []
-    questions = []  
     try:
         fileStr = decodeFile(fileStr)
-    
         fd = json.loads(fileStr)
+        # Integrity check
+        if not checkImportedFile(db, fd):
+            return {"message":"failure", "topic": None, "exception":"Failed integrity check"}
+
+
         tpd = fd["topic"]
-        resources = []
-        assessments = []
-        questions = []
         topic = create_topic(db, topic_name=tpd["topic_name"], topic_group_id=tpd["topic_group_id"], 
                             image_url=tpd["image_url"], created_by=user, archived=tpd["archived"], description=tpd["description"])
 
-        topicId = topic.id
         for rscd in fd["resources"]:
-            resource = create_resource(db, resource_type=rscd["resource_type"], title=rscd["title"], server_path=rscd["server_path"], url=rscd["url"],
-                                        duration=rscd["duration"], section=rscd["section"], description=rscd["description"], topic_id=topic.id, creator_id=rscd["creator_id"])
+            create_resource(db, resource_type=rscd["resource_type"], title=rscd["title"], server_path=rscd["server_path"], url=rscd["url"],
+                            duration=rscd["duration"], section=rscd["section"], description=rscd["description"], topic_id=topic.id, creator_id=rscd["creator_id"])
         for assd in fd["assessments"]:
             assessment = add_new_assessment(db, topic.id, assd["type"], assd["assessmentName"], assd["proportion"], assd["status"], assd["timeRange"])
-            assId = assessment.id
             for questd in assd["questions"]:
-                question = add_new_question_to_assessment(db, assessment.id,
-                                    questd["type"],questd["question_description"],
-                                    questd["choices"], questd["answer"])
+                add_new_question_to_assessment(db, assessment.id,
+                                               questd["type"],questd["question_description"],
+                                               questd["choices"], questd["answer"])
 
         return {"message":"success", "topic": topic}
     except Exception as e:
@@ -2558,7 +2557,39 @@ def decodeFile(dataUrl: str):
 def modelToDict(model):
     model = model.__dict__
     model.pop('_sa_instance_state')
-    return model
+    return model.copy()
+
+def logTopicExport(db: Session, topic):
+    auth_token = generate_auth_token()
+    checksum = hashlib.md5(topic[0].encode('utf-8')).hexdigest()
+    id = len(db.query(models.topicExportLog).all()) + 1
+    payload = {
+        "id":id,
+        "auth_token": auth_token,
+        "checkSum": checksum,
+        "topic_name": topic[1]
+    }
+
+    topicExportLog = models.topicExportLog(id=id,auth_token=auth_token, 
+                                           checksum=checksum, topic_name=topic[1])
+    db.add(topicExportLog)
+    db.commit()
+    
+    return jwt.encode(payload, TOKEN_SECRET, algorithm="HS256")
+
+def checkImportedFile(db: Session, topic):
+    # Removes dict entry 'token'
+    try:
+        tel = models.topicExportLog
+        decoded = jwt.decode(topic["token"], TOKEN_SECRET, algorithms=["HS256"])
+        topicLog = db.query(tel).filter(tel.id==decoded["id"]).first()
+        topic.pop('token')
+        checksum = hashlib.md5(json.dumps(topic).encode('utf-8')).hexdigest()
+        if topicLog.checksum == checksum and topicLog.auth_token == decoded["auth_token"] and topicLog.topic_name == decoded["topic_name"]:
+            return True
+    except:
+        pass
+    return False
 
 def get_db_test():
     db = SessionLocal()
