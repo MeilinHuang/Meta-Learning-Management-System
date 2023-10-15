@@ -30,7 +30,8 @@ export default function CustomProfilePage(props: any) {
     username: '',
     full_name: '',
     email: '',
-    introduction: ''
+    introduction: '',
+    profilePic: ''
   });
   const { id } = useParams(); // :id 是这个id
   const [conversation_name, setConversation_name] = useState('');
@@ -46,7 +47,10 @@ export default function CustomProfilePage(props: any) {
 
   useEffect(() => {
     console.log(id);
-    AccountService.getOneUser({ id: id }).then((response) => {
+    AccountService.getOneUser({ 
+      id: id,
+      access_token: localStorage.getItem('access_token') 
+    }).then((response) => {
       setUser(response.data.user);
       console.log(response.data);
     });
@@ -67,7 +71,12 @@ export default function CustomProfilePage(props: any) {
             </div>
             <div className="border-t border-gray-200">
               <dl>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <div className={
+                  (user.full_name != "")
+                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                }
+                >
                   <dt className="text-sm font-medium text-gray-500">
                     Full name
                   </dt>
@@ -75,7 +84,12 @@ export default function CustomProfilePage(props: any) {
                     {user.full_name}
                   </dd>
                 </div>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <div className={
+                  (user.email != "")
+                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                }
+                >
                   <dt className="text-sm font-medium text-gray-500">
                     Email address
                   </dt>
@@ -84,12 +98,34 @@ export default function CustomProfilePage(props: any) {
                   </dd>
                 </div>
 
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <div className={
+                  (user.introduction != "")
+                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                }
+                >
                   <dt className="text-sm font-medium text-gray-500">
                     Introduction
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                     {user.introduction}
+                  </dd>
+                </div>
+                <div className={
+                  (user.profilePic != "")
+                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                }
+                >
+                  <dt className="text-sm font-medium text-gray-500">
+                    Profile Picture
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                    <img
+                      className="h-12 w-12 rounded-full"
+                      src={user.profilePic}
+                      alt=""
+                    />
                   </dd>
                 </div>
               </dl>

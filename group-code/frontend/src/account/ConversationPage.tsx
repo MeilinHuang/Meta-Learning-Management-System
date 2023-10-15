@@ -8,7 +8,7 @@ import AccountService from './AccountService';
 
 import { format } from 'date-fns';
 import BadWords from 'bad-words';
-
+import defaultImg from '../default.jpg';
 
 export default function ConversationPage(props: any) {
     const [conversation, setConversation] = useState({id: "undefined", conversation_name: "undefined"});

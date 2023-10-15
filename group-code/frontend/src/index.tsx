@@ -19,6 +19,9 @@ import AdminUserPage from 'account/adminUserPage';
 import ProfilePage from 'account/profilePage';
 import ConversationPage from 'account/ConversationPage';
 import CustomProfilePage from 'account/CustomProfilePage';
+import VEmail from 'account/vEmail';
+import UpdatePicture from 'account/updatePicture';
+import RecoverPass from 'account/recoverPass';
 import TopicPage from 'content/TopicPage';
 import Forum from 'forum/Forum';
 import AssessmentMain from 'assessment/assessmentMain';
@@ -52,7 +55,10 @@ root.render(
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<SignupPage />} />
         <Route path="pwchang" element={<ChangePassword />} />
+        <Route path="vEmail" element={<VEmail />} />
+        <Route path="updatePicture" element={<UpdatePicture />} />
         <Route path="welcome" element={<WelcomePage />} />
+        <Route path="recoverPass" element={<RecoverPass />} />
         {/* Routes with navbar layout */}
         <Route element={<LayoutNoPadding />}>
           <Route path="test-forum" element={<Forum />} />

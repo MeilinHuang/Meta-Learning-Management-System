@@ -11,13 +11,18 @@ from .database import SessionLocal, engine
 from .auth import JWTBearer
 from pathlib import Path
 from io import BytesIO
+from .chatgpt.chatgpt import send_message as chatgpt_send_message
 import os
+import logging
+import re
+EMAILREG = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
 models.Base.metadata.create_all(bind=engine)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
+logging.basicConfig(level=logging.INFO)
 
 if (not os.path.exists("static")):
     os.mkdir("static")
@@ -81,7 +86,18 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
             detail="User name already exists",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
+    elif (helper.emailNotexists(db, details.email) == False):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email already exists",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    elif not re.fullmatch(EMAILREG, details.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email not valid",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     token = helper.create_user(
         db, details.username, details.password, details.email, details.full_name)
     user = helper.get_user_by_username(db, details.username)
@@ -105,30 +121,6 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
 
 # }
 
-
-@app.post("/login")
-async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
-    user = helper.get_user_by_username(db, details.username)
-    if (user is not None and helper.verify_password(details.password, user.password)):
-        token = helper.give_token(db, user)
-        username = user.username
-        email = user.email
-        userid = user.id
-        fullname = user.full_name
-        introduction = user.introduction
-        admin = user.superuser
-        res = {"access_token": token, "token_type": "Bearer",
-               "user_name": username, "email": email, "user_id": userid,
-               "full_name": fullname, "introduction": introduction,
-               "admin": admin}
-        return res
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Unauthorised",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
-
 @app.post("/logout")
 async def logout(details:schemas.OnlyToken, db: Session = Depends(get_db)):
     print("loging out")
@@ -145,16 +137,15 @@ async def logout(details:schemas.OnlyToken, db: Session = Depends(get_db)):
 
 @app.post("/editProfile")
 async def editProfile(details: schemas.UserEdit, db: Session = Depends(get_db)):
-    # print("edit in main")
-    # print(details)
-    user = helper.get_user_by_username(db, details.username)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorised",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return helper.edit_profile(db, user, details)
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.username:
+        return helper.edit_profile(db, user, details)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
 
 
 @app.post("/changePassword")
@@ -171,10 +162,20 @@ async def editPassword(details: schemas.UserPassword, db: Session = Depends(get_
 
 
 @app.get("/loadUsers")
-async def loadUsers(db: Session = Depends(get_db)):
-    users = helper.get_all_user_list(db)
-    print(users)
-    return users
+async def loadUsers(request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user = helper.extract_user(db, token)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if user.superuser == 1:
+        return helper.get_all_user_list(db, True)
+    
+    return helper.get_all_user_list(db, False)
 
 
 @app.get("/is_superuser")
@@ -184,16 +185,19 @@ async def is_superuser(token: str = Depends(JWTBearer(db_generator=get_db())), d
 
 
 @app.get("/user/{id}")
-async def getOneUser(id: int, db: Session = Depends(get_db)):
-    print(id)
-    user = helper.get_user_by_id(db, id)
+async def getOneUser(request: Request, id: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user = helper.extract_user(db, token)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return {"user": user}
+    elif user.superuser == 1:
+        return {"user": helper.get_user_by_id(db, id, True)}
+    else:
+        return {"user": helper.get_user_by_id(db, id, False)}
 
 
 @app.get("/authed")
@@ -1255,8 +1259,6 @@ async def get_resource_section(resource_id, db: Session = Depends(get_db)):
     return section
 
 # === CONTENT ===
-
-
 @app.get("/user_resources")
 async def get_created_resources(db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
@@ -1541,3 +1543,96 @@ async def test_forum(db: Session = Depends(get_db)):
     print(replies[0].replies[0].replies)
     print(replies[0].replies[0].replies[0].replies)
     return thread
+
+# Meta LMS 23T2
+
+@app.post("/login")
+async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
+    """
+    Function updated to allow mfa
+    """
+    user = helper.get_user_by_username(db, details.username)
+    if (user is not None and helper.verify_password(details.password, user.password)):
+        if user.mfa == "email":
+            helper.getVerifyEmail(db, user, False)
+            return {"mfa": user.mfa, "username": user.username}
+        else:
+            return helper.loginUser(db, user)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+@app.post("/vEmail")
+async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
+    user = helper.get_user_by_username(db, details.id)
+    return helper.getVerifyEmail(db, user, False)
+
+@app.post("/putOtp")
+async def putOtp(details: schemas.userOtp, db: Session = Depends(get_db)):
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.username:
+        return helper.putOtp(db, user, details.inputOtp)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+@app.post("/recoverPass")
+async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db)):
+    user = helper.get_user_by_username(db, details.username)
+    return helper.recoveryAcc(db, user, details.inputOtp, details.newPassword)
+
+@app.post("/chatgpt/sendMessage")
+async def chatgpt_api_send_message(details: schemas.GenerativeAI_SendMessage):
+    response = chatgpt_send_message(details.message)
+    print(f"ChatGPT Response: {response}")
+
+@app.post("/generativeai/sendMessage")
+# async def generativeai_send_message(details: schemas.GenerativeAI_SendMessage, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
+async def generativeai_send_message(details: schemas.GenerativeAI_SendMessage):
+    # RYAN TODO: Authenticate user
+    # user = helper.extract_user(db, token)
+
+    # RYAN TODO: Get current conversation for user given conversation_id
+
+    # Query OpenAI with conversation history
+    response = chatgpt_send_message(details.message)
+    print(f"ChatGPT Response: {response}")
+
+@app.post("/setMFA")
+async def setMFA(details: schemas.setMFA, db: Session = Depends(get_db)):
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.id and user.vEmail == user.email:
+        return helper.setMFA(db, user, details.mfa)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+@app.post("/verifyMFA")
+async def verifyMFA(details: schemas.userOtp, db: Session = Depends(get_db)):
+    user = helper.get_user_by_username(db, details.username)
+    return helper.verifyMFA(db, user, details.inputOtp)
+
+@app.post("/putPicture")
+async def putPicture(details: schemas.userImage, db: Session = Depends(get_db)):
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.id:
+        return helper.putPicture(user, details.image)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+@app.get("/getPicture/{id}")
+async def getPicture(id: int, db: Session = Depends(get_db)):
+    user = helper.get_user_by_id(db, id)
+    if user:
+        return helper.getPicture(user)
+    return ""
+    

@@ -65,11 +65,12 @@ class AccountService {
     return axios.post(`${API_URL}/loadAssessmentMain`, param);
   }
 
-  loadUsers() {
+  loadUsers(param) {
     return axios.get(`${API_URL}/loadUsers`, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
       }
     });
   }
@@ -80,6 +81,7 @@ class AccountService {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
       }
     });
   }
@@ -175,7 +177,75 @@ class AccountService {
     })
   }
   
+  vEmail(param) {
+    console.log(param)
+    return axios.post(`${API_URL}/vEmail`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true'
+      }
+    })
+  }
 
+  inputOtp(param) {
+    console.log(param)
+    return axios.post(`${API_URL}/putOtp`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true'
+      }
+    })
+  }
+
+  recoverPass(param) {
+    console.log(param)
+    return axios.post(`${API_URL}/recoverPass`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true'
+      }
+    })
+  }
+
+  setMFA(param) {
+    console.log(param)
+    return axios.post(`${API_URL}/setMFA`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true'
+      }
+    })
+  }
+
+  verifyMFA(param) {
+    console.log(param)
+    return axios.post(`${API_URL}/verifyMFA`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true'
+      }
+    })
+  }
+
+  putPicture(param) {
+    console.log(param)
+    return axios.post(`${API_URL}/putPicture`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true'
+      }
+    })
+  }
+
+  getPicture(param) {
+    console.log(param);
+    return axios.get(`${API_URL}/getPicture/${param.id}`, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+      }
+    });
+  }
 }
 
 export default new AccountService();

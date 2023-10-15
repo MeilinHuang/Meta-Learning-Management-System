@@ -37,6 +37,8 @@ import CustomProfilePage from './CustomProfilePage';
 import axios from 'axios';
 import EnrolledTopics from '../content/EnrolledTopics';
 import CreatedResources from '../content/CreatedResources';
+import defaultImg from '../default.jpg';
+import { response } from 'express';
 
 // import Detail from '@/Detail';
 
@@ -72,6 +74,16 @@ export default function UserPage() {
   const routeChange = (path: To) => {
     //let path = `newPath`;
     navigate(path);
+  };
+
+  const getProfilePic = (id: any) => {
+    AccountService.getPicture({"id":id}).then((response) => {
+      const dp = response.data
+      if (dp != "" && dp != null) {
+        return dp;
+      } 
+    });
+    return defaultImg;
   };
 
   useEffect(() => {
@@ -223,6 +235,12 @@ export default function UserPage() {
                 <li className="p-3" key={usersList[i].id}>
                   {usersList[i].username}
                 </li>
+                {/*<img
+                  className="h-8 w-8 rounded-full"
+                  src={getProfilePic(usersList[i].id)}
+                  alt=""
+                />
+                */}
               </Link>
             </div>
           );
