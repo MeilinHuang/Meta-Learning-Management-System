@@ -53,7 +53,7 @@ export default function DeleteArchiveForm() {
   return (
     <div>
       <ConfirmAlert
-        message="Exporting a topic will download a LMS Topic. This file can be used to import aspects of this topic when creating a new topic."
+        message="Exporting a topic will download a Meta LMS Topic. This file can be imported via the topic tree."
         noSpace
       />
       <WarningAlert

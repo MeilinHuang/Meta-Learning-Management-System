@@ -1282,7 +1282,6 @@ async def get_resource_section(resource_id, db: Session = Depends(get_db)):
 async def get_created_resources(db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
     if user:
-        helper.updateLog(db, user, "Browsing Resources")
         return helper.get_created_resources(db, user.id)
 
 
@@ -1322,11 +1321,9 @@ async def get_resources(topic_id: int, section: str, db: Session = Depends(get_d
         )
     
     try:
-        pass
-        #helper.updateLog(db, user, f"Browsing {resources.title}'s {resources.section}")
+        helper.updateLog(db, user, f"Browsing {resources.title}'s {resources.section}")
     except:
-        #helper.updateLog(db, user, f"Browsing Topic Resources")
-        pass
+        helper.updateLog(db, user, f"Browsing Topic Resources")
     
     return {"resources": resources}
 
@@ -1700,6 +1697,7 @@ async def notifications(request: Request, db: Session = Depends(get_db)):
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    helper.updateLog(db, user1, "")
     return helper.getNotifications(db, user1)
 
 @app.get("/activityStatus/{id}")

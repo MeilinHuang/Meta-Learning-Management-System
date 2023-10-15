@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { Listbox, Dialog, Transition } from '@headlessui/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import AccountService from '../account/AccountService';
+import { delay } from 'lodash';
 
 export default function CreateTopicImportModal({
   open,
@@ -12,42 +13,65 @@ export default function CreateTopicImportModal({
 }) {
   
   const cancelButtonRef = useRef(null);
-  const maxSize = 15 * 10**6;
+  const maxSize = 5 * 10**6;
   const [errorMessage, setErrorMessage] = useState('');
   const [dataUrl, setDataUrl] = useState('');
+  const successMsg = 'New topic created. Please Wait.';
+  const red = "py-2 text-center text-sm font-medium text-red-500";
+  const green = "py-2 text-center text-sm font-medium text-green-500";
+  const [errClass, setErrClass] = useState(red)
 
   function handleFileSelect(e: any) {
-    const file = e.target.files.item(0);
-    if (file.size <= maxSize) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.addEventListener("load", () => {
-      const dataUrl = reader.result as string;
-      setDataUrl(dataUrl);
-      console.log(dataUrl)
-      });
-    } else if (file.size <= maxSize) {
+    try {  
+      const file = e.target.files.item(0);
+      if (file.size <= maxSize && file.type == 'text/plain') {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.addEventListener("load", () => {
+        const dataUrl = reader.result as string;
+        setDataUrl(dataUrl);
+        });
+        setErrClass(green);
+        setErrorMessage(file.name + ' selected.');
+      } else if (file.size <= maxSize) {
+        setErrClass(red);
+        setErrorMessage('File type not supported.');
+      } else {
+        setErrClass(red);
+        setErrorMessage('File greater than 200KB.');
+      }
+    } catch {
+      setErrClass(red);
       setErrorMessage('File type not supported.');
-    } else {
-      setErrorMessage('File greater than 200KB.');
     }
   };
 
   const uploadTopic = () => {
-    if (dataUrl) {
+    if (dataUrl != '') {
       const param = {
         file: dataUrl
       }
       AccountService.importTopic(param)
         .then((response: any) => {
           console.log(response)
-          setErrorMessage('');
+          if (response.data.message == 'failure') {
+            setErrClass(red);
+            setErrorMessage('File corrupt, upload denied.');
+          } else {
+            setErrorMessage('');
+            setOpen(false)
+          }
         })
         .catch((error) => {
-          setErrorMessage('Topic failed to upload')
+          setErrClass(red);
+          setErrorMessage('Topic failed to upload.')
           console.log(error);
         });
+    } else {
+      setErrClass(red);
+      setErrorMessage('Select file.')
     }
+    setDataUrl('')
   };
 
   return (
@@ -117,7 +141,7 @@ export default function CreateTopicImportModal({
                         
                         </label>
                       </div>
-                      <div className="py-1 text-center text-sm font-medium text-red-500">
+                      <div className={errClass}>
                         {errorMessage}
                       </div>
                     </div>
@@ -128,10 +152,7 @@ export default function CreateTopicImportModal({
                   <button
                     type="button"
                     className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 sm:col-start-2 sm:text-sm"
-                    onClick={() => {
-                      uploadTopic();
-                      setOpen(false);
-                    }}
+                    onClick={() => uploadTopic()}
                   >
                     Upload and Create Topic
                   </button>
@@ -139,10 +160,9 @@ export default function CreateTopicImportModal({
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
                     onClick={() => {
-                      uploadTopic();
-                      if (errorMessage == '') {
-                        setOpen(false);
-                      };
+                      setOpen(false);
+                      setErrorMessage('');
+                      setDataUrl('')
                     }}
                     ref={cancelButtonRef}
                   >
