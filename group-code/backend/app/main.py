@@ -1313,17 +1313,16 @@ async def get_resources(topic_id: int, section: str, db: Session = Depends(get_d
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    try:
+        helper.updateLog(db, user, f"Browsing {resources.title}'s {resources.section}")
+    except:
+        helper.updateLog(db, user, f"Browsing Topic Resources")
     if not resources:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resource not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
-    try:
-        helper.updateLog(db, user, f"Browsing {resources.title}'s {resources.section}")
-    except:
-        helper.updateLog(db, user, f"Browsing Topic Resources")
     
     return {"resources": resources}
 
