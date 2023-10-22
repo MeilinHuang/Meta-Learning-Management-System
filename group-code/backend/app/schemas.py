@@ -159,6 +159,7 @@ class AuthorDetails(BaseModel):
     id: int
     name: str
     username: str
+    profilePic: str
 
 
 class Post(BaseModel):

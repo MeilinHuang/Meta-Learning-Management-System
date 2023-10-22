@@ -983,7 +983,7 @@ def get_post_by_id(db: Session, post_id: int):
     post = db.query(models.Post).filter_by(id=post_id).first()
     if post is None:
         return None
-    return format_post(post)
+    return format_post(db, post)
 
 
 def get_thread_by_id(db: Session, thread_id: int):
@@ -997,7 +997,8 @@ def get_thread_by_id(db: Session, thread_id: int):
         "author": {
             "id": thread.author.id,
             "name": thread.author.full_name,
-            "username": thread.author.username
+            "username": thread.author.username,
+            "profilePic": getPicture(get_user_by_id(db,thread.author.id,True))
         },
         "content": thread.content,
         "upvotes": thread.num_upvotes,
@@ -1023,7 +1024,8 @@ def get_threads_lite(db: Session, section_id: int, limit: int, offset: int):
             "author": {
                 "id": 0,
                 "name": "",
-                "username": ""
+                "username": "",
+                "profilePic": ""
             },
             "content": thread.content[:30] if len(thread.content) > 30 else thread.content[:len(thread.content)],
             "upvotes": 0,
@@ -1053,7 +1055,8 @@ def get_threads(db: Session, section_id: int, limit: int, offset: int):
             "author": {
                 "id": thread.author.id,
                 "name": thread.author.full_name,
-                "username": thread.author.username
+                "username": thread.author.username,
+                "profilePic": getPicture(get_user_by_id(db,thread.author.id,True))
             },
             "content": thread.content,
             "upvotes": thread.num_upvotes,
@@ -1067,7 +1070,7 @@ def get_threads(db: Session, section_id: int, limit: int, offset: int):
     return result
 
 
-def format_post(post: models.Post):
+def format_post(db: Session, post: models.Post):
     sorted_replies = sorted(
         post.replies, key=lambda x: x.num_upvotes, reverse=True)
     post_dict = {
@@ -1076,7 +1079,8 @@ def format_post(post: models.Post):
         "author": {
             "id": post.author.id,
             "name": post.author.full_name,
-            "username": post.author.username
+            "username": post.author.username,
+            "profilePic": getPicture(get_user_by_id(db,post.author.id,True))
         },
         "content": post.content,
         "time": post.time_created,
