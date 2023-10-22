@@ -21,6 +21,7 @@ import remarkGfm from 'remark-gfm';
 import remarkToc from 'remark-toc';
 import rehypeHighlight from 'rehype-highlight';
 import PostReply from './PostReply';
+import defaultImg from '../default.jpg';
 
 import {
   useUpvoteThreadMutation,
@@ -93,6 +94,14 @@ export default function Thread(props: any) {
     );
   }
 
+  const getProfilePic = (dp: string) => {
+    console.log(props.author)
+    if (dp != "" && dp != null) {
+      return dp;
+    } 
+    return defaultImg;
+  };
+
   return (
     <div className="mx-auto">
       <div className="lg:flex lg:items-center lg:justify-between">
@@ -102,9 +111,10 @@ export default function Thread(props: any) {
           </h2>
           <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
             <div className="mt-2 flex items-center text-sm text-gray-500">
-              <UserCircleIcon
-                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                aria-hidden="true"
+              <img
+                className="h-10 w-10 rounded-full mr-2"
+                src={getProfilePic(props.author.profilePic)}
+                alt=""
               />
               <a href={`#${props.author.id}`}>{props.author.name}</a>
             </div>
