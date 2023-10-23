@@ -27,6 +27,7 @@ export default function ProfilePage() {
     localStorage.getItem('full_name')
   );
   const [new_intro, setNew_intro] = useState(localStorage.getItem('intro'));
+  const [errMsg, setErrMsg] = useState(false)
 
   const handleChangeFullName = (event: ChangeEvent<HTMLInputElement>) => {
     //alert("New Email value: " + event.target.value);
@@ -249,7 +250,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex flex-row-reverse gap-4">
-              
+        
               <button
                 className="mt-6 items-center flex basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
                 onClick={() => {
@@ -260,9 +261,17 @@ export default function ProfilePage() {
                     introduction: new_intro
                   };
                   if (new_intro != null) {
+                    if (new_intro.length >= 40) {
+                      setErrMsg(true)
+                      return
+                    }
                     localStorage.setItem('intro', new_intro);
                   }
                   if (new_full_name != null) {
+                    if (new_full_name.length >= 40) {
+                      setErrMsg(true)
+                      return
+                    }
                     localStorage.setItem('full_name', new_full_name);
                   }
                   AccountService.editProfile(param)
@@ -295,7 +304,13 @@ export default function ProfilePage() {
               >
                 cancel
               </button>
-              
+              <div className={
+                (errMsg)
+                ? 'text-center text-sm font-medium text-red-500'
+                : 'hidden'
+              }>
+                Must be less than 40 characters.
+              </div>
             </div>
           </dl>
         </div>

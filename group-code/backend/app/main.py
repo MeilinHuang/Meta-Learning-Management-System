@@ -105,6 +105,12 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
             detail="Username can only contain alphanumericals.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    elif len(details.full_name) >= 40:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Name must be shorter than 40 characters.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     token = helper.create_user(
         db, details.username, details.password, details.email, details.full_name)
     user = helper.get_user_by_username(db, details.username)
