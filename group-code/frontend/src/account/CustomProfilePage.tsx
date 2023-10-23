@@ -100,6 +100,17 @@ export default function CustomProfilePage(props: any) {
     return res;
   };
 
+  const loadOneRole = () => {
+    const keys = Object.keys(mutalRoles)
+    if (keys.includes("Creator")) {
+      return "Creator"
+    } else if (keys.includes("Forum Staff")) {
+      return "Forum Staff"
+    } else if (keys.includes("Student")) {
+      return "Student"
+    } 
+    return "Member"
+  }
 
   useEffect(() => {
     console.log(id);
@@ -256,15 +267,18 @@ export default function CustomProfilePage(props: any) {
                 </div>
               </dl>
               <div className='ml-4 mt-4'>
-                <div className='bg-indigo-50 shadow sm:rounded-lg w-40 h-40 flex flex-col items-center'>
+                <div className='bg-indigo-100 shadow sm:rounded-lg w-40 h-40 flex flex-col items-center'>
                   <div className={'w-full h-4 shadow sm:rounded-t-lg bg' + statusColour}></div>
                   <img
                     className="h-12 w-12 rounded-full mt-4 justify-center"
                     src={getProfilePic()}
                     alt=""
                   />
-                  <div className="justify-center">
-                    yo
+                  <div className="justify-center font-medium text-lg">
+                    {user?.username}
+                  </div>
+                  <div className="justify-center font-thin text-xs text-indigo-600">
+                    {loadOneRole()}
                   </div>
                 </div>
               </div>
