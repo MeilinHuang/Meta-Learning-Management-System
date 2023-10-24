@@ -2,6 +2,8 @@ import { Fragment, useState, useRef, useEffect } from 'react';
 import { Transition, Menu, Dialog } from '@headlessui/react';
 import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import 'katex/dist/katex.css';
+import MarkdownEditor2 from 'common/MarkdownEditor2';
 
 import {
   ResourceIcon,
@@ -14,8 +16,6 @@ import { getButtonGroupStyles } from 'topictree/topicTreeHelpers';
 import { useParams } from 'react-router-dom';
 
 import { ConfirmAlert, WarningAlert, ErrorAlert } from '../common/Alert';
-
-import MDEditor, { commands } from '@uiw/react-md-editor';
 
 import {
   useUploadResourceMutation,
@@ -34,6 +34,11 @@ export default function CreateResForm({
   open: boolean;
   setOpen: any;
 }) {
+  const mdKaTeX = `This is to display the 
+  \`$$c = \\pm\\sqrt{a^2 + b^2}$$\`
+  in one line
+  `;
+
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [MDLoading, setMDLoading] = useState(false);
   const [update, forceUpdate] = useState(0);
@@ -62,9 +67,6 @@ export default function CreateResForm({
 
   const [markdown, setMarkdown] = useState('');
   const [MDfullscreen, setMDFullscreen] = useState(false);
-  const [MDpreview, setMDpreview] = useState<'live' | 'edit' | 'preview'>(
-    'edit'
-  );
   const [description, setDescription] = useState('');
 
   // Rerender component to reset topicId and currSection when modal is opened
@@ -639,27 +641,9 @@ export default function CreateResForm({
                               />
                             )}
                             {/* The preview component can be changed: https://github.com/uiwjs/react-md-editor/issues/429 */}
-                            <MDEditor
-                              value={markdown}
-                              onChange={(val: string | undefined) => {
-                                val !== undefined && setMarkdown(val);
-                              }}
-                              commandsFilter={(command) => {
-                                if (command.name === 'fullscreen') {
-                                  command.execute = () => {
-                                    if (MDfullscreen) {
-                                      // editor being minimised
-                                      // only show edit panel
-                                      setMDpreview('edit');
-                                    } else {
-                                      setMDpreview('live');
-                                    }
-                                    setMDFullscreen(!MDfullscreen);
-                                  };
-                                }
-                                return command;
-                              }}
-                              preview={MDpreview}
+                            <MarkdownEditor2
+                              MDContent={markdown}
+                              setMDContent={setMarkdown}
                             />
                           </div>
                         )}

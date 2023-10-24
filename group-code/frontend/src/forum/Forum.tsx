@@ -1,6 +1,7 @@
 import { Fragment, useMemo, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
+import { BATCH_SIZE, LIMIT } from './constants';
 import {
   Bars3Icon,
   CalendarIcon,
@@ -38,7 +39,55 @@ export default function Forum() {
 
   const [selectedSection, setSelectedSection] = useState(section);
 
-  const [selectedThread, setSelectedThread] = useState<Thread>({
+  // since RTK queries make api as hook to use, api cannot passed into callback
+  // Therefore, states of parameters must be set, such to call api using setState methods (once states updates, Quries are called again)
+  // This is due to the very bad design of previous contributor. RTK queries MUST BE USED WITH REDUX!!!!!!!!!!
+  const [currentBatch, setCurrentBatch] = useState(0);
+  const [lastResultParams, setLastResultParams] = useState({
+    offset: currentBatch * BATCH_SIZE - 20,
+    limit: LIMIT,
+    sectionId: selectedSection
+  });
+  const [currentResultParams, setCurrentResultParams] = useState({
+    offset: currentBatch * BATCH_SIZE,
+    limit: LIMIT,
+    sectionId: selectedSection
+  });
+  const [nextResultParams, setNextResultParams] = useState({
+    offset: currentBatch * BATCH_SIZE + 20,
+    limit: LIMIT,
+    sectionId: selectedSection
+  });
+
+  // useEffect to initialise the parameter states.
+  useEffect(() => {
+    setLastResultParams({
+      offset: currentBatch * BATCH_SIZE - 20,
+      limit: LIMIT,
+      sectionId: selectedSection
+    });
+    setCurrentResultParams({
+      offset: currentBatch * BATCH_SIZE,
+      limit: LIMIT,
+      sectionId: selectedSection
+    });
+    setNextResultParams({
+      offset: currentBatch * BATCH_SIZE + 20,
+      limit: LIMIT,
+      sectionId: selectedSection
+    });
+  }, [selectedSection]);
+
+  // Reload properties for getting the updated Thread after posting
+  const reloadProps = {
+    currentBatch,
+    selectedSection,
+    setLastResultParams,
+    setCurrentResultParams,
+    setNextResultParams
+  };
+
+  const emptyThread: Thread = {
     id: -1,
     author: {
       name: 'Please select a thread',
@@ -53,7 +102,9 @@ export default function Forum() {
     posts: [],
     stickied: false,
     reported: false
-  });
+  };
+
+  const [selectedThread, setSelectedThread] = useState<Thread>(emptyThread);
 
   const {
     data: forum,
@@ -108,6 +159,7 @@ export default function Forum() {
         )}
         onClick={() => {
           setSelectedSection(item.id);
+          setSelectedThread(emptyThread);
           navigate(`/forum/${topic}/${item.id}`);
         }}
       >
@@ -126,6 +178,13 @@ export default function Forum() {
     }
     sidebarContent = <div>{errorMessage}</div>;
   }
+
+  const selectedThreadCallback = (thread: Thread) => {
+    console.log(thread);
+    setSwitchOrder(true);
+    setSelectedThread(thread);
+    setShowPostCreator(false);
+  };
 
   return (
     <>
@@ -322,6 +381,8 @@ export default function Forum() {
                         setShowPostCreator(true);
                       }}
                       topicId={topic}
+                      reloadProps={reloadProps}
+                      selectedThreadCallback={selectedThreadCallback}
                     ></ThreadViewer>
                   )}
                   {/* End main area */}
@@ -333,11 +394,12 @@ export default function Forum() {
                   {/* Start secondary column (hidden on smaller screens) */}
                   <ThreadList
                     sectionId={selectedSection}
-                    selectThreadCallback={(thread) => {
-                      setSwitchOrder(true);
-                      setSelectedThread(thread);
-                      setShowPostCreator(false);
-                    }}
+                    selectThreadCallback={selectedThreadCallback}
+                    currentBatch={currentBatch}
+                    setCurrentBatch={setCurrentBatch}
+                    lastResultParams={lastResultParams}
+                    currentResultParams={currentResultParams}
+                    nextResultParams={nextResultParams}
                   />
                   {/* End secondary column */}
                 </aside>
@@ -351,11 +413,12 @@ export default function Forum() {
                   {/* Start secondary column (hidden on smaller screens) */}
                   <ThreadList
                     sectionId={selectedSection}
-                    selectThreadCallback={(thread) => {
-                      setSwitchOrder(true);
-                      setSelectedThread(thread);
-                      setShowPostCreator(false);
-                    }}
+                    selectThreadCallback={selectedThreadCallback}
+                    currentBatch={currentBatch}
+                    setCurrentBatch={setCurrentBatch}
+                    lastResultParams={lastResultParams}
+                    currentResultParams={currentResultParams}
+                    nextResultParams={nextResultParams}
                   />
                   {/* End secondary column */}
                 </aside>
@@ -378,6 +441,8 @@ export default function Forum() {
                         setShowPostCreator(true);
                       }}
                       topicId={topic}
+                      reloadProps={reloadProps}
+                      selectedThreadCallback={selectedThreadCallback}
                     ></ThreadViewer>
                   )}
                   {/* End main area */}

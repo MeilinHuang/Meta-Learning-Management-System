@@ -20,8 +20,11 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkToc from 'remark-toc';
 import rehypeHighlight from 'rehype-highlight';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import PostReply from './PostReply';
 import defaultImg from '../default.jpg';
+import { LIMIT, BATCH_SIZE } from './constants';
 
 import {
   useUpvoteThreadMutation,
@@ -289,15 +292,32 @@ export default function Thread(props: any) {
       <ReactMarkdown
         className="prose xs: prose-sm sm:prose-sm md:prose-base max-w-none"
         children={props.content}
-        remarkPlugins={[remarkGfm, remarkToc]}
-        rehypePlugins={[rehypeHighlight]}
+        remarkPlugins={[remarkGfm, remarkToc, remarkMath]}
+        rehypePlugins={[rehypeHighlight, rehypeKatex]}
       />
       <hr className="px-5 my-5" />
       <PostReply
         parentId={null}
         threadId={props.id}
         cancelCallback={() => {
-          console.log('Blank Function');
+          props.reloadProps.setLastResultParams({
+            offset: props.reloadProps.currentBatch * BATCH_SIZE - 20,
+            limit: LIMIT,
+            sectionId: props.reloadProps.selectedSection,
+            reRender: Math.random()
+          });
+          props.reloadProps.setCurrentResultParams({
+            offset: props.reloadProps.currentBatch * BATCH_SIZE,
+            limit: LIMIT,
+            sectionId: props.reloadProps.selectedSection,
+            reRender: Math.random()
+          });
+          props.reloadProps.setNextResultParams({
+            offset: props.reloadProps.currentBatch * BATCH_SIZE + 20,
+            limit: LIMIT,
+            sectionId: props.reloadProps.selectedSection,
+            reRender: Math.random()
+          });
         }}
       />
     </div>
