@@ -580,7 +580,6 @@ async def loadAssessmentMain(token: schemas.UserToken, db: Session = Depends(get
             detail="Not login"
         )
     result = helper.get_assessment_overview(db, user.id)
-    helper.updateLog(db, user, "Browsing Assessments")
     return result
 
 

@@ -2467,7 +2467,7 @@ def getPrivacy(db: Session, user: models.User):
     privSet = db.query(ps).filter(ps.user_id==user.id).first()
     if privSet:
         return privSet
-    return models.Privacy(user_id=user.id)
+    return models.Privacy(user_id=user.id, full_name=False,email=False,recent_activity=False,invisible=False)
 
 def topicExport(db: Session, topicId: int):
     tp = models.Topic

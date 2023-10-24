@@ -45,7 +45,7 @@ export default function CustomProfilePage(props: any) {
     details: ""
   });
 
-  const [statusColour, setStatusColour] = useState("-gray-500")
+  const [statusColour, setStatusColour] = useState(" bg-gray-500")
   const [mutalRoles, setMutalRoles] = useState({});
   const { id } = useParams(); // :id 是这个id
   const [conversation_name, setConversation_name] = useState('');
@@ -108,8 +108,10 @@ export default function CustomProfilePage(props: any) {
       return "Forum Staff"
     } else if (keys.includes("Student")) {
       return "Student"
-    } 
-    return "Member"
+    } else if (keys.length > 0) {
+      return "Member"
+    }
+    return "User"
   }
 
   useEffect(() => {
@@ -136,13 +138,14 @@ export default function CustomProfilePage(props: any) {
       setActivityStatus(response.data);
       if (response.data) {
         if (response.data.status == "Online") {
-          setStatusColour("-green-500");
+          setStatusColour(" bg-green-500");
         } else if (response.data.status == "Away") {
-          setStatusColour("-orange-500");
+          setStatusColour(" bg-orange-500");
         } else {
-          setStatusColour("-gray-500");
+          setStatusColour(" bg-gray-500");
         }
       }
+      console.log(statusColour);
     })
   }, []);
   
@@ -159,36 +162,24 @@ export default function CustomProfilePage(props: any) {
       <main className="">
         <div className=" py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-            <div className="px-4 py-5 sm:px-6">
-              <div className ="flex">
-                <h3 className="text-lg font-medium leading-6 text-gray-900">
-                  {user?.username}'s Profile
-                </h3>
-                <dd className={"w-4 h-4 rounded-full ml-2 mt-1 bg" + statusColour}></dd>
-              </div>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                Personal details.
-              </p>
-            </div>
-            <div className="border-t border-gray-200 divide-solid flex">
-              <dl>
-                <div className={
-                  (user.profilePic != "")
-                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
-                }
-                >
-                  <dt className="text-sm font-medium text-gray-500">
-                    Profile Picture
-                  </dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                    <img
-                      className="h-12 w-12 rounded-full"
-                      src={user.profilePic}
-                      alt=""
-                    />
-                  </dd>
+          <div className='ml-4 mt-4'>
+              <div className='bg-indigo-100 shadow sm:rounded-t-lg w-full flex flex-col items-center mb-1'>
+                <div className={'w-full h-4 shadow sm:rounded-t-lg' + statusColour}></div>
+                <img
+                  className="h-12 w-12 rounded-full mt-4 justify-center"
+                  src={getProfilePic()}
+                  alt=""
+                />
+                <div className="justify-center font-medium text-lg">
+                  {user?.username}
                 </div>
+                <div className="justify-center font-thin text-sm text-indigo-600 mb-2">
+                  {loadOneRole()}
+                </div>
+              </div>
+            </div>
+            <div className="divide-solid flex">
+              <dl>
                 <div className={
                   (user.full_name != "")
                   ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
@@ -266,22 +257,6 @@ export default function CustomProfilePage(props: any) {
                   </dd>
                 </div>
               </dl>
-              <div className='ml-4 mt-4'>
-                <div className='bg-indigo-100 shadow sm:rounded-lg w-40 h-40 flex flex-col items-center'>
-                  <div className={'w-full h-4 shadow sm:rounded-t-lg bg' + statusColour}></div>
-                  <img
-                    className="h-12 w-12 rounded-full mt-4 justify-center"
-                    src={getProfilePic()}
-                    alt=""
-                  />
-                  <div className="justify-center font-medium text-lg">
-                    {user?.username}
-                  </div>
-                  <div className="justify-center font-thin text-xs text-indigo-600">
-                    {loadOneRole()}
-                  </div>
-                </div>
-              </div>
             </div>
             <div className='flex flex-row-reverse'>
               <button
