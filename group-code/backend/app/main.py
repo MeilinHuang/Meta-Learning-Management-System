@@ -1756,7 +1756,7 @@ async def getPrivacy(request: Request, id: int, db: Session = Depends(get_db)):
 async def exportTopic(request: Request, topicId: int, db: Session = Depends(get_db)):
     token = request.headers.get('Authorization')
     user1 = helper.extract_user(db, token)
-    if user1 is None:
+    if user1 is None or not user1.superuser:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorised",
@@ -1776,7 +1776,7 @@ async def exportTopic(request: Request, topicId: int, db: Session = Depends(get_
 async def importTopic(request: Request, details: schemas.importTopic, db: Session = Depends(get_db)):
     token = request.headers.get('Authorization')
     user1 = helper.extract_user(db, token)
-    if user1 is None:
+    if user1 is None or not user1.superuser:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorised",
