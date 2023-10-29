@@ -20,41 +20,58 @@ export default function ConversationPage(props: any) {
     const [addUser, setAddUser] = useState(false);
     const [newAddUser, setNewAddUser] = useState("");
     const [usersList, setUsersList] = useState<any[]>([]);
+    const getProfilePic = (dp: any) => {
+        if (dp != "" && dp != null && dp.profilePic != "") {
+            return dp.profilePic;
+        } 
+        return defaultImg;
+    };
+
+    const isUserMsg = (username: string) => {
+        if (username == localStorage.getItem('user_name')) {
+            return true;
+        }
+        return false;
+    }
 
     useEffect(() => {
         if (id != undefined){
             const ids = id.split("_");
-            console.log(ids)
             setOtherName(ids.join(' '))
-            console.log(ids.join(' '))
         }
 
-        console.log(id) 
         AccountService.getOneConversation({"conversation_name": id})
         .then((response) => {
+            console.log(response.data.conversation)
             setConversation(response.data.conversation);
             setMessageList(response.data.mlist);
-            console.log(response.data);
 
         });
 
-        AccountService.loadUsers()
+        AccountService.loadUsers({search: "@"})
         .then((response) => {
-            console.log('users got: ');
-            console.log(response.data);
             // let i = 0;
-            console.log(response.data.length);
             setUsersList(response.data);
         })
         .catch((error) => {
-            console.log('error');
         });
 
 
         
     }, []);
 
-
+    const getUser = (username: string) => {
+        let i = 0;
+        console.log(usersList)
+        console.log(username)
+        while (i < usersList.length) {
+            if (username == usersList[i].username) {
+                return usersList[i];
+            }
+            i += 1;
+        }
+        return null
+    }
 
     const handleMessageChange = (event: ChangeEvent<HTMLInputElement>) => {
         setMessage(event.target.value);
@@ -63,20 +80,26 @@ export default function ConversationPage(props: any) {
     const AddUser = () => {
         AccountService.addUserToConversation({"username": newAddUser, "conversation_id":conversation.id})
         .then((response)=>{
-            console.log(response.data)
             
         })
         setAddUser(false)
     }
 
     const handleNewUserChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        console.log(event.target.value)
         setNewAddUser(event.target.value);
         
     }
 
+    const formatDate = (dateTime: string ) => {
+        if (dateTime) {
+            const date = dateTime.split('T')[0];
+            const time = dateTime.split('T')[1].split(":");
+
+            return date + " " + time.slice(0,2).join(":");
+        }
+        return dateTime
+    }
     const getUsers = (idss: any) => {
-        console.log(idss)
         const idsss = idss.split("_");
         const newidss = idss.replace(/_/g, ' ')
         const newidsss = newidss.replace(localStorage.getItem("user_name"), '')
@@ -109,7 +132,6 @@ export default function ConversationPage(props: any) {
                                 <button
                                 className={addUser ? "hidden" :'bg-neutral-200  text-neutral-600 h-10 w-10 font-mono text-2xl rounded-md border-solid border-slate-300 hover:bg-neutral-300'}
                                 onClick={()=>{
-                                    console.log("Add")
                                     setAddUser(true)
                                 }}
                                 >
@@ -131,7 +153,6 @@ export default function ConversationPage(props: any) {
                                         <button
                                         className="inline-flex items-center rounded-md border border-transparent bg-white px-4 py-2 text-base font-medium text-indigo-400 hover:bg-gray-50"
                                         onClick={()=>{
-                                            console.log("Add")
                                             setAddUser(false)
                                             AddUser()
                                         }}
@@ -152,13 +173,24 @@ export default function ConversationPage(props: any) {
                             <div className={"bg-indigo-50 px-3 py-3 sm:grid sm:gap-1 sm:px-2"}>
                                 {messagList.map((oneMessage: any, index: number)=>(
                                     <dt key={index}
-                                    className={"flex flex-row flex-m-1"}
+                                    className={
+                                        isUserMsg(oneMessage.sender_name)
+                                        ? "flex flex-row flex-m-1 justify-end"
+                                        : "flex flex-row flex-m-1"
+                                    }
                                     >
                                         <div>
-                                            <div className={'text-indigo-600 text-s'}
-                                            >{oneMessage.sender_name}</div>
+                                            <div className = "flex">
+                                                <img
+                                                    className="h-8 w-8 rounded-full"
+                                                    src={getProfilePic(getUser(oneMessage.sender_name))}
+                                                    alt=""
+                                                />
+                                                <div className={'text-indigo-600 text-s ml-2'}
+                                                >{oneMessage.sender_name}</div>
+                                            </div>
                                             <div className='text-slate-400 text-2xs'
-                                            >{oneMessage.time_created}</div>
+                                            >{formatDate(oneMessage.time_created)}</div>
                                             <div className='bg-indigo-300 max-w-xl break-words rounded-md p-1'
                                             >{oneMessage.content}</div>
                                             
@@ -184,25 +216,20 @@ export default function ConversationPage(props: any) {
                                 <button
                                     className='inline-flex items-center rounded-md border border-transparent bg-white px-4 py-2 text-base font-medium text-indigo-400 hover:bg-gray-50 border-dashed border-gray-200'
                                     onClick={() => {
-                                        console.log(message);
-                                        const now = new Date();
-                                        const nowStr = format(now, "yyyy-MM-dd HH:mm:ss");
-                                        const filter = new BadWords();
-                                        const param = {"conversation_id": conversation.id, "content": filter.clean(message), "sender_name": localStorage.getItem("user_name"), "time_created": nowStr} 
-                                        console.log(filter.clean(message))
-                                        AccountService.sendMessage(param)
-                                        .then((response:any)=>{
-                                            console.log(response.data);
-                                            AccountService.getOneConversation({"conversation_name": id})
-                                            .then((response) => {
-                                                setConversation(response.data.conversation);
-                                                setMessageList(response.data.mlist);
-                                                console.log(response.data);
-                                            });
+                                        if (message.length != 0) {
+                                            const filter = new BadWords();
+                                            const param = {"conversation_id": conversation.id, "content": filter.clean(message), "sender_name": localStorage.getItem("user_name"), "time_created": ""} 
+                                            AccountService.sendMessage(param)
+                                            .then((response:any)=>{
+                                                AccountService.getOneConversation({"conversation_name": id})
+                                                .then((response) => {
+                                                    setConversation(response.data.conversation);
+                                                    setMessageList(response.data.mlist);
+                                                });
 
-                                            setMessage("");
-                                        })
-                                        
+                                                setMessage("");
+                                            })
+                                        } 
                                     }}
                                 >
                                     send

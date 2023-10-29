@@ -395,7 +395,7 @@ class Message(Base):
     id = Column(Integer, primary_key=True, index=True)
     conversation_id = Column(Integer, ForeignKey("conversation.id"))
     sender_name = Column(Text)
-    time_created = Column(DateTime(timezone=True), server_default=func.now())
+    time_created = Column(DateTime(timezone=True))
     content = Column(Text)
 
 
@@ -404,3 +404,27 @@ class Group_member(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     conversation_id = Column(Integer, ForeignKey("conversation.id"))
+    lastSeen = Column(DateTime)
+
+class Log(Base):
+    __tablename__ = "log"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    time_created = Column(DateTime(timezone=True))
+    details = Column(Text) 
+
+class Privacy(Base):
+    __tablename__ = "privacy"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    full_name = Column(Boolean, default=False)
+    email = Column(Boolean, default=False)
+    recent_activity = Column(Boolean, default=False)
+    invisible = Column(Boolean, default=False)
+
+class topicExportLog(Base):
+    __tablename__ = "topicExportLog"
+    id = Column(Integer, primary_key=True, index=True)
+    auth_token = Column(String(16), nullable=True)
+    checksum = Column(Text)
+    topic_name = Column(String(32))

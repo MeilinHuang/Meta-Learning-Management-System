@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException, Request, status, Query, Form, UploadFile, File
+from fastapi import Depends, FastAPI, HTTPException, Request, status, Query, Form, UploadFile, File, BackgroundTasks
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,11 +12,12 @@ from .auth import JWTBearer
 from pathlib import Path
 from io import BytesIO
 from .chatgpt.chatgpt import send_message as chatgpt_send_message
+from datetime import datetime
 import os
 import logging
 import re
 EMAILREG = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
-
+USERREG = r'\b^[a-zA-Z0-9]+$\b'
 models.Base.metadata.create_all(bind=engine)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -83,19 +84,31 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
     if (helper.usernameNotexists(db, details.username) == False):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name already exists",
+            detail="User name already exists.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     elif (helper.emailNotexists(db, details.email) == False):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Email already exists",
+            detail="Email already exists.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     elif not re.fullmatch(EMAILREG, details.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email not valid",
+            detail="Email not valid.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    elif not re.fullmatch(USERREG, details.username):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username can only contain alphanumericals.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    elif len(details.full_name) >= 40 or len(details.username) >= 40 or len(details.email) >= 40:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inputs must be shorter than 40 characters.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = helper.create_user(
@@ -161,8 +174,8 @@ async def editPassword(details: schemas.UserPassword, db: Session = Depends(get_
     )
 
 
-@app.get("/loadUsers")
-async def loadUsers(request: Request, db: Session = Depends(get_db)):
+@app.get("/loadUsers/{search}")
+async def loadUsers(request: Request, search: str, db: Session = Depends(get_db)):
     token = request.headers.get('Authorization')
     user = helper.extract_user(db, token)
     if user is None:
@@ -172,15 +185,18 @@ async def loadUsers(request: Request, db: Session = Depends(get_db)):
             headers={"WWW-Authenticate": "Bearer"},
         )
     
+    isSuper = False
     if user.superuser == 1:
-        return helper.get_all_user_list(db, True)
-    
-    return helper.get_all_user_list(db, False)
+        isSuper = True
+    if search != "@":
+        return helper.get_users_search(db,search, isSuper)
+    return helper.get_all_user_list(db, isSuper)
 
 
 @app.get("/is_superuser")
 async def is_superuser(token: str = Depends(JWTBearer(db_generator=get_db())), db: Session = Depends(get_db)):
     user = helper.extract_user(db, token)
+    helper.updateLog(db, user, "")
     return {'is_superuser': user.superuser}
 
 
@@ -194,10 +210,9 @@ async def getOneUser(request: Request, id: int, db: Session = Depends(get_db)):
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    elif user.superuser == 1:
-        return {"user": helper.get_user_by_id(db, id, True)}
-    else:
-        return {"user": helper.get_user_by_id(db, id, False)}
+ 
+    return {"user": helper.get_user_by_id(db, id, user.superuser == 1)}
+
 
 
 @app.get("/authed")
@@ -240,7 +255,6 @@ async def list_non_super_users(db: Session = Depends(get_db)):
     #         headers={"WWW-Authenticate": "Bearer"},
     #     )
     res = helper.get_non_superuser_list(db)
-    print(res)
     return res
 
 
@@ -324,7 +338,7 @@ async def get_user_roles(user_id: int, topic_id: int = Query(None), db: Session 
     authenticator = helper.extract_user(db, token)
     topic = db.query(models.Topic).filter_by(id=topic_id).one()
     if helper.check_permission(db, authenticator, topic, "can_view_topic_roles"):
-        return helper.get_user_roles(db, helper.get_user_by_id(db, user_id), topic)
+        return helper.get_user_roles(db, helper.get_user_by_id(db, user_id, True), topic)
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Unauthorised",
@@ -490,11 +504,21 @@ async def addUserToConversation(details: schemas.addNameToConversation, db: Sess
 
 
 @app.get("/api/items/{conversation_name}")
-async def get_One_conversation(conversation_name, db: Session = Depends(get_db)):
+async def get_One_conversation(request: Request, conversation_name, db: Session = Depends(get_db)):
     print(conversation_name)
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 == None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     conver = helper.getOneConversation(db, conversation_name=conversation_name)
     # print(conver)
     if conver is not None:
+        helper.updateLastSeen(db, user1, conver)
         # user1, user2 = helper.getBothSidesName(db, conversation_id=conver.id)
         messages = helper.getMessagesOnCon(db, conversation_id=conver.id)
         return {"conversation": conver, "mlist": messages}
@@ -504,7 +528,7 @@ async def get_One_conversation(conversation_name, db: Session = Depends(get_db))
 @app.post("/sendMessage")
 async def send_message(details: schemas.SendMessage, db: Session = Depends(get_db)):
     new_nessage = helper.create_message(
-        db, details.conversation_id, details.content, details.time_created, details.sender_name)
+        db, details.conversation_id, details.content, details.sender_name)
     if new_nessage is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -556,7 +580,6 @@ async def loadAssessmentMain(token: schemas.UserToken, db: Session = Depends(get
             detail="Not login"
         )
     result = helper.get_assessment_overview(db, user.id)
-
     return result
 
 
@@ -570,6 +593,7 @@ async def assessmentEditOverview(token: schemas.UserToken, db: Session = Depends
             detail="Not login"
         )
     result = helper.get_assessment_edit_overview(db=db)
+    helper.updateLog(db, user, "Editing Assessments")
     return result
 
 
@@ -1288,6 +1312,23 @@ async def get_topic_info(topic_id: int, db: Session = Depends(get_db)):
 async def get_resources(topic_id: int, section: str, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
     resources = helper.get_resources(db, user.id, section, topic_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    try:
+        helper.updateLog(db, user, f"Browsing {resources.title}'s {resources.section}")
+    except:
+        helper.updateLog(db, user, f"Browsing Topic Resources")
+    if not resources:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Resource not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
     return {"resources": resources}
 
 
@@ -1636,3 +1677,113 @@ async def getPicture(id: int, db: Session = Depends(get_db)):
         return helper.getPicture(user)
     return ""
     
+@app.get("/mutalTopicsRoles/{id2}")
+async def mutalTopicsRoles(request: Request, id2: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    user2 = helper.get_user_by_id(db, id2,user1.superuser)
+    if user1 is None or user2 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return helper.mutalTopicRoles(db, user1, user2)
+
+@app.get("/notifications")
+async def notifications(request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    helper.updateLog(db, user1, "")
+    return helper.getNotifications(db, user1)
+
+@app.get("/activityStatus/{id}")
+async def activityStatus(request: Request, id: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    user2 = helper.get_user_by_id(db, id, True)
+
+    if user1 is None or user2 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return helper.getActivityStatus(db, user2, user1.superuser)
+
+@app.post("/setPrivacy")
+async def setPrivacy(request: Request, details: schemas.privacy, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    print(f"id: {user1.id}, full_name: {details.full_name}, email: {details.email}, recent: {details.recent_activity}, invisible: {details.invisible}")
+    privUser = models.Privacy(user_id=user1.id, full_name=details.full_name, email=details.email,
+                              recent_activity=details.recent_activity,invisible=details.invisible)
+    helper.setPrivacy(db, user1, privUser)
+    return {"message":"Updated"}
+
+@app.get("/getPrivacy/{id}")
+async def getPrivacy(request: Request, id: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    user2 = helper.get_user_by_id(db, id, True)
+
+    if user1 is None or user2 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    priv = helper.getPrivacy(db, user2)
+    if priv:
+        return {"email": priv.email, "recent_activity": priv.recent_activity, "invisible": priv.invisible, "full_name": priv.full_name}
+    return None
+
+@app.get("/exportTopic/{topicId}")
+async def exportTopic(request: Request, topicId: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None or not user1.superuser:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    topic = helper.topicExport(db, topicId)
+    if topic is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Topic not found"
+        )
+    
+    return {"topic":topic[0], "topic_name":topic[1]}
+
+@app.post("/importTopic")
+async def importTopic(request: Request, details: schemas.importTopic, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None or not user1.superuser:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    return helper.topicImport(db, details.file, user1)
+
+if __name__ == "__main__":
+    print(datetime.now())

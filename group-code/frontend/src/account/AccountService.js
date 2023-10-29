@@ -66,7 +66,10 @@ class AccountService {
   }
 
   loadUsers(param) {
-    return axios.get(`${API_URL}/loadUsers`, {
+    if (param.search == "") {
+      param = {search: "@"}
+    }
+    return axios.get(`${API_URL}/loadUsers/${param.search}`, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': 'true',
@@ -125,6 +128,7 @@ class AccountService {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
       }
     });
   }
@@ -246,6 +250,75 @@ class AccountService {
       }
     });
   }
-}
+  mutalTopicsRoless(param) {
+    return axios.get(`${API_URL}/mutalTopicsRoles/${param.id2}`, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
+      }
+    });
+  }
 
+  notifications(param) {
+    return axios.get(`${API_URL}/notifications`, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
+      }
+    });
+  }
+
+  activityStatus(param) {
+    return axios.get(`${API_URL}/activityStatus/${param.id}`, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
+      }
+    });
+  }
+
+  setPrivacy(param) {
+    return axios.post(`${API_URL}/setPrivacy`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
+      }
+    })
+  }
+
+  getPrivacy(param) {
+    return axios.get(`${API_URL}/getPrivacy/${param.id}`, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
+      }
+    });
+  }
+
+  exportTopic(param) {
+    return axios.get(`${API_URL}/exportTopic/${param.topicId}`, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
+      }
+    });
+  }
+
+  importTopic(param) {
+    return axios.post(`${API_URL}/importTopic`, param, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        Authorization: localStorage.getItem('access_token')
+      }
+    })
+  }
+
+}
 export default new AccountService();

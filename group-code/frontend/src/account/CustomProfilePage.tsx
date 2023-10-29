@@ -22,6 +22,11 @@ import { format } from 'date-fns';
 import { PaperClipIcon } from '@heroicons/react/20/solid';
 import { parseDateString } from 'react-ymd-date-select/dist/cjs/date-string';
 import { parse } from 'path';
+import memberImg from '../Icons/member.png';
+import studentImg from '../Icons/student.png';
+import teacherImg from '../Icons/teacher.png';
+import forumStaffImg from '../Icons/forumStaff.png'
+import defaultImg from '../default.jpg';
 
 export default function CustomProfilePage(props: any) {
   const [sendBlock, setSendBlock] = useState(false);
@@ -33,6 +38,15 @@ export default function CustomProfilePage(props: any) {
     introduction: '',
     profilePic: ''
   });
+
+  const [activityStatus, setActivityStatus] = useState({
+    status:'Offline', 
+    delta:-1,
+    details: ""
+  });
+
+  const [statusColour, setStatusColour] = useState(" bg-gray-500")
+  const [mutalRoles, setMutalRoles] = useState({});
   const { id } = useParams(); // :id 是这个id
   const [conversation_name, setConversation_name] = useState('');
   const navigate = useNavigate();
@@ -45,6 +59,61 @@ export default function CustomProfilePage(props: any) {
     }
   };
 
+  const roleToImg = (role: string) => {
+      if (role == "Creator") {
+        return teacherImg;
+      } else if (role == "Student") {
+        return studentImg;
+      } else if (role == "Forum Staff") {
+        return forumStaffImg;
+      } else {
+        return memberImg;
+      }
+
+  }
+
+  const loadMutalRoles = () => {
+    const res = [];
+    let i = 0;
+    const keys = Object.keys(mutalRoles);
+    while (i < keys.length) {
+      const topics = mutalRoles[keys[i]];
+      let roleName = keys[i]
+      if (roleName == null || roleName == "null") {
+        roleName = "Member"
+      }
+      const roleText = `${roleName} in ${topics.join(', ')}.`; 
+      res.push(
+        <div className="px-1 flex">
+          <img
+            className="h-7 w-7"
+            src={roleToImg(keys[i])}
+            alt=""
+          />
+          <dd className="mt-1.5 text-sm text-gray-900 sm:col-span-2 sm:mt-0 ml-2">
+            {roleText}
+          </dd>
+        </div>
+      );
+      i += 1;
+    }
+    return res;
+  };
+
+  const loadOneRole = () => {
+    const keys = Object.keys(mutalRoles)
+    if (keys.includes("Creator")) {
+      return "Creator"
+    } else if (keys.includes("Forum Staff")) {
+      return "Forum Staff"
+    } else if (keys.includes("Student")) {
+      return "Student"
+    } else if (keys.length > 0) {
+      return "Member"
+    }
+    return "User"
+  }
+
   useEffect(() => {
     console.log(id);
     AccountService.getOneUser({ 
@@ -54,22 +123,62 @@ export default function CustomProfilePage(props: any) {
       setUser(response.data.user);
       console.log(response.data);
     });
+
+    AccountService.mutalTopicsRoless({
+      id2: id,
+      access_token: localStorage.getItem('access_token') 
+    }).then((response) => {
+      setMutalRoles(response.data);
+    });
+
+    AccountService.activityStatus({
+      id: id
+    }).then((response) => {
+      console.log(response.data);
+      setActivityStatus(response.data);
+      if (response.data) {
+        if (response.data.status == "Online") {
+          setStatusColour(" bg-green-500");
+        } else if (response.data.status == "Away") {
+          setStatusColour(" bg-orange-500");
+        } else {
+          setStatusColour(" bg-gray-500");
+        }
+      }
+      console.log(statusColour);
+    })
   }, []);
+  
+  const getProfilePic = () => {
+    const dp = user.profilePic;
+    if (dp != "" && dp != null) {
+      return dp;
+    } 
+    return defaultImg;
+  };
 
   return (
     <div>
       <main className="">
         <div className=" py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-            <div className="px-4 py-5 sm:px-6">
-              <h3 className="text-lg font-medium leading-6 text-gray-900">
-                {user?.username}'s Profile
-              </h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                Personal details.
-              </p>
+          <div className='ml-4 mt-4'>
+              <div className='bg-indigo-100 shadow sm:rounded-t-lg w-full flex flex-col items-center mb-1'>
+                <div className={'w-full h-4 shadow sm:rounded-t-lg' + statusColour}></div>
+                <img
+                  className="h-12 w-12 rounded-full mt-4 justify-center"
+                  src={getProfilePic()}
+                  alt=""
+                />
+                <div className="justify-center font-medium text-lg">
+                  {user?.username}
+                </div>
+                <div className="justify-center font-thin text-sm text-indigo-600 mb-2">
+                  {loadOneRole()}
+                </div>
+              </div>
             </div>
-            <div className="border-t border-gray-200">
+            <div className="divide-solid flex">
               <dl>
                 <div className={
                   (user.full_name != "")
@@ -112,20 +221,39 @@ export default function CustomProfilePage(props: any) {
                   </dd>
                 </div>
                 <div className={
-                  (user.profilePic != "")
+                  (Object.keys(mutalRoles).length != 0)
                   ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
                   : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
                 }
                 >
                   <dt className="text-sm font-medium text-gray-500">
-                    Profile Picture
+                    Mutal Roles
                   </dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                    <img
-                      className="h-12 w-12 rounded-full"
-                      src={user.profilePic}
-                      alt=""
-                    />
+                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 flex">
+                    
+                    {loadMutalRoles()}
+        
+                  </dd>
+                </div>
+                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Activity status
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 flex">
+                    {activityStatus.status}
+                  </dd>
+                </div>
+                <div className={
+                  (activityStatus.details != "")
+                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                }
+                >
+                  <dt className="text-sm font-medium text-gray-500">
+                    Recent Activity
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 flex">
+                    {activityStatus.details}
                   </dd>
                 </div>
               </dl>

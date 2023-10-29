@@ -58,7 +58,6 @@ class User(BaseModel):
     emailAuth: str
     mfa: str
     profilePic: str
-    
     class Config:
         orm_mode = True
 
@@ -160,6 +159,7 @@ class AuthorDetails(BaseModel):
     id: int
     name: str
     username: str
+    profilePic: str
 
 
 class Post(BaseModel):
@@ -565,3 +565,18 @@ class userImage(BaseModel):
     token: str
     image: Any
 
+class log(BaseModel):
+    id: int
+    user_id: int
+    time: datetime
+    details: str
+
+class privacy(BaseModel):
+    email: bool
+    recent_activity: bool
+    invisible: bool
+    full_name: bool
+
+class importTopic(BaseModel):
+    file: str
+    

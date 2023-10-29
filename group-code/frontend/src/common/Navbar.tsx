@@ -5,6 +5,7 @@ import defaultImg from '../default.jpg';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLogoutMutation, useIsSuperuserQuery } from 'features/api/apiSlice';
 import AccountService from 'account/AccountService';
+import msgIcon from '../Icons/newMsgF.png';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -15,6 +16,8 @@ export default function Navbar() {
   const [path, setPath] = useState('');
   const [logout] = useLogoutMutation();
   const [isSuperuser, setIsSuperUser] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [lastMsgLink, setLastMsgLink] = useState("");
 
   const getProfilePic = () => {
     const dp = localStorage.getItem("profilePic");
@@ -24,8 +27,22 @@ export default function Navbar() {
     return defaultImg;
   };
 
+  useEffect(() => {
+    AccountService.notifications().then((response)=>{
+      setNotifications(response.data.notifications);
+      console.log(response.data.notifications)
+    });
+    console.log(notifications)
+  }, []);
 
-
+  useEffect(() => {
+    console.log(notifications)
+    if (notifications.length > 0) {
+      setLastMsgLink("/details/" + notifications[0]["conversation_name"]);
+    };
+    console.log(lastMsgLink);
+  }, [notifications]);
+  
   useEffect(() => {
     setPath(window.location.pathname);
   }, [window.location.pathname]);
@@ -124,6 +141,17 @@ export default function Navbar() {
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                <Link
+                to={lastMsgLink} >
+                  <img className={
+                    (notifications.length != 0)
+                    ? 'h-8 w-8'
+                    : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                  }
+                  src={msgIcon}
+                  >
+                  </img>
+                </Link>
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
                   <div>
@@ -174,14 +202,16 @@ export default function Navbar() {
                               AccountService.logout({"access_token": localStorage.getItem("access_token")})
                               .then((response)=>{
                                 console.log(response)
+
                               })
                               .catch((error)=>{
                                 console.log(error)
-                              })
+                              });
 
                               localStorage.clear();
                               logout(null);
                               navigate('/welcome');
+                              location.reload();
                             }}
                           >
                             Sign out

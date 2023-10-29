@@ -22,6 +22,7 @@ import CustomProfilePage from 'account/CustomProfilePage';
 import VEmail from 'account/vEmail';
 import UpdatePicture from 'account/updatePicture';
 import RecoverPass from 'account/recoverPass';
+import PrivacySettings from 'account/privacySettings';
 import TopicPage from 'content/TopicPage';
 import Forum from 'forum/Forum';
 import AssessmentMain from 'assessment/assessmentMain';
@@ -59,6 +60,7 @@ root.render(
         <Route path="updatePicture" element={<UpdatePicture />} />
         <Route path="welcome" element={<WelcomePage />} />
         <Route path="recoverPass" element={<RecoverPass />} />
+        <Route path="PrivacySettings" element={<PrivacySettings />} />
         {/* Routes with navbar layout */}
         <Route element={<LayoutNoPadding />}>
           <Route path="test-forum" element={<Forum />} />

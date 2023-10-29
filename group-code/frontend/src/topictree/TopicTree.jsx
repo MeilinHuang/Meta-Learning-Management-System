@@ -17,6 +17,7 @@ import PathwayDropdown from './PathwayDropdown';
 import CreateDropdown from './CreateDropdown';
 
 import CreateTopicModal from './CreateTopicModal';
+import CreateTopicImportModal from './CreateTopicImportModal';
 import CreateGroupModal from './CreateGroupModal';
 import CreatePrerequisiteModal from './CreatePrerequisiteModal';
 import CreatePathwayModal from './CreatePathwayModal';
@@ -149,6 +150,8 @@ export default function TopicTree() {
   // Modals
   const [showCreateTopicModal, setShowCreateTopicModal] = useState(false);
   const [showTopicModal, setShowTopicModal] = useState(false);
+  const [showCreateTopicImportModal, setShowCreateTopicImportModal] = useState(false);
+  const [showTopicImportModal, setShowTopicImportModal] = useState(false);
   const [showCreatePrereqModal, setShowCreatePrereqModal] = useState(false);
   const [showPrereqModal, setShowPrereqModal] = useState(false);
   const [showGroupModal, setShowGroupModal] = useState(false);
@@ -362,6 +365,10 @@ export default function TopicTree() {
         open={showCreateTopicModal}
         setOpen={setShowCreateTopicModal}
       />
+      <CreateTopicImportModal
+        open={showCreateTopicImportModal}
+        setOpen={setShowCreateTopicImportModal}
+      />
       <CreateGroupModal
         open={showCreateGroupModal}
         setOpen={setShowCreateGroupModal}
@@ -412,6 +419,7 @@ export default function TopicTree() {
               {currPath.id == 0 ? (
                 <CreateDropdown
                   setShowTopicModal={setShowCreateTopicModal}
+                  setShowTopicImportModal={setShowCreateTopicImportModal}
                   setShowGroupModal={setShowCreateGroupModal}
                   setShowPrereqModal={setShowCreatePrereqModal}
                   setShowPathwayModal={setShowPathwayModal}
