@@ -1,8 +1,23 @@
 .float-component {
-    position: fixed;
-    border: 2px solid blue; /* Add a blue border to the floating component */
-    border-radius: 8px; /* Add rounded corners to the floating component */
-    background-color: red; /* Set the background color to red */
-    cursor: move; /* Change the cursor to indicate that the component can be dragged */
-  }
-  
+  position: fixed;
+  border: 2px solid blue;
+  /* Add a blue border to the floating component */
+  border-radius: 8px;
+  /* Add rounded corners to the floating component */
+  background-color: red;
+  /* Set the background color to red */
+  cursor: move;
+  /* Change the cursor to indicate that the component can be dragged */
+}
+
+/* Works for Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Works for Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
