@@ -206,7 +206,7 @@ export default function ThreadList(props: ThreadListProps) {
   return (
     <div className="h-full overflow-hidden">
       <AutoSizer>
-        {({ height, width }) => (
+        {({ height, width }: { height: number, width: number }) => (
           <InfiniteLoader
             isItemLoaded={isItemLoaded}
             itemCount={itemCount}

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@angular/core": "^14.2.6",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/regjsgen": "^0.8.0",
     "@headlessui/react": "^1.7.3",
     "@heroicons/react": "^2.0.12",

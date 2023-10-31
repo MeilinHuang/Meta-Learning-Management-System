@@ -54,6 +54,7 @@ export default function ConversationPage(props: any) {
             setUsersList(response.data);
         })
         .catch((error) => {
+            // do nothing
         });
 
 
@@ -80,7 +81,7 @@ export default function ConversationPage(props: any) {
     const AddUser = () => {
         AccountService.addUserToConversation({"username": newAddUser, "conversation_id":conversation.id})
         .then((response)=>{
-            
+            // do nothing
         })
         setAddUser(false)
     }
