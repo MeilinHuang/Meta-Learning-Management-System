@@ -1,0 +1,8 @@
+.float-component {
+    position: fixed;
+    border: 2px solid blue; /* Add a blue border to the floating component */
+    border-radius: 8px; /* Add rounded corners to the floating component */
+    background-color: red; /* Set the background color to red */
+    cursor: move; /* Change the cursor to indicate that the component can be dragged */
+  }
+  
