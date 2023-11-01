@@ -8,5 +8,4 @@ psycopg2-binary
 uvicorn==0.18.3
 pyjwt==2.5.0
 passlib[bcrypt]
-pydantic
 faker

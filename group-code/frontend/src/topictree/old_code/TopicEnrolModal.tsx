@@ -5,65 +5,32 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { PlusIcon as PlusIconMini } from '@heroicons/react/20/solid';
 import Select from 'react-select';
 
-import {
-  useCreateTopicGroupMutation,
-  useGetPathwayQuery
-} from '../features/api/apiSlice';
+import { useEnrolInTopicMutation } from '../../features/api/apiSlice';
+import { QuestionMarkCircleIcon } from '@heroicons/react/24/solid';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function CreateGroupModal({
-  open,
-  setOpen
-}: {
+type CreateTopicModalProps = {
   open: boolean;
   setOpen: any;
-}) {
+  topicId: number;
+  topicName: string;
+};
+
+export default function TopicEnrolModal({
+  open,
+  setOpen,
+  topicId,
+  topicName
+}: CreateTopicModalProps) {
   const cancelButtonRef = useRef(null);
 
-  const [formattedTopics, setFormattedTopics] = useState<
-    Array<{ value: string; label: string }>
-  >([]);
-
-  const [topics, setTopics] = useState<Array<number>>([]);
-
-  const {
-    data: globalPathData,
-    error: errorPath,
-    isLoading: isLoadingPath,
-    isFetching: isFetchingPath,
-    isSuccess: isSuccessPath
-  } = useGetPathwayQuery({
-    pathway_id: 0,
-    user: false
-  });
-
-  useEffect(() => {
-    if (!isFetchingPath && isSuccessPath) {
-      setFormattedTopics(
-        globalPathData.electives.map((topic: any) => {
-          return {
-            value: `${topic.id}`,
-            label: topic.name
-          };
-        })
-      );
-    }
-  }, [isFetchingPath]);
-
-  useEffect(() => {
-    if (open) {
-      // reset form fields
-      setName('');
-    }
-  }, [open]);
-
-  const [name, setName] = useState('');
-
-  // permutations
-  const [createTopicGroup, { isSuccess, data }] = useCreateTopicGroupMutation();
+  const [
+    enrolInTopic,
+    { data: topicEnrolData, isSuccess: isSuccessTopicEnrol }
+  ] = useEnrolInTopicMutation();
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -97,10 +64,10 @@ export default function CreateGroupModal({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div className="mb-10">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
-                    <PlusIcon
-                      className="h-6 w-6 text-indigo-600"
+                <div className="mb-5">
+                  <div className="mx-auto flex items-center justify-center rounded-full">
+                    <QuestionMarkCircleIcon
+                      className="h-10 w-10 text-indigo-600"
                       aria-hidden="true"
                     />
                   </div>
@@ -109,58 +76,12 @@ export default function CreateGroupModal({
                       as="h3"
                       className="text-lg font-medium leading-6 text-gray-900"
                     >
-                      Create Topic Group
+                      Enrol in {topicName}
                     </Dialog.Title>
-                    {/* Create group form */}
                     <div className="mt-2">
-                      {/* Group name */}
-                      <div className="w-full flex flex-col items-start">
-                        <label
-                          htmlFor="name"
-                          className="block text-sm font-medium text-gray-700"
-                        >
-                          Group name*
-                        </label>
-                        <div className="mt-1 w-full">
-                          <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      {/* Group topics */}
-                      <div className="w-full flex flex-col items-start mt-4">
-                        <label
-                          htmlFor="name"
-                          className="block text-sm font-medium text-gray-700"
-                        >
-                          Topics
-                        </label>
-                        <Select
-                          name="topics"
-                          options={formattedTopics}
-                          isMulti
-                          className="basic-multi-select mt-1 block w-full text-sm text-left"
-                          classNamePrefix="select"
-                          maxMenuHeight={90}
-                          onChange={(e) => {
-                            setTopics(e.map((topic) => Number(topic.value)));
-                          }}
-                          theme={(theme) => ({
-                            ...theme,
-                            borderRadius: 5,
-                            colors: {
-                              ...theme.colors,
-                              primary25: '#eef2ff',
-                              primary: '#818cf8'
-                            }
-                          })}
-                        />
-                      </div>
+                      <p className="text-sm text-gray-500">
+                        Would you like to enrol in this topic?
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -169,11 +90,14 @@ export default function CreateGroupModal({
                     type="button"
                     className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 sm:col-start-2 sm:text-sm"
                     onClick={() => {
-                      createTopicGroup({ name: name, topics: topics });
+                      enrolInTopic({
+                        user_id: localStorage.getItem('user_id'),
+                        topic_id: topicId
+                      });
                       setOpen(false);
                     }}
                   >
-                    Create Group
+                    Enrol
                   </button>
                   <button
                     type="button"

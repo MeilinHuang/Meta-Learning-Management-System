@@ -85,12 +85,14 @@ class Prerequisite(Base):
         "Topic", secondary=prerequisite_assosciation, backref="prerequisite_of")
     amount = Column(Integer, default=1)
 
-    @validates(amount)
-    def validate_amount(self, key, amount):
-        if amount > len(self.choices):
-            raise ValueError(
-                "Amount cannot be greater than number of prerequisite choices")
-        return amount
+    # @validates(amount)
+    # def validate_amount(self, key, amount):
+    #     non_archived_choices = filter(lambda c: not c.archived, self.choices)
+    #     print('non_archived_choices', non_archived_choices)
+    #     if amount > len(non_archived_choices):
+    #         raise ValueError(
+    #             "Amount cannot be greater than number of prerequisite active (non-archived) topics")
+    #     return amount
 
 
 class Topic(Base):

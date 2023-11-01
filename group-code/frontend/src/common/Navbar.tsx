@@ -151,8 +151,8 @@ export default function Navbar() {
                           </a>
                         )}
                       </Menu.Item>
-                      <Link to="/welcome"
-                      >
+                      {/* <Link to="/welcome"
+                      > */}
                       <Menu.Item>
                         {({ active }) => (
                           <a
@@ -164,10 +164,10 @@ export default function Navbar() {
                             onClick={() => {
                               AccountService.logout({"access_token": localStorage.getItem("access_token")})
                               .then((response)=>{
-                                console.log(response)
+                                // console.log(response)
                               })
                               .catch((error)=>{
-                                console.log(error)
+                                console.error(error)
                               })
 
                               localStorage.clear();
@@ -179,7 +179,7 @@ export default function Navbar() {
                           </a>
                         )}
                       </Menu.Item>
-                      </Link>
+                      {/* </Link> */}
                     </Menu.Items>
                   </Transition>
                 </Menu>

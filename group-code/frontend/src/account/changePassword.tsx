@@ -177,16 +177,14 @@ export default function ChangePassword() {
                       const param = { username: localStorage.getItem("user_name"), password: oldPassword, newpassword: newPassword };
                       AccountService.changePw(param)
                         .then((response: any) => {
-                          console.log(response)
+                          // console.log(response)
                           setErrorMessage(
                             'Password Changing Successed'
                           );
                         })
                         .catch((error: any) => {
                           if (error.response) {
-                            console.log(error.response.data);
-                            console.log(error.response.status);
-                            console.log(error.response.headers);
+                            console.error(error.response.data, error.response.status, error.response.headers);
                             setCode(error.response.status);
                             if (error.response.status == 401) {
                               setErrorMessage(

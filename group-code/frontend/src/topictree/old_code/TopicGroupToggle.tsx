@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getButtonGroupStyles } from './topicTreeHelpers';
+import { getButtonGroupStyles } from '../topicTreeHelpers';
 
 export default function Button({
   cy,

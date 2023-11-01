@@ -9,14 +9,14 @@ import {
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
 import Select from 'react-select';
 
-import { getButtonGroupStyles } from './topicTreeHelpers';
+import { getButtonGroupStyles } from '../topicTreeHelpers';
 
 import {
   useGetTopicGroupInfoQuery,
   useGetPathwayQuery,
   useEditTopicGroupMutation,
   useDeleteTopicGroupMutation
-} from '../features/api/apiSlice';
+} from '../../features/api/apiSlice';
 import { WarningAlert } from 'common/Alert';
 
 function classNames(...classes: any) {
@@ -75,7 +75,6 @@ export default function GroupModal({
   ] = useDeleteTopicGroupMutation();
 
   useEffect(() => {
-    console.log(groupData);
     if (groupData) {
       setName(groupData.name);
       setSelectedTopics(
@@ -141,7 +140,7 @@ export default function GroupModal({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div className="mb-10">
+                <div className="mb-5">
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
                     {editMode && (
                       <PencilIcon

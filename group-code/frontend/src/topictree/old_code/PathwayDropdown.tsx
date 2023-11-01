@@ -9,37 +9,47 @@ import {
 import {
   useGetPathwaysQuery,
   useIsSuperuserQuery
-} from '../features/api/apiSlice';
+} from '../../features/api/apiSlice';
 import { useState, useEffect } from 'react';
-import { currPathT } from './types';
-import { classNames } from './topicTreeHelpers';
 
-type PathwayDropdownProps = { 
-  currPath: currPathT,
-  setCurrPath: any, 
-  isSuperuser: boolean,
-  pathwaysData: {
-    userPathsData: {
-      pathways: Array<any>, 
-      error:any, 
-      isLoading:boolean, 
-      isSuccess:boolean
-    }, 
-    allPathsData: {
-      pathways: Array<any>, 
-      error:any, 
-      isLoading:boolean, 
-      isSuccess:boolean
-    },
-  }
-};
+function classNames(...classes: any) {
+  return classes.filter(Boolean).join(' ');
+}
 
-export default function PathwayDropdown(props: PathwayDropdownProps) {
+type currPathT = { id: number; name: string; user: boolean };
+type PathwayDropdownProps = { currPath: currPathT; setCurrPath: any };
+
+export default function PathwayDropdown({
+  currPath,
+  setCurrPath
+}: PathwayDropdownProps) {
+  // TODO: error handling
+
+  //Why are the constants written over immediately??
+  const {
+    data: userPathsData,
+    error: errorUserPaths,
+    isLoading: isLoadingUserPaths,
+    isSuccess: isSuccessUserPaths
+  } = useGetPathwaysQuery(true);
+  const { data, error, isLoading, isSuccess } = useGetPathwaysQuery(false);
+
+  const { data: superuserData, error: superuserError } =
+    useIsSuperuserQuery(null);
+
+  const [isSuperuser, setIsSuperuser] = useState(false);
+
+  useEffect(() => {
+    if (superuserData && superuserData['is_superuser']) {
+      setIsSuperuser(true);
+    }
+  }, [superuserData]);
+
   return (
     <Menu as="div" className="mt-1 ml-1 md:mt-0 relative inline-block text-left">
       <div>
         <Menu.Button className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-100">
-          {props.currPath.name}
+          {currPath.name}
           <ChevronDownIcon className="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
         </Menu.Button>
       </div>
@@ -54,7 +64,7 @@ export default function PathwayDropdown(props: PathwayDropdownProps) {
         leaveTo="transform opacity-0 scale-95"
       >
         <Menu.Items className="absolute right-0 z-10 mt-2 w-56 divide-y divide-gray-100 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-          {!props.isSuperuser && (
+          {!isSuperuser && (
             <div>
               <div className="flex px-4 items-center">
                 <UserCircleIcon
@@ -65,9 +75,9 @@ export default function PathwayDropdown(props: PathwayDropdownProps) {
                   My Pathways
                 </p>
               </div>
-              {props.pathwaysData.allPathsData.isSuccess &&
-                props.pathwaysData.userPathsData.isSuccess &&
-                props.pathwaysData.userPathsData.pathways.map((pathway: any) => {
+              {isSuccess &&
+                isSuccessUserPaths &&
+                userPathsData.pathways.map((pathway: any) => {
                   return (
                     <Menu.Item key={pathway.id}>
                       {({ active }) => (
@@ -79,7 +89,7 @@ export default function PathwayDropdown(props: PathwayDropdownProps) {
                             'block px-4 py-2 text-sm'
                           )}
                           onClick={() => {
-                            props.setCurrPath({
+                            setCurrPath({
                               id: pathway.id,
                               name: pathway.name,
                               user: true
@@ -95,7 +105,7 @@ export default function PathwayDropdown(props: PathwayDropdownProps) {
             </div>
           )}
           <div>
-            {!props.isSuperuser && (
+            {!isSuperuser && (
               <div className="flex px-4 items-center">
                 <ArchiveBoxIcon
                   className="mr-2 h-[18px] w-[18px] text-gray-900"
@@ -106,12 +116,12 @@ export default function PathwayDropdown(props: PathwayDropdownProps) {
                 </p>
               </div>
             )}
-            {props.pathwaysData.allPathsData.isSuccess &&
-                props.pathwaysData.userPathsData.isSuccess &&
-                props.pathwaysData.allPathsData.pathways.map((pathway: any) => {
+            {isSuccess &&
+              isSuccessUserPaths &&
+              data.pathways.map((pathway: any) => {
                 // only show in other pathways if user has not joined path
                 if (
-                  props.isSuperuser || props.pathwaysData.userPathsData.pathways.filter(
+                  userPathsData.pathways.filter(
                     (userPath: any) => userPath.id == pathway.id
                   ).length === 0
                 ) {
@@ -126,10 +136,10 @@ export default function PathwayDropdown(props: PathwayDropdownProps) {
                             'block px-4 py-2 text-sm'
                           )}
                           onClick={() => {
-                            props.setCurrPath({
+                            setCurrPath({
                               id: pathway.id,
                               name: pathway.name,
-                              user: true
+                              user: false
                             });
                           }}
                         >
@@ -146,3 +156,5 @@ export default function PathwayDropdown(props: PathwayDropdownProps) {
     </Menu>
   );
 }
+
+// max-h-46 overflow-y-scroll

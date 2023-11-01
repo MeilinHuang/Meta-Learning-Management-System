@@ -8,4 +8,3 @@ pyjwt==2.5.0
 python-multipart
 faker
 passlib[bcrypt]
-pydantic

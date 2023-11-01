@@ -45,10 +45,10 @@ export default function CustomProfilePage(props: any) {
   };
 
   useEffect(() => {
-    console.log(id);
+    // console.log(id);
     AccountService.getOneUser({ id: id }).then((response) => {
       setUser(response.data.user);
-      console.log(response.data);
+      // console.log(response.data);
     });
   }, []);
 
@@ -109,14 +109,14 @@ export default function CustomProfilePage(props: any) {
                 };
                 AccountService.createConversation(param)
                   .then((response: any) => {
-                    console.log(response);
+                    // console.log(response);
                     setConversation_name(response.data.conversation_name);
 
-                    console.log(`/details/${response.data.conversation_name}`);
+                    // console.log(`/details/${response.data.conversation_name}`);
                     navigate(`/details/${response.data.conversation_name}`);
                   })
                   .catch((error: any) => {
-                    console.log(error);
+                    console.error(error);
                   });
               }}
               >

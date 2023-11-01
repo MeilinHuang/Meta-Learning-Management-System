@@ -19,8 +19,8 @@ import {
   PaperAirplaneIcon
 } from '@heroicons/react/20/solid';
 
-import { ErrorAlert, WarningAlert } from '../common/Alert';
-import { getButtonGroupStyles } from './topicTreeHelpers';
+import { ErrorAlert, WarningAlert } from '../../common/Alert';
+import { getButtonGroupStyles } from '../topicTreeHelpers';
 import Select from 'react-select';
 import { Switch } from '@headlessui/react';
 
@@ -32,7 +32,7 @@ import {
   useGetTopicGroupsQuery,
   useGetTopicInfoQuery,
   useIsSuperuserQuery
-} from '../features/api/apiSlice';
+} from '../../features/api/apiSlice';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -228,7 +228,7 @@ export default function TopicModal({
                 )}
                 {!topicInfoIsLoading && topicInfoIsSuccess && topicInfoData && (
                   <div>
-                    <div className="mb-10">
+                    <div className="mb-5">
                       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
                         {deleteMode && (
                           <TrashIconOutline

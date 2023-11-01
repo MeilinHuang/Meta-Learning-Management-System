@@ -65,22 +65,22 @@ export default function AdminUserPage() {
   const updateAdminList = () => {
     AccountService.getAdmins()
       .then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
         setAdminList(response.data);
       })
       .catch((error) => {
-        console.log('error');
+        console.error('error');
       });
   };
 
   const updateNonAdminList = () => {
     AccountService.getNonAdmins()
       .then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
         setNonAdminList(response.data);
       })
       .catch((error) => {
-        console.log('error');
+        console.error('error');
       });
   };
 
@@ -88,13 +88,13 @@ export default function AdminUserPage() {
     AccountService.loadUsers()
       .then((response) => {
         // console.log("users got: ")
-        console.log(response.data);
+        // console.log(response.data);
         // console.log(response.data.length)
 
         setUsersList(response.data);
       })
       .catch((error) => {
-        console.log('error');
+        console.error('error');
       });
   };
 
@@ -105,7 +105,7 @@ export default function AdminUserPage() {
         setFriendsList(response.data.friends);
       })
       .catch((error) => {
-        console.log('error');
+        console.error('error');
       });
 
     updateUserList();
@@ -114,7 +114,7 @@ export default function AdminUserPage() {
     updateAdminList()
 
     updateNonAdminList()
-    console.log(localStorage.getItem('admin'))
+    // console.log(localStorage.getItem('admin'))
     
   },[])
 
@@ -129,7 +129,7 @@ export default function AdminUserPage() {
         // console.log(friendsList[i].username)
         // console.log(i)
         res.push(
-          <Link to={`/details/${friendsList[i].conver.conversation_name}`}>
+          <Link key={friendsList[i].id} to={`/details/${friendsList[i].conver.conversation_name}`}>
             <div
               className={
                 i % 2 == 0
@@ -140,7 +140,7 @@ export default function AdminUserPage() {
               <ul>
                 <li 
                   className='p-3'
-                  key={friendsList[i].id}
+                  // key={friendsList[i].id}
                 >
                   
                   {friendsList[i].conver.conversation_name.replace(/_/g, " ").replace(localStorage.getItem("user_name"), "")}
@@ -165,12 +165,12 @@ export default function AdminUserPage() {
       while (i < len) {
         // console.log(usersList[i].username)
         if (usersList[i].username != localStorage.getItem("user_name")) {
-          res.push(<Link to={`/users/${usersList[i].id}`}>
+          res.push(<Link key={usersList[i].id} to={`/users/${usersList[i].id}`}>
             <div className={
                 'bg-gray-50 h-10 font-sans font-medium hover:bg-gray-100 m-2'
               }
             >
-              <li key={usersList[i].id}>
+              <li>
                   {usersList[i].username}
               </li>
             </div>
@@ -256,14 +256,14 @@ export default function AdminUserPage() {
                   onClick={() => {
                     AccountService.loadUsers()
                       .then((response) => {
-                        console.log('users got: ');
-                        console.log(response.data);
+                        // console.log('users got: ');
+                        // console.log(response.data);
                         // let i = 0
-                        console.log(response.data.length);
+                        // console.log(response.data.length);
                         setUsersList(response.data);
                       })
                       .catch((error) => {
-                        console.log('error');
+                        console.error('error');
                       });
                     setTopicsShow(false);
                     setAdminShow(true);
@@ -294,14 +294,14 @@ export default function AdminUserPage() {
 
                     AccountService.getConversations(param)
                       .then((response) => {
-                        console.log('users got: ');
-                        console.log(response.data);
+                        // console.log('users got: ');
+                        // console.log(response.data);
                         localStorage.setItem('friends', response.data);
-                        console.log(response.data.length);
+                        // console.log(response.data.length);
                         setFriendsList(response.data.friends);
                       })
                       .catch((error) => {
-                        console.log('error');
+                        console.error('error');
                       });
                     setTopicsShow(false);
                     setAdminShow(false);
@@ -350,19 +350,19 @@ export default function AdminUserPage() {
                   onClick={() => {
                     AccountService.loadUsers()
                       .then((response) => {
-                        console.log('users got: ');
-                        console.log(response.data);
-                        let i = 0;
-                        console.log(response.data.length);
-                        while (i < response.data.length) {
-                          console.log(response.data[i]);
+                        // console.log('users got: ');
+                        // console.log(response.data);
+                        // let i = 0;
+                        // console.log(response.data.length);
+                        // while (i < response.data.length) {
+                        //   console.log(response.data[i]);
 
-                          i += 1;
-                        }
+                        //   i += 1;
+                        // }
                         setUsersList(response.data);
                       })
                       .catch((error) => {
-                        console.log('error');
+                        console.error('error');
                       });
                     setTopicsShow(false);
                     setAdminShow(false);
@@ -390,13 +390,7 @@ export default function AdminUserPage() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
               <h1 className="text-2xl font-semibold text-gray-900">Topics</h1>
             </div>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-              <div className="py-4">
-                <div className="rounded-lg border-gray-200">
-                  <EnrolledTopics />
-                </div>
-              </div>
-            </div>
+            <EnrolledTopics />
           </div>
         </main>
 
@@ -489,12 +483,12 @@ export default function AdminUserPage() {
                           <button
                             className="bg-neutral-200 w-64 text-indigo-600 h-10 font-mono rounded-md border-solid border-slate-300 hover:bg-neutral-300"
                             onClick={() => {
-                              console.log(selectedList);
+                              // console.log(selectedList);
                               AccountService.promoteAdmin({
                                 ids: selectedList,
                                 token: localStorage.getItem('access_token')
                               }).then((response) => {
-                                console.log(response);
+                                // console.log(response);
                                 updateAdminList();
                                 setAddAdmin(false);
                                 updateNonAdminList();
@@ -570,12 +564,12 @@ export default function AdminUserPage() {
                           <button
                             className="bg-neutral-200 w-64 text-indigo-600 h-10 font-mono rounded-md border-solid border-slate-300 hover:bg-neutral-300"
                             onClick={() => {
-                              console.log(selectedList);
+                              // console.log(selectedList);
                               AccountService.demoteAdmin({
                                 ids: selectedList,
                                 token: localStorage.getItem('access_token')
                               }).then((response) => {
-                                console.log(response);
+                                // console.log(response);
                                 updateAdminList();
                               });
                               updateUserList();

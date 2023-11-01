@@ -116,33 +116,33 @@ export default function WelcomePage() {
                 <div className='flex gap-4'>
                   <Link to="/register">
                   <span className="inline-flex rounded-md shadow">
-                    <a
-                      href=""
+                    <p
+                      // href=""
                       className="inline-flex items-center rounded-md border border-transparent bg-white px-4 py-2 text-base font-medium text-indigo-400 hover:bg-gray-50"
                     >
                       sign up
-                    </a>
+                    </p>
                   </span>
                 </Link>
                 <Link to="/login">
                   <span className="inline-flex rounded-md shadow">
-                    <a
-                      href=""
+                    <p
+                      // href=""
                       className="inline-flex items-center rounded-md border border-transparent bg-white px-4 py-2 text-base font-medium text-indigo-400 hover:bg-gray-50"
                     >
                       Login
-                    </a>
+                    </p>
                   </span>
                 </Link>
                 </div> : 
                 <Link to="/user">
                   <span className="inline-flex rounded-md shadow">
-                    <a
-                      href=""
+                    <p
+                      // href=""
                       className="inline-flex items-center rounded-md border border-transparent bg-white px-4 py-2 text-base font-medium text-indigo-400 hover:bg-gray-50"
                     >
                       Your Home Page
-                    </a>
+                    </p>
                   </span>
                 </Link>}
                 
