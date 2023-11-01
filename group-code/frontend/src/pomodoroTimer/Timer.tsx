@@ -15,9 +15,16 @@ const Timer = () => {
         longBreakInterval: 3,
     })
 
-    const [pomodoroDuration, setPomodoroDuration] = useState(defaultSettings.pomodoroDuration); // 25 minutes
-    const [shortBreakDuration, setShortBreakDuration] = useState(defaultSettings.shortBreakDuration); // 5 minutes
-    const [longBreakDuration, setLongBreakDuration] = useState(defaultSettings.longBreakDuration); // 10 minutes
+    // Retrieve settings from cookies or use default settings
+    const [pomodoroDuration, setPomodoroDuration] = useState(
+        cookies.timerSettings?.pomodoroDuration || defaultSettings.pomodoroDuration
+    );
+    const [shortBreakDuration, setShortBreakDuration] = useState(
+        cookies.timerSettings?.shortBreakDuration || defaultSettings.shortBreakDuration
+    );
+    const [longBreakDuration, setLongBreakDuration] = useState(
+        cookies.timerSettings?.longBreakDuration || defaultSettings.longBreakDuration
+    );
     const [longBreakInterval, setLongBreakInterval] = useState(defaultSettings.longBreakInterval);
 
     const [currentTimer, setCurrentTimer] = useState('pomodoro'); // 'pomodoro', 'shortBreak', 'longBreak'
@@ -40,7 +47,7 @@ const Timer = () => {
 
         if (isRunning && time > 0) {
             interval = setInterval(() => {
-                setTime((prevTime) => prevTime - 1);
+                setTime((prevTime: number) => prevTime - 1);
             }, 1000);
         } else if (time === 0) {
             handleIntervalEnd();
@@ -168,7 +175,7 @@ const Timer = () => {
         setTempPomodoroDuration(defaultSettings.pomodoroDuration);
         setTempShortBreakDuration(defaultSettings.shortBreakDuration);
         setTempLongBreakDuration(defaultSettings.longBreakDuration);
-        setTempLongBreakInterval(defaultSettings.longBreakInterval);
+        setTempLongBreakInterval(3);
     };
 
 
@@ -186,6 +193,14 @@ const Timer = () => {
         } else {
             setTime(tempLongBreakDuration);
         }
+
+        // Update the cookies with the new settings
+        setCookie('timerSettings', {
+            pomodoroDuration: tempPomodoroDuration,
+            shortBreakDuration: tempShortBreakDuration,
+            longBreakDuration: tempLongBreakDuration,
+            longBreakInterval: tempLongBreakInterval,
+        });
 
         setIsSettingsOpen(false);
         setShowSaveDialog(false);
@@ -275,18 +290,13 @@ const Timer = () => {
                             setState: setTempLongBreakDuration,
                             label: 'Long Break Duration (minutes)',
                         },
-                        {
-                            state: tempLongBreakInterval,
-                            setState: setTempLongBreakInterval,
-                            label: 'Normal Breaks Before Long Break',
-                        },
                     ].map((input, index) => (
                         <div key={index} className="flex flex-col gap-2">
                             <label className="font-medium">{input.label}:</label>
                             <div className="input-with-buttons flex flex-row gap-2">
                                 <button
                                     className="decrement-button bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
-                                    onClick={() => input.setState(Math.max(input.state - 60, 0))}
+                                    onClick={() => input.setState(input.state - 60)}
                                 >
                                     -
                                 </button>
@@ -294,7 +304,7 @@ const Timer = () => {
                                     type="number"
                                     className="rounded border border-gray-300 px-0 py-1 text-center"
                                     value={input.state / 60}
-                                    onChange={(e) => input.setState(Math.max(Number(e.target.value) * 60, 0))}
+                                    onChange={(e) => input.setState(Number(e.target.value) * 60)}
                                     min="0"
                                     maxLength={4}
                                 />
@@ -307,6 +317,34 @@ const Timer = () => {
                             </div>
                         </div>
                     ))}
+
+                    {/* Normal Breaks Before Long Break */}
+                    <div className="flex flex-col gap-2">
+                        <label className="font-medium">Normal Breaks Before Long Break:</label>
+                        <div className="input-with-buttons flex flex-row gap-2">
+                            <button
+                                className="decrement-button bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
+                                onClick={() => setTempLongBreakInterval(Math.max(tempLongBreakInterval - 1, 2))}
+                            >
+                                -
+                            </button>
+                            <input
+                                type="number"
+                                className="rounded border border-gray-300 px-0 py-1 text-center"
+                                value={tempLongBreakInterval}
+                                onChange={(e) => setTempLongBreakInterval(Math.max(Number(e.target.value), 2))}
+                                min="2"
+                                maxLength={2}
+                            />
+                            <button
+                                className="increment-button bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
+                                onClick={() => setTempLongBreakInterval(tempLongBreakInterval + 1)}
+                            >
+                                +
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="flex justify-end mt-4 gap-1">
                         <button className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full" onClick={handleSave}>
                             Save
@@ -317,6 +355,7 @@ const Timer = () => {
                     </div>
                 </div>
             )}
+
 
             {showSaveDialog && (
                 <div className="save-dialog bg-white shadow-lg rounded-lg fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-64">
