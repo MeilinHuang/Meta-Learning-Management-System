@@ -6,7 +6,7 @@ import './Timer.css'; // Import custom CSS for styling
 
 const Timer = () => {
     // Timer durations in seconds
-    // const [cookies, setCookie] = useCookies(['timerSettings']);
+    const [cookies, setCookie] = useCookies(['timerSettings']);
 
     const [defaultSettings] = useState({
         pomodoroDuration: 25 * 60,
@@ -80,7 +80,6 @@ const Timer = () => {
             default:
                 break;
         }
-
         logSkippedTimer();
     };
 
@@ -170,12 +169,6 @@ const Timer = () => {
         setTempShortBreakDuration(defaultSettings.shortBreakDuration);
         setTempLongBreakDuration(defaultSettings.longBreakDuration);
         setTempLongBreakInterval(defaultSettings.longBreakInterval);
-
-        // Additionally, update the main state values
-        setPomodoroDuration(defaultSettings.pomodoroDuration);
-        setShortBreakDuration(defaultSettings.shortBreakDuration);
-        setLongBreakDuration(defaultSettings.longBreakDuration);
-        setLongBreakInterval(defaultSettings.longBreakInterval);
     };
 
 
@@ -207,44 +200,20 @@ const Timer = () => {
         <div className="pomodoro-timer flex flex-col items-center justify-center min-h-screen bg-gray-100">
             <div className="pomodoro-timer flex flex-col items-center justify-center bg-gray-100 mb-4">
                 <div className="buttons flex gap-4">
-                    <button
-                        className={`${currentTimer === 'pomodoro'
-                            ? 'bg-indigo-500'
-                            : 'bg-gray-500'
-                            } hover:bg-indigo-700 text-white px-4 py-2 rounded-full`}
-                        onClick={handlePomodoro}
-                    >
-                        Pomodoro
-                    </button>
-                    <button
-                        className={`${currentTimer === 'shortBreak'
-                            ? 'bg-indigo-500'
-                            : 'bg-gray-500'
-                            } hover:bg-indigo-700 text-white px-4 py-2 rounded-full`}
-                        onClick={handleShortBreak}
-                    >
-                        Short Break
-                    </button>
-                    <button
-                        className={`${currentTimer === 'longBreak'
-                            ? 'bg-indigo-500'
-                            : 'bg-gray-500'
-                            } hover:bg-indigo-700 text-white px-4 py-2 rounded-full`}
-                        onClick={handleLongBreak}
-                    >
-                        Long Break
-                    </button>
-                    <div className='Settings'>
+                    {[
+                        { type: 'pomodoro', label: 'Pomodoro', onClick: handlePomodoro },
+                        { type: 'shortBreak', label: 'Short Break', onClick: handleShortBreak },
+                        { type: 'longBreak', label: 'Long Break', onClick: handleLongBreak },
+                        { type: 'settings', label: <FontAwesomeIcon icon={faCog} />, onClick: handleCogIconClick },
+                    ].map((button) => (
                         <button
-                            className={`${currentTimer === 'settings'
-                                ? 'bg-indigo-500'
-                                : 'bg-indigo-700'
-                                } hover:bg-indigo-700 text-white px-4 py-2 rounded-full`}
-                            onClick={handleCogIconClick}
+                            key={button.type}
+                            className={`${currentTimer === button.type ? 'bg-indigo-500' : 'bg-gray-500'} hover:bg-indigo-700 text-white px-4 py-2 rounded-full`}
+                            onClick={button.onClick}
                         >
-                            <FontAwesomeIcon icon={faCog} />
+                            {button.label}
                         </button>
-                    </div>
+                    ))}
                 </div>
             </div>
             <h1 className="text-4xl font-bold mb-4">
@@ -256,9 +225,7 @@ const Timer = () => {
                     <button
                         className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
                         onClick={handleStart}
-                    >
-                        Start
-                    </button>
+                    > Start</button>
                 ) : (
                     <>
                         <button
@@ -292,106 +259,54 @@ const Timer = () => {
                             Reset to Default
                         </button>
                     </div>
-                    <div className="flex flex-col gap-2">
-                        <label className="font-medium">Pomodoro Duration (minutes):</label>
-                        <div className="input-with-buttons flex flex-row gap-2">
-                            <button
-                                className="decrement-button bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
-                                onClick={() => setTempPomodoroDuration(Math.max(tempPomodoroDuration - 60, 0))}
-                            >
-                                -
-                            </button>
-                            <input
-                                type="number"
-                                className="rounded border border-gray-300 px-0 py-1 text-center"
-                                value={tempPomodoroDuration / 60}
-                                onChange={(e) => setTempPomodoroDuration(Math.max(Number(e.target.value) * 60, 0))}
-                                min="0"
-                                maxLength={4}
-                            />
-                            <button
-                                className="increment-button bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
-                                onClick={() => setTempPomodoroDuration(tempPomodoroDuration + 60)}
-                            >
-                                +
-                            </button>
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label className="font-medium">Short Break Duration (minutes):</label>
-                        <div className="input-with-buttons flex flex-row gap-2">
-                            <button
-                                className="decrement-button bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
-                                onClick={() => setTempShortBreakDuration(Math.max(tempShortBreakDuration - 60, 0))}
-                            >
-                                -
-                            </button>
-                            <input
-                                type="number"
-                                className="rounded border border-gray-300 px-0 py-1 text-center"
-                                value={tempShortBreakDuration / 60}
-                                onChange={(e) => setTempShortBreakDuration(Math.max(Number(e.target.value) * 60, 0))}
-                                min="0"
-                                maxLength={4}
-                            />
-                            <button
-                                className="increment-button bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
-                                onClick={() => setTempShortBreakDuration(tempShortBreakDuration + 60)}
-                            >
-                                +
-                            </button>
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label className="font-medium">Long Break Duration (minutes):</label>
-                        <div className="input-with-buttons flex flex-row gap-2">
-                            <button
-                                className="decrement-button bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
-                                onClick={() => setTempLongBreakDuration(Math.max(tempLongBreakDuration - 60, 0))}
-                            >
-                                -
-                            </button>
-                            <input
-                                type="number"
-                                className="rounded border border-gray-300 px-0 py-1 text-center"
-                                value={tempLongBreakDuration / 60}
-                                onChange={(e) => setTempLongBreakDuration(Math.max(Number(e.target.value) * 60, 0))}
-                                min="0"
-                                maxLength={4}
-                            />
-                            <button
-                                className="increment-button bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
-                                onClick={() => setTempLongBreakDuration(tempLongBreakDuration + 60)}
-                            >
-                                +
-                            </button>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <label className="font-medium">Normal Breaks Before Long Break:</label>
+                    {[
+                        {
+                            state: tempPomodoroDuration,
+                            setState: setTempPomodoroDuration,
+                            label: 'Pomodoro Duration (minutes)',
+                        },
+                        {
+                            state: tempShortBreakDuration,
+                            setState: setTempShortBreakDuration,
+                            label: 'Short Break Duration (minutes)',
+                        },
+                        {
+                            state: tempLongBreakDuration,
+                            setState: setTempLongBreakDuration,
+                            label: 'Long Break Duration (minutes)',
+                        },
+                        {
+                            state: tempLongBreakInterval,
+                            setState: setTempLongBreakInterval,
+                            label: 'Normal Breaks Before Long Break',
+                        },
+                    ].map((input, index) => (
+                        <div key={index} className="flex flex-col gap-2">
+                            <label className="font-medium">{input.label}:</label>
                             <div className="input-with-buttons flex flex-row gap-2">
                                 <button
                                     className="decrement-button bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
-                                    onClick={() => setTempLongBreakInterval(Math.max(tempLongBreakInterval - 1, 2))}
+                                    onClick={() => input.setState(Math.max(input.state - 60, 0))}
                                 >
                                     -
                                 </button>
                                 <input
                                     type="number"
                                     className="rounded border border-gray-300 px-0 py-1 text-center"
-                                    value={tempLongBreakInterval}
-                                    onChange={(e) => setTempLongBreakInterval(Math.max(Number(e.target.value), 2))}
+                                    value={input.state / 60}
+                                    onChange={(e) => input.setState(Math.max(Number(e.target.value) * 60, 0))}
                                     min="0"
-                                    maxLength={2}
+                                    maxLength={4}
                                 />
                                 <button
                                     className="increment-button bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full"
-                                    onClick={() => setTempLongBreakInterval(tempLongBreakInterval + 1)}
+                                    onClick={() => input.setState(input.state + 60)}
                                 >
                                     +
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    ))}
                     <div className="flex justify-end mt-4 gap-1">
                         <button className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full" onClick={handleSave}>
                             Save
