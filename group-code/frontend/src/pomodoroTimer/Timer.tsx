@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faCircle } from '@fortawesome/free-solid-svg-icons';
 import { useCookies } from 'react-cookie';
 import './Timer.css'; // Import custom CSS for styling
+import CircleRating from './CircleRating';
 
 const Timer = () => {
     // Timer durations in seconds
@@ -25,7 +26,7 @@ const Timer = () => {
     const [longBreakDuration, setLongBreakDuration] = useState(
         cookies.timerSettings?.longBreakDuration || defaultSettings.longBreakDuration
     );
-    const [longBreakInterval, setLongBreakInterval] = useState(defaultSettings.longBreakInterval);
+    const [longBreakInterval, setLongBreakInterval] = useState(cookies.timerSettings?.longBreakInterval || defaultSettings.longBreakInterval);
 
     const [currentTimer, setCurrentTimer] = useState('pomodoro'); // 'pomodoro', 'shortBreak', 'longBreak'
     const [timerCount, setTimerCount] = useState(0); // Number of completed intervals
@@ -66,22 +67,22 @@ const Timer = () => {
         switch (currentTimer) {
             case 'pomodoro':
                 if (timerCount < longBreakInterval) {
+                    // Check if a full Pomodoro interval is completed
                     setCurrentTimer('shortBreak');
                     setTime(shortBreakDuration);
+                    setTimerCount((prevCount) => prevCount + 1);
                 } else {
                     setCurrentTimer('longBreak');
-                    setTimerCount(0);
+                    setTimerCount(0); // Reset the timer count when long break starts
                     setTime(longBreakDuration);
                 }
                 break;
             case 'shortBreak':
                 setCurrentTimer('pomodoro');
-                setTimerCount((prevCount) => prevCount + 1);
                 setTime(pomodoroDuration);
                 break;
             case 'longBreak':
                 setCurrentTimer('pomodoro');
-                setTimerCount((prevCount) => prevCount + 1);
                 setTime(pomodoroDuration);
                 break;
             default:
@@ -89,6 +90,8 @@ const Timer = () => {
         }
         logSkippedTimer();
     };
+
+
 
     const logSkippedTimer = () => {
         if (canSkip) {
@@ -118,6 +121,7 @@ const Timer = () => {
         setIsRunning(false);
         setCanSkip(false);
         setCurrentTimer('pomodoro');
+        setTimerCount(0);
         // setProgress(0);
     };
 
@@ -175,7 +179,7 @@ const Timer = () => {
         setTempPomodoroDuration(defaultSettings.pomodoroDuration);
         setTempShortBreakDuration(defaultSettings.shortBreakDuration);
         setTempLongBreakDuration(defaultSettings.longBreakDuration);
-        setTempLongBreakInterval(3);
+        setTempLongBreakInterval(defaultSettings.longBreakInterval);
     };
 
 
@@ -209,6 +213,10 @@ const Timer = () => {
     const handleDiscardChanges = () => {
         setIsSettingsOpen(false);
         setShowSaveDialog(false);
+        setTempLongBreakInterval(longBreakInterval)
+        setTempLongBreakDuration(longBreakDuration)
+        setTempPomodoroDuration(pomodoroDuration)
+        setTempShortBreakDuration(shortBreakDuration)
     };
 
     return (
@@ -234,7 +242,10 @@ const Timer = () => {
             <h1 className="text-4xl font-bold mb-4">
                 {currentTimer === 'pomodoro' ? 'Pomodoro Timer' : currentTimer === 'shortBreak' ? 'Short Break' : 'Long Break'}
             </h1>
-            <div className="timer text-6xl font-bold mb-6">{formatTime(time)}</div>
+            <div className="timer text-6xl font-bold mb-3">{formatTime(time)}</div>
+            <div className="mb-3">
+                <CircleRating value={timerCount} total={longBreakInterval} />
+            </div>
             <div className="buttons flex gap-4">
                 {!isRunning ? (
                     <button
@@ -344,7 +355,6 @@ const Timer = () => {
                             </button>
                         </div>
                     </div>
-
                     <div className="flex justify-end mt-4 gap-1">
                         <button className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full" onClick={handleSave}>
                             Save
@@ -353,10 +363,9 @@ const Timer = () => {
                             Exit
                         </button>
                     </div>
+
                 </div>
             )}
-
-
             {showSaveDialog && (
                 <div className="save-dialog bg-white shadow-lg rounded-lg fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-64">
                     <h3 className="text-xl font-bold mb-2">Save Changes?</h3>
