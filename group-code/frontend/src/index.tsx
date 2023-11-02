@@ -41,7 +41,7 @@ import AssessmentAssignmentAttemptDetail from 'assessment/assessmentAssignmentAt
 import AssessmentEditTestDetail from 'assessment/assessmentEditTestDetail';
 import AssessmentAssignmentEditDetail from 'assessment/assessmentAssignmentEditDetail';
 import { Layout, LayoutNoPadding } from 'common/Layout';
-import Timer from 'pomodoroTimer/Timer';
+import Timer from 'pomodoroTimer/PomodoroTimerApp';
 
 import RoleEditor from 'account/RoleEditor';
 
@@ -64,7 +64,7 @@ root.render(
         <Route path="PrivacySettings" element={<PrivacySettings />} />
         {/* Routes with navbar layout */}
         <Route element={<LayoutNoPadding />}>
-          <Route path="pomodoro-timer" element={<Timer />}/>
+          <Route path="pomodoro-timer" element={<Timer />} />
           <Route path="test-forum" element={<Forum />} />
           <Route path="forum/:topicId" element={<Forum />} />
           <Route path="forum/:topicId/:sectionId" element={<Forum />} />
