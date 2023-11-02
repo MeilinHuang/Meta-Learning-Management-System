@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faChartBar, faChartColumn, faChartArea } from '@fortawesome/free-solid-svg-icons';
 import { useCookies } from 'react-cookie';
 import './Timer.css'; // Import custom CSS for styling
 import CircleRating from './CircleRating';
+import Report from './Report';
 
 const Timer = () => {
     // Timer durations in seconds
@@ -42,6 +43,8 @@ const Timer = () => {
     const [tempLongBreakDuration, setTempLongBreakDuration] = useState(longBreakDuration);
     const [tempLongBreakInterval, setTempLongBreakInterval] = useState(longBreakInterval);
     const [showSaveDialog, setShowSaveDialog] = useState(false);
+
+    const [showReportDialog, setShowReportDialog] = useState(false);
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -276,7 +279,18 @@ const Timer = () => {
                 >
                     Reset
                 </button>
+                <div className='report-button'>
+                    <button
+                        className="bg-gray-500 hover:bg-indigo-700 text-white px-4 py-2 rounded-full"
+                        onClick={() => { setShowReportDialog(true) }}
+                    >
+                        <i className="fa-solid fa-chart-simple fa-lg"></i>
+                    </button>
+                </div>
             </div>
+            {showReportDialog && (
+                <Report setShowReportDialog={setShowReportDialog} />
+            )}
             {isSettingsOpen && (
                 <div className="settings-menu bg-white shadow-lg rounded-lg fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-100">
                     <div className="flex flex-row gap-10">
