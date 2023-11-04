@@ -250,8 +250,8 @@ class AccountService {
       }
     });
   }
-  mutalTopicsRoless(param) {
-    return axios.get(`${API_URL}/mutalTopicsRoles/${param.id2}`, {
+  mutualTopicRoles(param) {
+    return axios.get(`${API_URL}/mutualTopicRoles/${param.id2}`, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': 'true',

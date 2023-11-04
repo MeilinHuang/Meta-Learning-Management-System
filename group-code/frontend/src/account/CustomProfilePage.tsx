@@ -46,7 +46,7 @@ export default function CustomProfilePage(props: any) {
   });
 
   const [statusColour, setStatusColour] = useState(" bg-gray-500")
-  const [mutalRoles, setMutalRoles] = useState({});
+  const [mutualRoles, setMutualRoles] = useState({});
   const { id } = useParams(); // :id 是这个id
   const [conversation_name, setConversation_name] = useState('');
   const navigate = useNavigate();
@@ -72,12 +72,12 @@ export default function CustomProfilePage(props: any) {
 
   }
 
-  const loadMutalRoles = () => {
+  const loadMutualRoles = () => {
     const res = [];
     let i = 0;
-    const keys = Object.keys(mutalRoles);
+    const keys = Object.keys(mutualRoles);
     while (i < keys.length) {
-      const topics = mutalRoles[keys[i]];
+      const topics = mutualRoles[keys[i]];
       let roleName = keys[i]
       if (roleName == null || roleName == "null") {
         roleName = "Member"
@@ -101,7 +101,7 @@ export default function CustomProfilePage(props: any) {
   };
 
   const loadOneRole = () => {
-    const keys = Object.keys(mutalRoles)
+    const keys = Object.keys(mutualRoles)
     if (keys.includes("Creator")) {
       return "Creator"
     } else if (keys.includes("Forum Staff")) {
@@ -124,11 +124,11 @@ export default function CustomProfilePage(props: any) {
       console.log(response.data);
     });
 
-    AccountService.mutalTopicsRoless({
+    AccountService.mutualTopicRoles({
       id2: id,
       access_token: localStorage.getItem('access_token') 
     }).then((response) => {
-      setMutalRoles(response.data);
+      setMutualRoles(response.data);
     });
 
     AccountService.activityStatus({
@@ -221,17 +221,17 @@ export default function CustomProfilePage(props: any) {
                   </dd>
                 </div>
                 <div className={
-                  (Object.keys(mutalRoles).length != 0)
+                  (Object.keys(mutualRoles).length != 0)
                   ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
                   : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
                 }
                 >
                   <dt className="text-sm font-medium text-gray-500">
-                    Mutal Roles
+                    Mutual Roles
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 flex">
                     
-                    {loadMutalRoles()}
+                    {loadMutualRoles()}
         
                   </dd>
                 </div>

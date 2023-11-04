@@ -2358,22 +2358,22 @@ def get_users_search(db: Session, search: str, admin: bool):
         user.profilePic = getPicture(user)
     return query
 
-def mutalTopicRoles(db: Session, user1: models.User, user2: models.User):
-    mutalRoles = {}
+def mutualTopicRoles(db: Session, user1: models.User, user2: models.User):
+    mutualRoles = {}
     for topic1 in user1.enrollments:
         for topic2 in user2.enrollments:
             if topic1.topic_id == topic2.topic_id:
                 if len(topic2.roles) != 0:
                     for role in topic2.roles:
-                        if role.role_name in mutalRoles:
-                            mutalRoles[role.role_name] += [topic2.topic.topic_name]
+                        if role.role_name in mutualRoles:
+                            mutualRoles[role.role_name] += [topic2.topic.topic_name]
                         else:
-                            mutalRoles[role.role_name] = [topic2.topic.topic_name]
-                elif "Member" in mutalRoles:
-                    mutalRoles["Member"] += [topic1.topic.topic_name]
+                            mutualRoles[role.role_name] = [topic2.topic.topic_name]
+                elif "Member" in mutualRoles:
+                    mutualRoles["Member"] += [topic1.topic.topic_name]
                 else:
-                    mutalRoles["Member"] = [topic1.topic.topic_name]
-    return mutalRoles
+                    mutualRoles["Member"] = [topic1.topic.topic_name]
+    return mutualRoles
 
 def updateLastSeen(db: Session, user1: models.User, convo: models.Conversation):
     gm = models.Group_member

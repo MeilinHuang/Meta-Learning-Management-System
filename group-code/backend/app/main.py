@@ -1677,8 +1677,8 @@ async def getPicture(id: int, db: Session = Depends(get_db)):
         return helper.getPicture(user)
     return ""
     
-@app.get("/mutalTopicsRoles/{id2}")
-async def mutalTopicsRoles(request: Request, id2: int, db: Session = Depends(get_db)):
+@app.get("/mutualTopicRoles/{id2}")
+async def mutualTopicRoles(request: Request, id2: int, db: Session = Depends(get_db)):
     token = request.headers.get('Authorization')
     user1 = helper.extract_user(db, token)
     user2 = helper.get_user_by_id(db, id2,user1.superuser)
@@ -1689,7 +1689,7 @@ async def mutalTopicsRoles(request: Request, id2: int, db: Session = Depends(get
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return helper.mutalTopicRoles(db, user1, user2)
+    return helper.mutualTopicRoles(db, user1, user2)
 
 @app.get("/notifications")
 async def notifications(request: Request, db: Session = Depends(get_db)):
