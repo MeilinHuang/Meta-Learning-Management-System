@@ -18,7 +18,7 @@ export default function OverviewBar() {
   // Update types summary when a new set of resources is shown
   useEffect(() => {
     if (resourcesData) {
-      const typesSummaryObj = {};
+      const typesSummaryObj: { [key: string]: any } = {};
 
       resourcesData.resources.forEach(
         (resource: { resource_type: string; duration: number }) => {
