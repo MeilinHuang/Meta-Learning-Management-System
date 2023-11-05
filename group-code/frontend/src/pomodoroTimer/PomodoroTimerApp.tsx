@@ -7,6 +7,7 @@ import CircleRating from './CircleRating';
 import Report from './Report';
 import Settings from './Settings';
 import SettingsSaveDialog from './SettingsSaveDialog';
+import { BarChart } from '@mui/x-charts/BarChart';
 
 const Timer = () => {
     // Timer durations in seconds
@@ -310,7 +311,7 @@ const Timer = () => {
                 </div>
             </div>
             {showReportDialog && (
-                <Report setShowReportDialog={setShowReportDialog} />
+                <Report setShowReportDialog={setShowReportDialog} pomodoros={[]} />
             )}
             {isSettingsOpen &&
                 <Settings {...settingsConfig} />
