@@ -24,6 +24,8 @@ export default function PathwayDropdown({
   setCurrPath
 }: PathwayDropdownProps) {
   // TODO: error handling
+
+  //Why are the constants written over immediately??
   const {
     data: userPathsData,
     error: errorUserPaths,
