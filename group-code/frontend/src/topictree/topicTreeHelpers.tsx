@@ -584,9 +584,24 @@ export const formatTopics = (
       nodes.push(newNode);
     }
   });
+  const compareLabelsFn = (x: option, y: option) => {
+    if (x.label.toUpperCase() > y.label.toUpperCase()) {
+      return 1;
+    } else if (x.label.toUpperCase() < y.label.toUpperCase()) {
+      return -1;
+    } else {
+      return 0;
+    }
+  };
   const searchTopics: SearchTopics = [
-    { label: 'Topic', options: searchTopicOptions },
-    { label: 'Pre-req relationship', options: searchPreReqOptions }
+    {
+      label: 'Topic',
+      options: searchTopicOptions.sort(compareLabelsFn)
+    },
+    {
+      label: 'Pre-req relationship',
+      options: searchPreReqOptions.sort(compareLabelsFn)
+    }
   ];
 
   if (layout) {

@@ -72,14 +72,14 @@ export default function SideBarContent(props: SideBarContentProps) {
   return (
     <>
       {props.tabOpen === 'help' && (
-        <div className="py-4 overflow-y-auto border-l border-r w-72 bg-gray-900 border-gray-700">
+        <div className="py-4 overflow-y-auto border-l border-r w-80 bg-gray-900 border-gray-700">
           <h2 className="px-5 text-lg font-medium text-white">
             Help and Documentation
           </h2>
         </div>
       )}
       {props.tabOpen === 'search' && (
-        <div className="py-4 overflow-y-auto border-l border-r w-72 bg-gray-900 border-gray-700">
+        <div className="py-4 overflow-y-auto border-l border-r w-80 bg-gray-900 border-gray-700">
           <Search
             searchTopics={props.searchTopics}
             selectedTopic={props.selectedTopic}
@@ -89,7 +89,7 @@ export default function SideBarContent(props: SideBarContentProps) {
         </div>
       )}
       {props.tabOpen === 'details' && (
-        <div className="pb-4 overflow-y-auto border-l border-r w-72 bg-gray-900 border-gray-700">
+        <div className="pb-4 overflow-y-auto border-l border-r w-80 bg-gray-900 border-gray-700">
           <Details
             pathwayId={props.pathwayId}
             pathwayName={props.pathwayName}
@@ -110,7 +110,7 @@ export default function SideBarContent(props: SideBarContentProps) {
         </div>
       )}
       {props.tabOpen === 'edit' && (
-        <div className="pb-4 overflow-y-auto border-l border-r w-72 bg-gray-900 border-gray-700">
+        <div className="pb-4 overflow-y-auto border-l border-r w-80 bg-gray-900 border-gray-700">
           <Edit
             pathwayId={props.pathwayId}
             pathwayName={props.pathwayName}
@@ -128,7 +128,7 @@ export default function SideBarContent(props: SideBarContentProps) {
         </div>
       )}
       {props.tabOpen === 'add' && (
-        <div className="pb-4 overflow-y-auto border-l border-r w-72 bg-gray-900 border-gray-700">
+        <div className="pb-4 overflow-y-auto border-l border-r w-80 bg-gray-900 border-gray-700">
           <Add
             selectedSubTab={props.selectedSubTab}
             setSelectedSubTab={props.setSelectedSubTab}
@@ -146,7 +146,7 @@ export default function SideBarContent(props: SideBarContentProps) {
         </div>
       )}
       {props.tabOpen === 'delete' && (
-        <div className="pb-4 overflow-y-auto border-l border-r w-72 bg-gray-900 border-gray-700">
+        <div className="pb-4 overflow-y-auto border-l border-r w-80 bg-gray-900 border-gray-700">
           <Delete
             selectedSubTab={props.selectedSubTab}
             setSelectedSubTab={props.setSelectedSubTab}
