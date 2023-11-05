@@ -80,8 +80,8 @@ export default function Add(props: AddProps) {
         onChange={(ind) => props.setSelectedSubTab(setNameOfTab(ind))}
       >
         <div
-          className="bg-gray-900 h-auto fixed py-4 z-10"
-          style={{ width: '15.5rem' }}
+          className="bg-gray-900 h-auto fixed py-4 z-10 rounded-md"
+          style={{ width: '17.5rem' }}
         >
           <h1 className=" pb-1 text-lg font-medium text-white">Add:</h1>
           <Tab.List className="flex space-x-1 rounded-xl bg-blue-300/20 p-1 text-blue-100">
