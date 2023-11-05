@@ -9,7 +9,7 @@ import {
 import { TrashIcon, PencilSquareIcon } from '@heroicons/react/20/solid';
 
 import Select from 'react-select';
-import { ErrorAlert, WarningAlert } from '../common/Alert';
+import { ErrorAlert, WarningAlert } from '../../common/Alert';
 
 import {
   useGetPathwayQuery,
@@ -17,8 +17,8 @@ import {
   useEditPrerequisiteMutation,
   useDeletePrerequisiteMutation,
   useIsSuperuserQuery
-} from '../features/api/apiSlice';
-import { getButtonGroupStyles } from './topicTreeHelpers';
+} from '../../features/api/apiSlice';
+import { getButtonGroupStyles } from '../topicTreeHelpers';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -173,7 +173,7 @@ export default function PrerequisiteModal({
                 )}
                 {!prereqInfoIsLoading && prereqInfoIsSuccess && prereqInfoData && (
                   <div>
-                    <div className="mb-10">
+                    <div className="mb-5">
                       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
                         {editMode && (
                           <PencilIcon
@@ -390,15 +390,6 @@ export default function PrerequisiteModal({
                                 prereqSet.choices.length > 0 &&
                                 prereqSet.amount <= prereqSet.choices.length
                               ) {
-                                console.log({
-                                  prerequisite_id: prereqId,
-                                  topic:
-                                    targetTopic && Number(targetTopic.value),
-                                  amount: prereqSet.amount,
-                                  choices: prereqSet.choices.map(
-                                    (choice) => choice.id
-                                  )
-                                });
                                 editPrerequisite({
                                   prerequisite_id: prereqId,
                                   topic:

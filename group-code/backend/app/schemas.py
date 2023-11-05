@@ -346,6 +346,8 @@ class PathwayTopicInfo(BaseModel):
     topic_group: PathwayTopicGroupInfo
     needs: List[PathwayTopicPrerequisite]
     archived: bool
+    year: Optional[int]
+    term: Optional[str]
 
 
 PathwayTopicPrerequisite.update_forward_refs()
@@ -395,7 +397,11 @@ class PathwayCreate(BaseModel):
     electives: List[int]
 
 
+class PathwayDelete(BaseModel):
+    pathway_id: int
+
 class PathwayEdit(BaseModel):
+    pathway_name: str
     pathway_id: int
     core: List[int]
     electives: List[int]

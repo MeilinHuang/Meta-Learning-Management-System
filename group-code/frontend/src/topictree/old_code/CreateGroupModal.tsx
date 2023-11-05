@@ -6,15 +6,15 @@ import { PlusIcon as PlusIconMini } from '@heroicons/react/20/solid';
 import Select from 'react-select';
 
 import {
-  useCreatePathwayMutation,
+  useCreateTopicGroupMutation,
   useGetPathwayQuery
-} from '../features/api/apiSlice';
+} from '../../features/api/apiSlice';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function CreatePathwayModal({
+export default function CreateGroupModal({
   open,
   setOpen
 }: {
@@ -23,22 +23,11 @@ export default function CreatePathwayModal({
 }) {
   const cancelButtonRef = useRef(null);
 
-  useEffect(() => {
-    if (open) {
-      // reset form fields
-      setName('');
-      setCoreTopics([]);
-      setElectiveTopics([]);
-    }
-  }, [open]);
-
-  const [name, setName] = useState('');
-  const [coreTopics, setCoreTopics] = useState<Array<number>>([]);
-  const [electiveTopics, setElectiveTopics] = useState<Array<number>>([]);
-
   const [formattedTopics, setFormattedTopics] = useState<
     Array<{ value: string; label: string }>
   >([]);
+
+  const [topics, setTopics] = useState<Array<number>>([]);
 
   const {
     data: globalPathData,
@@ -50,11 +39,6 @@ export default function CreatePathwayModal({
     pathway_id: 0,
     user: false
   });
-
-  const [
-    createPathway,
-    { data: pathwayCreateData, isSuccess: isSuccessCreatePathway }
-  ] = useCreatePathwayMutation();
 
   useEffect(() => {
     if (!isFetchingPath && isSuccessPath) {
@@ -68,6 +52,18 @@ export default function CreatePathwayModal({
       );
     }
   }, [isFetchingPath]);
+
+  useEffect(() => {
+    if (open) {
+      // reset form fields
+      setName('');
+    }
+  }, [open]);
+
+  const [name, setName] = useState('');
+
+  // permutations
+  const [createTopicGroup, { isSuccess, data }] = useCreateTopicGroupMutation();
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -101,7 +97,7 @@ export default function CreatePathwayModal({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div className="mb-10">
+                <div className="mb-5">
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
                     <PlusIcon
                       className="h-6 w-6 text-indigo-600"
@@ -113,17 +109,17 @@ export default function CreatePathwayModal({
                       as="h3"
                       className="text-lg font-medium leading-6 text-gray-900"
                     >
-                      Create Pathway
+                      Create Topic Group
                     </Dialog.Title>
-                    {/* Create topic form */}
+                    {/* Create group form */}
                     <div className="mt-2">
-                      {/* Pathway name */}
+                      {/* Group name */}
                       <div className="w-full flex flex-col items-start">
                         <label
                           htmlFor="name"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Pathway name*
+                          Group name*
                         </label>
                         <div className="mt-1 w-full">
                           <input
@@ -136,56 +132,23 @@ export default function CreatePathwayModal({
                           />
                         </div>
                       </div>
-                      {/* Core topics */}
+                      {/* Group topics */}
                       <div className="w-full flex flex-col items-start mt-4">
                         <label
                           htmlFor="name"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Core topics
+                          Topics
                         </label>
                         <Select
-                          name="prerequisites"
+                          name="topics"
                           options={formattedTopics}
                           isMulti
                           className="basic-multi-select mt-1 block w-full text-sm text-left"
                           classNamePrefix="select"
                           maxMenuHeight={90}
                           onChange={(e) => {
-                            setCoreTopics(
-                              e.map((topic) => Number(topic.value))
-                            );
-                          }}
-                          theme={(theme) => ({
-                            ...theme,
-                            borderRadius: 5,
-                            colors: {
-                              ...theme.colors,
-                              primary25: '#eef2ff',
-                              primary: '#818cf8'
-                            }
-                          })}
-                        />
-                      </div>
-                      {/* Elective topics */}
-                      <div className="w-full flex flex-col items-start mt-4">
-                        <label
-                          htmlFor="name"
-                          className="block text-sm font-medium text-gray-700"
-                        >
-                          Elective topics
-                        </label>
-                        <Select
-                          name="prerequisites"
-                          options={formattedTopics}
-                          isMulti
-                          className="basic-multi-select mt-1 block w-full text-sm text-left"
-                          classNamePrefix="select"
-                          maxMenuHeight={90}
-                          onChange={(e) => {
-                            setElectiveTopics(
-                              e.map((topic) => Number(topic.value))
-                            );
+                            setTopics(e.map((topic) => Number(topic.value)));
                           }}
                           theme={(theme) => ({
                             ...theme,
@@ -206,15 +169,11 @@ export default function CreatePathwayModal({
                     type="button"
                     className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 sm:col-start-2 sm:text-sm"
                     onClick={() => {
-                      createPathway({
-                        name,
-                        core: coreTopics,
-                        electives: electiveTopics
-                      });
+                      createTopicGroup({ name: name, topics: topics });
                       setOpen(false);
                     }}
                   >
-                    Create Pathway
+                    Create Group
                   </button>
                   <button
                     type="button"

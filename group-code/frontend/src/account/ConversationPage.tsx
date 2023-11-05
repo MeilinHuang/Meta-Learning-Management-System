@@ -50,10 +50,14 @@ export default function ConversationPage(props: any) {
 
         AccountService.loadUsers({search: "@"})
         .then((response) => {
+            // console.log('users got: ');
+            // console.log(response.data);
             // let i = 0;
+            // console.log(response.data.length);
             setUsersList(response.data);
         })
         .catch((error) => {
+            console.error('error');
         });
 
 
@@ -80,6 +84,7 @@ export default function ConversationPage(props: any) {
     const AddUser = () => {
         AccountService.addUserToConversation({"username": newAddUser, "conversation_id":conversation.id})
         .then((response)=>{
+            console.log(response.data)
             
         })
         setAddUser(false)

@@ -39,7 +39,6 @@ def generate_auth_token():
 
 def invalidate_auth_token(db: Session, user: models.User):
     # user.auth_token = None
-    print("here1")
     setattr(user, "auth_token", None)
     db.add(user)
     db.commit()
@@ -160,11 +159,9 @@ def create_group_member(db: Session, user_id: int, conversation_id: int):
 def create_conversation(db: Session, sender: str, receiver: str, sender_id: int, receiver_id: int):
     new_conversation = models.Conversation(
         conversation_name=get_conversation_id_from_user_name(sender, receiver))
-    print(new_conversation.id)
     db.add(new_conversation)
     db.commit()
     db.refresh(new_conversation)
-    print("here1")
     return db.query(models.Conversation).filter_by(id=new_conversation.id).first()
 
 
@@ -534,6 +531,7 @@ def get_assessment_overview(db: Session, user_id: int):
         res_dict["topic"] = modelToDict(ele.topic)
         res_dict["year"] = str(ele.year)
         res_dict["term"] = str(ele.term)
+        res_dict["complete"] = ele.complete
         mark = 0
         assessment_id = 0
         max_mark = 0
@@ -1143,10 +1141,26 @@ def get_enrolled_topics(db: Session, user: models.User):
 
     topics = []
     for enrollment in enrollments:
-        topic = db.query(models.Topic).filter_by(
-            id=enrollment.topic_id).first()
-        if topic:
-            topics.append(topic)
+      prereq_sets = db.query(models.Prerequisite).filter_by(
+        topic_id=enrollment.topic_id).all()
+      
+      formatted_prereq_sets = []
+
+      for prereq_set in prereq_sets:
+        formatted_prereq_sets.append({
+            "amount": prereq_set.amount,
+            "choices": [{
+                "id": choice.id,
+                "name": choice.topic_name
+            } for choice in prereq_set.choices]
+        })
+      
+      topic = db.query(models.Topic).filter_by(
+          id=enrollment.topic_id).first()
+      if topic:
+          topic.complete = enrollment.complete
+          topic.prereq_sets = formatted_prereq_sets
+          topics.append(topic)
 
     return topics
 
@@ -1380,7 +1394,6 @@ def get_pathways(db: Session, for_user: bool, user: models.User):
             models.Pathway.users.contains(user)).all()
     else:
         query = db.query(models.Pathway).all()
-        print()
 
     pathways = []
     for pathway in query:
@@ -1392,7 +1405,7 @@ def get_pathways(db: Session, for_user: bool, user: models.User):
     # return [pathway.id for pathway in query]
 
 
-def calculate_pathway(db: Session, pathway_id: int, include_user_status: bool, user: models.User):
+def calculate_pathway(db: Session, pathway_id: int, notSuperuser: bool, user: models.User):
     # create global pathway if it doesn't exist
     if pathway_id == 0 and len(db.query(models.Pathway).filter_by(id=0).all()) == 0:
         global_pathway = models.Pathway(id=0, name="Global Pathway")
@@ -1405,37 +1418,62 @@ def calculate_pathway(db: Session, pathway_id: int, include_user_status: bool, u
         return {
             "id": pathway.id,
             "name": pathway.name,
-            "core": get_recursive_path(pathway.core, db, include_user_status, user),
-            "electives": get_recursive_path(pathway.electives, db, include_user_status, user)
+            "core": get_recursive_path(pathway.core, db, notSuperuser, user),
+            "electives": get_recursive_path(pathway.electives, db, notSuperuser, user)
         }
 
 
-def get_recursive_path(topics: List[models.Topic], db: Session, include_user_status: bool, user: models.User):
+def get_recursive_path(topics: List[models.Topic], db: Session, notSuperuser: bool, user: models.User):
     result = []
     for topic in topics:
         enrollment = db.query(models.TopicEnrollment).filter(
             models.TopicEnrollment.user == user, models.TopicEnrollment.topic == topic).first()
-        topic_dict = {
-            "id": topic.id,
-            "name": topic.topic_name,
-            "topic_group": {
-                "id": topic.topic_group.id if topic.topic_group is not None else None,
-                "name": topic.topic_group.name if topic.topic_group is not None else None,
-            },
-            "status": None if include_user_status is False else 'not-started' if enrollment is None else ('complete' if enrollment.complete == True else 'in-progress'),
-            "archived": topic.archived,
-            "needs": []
-        }
-        for prerequisite in topic.prerequisites:
-            prereq_dict = {
-                "id": prerequisite.id,
-                "amount": prerequisite.amount,
-                "choices": get_recursive_path(prerequisite.choices, db, include_user_status, user)
+        if (not notSuperuser) or (not topic.archived):
+            topic_dict = {
+                "id": topic.id,
+                "name": topic.topic_name,
+                "topic_group": {
+                    "id": topic.topic_group.id if topic.topic_group is not None else None,
+                    "name": topic.topic_group.name if topic.topic_group is not None else None,
+                },
+                "status": None if (not notSuperuser) else findAvailability(topic, db, user) if enrollment is None else ('complete' if enrollment.complete == True else 'in-progress'),
+                "archived": topic.archived,
+                "needs": [],
+                "year": None if enrollment is None else enrollment.year,
+                "term": None if enrollment is None else enrollment.term,
             }
-            topic_dict["needs"].append(prereq_dict)
-        result.append(topic_dict)
+            for prerequisite in topic.prerequisites:
+                # print(topic.topic_name)
+                # print()
+                # for choice in prerequisite.choices:
+                #   print(choice.topic_name)
+                # print()
+                prereq_dict = {
+                    "id": prerequisite.id,
+                    "amount": prerequisite.amount,
+                    "choices": get_recursive_path(prerequisite.choices, db, notSuperuser, user)
+                }
+                topic_dict["needs"].append(prereq_dict)
+            result.append(topic_dict)
     return result
 
+
+def findAvailability(topic: models.Topic, db: Session, user: models.User):
+    available = True
+    for prereq_set in topic.prerequisites:
+      needed = prereq_set.amount
+      for choice in prereq_set.choices:
+          enrollment = db.query(models.TopicEnrollment).filter(models.TopicEnrollment.user == user, models.TopicEnrollment.topic == choice).first()
+          if enrollment and enrollment.complete:
+            needed -=1
+          if needed <= 0:
+            break
+      if needed > 0:
+        available = False
+    if available:
+      return 'available'
+    else:
+      return 'unavailable'
 
 def create_topic(db: Session, topic_name: str, topic_group_id: Optional[int], image_url: Optional[str], created_by: models.User, archived: Optional[bool] = False, description: str = ""):
     if topic_group_id is None:
@@ -1460,7 +1498,7 @@ def create_topic(db: Session, topic_name: str, topic_group_id: Optional[int], im
     db.refresh(topic)
     # Set roles for the topic creator
     creator_role = db.query(models.Role).filter_by(
-        role_name="Creator", topic=topic).one()
+        role_name="Creator", topic=topic).first()
     # We need to enroll the creator into the topic
     creator_enrollment = models.TopicEnrollment(user=created_by, topic=topic)
     creator_enrollment.roles.append(creator_role)
@@ -1474,7 +1512,7 @@ def create_topic(db: Session, topic_name: str, topic_group_id: Optional[int], im
             os.mkdir(f"static/{topic.id}/preparation")
         if (not os.path.exists(f"static/{topic.id}/content")):
             os.mkdir(f"static/{topic.id}/content")
-
+    print(topic)
     return topic
 
 
@@ -1523,44 +1561,52 @@ def delete_topic(db: Session, id: int):
 
     db.query(models.Topic).filter_by(id=id).delete()
 
+    # Delete all enrollments in the topic
+    db.execute("DELETE from topic_enrollments where topic_id = " + str(id))
+
     db.commit()
 
 
 def create_prerequisite_sets(db: Session, topic_id: int, sets: List[schemas.PrerequisiteSet]):
     created_sets = []
-
     for set in sets:
         created_set = create_prerequisite(
             db, topic_id, set.amount, set.choices)
-        created_sets.append(created_set.id)
+        created_sets.append(created_set["id"])
 
     return created_sets
 
 
 def delete_prerequisite_set(db: Session, prereq_id: int):
-    deleted = db.query(models.Prerequisite).filter_by(id=prereq_id).delete()
+    prereqSet = db.query(models.Prerequisite).filter_by(id=prereq_id).delete()
+    print('prereq_id')
+    print(prereq_id)
+    print()
+    print("DELETE from prerequisite_assosciation where prerequisite_id = " + str(prereq_id))
+    db.execute("DELETE from prerequisite_assosciation where prerequisite_id = " + str(prereq_id))
 
     db.commit()
-    return deleted
+    return prereqSet
 
 # create prerequisite set given an amount and list of prerequisite topic ids
 
 
 def create_prerequisite(db: Session, topic_id: int, amount: int, choices: List[int]):
     topic = db.query(models.Topic).filter_by(id=topic_id).one()
-
-    prereqs = []
-    for prereq_id in choices:
-        prereq = db.query(models.Topic).filter_by(id=prereq_id).one()
-        prereqs.append(prereq)
-
-    prereq_set = models.Prerequisite(
-        topic=topic, amount=amount, choices=prereqs)
-    db.add(prereq_set)
+    
+    new_id = 1
+    if db.execute("SELECT COUNT(id) from prerequisites") != 0:
+      new_id = db.execute("SELECT MAX(id) from prerequisites").fetchone()[0]
+      new_id += 1
+    print("INSERT INTO prerequisites (id, topic_id, amount) VALUES " + "(" + str(new_id) + ", " + str(topic.id) + ", " + str(amount) + ")")
+    db.execute("INSERT INTO prerequisites (id, topic_id, amount) VALUES " + "(" + str(new_id) + ", " + str(topic.id) + ", " + str(amount) + ")")
     db.commit()
-    db.refresh(prereq_set)
+    for prereq_id in choices:
+      db.execute("INSERT INTO prerequisite_assosciation (prerequisite_id, topic_id) VALUES " + "(" + str(new_id) + ", " + str(prereq_id) + ")")
+    
+    db.commit()
 
-    return prereq_set
+    return {"id": new_id}
 
 
 def edit_prerequisite(db: Session, prerequisite_id: int, topic_id: int, amount: int, choices: List[int]):
@@ -1577,7 +1623,6 @@ def edit_prerequisite(db: Session, prerequisite_id: int, topic_id: int, amount: 
         prereqs.append(prereq)
 
     setattr(edited_prereq, "choices", prereqs)
-
     db.commit()
     db.refresh(edited_prereq)
 
@@ -1601,10 +1646,10 @@ def get_prereq_info(db: Session, prerequisite_id: int):
         }
 
 
-def delete_prerequisite(db: Session, id: int):
-    db.query(models.Prerequisite).filter_by(id=id).delete()
+# def delete_prerequisite(db: Session, id: int):
+#     db.query(models.Prerequisite).filter_by(id=id).delete()
 
-    db.commit()
+#     db.commit()
 
 
 def create_topic_group(db: Session, name: str, topics: List[int]):
@@ -1712,18 +1757,26 @@ def create_pathway(db: Session, name: str, core_ids: List[int], elective_ids: Li
     db.refresh(pathway)
     return pathway
 
+def delete_pathway(db: Session, pathway_id: int):
+    pathway = db.query(models.Pathway).filter_by(id=pathway_id)
 
-def edit_pathway(db: Session, pathway_id: int, core_ids: List[int], elective_ids: List[int]):
+    edit_pathway(db, pathway.first().name, pathway_id, [], [])
+    pathway.delete()
+    db.commit()
+
+
+def edit_pathway(db: Session, pathway_name: string, pathway_id: int, core_ids: List[int], elective_ids: List[int]):
     pathway = db.query(models.Pathway).filter_by(id=pathway_id).first()
 
     if (pathway):
-        topics = find_pathway_topics(db, core_ids, elective_ids)
-        pathway.core = topics["core_topics"]
-        pathway.electives = topics["elective_topics"]
+      topics = find_pathway_topics(db, core_ids, elective_ids)
+      pathway.name = pathway_name
+      pathway.core = topics["core_topics"]
+      pathway.electives = topics["elective_topics"]
 
-        db.commit()
-        db.refresh(pathway)
-        return pathway
+      db.commit()
+      db.refresh(pathway)
+      return pathway
 
 
 def enrol_user_in_pathway(db: Session, user_id: int, pathway_id: int):
@@ -1732,6 +1785,16 @@ def enrol_user_in_pathway(db: Session, user_id: int, pathway_id: int):
 
     if (user is not None and pathway is not None):
         user.pathways.append(pathway)
+        db.commit()
+        db.refresh(user)
+        return {"user_pathways": user.pathways}
+
+def unenrol_user_in_pathway(db: Session, user_id: int, pathway_id: int):
+    user = db.query(models.User).filter_by(id=user_id).first()
+    pathway = db.query(models.Pathway).filter_by(id=pathway_id).first()
+
+    if (user is not None and pathway is not None):
+        user.pathways.remove(pathway)
         db.commit()
         db.refresh(user)
         return {"user_pathways": user.pathways}
@@ -1747,6 +1810,13 @@ def enrol_user_in_topic(db: Session, user_id: int, topic_id: int):
         db.refresh(enrollment)
         return enrollment
 
+def unenrol_user_in_topic(db: Session, user_id: int, topic_id: int):
+    # user = db.query(models.User).filter_by(id=user_id).first()
+    # topic = db.query(models.Topic).filter_by(id=topic_id).first()
+    
+    # if (user is not None and topic is not None):
+    db.query(models.TopicEnrollment).filter_by(user_id=user_id, topic_id=topic_id).delete()
+    db.commit()
 
 # === DEBUG ===
 
@@ -2078,7 +2148,7 @@ def create_test_data(engine: Engine, db: Session):
     t6 = create_topic(db, "Topic 6", None, None, user2)
     t7 = create_topic(db, "Topic 7", None, None, user2)
     t8 = create_topic(db, "Elective 1", None, None, user2)
-    t9 = create_topic(db, "Elective 2", None, None, user2)
+    t9 = create_topic(db, "Elective 2", None, None, user2, True)
     pre1 = models.Prerequisite(topic=t1, amount=1, choices=[t2])
     pre2 = models.Prerequisite(topic=t1, amount=1, choices=[t3, t4])
     pre3 = models.Prerequisite(topic=t3, amount=1, choices=[t5])
@@ -2114,19 +2184,21 @@ def create_test_data(engine: Engine, db: Session):
     role2 = models.Role(id=102, topic=t7, can_edit_assessment=True)
     role3 = models.Role(id=103, topic=t8, can_edit_assessment=True)
     enrol9 = models.TopicEnrollment(
-        user=user4, topic=t6, year=2023, term="T1", roles=[role1])
+        user=user4, topic=t6, year=2022, term="T3", roles=[role1], complete=True)
     enrol10 = models.TopicEnrollment(
-        user=user4, topic=t7, year=2023, term="T1", roles=[role2])
+        user=user4, topic=t7, year=2022, term="T3", roles=[role2], complete=True)
     enrol11 = models.TopicEnrollment(
         user=user4, topic=t8, year=2023, term="T1", roles=[role3])
+    enrol15 = models.TopicEnrollment(
+        user=user4, topic=t2, year=2023, term="T1", roles=[role3])
 
     # enrolments to check homepage
     enrol12 = models.TopicEnrollment(
-        user=user1, topic=t1, year=2023, term="T1")
+        user=user1, topic=t5, year=2023, term="T1")
     enrol13 = models.TopicEnrollment(
-        user=user1, topic=t2, year=2023, term="T1")
+        user=user1, topic=t4, year=2023, term="T1")
     enrol14 = models.TopicEnrollment(
-        user=user1, topic=t3, year=2023, term="T1")
+        user=user1, topic=t8, year=2023, term="T1")
 
     # create assessment
     # q1 = create_question(db, id: int,type: str, choices: list answer_attempt: list,

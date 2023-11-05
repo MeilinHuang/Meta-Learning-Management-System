@@ -116,7 +116,7 @@ export default function CustomProfilePage(props: any) {
       access_token: localStorage.getItem('access_token')
     }).then((response) => {
       setUser(response.data.user);
-      console.log(response.data);
+      // console.log(response.data);
     });
 
     AccountService.mutualTopicRoles({

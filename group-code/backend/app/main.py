@@ -1421,11 +1421,14 @@ async def create_pathway(details: schemas.PathwayCreate, db: Session = Depends(g
         db, name=details.name, core_ids=details.core, elective_ids=details.electives)
     return {"pathway_id": pathway.id}
 
+@app.delete('/delete_pathway')
+async def delete_pathway(details: schemas.PathwayDelete, db: Session = Depends(get_db)):
+    helper.delete_pathway(db, pathway_id=details.pathway_id)
 
 @app.put('/edit_pathway')
 async def edit_pathway(details: schemas.PathwayEdit, db: Session = Depends(get_db)):
     pathway = helper.edit_pathway(
-        db, pathway_id=details.pathway_id, core_ids=details.core, elective_ids=details.electives)
+        db, pathway_name=details.pathway_name, pathway_id=details.pathway_id, core_ids=details.core, elective_ids=details.electives)
 
     return pathway
 
@@ -1435,6 +1438,10 @@ async def enrol_user_in_pathway(details: schemas.PathwayEnrol, db: Session = Dep
     enrollment = helper.enrol_user_in_pathway(
         db, user_id=details.user_id, pathway_id=details.pathway_id)
     return enrollment
+
+@app.delete('/unenrol_in_pathway')
+async def unenrol_user_in_pathway(details: schemas.PathwayEnrol, db: Session = Depends(get_db)):
+    helper.unenrol_user_in_pathway(db, user_id=details.user_id, pathway_id=details.pathway_id)
 
 
 @app.put('/edit_topic')
@@ -1463,6 +1470,10 @@ async def enrol_user_in_topic(details: schemas.TopicEnrol, db: Session = Depends
         return {"enrollment_id": enrollment.id}
     return {"status": "error"}
 
+@app.delete('/unenrol_in_topic')
+async def unenrol_user_in_topic(details: schemas.TopicEnrol, db: Session = Depends(get_db)):
+    helper.unenrol_user_in_topic(db, user_id=details.user_id, topic_id=details.topic_id)
+
 
 @app.post("/create_topic")
 async def create_topic(details: schemas.PathwayTopicCreate, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
@@ -1487,7 +1498,7 @@ async def get_prereq_info(prerequisite_id: int, db: Session = Depends(get_db)):
 
 @app.delete('/delete_prerequisite')
 async def delete_prerequisite(details: schemas.PathwayTopicPrerequisiteSetDelete, db: Session = Depends(get_db)):
-    helper.delete_prerequisite(db, id=details.id)
+    helper.delete_prerequisite_set(db, prereq_id=details.id)
 
 
 @app.post("/create_prerequisite_sets")

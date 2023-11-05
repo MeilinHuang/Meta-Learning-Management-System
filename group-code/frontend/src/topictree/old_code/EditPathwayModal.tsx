@@ -9,7 +9,7 @@ import {
   useCreatePathwayMutation,
   useGetPathwayQuery,
   useEditPathwayMutation
-} from '../features/api/apiSlice';
+} from '../../features/api/apiSlice';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -140,7 +140,7 @@ export default function EditPathwayModal({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div className="mb-10">
+                <div className="mb-5">
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
                     <PencilIcon
                       className="h-6 w-6 text-indigo-600"
@@ -229,6 +229,7 @@ export default function EditPathwayModal({
                     className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 sm:col-start-2 sm:text-sm"
                     onClick={() => {
                       editPathway({
+                        pathway_name: pathwayName,
                         pathway_id: pathwayId,
                         core: coreTopics,
                         electives: electiveTopics

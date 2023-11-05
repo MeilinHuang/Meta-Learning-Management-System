@@ -17,32 +17,32 @@ export default function Navbar() {
   const [logout] = useLogoutMutation();
   const [isSuperuser, setIsSuperUser] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [lastMsgLink, setLastMsgLink] = useState("");
+  const [lastMsgLink, setLastMsgLink] = useState('');
 
   const getProfilePic = () => {
-    const dp = localStorage.getItem("profilePic");
-    if (dp != "" && dp != null) {
+    const dp = localStorage.getItem('profilePic');
+    if (dp != '' && dp != null) {
       return dp;
-    } 
+    }
     return defaultImg;
   };
 
   useEffect(() => {
-    AccountService.notifications().then((response)=>{
+    AccountService.notifications().then((response) => {
       setNotifications(response.data.notifications);
-      console.log(response.data.notifications)
+      console.log(response.data.notifications);
     });
-    console.log(notifications)
+    console.log(notifications);
   }, []);
 
   useEffect(() => {
-    console.log(notifications)
+    console.log(notifications);
     if (notifications.length > 0) {
-      setLastMsgLink("/details/" + notifications[0]["conversation_name"]);
-    };
+      setLastMsgLink('/details/' + notifications[0]['conversation_name']);
+    }
     console.log(lastMsgLink);
   }, [notifications]);
-  
+
   useEffect(() => {
     setPath(window.location.pathname);
   }, [window.location.pathname]);
@@ -141,16 +141,15 @@ export default function Navbar() {
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <Link
-                to={lastMsgLink} >
-                  <img className={
-                    (notifications.length != 0)
-                    ? 'h-8 w-8'
-                    : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
-                  }
-                  src={msgIcon}
-                  >
-                  </img>
+                <Link to={lastMsgLink}>
+                  <img
+                    className={
+                      notifications.length != 0
+                        ? 'h-8 w-8'
+                        : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                    }
+                    src={msgIcon}
+                  ></img>
                 </Link>
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
@@ -188,8 +187,8 @@ export default function Navbar() {
                           </a>
                         )}
                       </Menu.Item>
-                      <Link to="/welcome"
-                      >
+                      {/* <Link to="/welcome"
+                      > */}
                       <Menu.Item>
                         {({ active }) => (
                           <a
@@ -199,14 +198,16 @@ export default function Navbar() {
                               'block px-4 py-2 text-sm text-gray-700'
                             )}
                             onClick={() => {
-                              AccountService.logout({"access_token": localStorage.getItem("access_token")})
-                              .then((response)=>{
-                                console.log(response)
-
+                              AccountService.logout({
+                                access_token:
+                                  localStorage.getItem('access_token')
                               })
-                              .catch((error)=>{
-                                console.log(error)
-                              });
+                                .then((response) => {
+                                  console.log(response);
+                                })
+                                .catch((error) => {
+                                  console.log(error);
+                                });
 
                               localStorage.clear();
                               logout(null);
@@ -218,7 +219,7 @@ export default function Navbar() {
                           </a>
                         )}
                       </Menu.Item>
-                      </Link>
+                      {/* </Link> */}
                     </Menu.Items>
                   </Transition>
                 </Menu>
