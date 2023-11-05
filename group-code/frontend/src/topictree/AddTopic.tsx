@@ -267,41 +267,43 @@ export default function AddTopic(props: AddTopicProps) {
               </div>
             </div>
             {/* Add to this pathway */}
-            {props.currPathData.data.id !== props.globalPathData.data.id && (
-              <div className="w-full flex flex-col items-start mt-4">
-                <WarningAlert
-                  message="Adding to Global Pathway"
-                  description="If the below is not toggled on, this topic will be added to only the global pathway. Toggle to additionally add to current pathway"
-                  className="mt-4"
-                  noSpace
-                />
-                <div className="mt-1 w-full flex items-center">
-                  <label
-                    htmlFor="archived"
-                    className="block text-sm font-medium text-gray-700 mr-3"
-                  >
-                    Add to this pathway
-                  </label>
-                  <Switch
-                    checked={addToPathway}
-                    onChange={setAddToPathway}
-                    className={classNames(
-                      addToPathway ? 'bg-indigo-600' : 'bg-gray-200',
-                      'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2'
-                    )}
-                  >
-                    <span className="sr-only">Add To Pathway</span>
-                    <span
-                      aria-hidden="true"
+            {props.currPathData.data &&
+              'id' in props.currPathData.data &&
+              props.currPathData.data.id !== props.globalPathData.data.id && (
+                <div className="w-full flex flex-col items-start mt-4">
+                  <WarningAlert
+                    message="Adding to Global Pathway"
+                    description="If the below is not toggled on, this topic will be added to only the global pathway. Toggle to additionally add to current pathway"
+                    className="mt-4"
+                    noSpace
+                  />
+                  <div className="mt-1 w-full flex items-center">
+                    <label
+                      htmlFor="archived"
+                      className="block text-sm font-medium text-gray-700 mr-3"
+                    >
+                      Add to this pathway
+                    </label>
+                    <Switch
+                      checked={addToPathway}
+                      onChange={setAddToPathway}
                       className={classNames(
-                        addToPathway ? 'translate-x-5' : 'translate-x-0',
-                        'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
+                        addToPathway ? 'bg-indigo-600' : 'bg-gray-200',
+                        'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2'
                       )}
-                    />
-                  </Switch>
+                    >
+                      <span className="sr-only">Add To Pathway</span>
+                      <span
+                        aria-hidden="true"
+                        className={classNames(
+                          addToPathway ? 'translate-x-5' : 'translate-x-0',
+                          'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
+                        )}
+                      />
+                    </Switch>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             {/* Topic prerequisites */}
             <div className="w-full flex flex-col items-start mt-5">
               <div className="w-full flex items-center justify-between">
@@ -457,79 +459,81 @@ export default function AddTopic(props: AddTopicProps) {
               className="mt-4 px-3"
             />
           )}
-          <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
-            <button
-              type="submit"
-              className={`inline-flex w-full justify-center rounded-md border border-transparent ${
-                !error ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-800'
-              } px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 sm:col-start-2 sm:text-sm`}
-              disabled={error ? true : false}
-              title={`${
-                error
-                  ? 'Please fix error above before continuing'
-                  : 'submit changes'
-              }`}
-              onClick={async (e) => {
-                e.preventDefault();
-                if (!error) {
-                  const r = await createTopic({
-                    name,
-                    topic_group_id: null,
-                    image_url: imageUrl,
-                    archived: archived,
-                    description: description
-                  });
-                  if ('data' in r && 'topic_id' in r['data']) {
-                    const formattedPrereqSets: Array<{
-                      amount: number;
-                      choices: number[];
-                    }> = prereqSets.map((prereqSet) => {
-                      return {
-                        amount: prereqSet.amount,
-                        choices: prereqSet.choices.map((choice) => choice.id)
-                      };
-                    });
-                    await editTopic({
-                      id: Number(r['data']['topic_id']),
+          {props.currPathData.data && 'id' in props.currPathData.data && (
+            <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+              <button
+                type="submit"
+                className={`inline-flex w-full justify-center rounded-md border border-transparent ${
+                  !error ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-800'
+                } px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 sm:col-start-2 sm:text-sm`}
+                disabled={error ? true : false}
+                title={`${
+                  error
+                    ? 'Please fix error above before continuing'
+                    : 'submit changes'
+                }`}
+                onClick={async (e) => {
+                  e.preventDefault();
+                  if (!error) {
+                    const r = await createTopic({
                       name,
                       topic_group_id: null,
                       image_url: imageUrl,
-                      description,
-                      sets: formattedPrereqSets
+                      archived: archived,
+                      description: description
                     });
-                    if (addToPathway) {
-                      const elecs: Array<number> =
-                        props.currPathData.data.electives.map((e: any) =>
-                          Number(e.id)
-                        );
-                      elecs.push(Number(r['data']['topic_id']));
-                      await editPathway({
-                        pathway_name: props.currPathData.data.name,
-                        pathway_id: Number(props.currPathData.data.id),
-                        core: props.currPathData.data.core.map((c: any) =>
-                          Number(c.id)
-                        ),
-                        electives: elecs
+                    if ('data' in r && 'topic_id' in r['data']) {
+                      const formattedPrereqSets: Array<{
+                        amount: number;
+                        choices: number[];
+                      }> = prereqSets.map((prereqSet) => {
+                        return {
+                          amount: prereqSet.amount,
+                          choices: prereqSet.choices.map((choice) => choice.id)
+                        };
                       });
+                      await editTopic({
+                        id: Number(r['data']['topic_id']),
+                        name,
+                        topic_group_id: null,
+                        image_url: imageUrl,
+                        description,
+                        sets: formattedPrereqSets
+                      });
+                      if (addToPathway) {
+                        const elecs: Array<number> =
+                          props.currPathData.data.electives.map((e: any) =>
+                            Number(e.id)
+                          );
+                        elecs.push(Number(r['data']['topic_id']));
+                        await editPathway({
+                          pathway_name: props.currPathData.data.name,
+                          pathway_id: Number(props.currPathData.data.id),
+                          core: props.currPathData.data.core.map((c: any) =>
+                            Number(c.id)
+                          ),
+                          electives: elecs
+                        });
+                      }
+                      props.setTabOpen('details');
+                      props.setSelectedSubTab('Pathway');
                     }
-                    props.setTabOpen('details');
-                    props.setSelectedSubTab('Pathway');
                   }
-                }
-              }}
-            >
-              Create Topic
-            </button>
-            <button
-              type="button"
-              className="mt-3 inline-flex w-full justify-center items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
-              onClick={() => {
-                resetFormFn();
-              }}
-            >
-              Reset
-            </button>
-          </div>
+                }}
+              >
+                Create Topic
+              </button>
+              <button
+                type="button"
+                className="mt-3 inline-flex w-full justify-center items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
+                onClick={() => {
+                  resetFormFn();
+                }}
+              >
+                Reset
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </form>

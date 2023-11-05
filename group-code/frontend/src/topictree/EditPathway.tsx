@@ -52,8 +52,10 @@ export default function EditPathway(props: EditPathwayProps) {
     if (
       props.currPathData &&
       props.currPathData.data &&
+      'id' in props.currPathData.data &&
       props.globalPathData &&
-      props.globalPathData.data
+      props.globalPathData.data &&
+      'id' in props.globalPathData.data
     ) {
       const changeAndError = findChangesAndErrorsPathway(
         name,
