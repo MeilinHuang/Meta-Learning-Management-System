@@ -1,12 +1,7 @@
-import { Tab } from '@headlessui/react';
-
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkToc from 'remark-toc';
-import rehypeHighlight from 'rehype-highlight';
 import { useState } from 'react';
 import { useCreateThreadMutation } from 'features/api/apiSlice';
 import PostCreatorError from './PostCreatorError';
+import MarkdownEditor2 from 'common/MarkdownEditor2';
 
 /*
  Clarification: I know this is called 'PostCreator' but it actually creates Threads, not Posts.
@@ -17,10 +12,6 @@ import PostCreatorError from './PostCreatorError';
  Sorry!
 
 */
-
-function classNames(...classes: any) {
-  return classes.filter(Boolean).join(' ');
-}
 
 type PostCreatorProps = {
   closeCallback: () => void;
@@ -93,66 +84,7 @@ export default function PostCreator(props: PostCreatorProps) {
                 </div>
               </div>
               <div className="sm:col-span-6">
-                <Tab.Group>
-                  {({ selectedIndex }) => (
-                    <>
-                      <Tab.List className="flex items-center">
-                        <Tab
-                          className={({ selected }) =>
-                            classNames(
-                              selected
-                                ? 'text-gray-900 bg-gray-100 hover:bg-gray-200'
-                                : 'text-gray-500 hover:text-gray-900 bg-white hover:bg-gray-100',
-                              'rounded-md border border-transparent px-3 py-1.5 text-sm font-medium'
-                            )
-                          }
-                        >
-                          Write
-                        </Tab>
-                        <Tab
-                          className={({ selected }) =>
-                            classNames(
-                              selected
-                                ? 'text-gray-900 bg-gray-100 hover:bg-gray-200'
-                                : 'text-gray-500 hover:text-gray-900 bg-white hover:bg-gray-100',
-                              'ml-2 rounded-md border border-transparent px-3 py-1.5 text-sm font-medium'
-                            )
-                          }
-                        >
-                          Preview
-                        </Tab>
-                      </Tab.List>
-                      <Tab.Panels className="mt-2">
-                        <Tab.Panel className="-m-0.5 rounded-lg p-0.5">
-                          <label htmlFor="comment" className="sr-only">
-                            Thread Content
-                          </label>
-                          <div>
-                            <textarea
-                              rows={25}
-                              name="comment"
-                              id="comment"
-                              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                              placeholder="Add your thread content..."
-                              defaultValue={content}
-                              onChange={(e) => setContent(e.target.value)}
-                            />
-                          </div>
-                        </Tab.Panel>
-                        <Tab.Panel className="-m-0.5 rounded-lg p-0.5">
-                          <div className="border-b prose">
-                            <ReactMarkdown
-                              remarkPlugins={[remarkGfm, remarkToc]}
-                              rehypePlugins={[rehypeHighlight]}
-                            >
-                              {content}
-                            </ReactMarkdown>
-                          </div>
-                        </Tab.Panel>
-                      </Tab.Panels>
-                    </>
-                  )}
-                </Tab.Group>
+                <MarkdownEditor2 MDContent={content} setMDContent={setContent} />
               </div>
             </div>
             <div className="pt-5">

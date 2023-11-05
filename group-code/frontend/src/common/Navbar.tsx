@@ -1,10 +1,11 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-
+import defaultImg from '../default.jpg';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLogoutMutation, useIsSuperuserQuery } from 'features/api/apiSlice';
 import AccountService from 'account/AccountService';
+import msgIcon from '../Icons/newMsgF.png';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -13,9 +14,34 @@ function classNames(...classes: string[]) {
 export default function Navbar() {
   const navigate = useNavigate();
   const [path, setPath] = useState('');
-
   const [logout] = useLogoutMutation();
   const [isSuperuser, setIsSuperUser] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [lastMsgLink, setLastMsgLink] = useState('');
+
+  const getProfilePic = () => {
+    const dp = localStorage.getItem('profilePic');
+    if (dp != '' && dp != null) {
+      return dp;
+    }
+    return defaultImg;
+  };
+
+  useEffect(() => {
+    AccountService.notifications().then((response) => {
+      setNotifications(response.data.notifications);
+      console.log(response.data.notifications);
+    });
+    console.log(notifications);
+  }, []);
+
+  useEffect(() => {
+    console.log(notifications);
+    if (notifications.length > 0) {
+      setLastMsgLink('/details/' + notifications[0]['conversation_name']);
+    }
+    console.log(lastMsgLink);
+  }, [notifications]);
 
   useEffect(() => {
     setPath(window.location.pathname);
@@ -115,6 +141,16 @@ export default function Navbar() {
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                <Link to={lastMsgLink}>
+                  <img
+                    className={
+                      notifications.length != 0
+                        ? 'h-8 w-8'
+                        : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                    }
+                    src={msgIcon}
+                  ></img>
+                </Link>
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
                   <div>
@@ -122,7 +158,7 @@ export default function Navbar() {
                       <span className="sr-only">Open user menu</span>
                       <img
                         className="h-8 w-8 rounded-full"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                        src={getProfilePic()}
                         alt=""
                       />
                     </Menu.Button>
@@ -162,17 +198,21 @@ export default function Navbar() {
                               'block px-4 py-2 text-sm text-gray-700'
                             )}
                             onClick={() => {
-                              AccountService.logout({"access_token": localStorage.getItem("access_token")})
-                              .then((response)=>{
-                                // console.log(response)
+                              AccountService.logout({
+                                access_token:
+                                  localStorage.getItem('access_token')
                               })
-                              .catch((error)=>{
-                                console.error(error)
-                              })
+                                .then((response) => {
+                                  console.log(response);
+                                })
+                                .catch((error) => {
+                                  console.log(error);
+                                });
 
                               localStorage.clear();
                               logout(null);
                               navigate('/welcome');
+                              location.reload();
                             }}
                           >
                             Sign out

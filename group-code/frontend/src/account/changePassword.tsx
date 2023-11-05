@@ -146,7 +146,7 @@ export default function ChangePassword() {
                 >
                   {same && haveNewConfirmPs
                     ? 'Confirm New Password*'
-                    : 'Please type same new passwrod again*'}
+                    : 'Please type same new password again*'}
                 </label>
                 <div className="mt-1">
                   <input

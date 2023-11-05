@@ -422,7 +422,9 @@ export default function AddPrerequisite(props: AddPrerequisiteProps) {
                           target: targetTopic.value
                         })
                       ) {
-                        const prereqs = { prereqs: {} };
+                        const prereqs: {
+                          prereqs: { [key: string]: { [key: string]: string } };
+                        } = { prereqs: {} };
                         prereqs['prereqs'][ind.toString()] = {
                           choices: `Adding prerequisite '${choice.name}' to current topic causes a unfulfillable loop to be created.`
                         };

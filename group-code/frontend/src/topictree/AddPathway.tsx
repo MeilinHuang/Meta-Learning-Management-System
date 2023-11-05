@@ -288,7 +288,7 @@ export default function AddPathway(props: AddPathwayProps) {
                   const newElecs = electiveTopics.map((topic: any) =>
                     Number(topic.value)
                   );
-                  const r = await createPathway({
+                  const r: { [key: string]: any } = await createPathway({
                     name,
                     core: newCores,
                     electives: newElecs

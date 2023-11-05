@@ -15,11 +15,19 @@ import { PaperClipIcon } from '@heroicons/react/20/solid';
 export default function ProfilePage() {
   const [profileBlock, setProfileBlock] = useState(true);
   const [editBlock, setEditBlock] = useState(false);
+  const [emailStr, setEmailStr] = useState('Email address');
+  const [mfaStr, setMfaStr] = useState( () => {
+    if (localStorage.getItem('mfa') == 'email') {
+      return 'Disable MFA'
+    } 
+    return 'Enable MFA'
+  });
+
   const [new_full_name, setNew_full_name] = useState(
     localStorage.getItem('full_name')
   );
   const [new_intro, setNew_intro] = useState(localStorage.getItem('intro'));
-  const [topicsShow, setTopicsShow] = useState(false);
+  const [errMsg, setErrMsg] = useState(false)
 
   const handleChangeFullName = (event: ChangeEvent<HTMLInputElement>) => {
     //alert("New Email value: " + event.target.value);
@@ -37,6 +45,18 @@ export default function ProfilePage() {
       setProfileBlock(true);
     }
   };
+
+
+  const checkvEmail = () => {
+    if (localStorage.getItem('vEmail')?.includes('@')) {
+      setEmailStr('Email address (Verified)')
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const [isEmailVerified, setIsEmailV] = useState(checkvEmail);
 
   return (
     <div>
@@ -72,7 +92,7 @@ export default function ProfilePage() {
             Your Profile
           </h3>
           <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            Personal details.
+            Personal details
           </p>
         </div>
 
@@ -92,7 +112,7 @@ export default function ProfilePage() {
             </div>
             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt className="text-sm font-medium text-gray-500">
-                Email address
+                {emailStr}
               </dt>
               <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {localStorage.getItem('email')}
@@ -110,13 +130,13 @@ export default function ProfilePage() {
           </dl>
         </div>
         <div
-        className='flex flex-row-reverse gap-4'
+        className='flex flex-row-reverse gap-4 pb-4 px-4'
         >
           <button
             className="mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
             onClick={editOrProfile}
           >
-            edit
+            Edit
           </button>
           <Link to="/pwchang"
           >
@@ -124,7 +144,70 @@ export default function ProfilePage() {
             className="mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
             onClick={editOrProfile}
           >
-            change password
+            Change Password
+          </button>
+          </Link>
+          <Link to="/updatePicture"
+          >
+          <button
+            className="mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+            onClick={editOrProfile}
+          >
+            Change Profile Picture
+          </button>
+          </Link>
+          <button
+            className={
+              !isEmailVerified
+              ? 'mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3'
+              : 'hidden'
+            }
+            onClick={() => {
+              const param = {
+                token: localStorage.getItem('access_token'),
+                id: localStorage.getItem('user_name'),
+                mfa: 'email'
+              };
+              if (localStorage.getItem('mfa') == 'email') {
+                param.mfa = ''
+              };
+              AccountService.setMFA(param)
+                .then((response) => {
+                  if (response.data.message == "true") {
+                    if (localStorage.getItem('mfa') == 'email') {
+                      setMfaStr('Enable MFA')
+                      localStorage.setItem('mfa', '')
+                    } else {
+                      setMfaStr('Disable MFA')
+                      localStorage.setItem('mfa', 'email')
+                    }
+                  } 
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }}
+          >
+            {mfaStr}
+          </button>
+          <Link to="/vEmail"
+          >
+          <button
+            className={
+              isEmailVerified
+              ? 'mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3'
+              : 'hidden'
+            }
+          >
+            Verify Email
+          </button>
+          </Link>
+          <Link to="/privacySettings"
+          >
+          <button
+            className='mt-6 basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3'
+          >
+            Privacy Settings
           </button>
           </Link>
         </div>
@@ -139,7 +222,7 @@ export default function ProfilePage() {
       >
         <div className="px-4 py-5 sm:px-6">
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            Chnage Your Profile
+            Change Your Profile
           </h3>
         </div>
         <div className="border-t border-gray-200">
@@ -167,19 +250,28 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex flex-row-reverse gap-4">
-              
+        
               <button
                 className="mt-6 items-center flex basis-1/8 justify-center rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
                 onClick={() => {
                   const param = {
+                    token: localStorage.getItem('access_token'),
                     username: localStorage.getItem('user_name'),
                     full_name: new_full_name,
                     introduction: new_intro
                   };
                   if (new_intro != null) {
+                    if (new_intro.length >= 40) {
+                      setErrMsg(true)
+                      return
+                    }
                     localStorage.setItem('intro', new_intro);
                   }
                   if (new_full_name != null) {
+                    if (new_full_name.length >= 40) {
+                      setErrMsg(true)
+                      return
+                    }
                     localStorage.setItem('full_name', new_full_name);
                   }
                   AccountService.editProfile(param)
@@ -212,7 +304,13 @@ export default function ProfilePage() {
               >
                 cancel
               </button>
-              
+              <div className={
+                (errMsg)
+                ? 'text-center text-sm font-medium text-red-500'
+                : 'hidden'
+              }>
+                Must be less than 40 characters.
+              </div>
             </div>
           </dl>
         </div>

@@ -53,7 +53,11 @@ class User(BaseModel):
     introduction: str
     friends: List[Conversation]
     superuser: bool
-
+    vEmail: str
+    lastOtp: str
+    emailAuth: str
+    mfa: str
+    profilePic: str
     class Config:
         orm_mode = True
 
@@ -68,6 +72,7 @@ class UserCreate(BaseModel):
 
 
 class UserEdit(BaseModel):
+    token: str
     username: str
     full_name: str
     introduction: str
@@ -154,6 +159,7 @@ class AuthorDetails(BaseModel):
     id: int
     name: str
     username: str
+    profilePic: str
 
 
 class Post(BaseModel):
@@ -535,6 +541,48 @@ class Assessment(BaseModel):
     status: str
     timeRange: str
 
-
 class testTopicEnrollment(BaseModel):
     enroll_id: int
+
+class userOtp(BaseModel):
+    token: str
+    username: str
+    inputOtp: str
+
+class recoverPass(BaseModel):
+    username: str
+    inputOtp: str
+    newPassword: str
+
+class GenerativeAI_SendMessage(BaseModel):
+    message: str
+
+class setMFA(BaseModel):
+    token: str
+    id: str
+    mfa: str
+
+class idToken(BaseModel):
+    id: str
+    token: str
+
+class userImage(BaseModel):
+    id: str
+    token: str
+    image: Any
+
+class log(BaseModel):
+    id: int
+    user_id: int
+    time: datetime
+    details: str
+
+class privacy(BaseModel):
+    email: bool
+    recent_activity: bool
+    invisible: bool
+    full_name: bool
+
+class importTopic(BaseModel):
+    file: str
+    

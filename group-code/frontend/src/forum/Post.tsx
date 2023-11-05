@@ -16,6 +16,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkToc from 'remark-toc';
 import rehypeHighlight from 'rehype-highlight';
+import defaultImg from '../default.jpg';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
 import PostReply from './PostReply';
 
@@ -75,6 +78,14 @@ export default function Post(props: any) {
     error
   } = useGetPostsQuery({ postIds: props.replies });
 
+  const getProfilePic = (dp: string) => {
+    console.log(props.author)
+    if (dp != "" && dp != null) {
+      return dp;
+    } 
+    return defaultImg;
+  };
+
   return (
     <div className="mx-auto my-10 ">
       <div
@@ -132,7 +143,7 @@ export default function Post(props: any) {
                 <div className="flex-shrink-0">
                   <img
                     className="h-10 w-10 rounded-full"
-                    src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    src={getProfilePic(props.author.profilePic)}
                     alt=""
                   />
                 </div>
@@ -403,8 +414,8 @@ export default function Post(props: any) {
               <ReactMarkdown
                 className="prose prose-sm max-w-none"
                 children={props.content}
-                remarkPlugins={[remarkGfm, remarkToc]}
-                rehypePlugins={[rehypeHighlight]}
+                remarkPlugins={[remarkGfm, remarkToc, remarkMath]}
+                rehypePlugins={[rehypeHighlight, rehypeKatex]}
               />
               {replyOpen ? (
                 <div>

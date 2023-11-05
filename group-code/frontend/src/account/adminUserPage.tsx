@@ -1,6 +1,6 @@
 import { PaperClipIcon } from '@heroicons/react/20/solid';
 
-import { Fragment, MouseEventHandler, useState, useEffect } from 'react';
+import { ChangeEvent, Fragment, MouseEventHandler, useState, useEffect } from 'react';
 // import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import {
@@ -57,11 +57,21 @@ export default function AdminUserPage() {
   const [detail1, setDetail1] = useState(false);
   const [detail2, setDetail2] = useState(false);
   const navigate = useNavigate();
+  const [userSearch, setUserSearch] = useState("@");
   const routeChange = (path: To) => {
     //let path = `newPath`;
     navigate(path);
   };
 
+  const handleInputSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    setUserSearch(event.target.value);
+    updateUserList(userSearch);
+  };
+
+  const clearSearch = () => {
+    (document.getElementById("searchBar") as HTMLInputElement).value = "";
+    updateUserList("@");
+  }
   const updateAdminList = () => {
     AccountService.getAdmins()
       .then((response) => {
@@ -84,8 +94,9 @@ export default function AdminUserPage() {
       });
   };
 
-  const updateUserList = () => {
-    AccountService.loadUsers()
+  const updateUserList = (search: string) => {
+    const param = { search: search };
+    AccountService.loadUsers(param)
       .then((response) => {
         // console.log("users got: ")
         // console.log(response.data);
@@ -108,7 +119,7 @@ export default function AdminUserPage() {
         console.error('error');
       });
 
-    updateUserList();
+    updateUserList(userSearch);
 
     // get the current admins
     updateAdminList()
@@ -254,7 +265,7 @@ export default function AdminUserPage() {
                       : 'text-white hover:bg-indigo-600 w-48 group flex items-center px-2 py-2 text-sm font-medium rounded-md'
                   }
                   onClick={() => {
-                    AccountService.loadUsers()
+                    AccountService.loadUsers({search: ""})
                       .then((response) => {
                         // console.log('users got: ');
                         // console.log(response.data);
@@ -348,7 +359,7 @@ export default function AdminUserPage() {
                       : 'text-white hover:bg-indigo-600 w-48 group flex items-center px-2 py-2 text-sm font-medium rounded-md'
                   }
                   onClick={() => {
-                    AccountService.loadUsers()
+                    AccountService.loadUsers({search: ""})
                       .then((response) => {
                         // console.log('users got: ');
                         // console.log(response.data);
@@ -572,7 +583,7 @@ export default function AdminUserPage() {
                                 // console.log(response);
                                 updateAdminList();
                               });
-                              updateUserList();
+                              updateUserList(userSearch);
                               setDeleteAdmin(false);
                               setSelectedUsersList([]);
                               updateNonAdminList();
@@ -666,6 +677,21 @@ export default function AdminUserPage() {
           <div className="py-6">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
               <h1 className="text-2xl font-semibold text-gray-900">Users</h1>
+            </div>
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 flex margin-left h-15 mt-4">
+              <input
+                className="text-sm text-gray-900 sm:col-span-2 sm:mt-0"
+                placeholder="Enter Username"
+                onChange={handleInputSearch}
+                id="searchBar"
+              ></input>
+              <button
+                type="submit"
+                className="ml-4 flex justify-right rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+                onClick={clearSearch}
+              >
+                Clear
+              </button>
             </div>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
               <div></div>
