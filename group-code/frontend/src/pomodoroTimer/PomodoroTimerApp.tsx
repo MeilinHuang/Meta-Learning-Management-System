@@ -135,9 +135,9 @@ const Timer = () => {
         const { username, email, focusTimeMinutes } = pomodoroSession;
         const token = localStorage.getItem('access_token') ?? "";
         console.log('Pomodoro Session Log:');
-        // console.log('Email:', email, ',Username:', username, ',Focus Time (minutes):', focusTimeMinutes);
+        console.log('Email:', email, ',Username:', username, ',Focus Time (minutes):', focusTimeMinutes);
         // console.log(token);
-        // PomodoroService.createPomodoroLog(pomodoroSession, token);
+        console.log(PomodoroService.createPomodoroLog(pomodoroSession, token));
 
     };
 

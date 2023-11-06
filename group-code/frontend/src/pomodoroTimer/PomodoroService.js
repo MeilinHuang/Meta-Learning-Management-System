@@ -4,8 +4,22 @@ const API_URL = 'http://localhost:8000';
 
 class PomodoroService {
     createPomodoroLog(data, token) {
-        console.log("sending log,", data, "with token: ", token)
-        return axios.post(`${API_URL}/createPomodoroSession`, data, {
+        // console.log("sending log,", data, "with token: ", token)
+        const headers = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': 'true',
+            Authorization: token
+        }
+
+        const payload = {
+            "username": data.username,
+            "email": data.email,
+            "time": new Date(),
+            "focusTimeMinutes": data.focusTimeMinutes
+        }
+
+        // console.log("sending log", " headers", headers, "data", data)
+        return axios.post(`${API_URL}/createPomodoroSession`, payload, {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': 'true',
