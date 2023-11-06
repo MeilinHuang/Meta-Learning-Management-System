@@ -89,8 +89,15 @@ export default function DetailsPathway(props: DetailPathwayProps) {
         </h2>
       )}
       {props.currPathData.isSuccess &&
+        props.globalPathData.isSuccess &&
         props.currPathData.data &&
-        'id' in props.currPathData.data && (
+        'id' in props.currPathData.data &&
+        props.currPathData.data.id !== null &&
+        props.currPathData.data.id !== undefined &&
+        props.globalPathData.data &&
+        'id' in props.globalPathData.data &&
+        props.globalPathData.data.id !== null &&
+        props.globalPathData.data.id !== undefined && (
           <div>
             <div className="flex flex-col items-center">
               <h2 className=" py-1 text-center text-medium font-medium text-gray-600">

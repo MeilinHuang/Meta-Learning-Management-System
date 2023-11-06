@@ -438,42 +438,50 @@ export default function AddTopic(props: AddTopicProps) {
                   </div>
                 </div>
                 {/* Add to this pathway */}
-                {props.currPathData.data.id !==
-                  props.globalPathData.data.id && (
-                  <div className="w-full flex flex-col items-start mt-4">
-                    <WarningAlert
-                      message="Adding to Global Pathway"
-                      description="If the below is not toggled on, this topic will be added to only the global pathway. Toggle to additionally add to current pathway"
-                      className="mt-4"
-                      noSpace
-                    />
-                    <div className="mt-1 w-full flex items-center">
-                      <label
-                        htmlFor="archived"
-                        className="block text-sm font-medium text-gray-700 mr-3"
-                      >
-                        Add to this pathway
-                      </label>
-                      <Switch
-                        checked={addToPathway}
-                        onChange={setAddToPathway}
-                        className={classNames(
-                          addToPathway ? 'bg-indigo-600' : 'bg-gray-200',
-                          'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2'
-                        )}
-                      >
-                        <span className="sr-only">Add To Pathway</span>
-                        <span
-                          aria-hidden="true"
+                {props.currPathData.data &&
+                  'id' in props.currPathData.data &&
+                  props.currPathData.data.id !== null &&
+                  props.currPathData.data.id !== undefined &&
+                  props.globalPathData.data &&
+                  'id' in props.globalPathData.data &&
+                  props.globalPathData.data.id !== null &&
+                  props.globalPathData.data.id !== undefined &&
+                  props.currPathData.data.id !==
+                    props.globalPathData.data.id && (
+                    <div className="w-full flex flex-col items-start mt-4">
+                      <WarningAlert
+                        message="Adding to Global Pathway"
+                        description="If the below is not toggled on, this topic will be added to only the global pathway. Toggle to additionally add to current pathway"
+                        className="mt-4"
+                        noSpace
+                      />
+                      <div className="mt-1 w-full flex items-center">
+                        <label
+                          htmlFor="archived"
+                          className="block text-sm font-medium text-gray-700 mr-3"
+                        >
+                          Add to this pathway
+                        </label>
+                        <Switch
+                          checked={addToPathway}
+                          onChange={setAddToPathway}
                           className={classNames(
-                            addToPathway ? 'translate-x-5' : 'translate-x-0',
-                            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
+                            addToPathway ? 'bg-indigo-600' : 'bg-gray-200',
+                            'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2'
                           )}
-                        />
-                      </Switch>
+                        >
+                          <span className="sr-only">Add To Pathway</span>
+                          <span
+                            aria-hidden="true"
+                            className={classNames(
+                              addToPathway ? 'translate-x-5' : 'translate-x-0',
+                              'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
+                            )}
+                          />
+                        </Switch>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
                 {/* Topic prerequisites */}
                 <div className="w-full flex flex-col items-start mt-5">
                   <div className="w-full flex items-center justify-between">
@@ -677,7 +685,13 @@ export default function AddTopic(props: AddTopicProps) {
                           description,
                           sets: formattedPrereqSets
                         });
-                        if (addToPathway) {
+                        if (
+                          addToPathway &&
+                          props.currPathData.data &&
+                          'id' in props.currPathData.data &&
+                          props.currPathData.data.id !== null &&
+                          props.currPathData.data.id !== undefined
+                        ) {
                           const elecs: Array<number> =
                             props.currPathData.data.electives.map((e: any) =>
                               Number(e.id)

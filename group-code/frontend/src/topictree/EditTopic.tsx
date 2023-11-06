@@ -492,10 +492,10 @@ export default function EditTopic(props: EditTopicProps) {
                           })
                         ) {
                           const prereqs: {
-                            [key: string]: {
+                            prereqs: {
                               [key: string]: { [key: string]: string };
                             };
-                          } = {};
+                          } = { prereqs: {} };
                           prereqs['prereqs'][ind.toString()] = {
                             choices: `Adding prerequisite '${choice.name}' to current topic causes a unfulfillable loop to be created.`
                           };
