@@ -56,8 +56,6 @@ const Timer = () => {
     const [showReportDialog, setShowReportDialog] = useState(false);
     const [pomodoroSessions, setPomodoroSessions] = useState<PomodoroSession[]>([]);
 
-
-
     useEffect(() => {
         let interval: NodeJS.Timeout;
 
@@ -354,7 +352,7 @@ const Timer = () => {
                 </div>
             </div>
             {showReportDialog && (
-                <Report setShowReportDialog={setShowReportDialog} pomodoros={[]} />
+                <Report setShowReportDialog={setShowReportDialog} pomodoros={[]} showReport={showReportDialog} />
             )}
             {isSettingsOpen &&
                 <Settings {...settingsConfig} />
