@@ -1,0 +1,52 @@
+User:None
+User:<backend.app.models.User object at 0x10becfa10>
+User:<backend.app.models.User object at 0x10c16be10>
+User:<backend.app.models.User object at 0x10c75e950>
+User:<backend.app.models.User object at 0x10c9c8e10>
+User:None, db: <sqlalchemy.orm.session.Session object at 0x106f0cfd0>, token:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX3Rva2VuIjoiNXg5cnoyNXFnb2twblRiZSIsInVzZXJfaWQiOjF9.SFKBIIHlVzCbeqsnqWtF13cVWOiZF2RiqqP_JOY1T_o
+User:<backend.app.models.User object at 0x1071ba610>, db: <sqlalchemy.orm.session.Session object at 0x106d1f090>, token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX3Rva2VuIjoiNXg5cnoyNXFnb2twblRiZSIsInVzZXJfaWQiOjF9.SFKBIIHlVzCbeqsnqWtF13cVWOiZF2RiqqP_JOY1T_o
+User:<backend.app.models.User object at 0x1071bb150>, db: <sqlalchemy.orm.session.Session object at 0x106f2f750>, token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX3Rva2VuIjoiNXg5cnoyNXFnb2twblRiZSIsInVzZXJfaWQiOjF9.SFKBIIHlVzCbeqsnqWtF13cVWOiZF2RiqqP_JOY1T_o
+User:<backend.app.models.User object at 0x116ebad10>, db: <sqlalchemy.orm.session.Session object at 0x11587f010>, token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX3Rva2VuIjoiNXg5cnoyNXFnb2twblRiZSIsInVzZXJfaWQiOjF9.SFKBIIHlVzCbeqsnqWtF13cVWOiZF2RiqqP_JOY1T_o
+User:<backend.app.models.User object at 0x116ebb7d0>, db: <sqlalchemy.orm.session.Session object at 0x116d76c50>, token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX3Rva2VuIjoiNXg5cnoyNXFnb2twblRiZSIsInVzZXJfaWQiOjF9.SFKBIIHlVzCbeqsnqWtF13cVWOiZF2RiqqP_JOY1T_o
+User:<backend.app.models.User object at 0x116e5d290>, db: <sqlalchemy.orm.session.Session object at 0x116dee0d0>, token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX3Rva2VuIjoiNXg5cnoyNXFnb2twblRiZSIsInVzZXJfaWQiOjF9.SFKBIIHlVzCbeqsnqWtF13cVWOiZF2RiqqP_JOY1T_o
+Success:False
+session_data:username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+session_data:username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+exception: __init__() got an unexpected keyword argument 'time'
+session_data:username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+exception: __init__() got an unexpected keyword argument 'user_id'
+session_data:username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+exception: __init__() missing 2 required positional arguments: 'username' and 'email'
+session_data:username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+exception: __init__() got an unexpected keyword argument 'time'
+session_data:username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+session_data username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+exception: __init__() got an unexpected keyword argument 'time'
+session_data:username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+session_data username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+exception: __init__() got an unexpected keyword argument 'time'
+session_data:username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+session_data username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+session_data:username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+session_data:username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+session_data:username='EddyWong' email='eddyxwong@gmail.com' time=datetime.datetime(2023, 11, 2, 12, 0, tzinfo=datetime.timezone.utc) focusTimeMinutes=25
+current_user:None
+current_user:None
+current_user:<backend.app.models.User object at 0x110f337d0>
+current_user:<backend.app.models.User object at 0x1145b62d0>
+current_user:<backend.app.models.User object at 0x107b606d0>
+current_user:<backend.app.models.User object at 0x112a09d50>
+current_user:<backend.app.models.User object at 0x112fba210>
+current_user:<backend.app.models.User object at 0x112fbac50>
+current_user:EddyWong
+current_user:EddyWong
+hellooo
+[<backend.app.models.PomodoroSession object at 0x1086c4c50>, <backend.app.models.PomodoroSession object at 0x1086c4d10>, <backend.app.models.PomodoroSession object at 0x1086c4dd0>]
+hellooo
+[<backend.app.models.PomodoroSession object at 0x115828b90>, <backend.app.models.PomodoroSession object at 0x115828c50>, <backend.app.models.PomodoroSession object at 0x115828d10>]
+hellooo
+[<backend.app.models.PomodoroSession object at 0x11563d790>, <backend.app.models.PomodoroSession object at 0x115829a50>, <backend.app.models.PomodoroSession object at 0x115829b10>]
+hellooo
+[<backend.app.models.PomodoroSession object at 0x11582a2d0>, <backend.app.models.PomodoroSession object at 0x11582a390>, <backend.app.models.PomodoroSession object at 0x11582a450>]
+hellooo
+hellooo

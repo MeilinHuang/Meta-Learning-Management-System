@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from datetime import datetime, timezone
 from fastapi import Form, File, UploadFile
 
-
 class Message(BaseModel):
     id: str
     username: str
@@ -580,3 +579,8 @@ class privacy(BaseModel):
 class importTopic(BaseModel):
     file: str
     
+class PomodoroSession(BaseModel):
+    username: str  # User's username
+    email: str  # User's email
+    time: datetime
+    focusTimeMinutes: int

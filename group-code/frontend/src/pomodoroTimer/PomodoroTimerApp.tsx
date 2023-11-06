@@ -7,7 +7,11 @@ import CircleRating from './CircleRating';
 import Report from './Report';
 import Settings from './Settings';
 import SettingsSaveDialog from './SettingsSaveDialog';
-import { BarChart } from '@mui/x-charts/BarChart';
+
+type PomodoroSession = {
+    time: Date;
+    focusTimeMinutes: number;
+};
 
 const Timer = () => {
     // Timer durations in seconds
@@ -33,7 +37,7 @@ const Timer = () => {
     const [longBreakInterval, setLongBreakInterval] = useState(cookies.timerSettings?.longBreakInterval || defaultSettings.longBreakInterval);
 
     const [currentTimer, setCurrentTimer] = useState('pomodoro'); // 'pomodoro', 'shortBreak', 'longBreak'
-    const [timerCount, setTimerCount] = useState(0); // Number of completed intervals
+    const [timerCount, setTimerCount] = useState(0);
     const [skippedTimers, setSkippedTimers] = useState<string[]>([]); // Logs skipped timers
 
     const [time, setTime] = useState(pomodoroDuration);
@@ -48,6 +52,9 @@ const Timer = () => {
     const [showSaveDialog, setShowSaveDialog] = useState(false);
 
     const [showReportDialog, setShowReportDialog] = useState(false);
+    const [pomodoroSessions, setPomodoroSessions] = useState<PomodoroSession[]>([]);
+
+
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -65,10 +72,16 @@ const Timer = () => {
         };
     }, [isRunning, time]);
 
+    let pomodoroSession: PomodoroSession = {
+        time: new Date(), // Initialize with default values
+        focusTimeMinutes: 0,
+    };
+    const pomodoroSkipped = false; // Initialize with false
 
     const handleIntervalEnd = () => {
         setIsRunning(false);
         setCanSkip(false);
+        let pomodoroSkipped = false; // Initialize with false
 
         switch (currentTimer) {
             case 'pomodoro':
@@ -76,27 +89,51 @@ const Timer = () => {
                     // Check if a full Pomodoro interval is completed
                     setCurrentTimer('shortBreak');
                     setTime(shortBreakDuration);
-                    setTimerCount((prevCount) => prevCount + 1);
+                    setTimerCount((prevCount: number) => prevCount + 1);
                 } else {
                     setCurrentTimer('longBreak');
-                    setTimerCount(0); // Reset the timer count when long break starts
+                    setTimerCount(0); // Reset the timer count when a long break starts
                     setTime(longBreakDuration);
                 }
+
+                // Log the pomodoro session
+                pomodoroSession = {
+                    time: pomodoroSession.time,
+                    focusTimeMinutes: (pomodoroDuration - time) / 60, // Time focused in minutes
+                };
+                logPomodoroSession(pomodoroSession);
+                // Update pomodoroSkipped based on canSkip
+                pomodoroSkipped = !canSkip;
+
+                setPomodoroSessions([...pomodoroSessions, pomodoroSession]);
                 break;
+
             case 'shortBreak':
                 setCurrentTimer('pomodoro');
                 setTime(pomodoroDuration);
                 break;
+
             case 'longBreak':
                 setCurrentTimer('pomodoro');
                 setTime(pomodoroDuration);
                 break;
+
             default:
                 break;
         }
-        logSkippedTimer();
+
+        // You can now use pomodoroSkipped and pomodoroSession for logging.
     };
 
+
+
+    const logPomodoroSession = (pomodoroSession: PomodoroSession,) => {
+        const { time, focusTimeMinutes } = pomodoroSession;
+
+        console.log('Pomodoro Session Log:');
+        console.log('Start Time:', time);
+        console.log('Focus Time (minutes):', focusTimeMinutes);
+    };
 
 
     const logSkippedTimer = () => {

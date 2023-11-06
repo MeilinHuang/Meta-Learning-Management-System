@@ -428,3 +428,17 @@ class topicExportLog(Base):
     auth_token = Column(String(16), nullable=True)
     checksum = Column(Text)
     topic_name = Column(String(32))
+
+class PomodoroSession(Base):
+    __tablename__ = "pomodoro_sessions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, index=True)
+    email = Column(String, index=True)
+    time = Column(DateTime, server_default=func.now())
+    focusTimeMinutes = Column(Integer)
+
+    def __init__(self, username: str, email: str, focusTimeMinutes: int):
+        self.username = username
+        self.email = email
+        self.focusTimeMinutes = focusTimeMinutes

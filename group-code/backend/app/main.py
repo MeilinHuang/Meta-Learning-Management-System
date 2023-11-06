@@ -16,6 +16,7 @@ from datetime import datetime
 import os
 import logging
 import re
+from .pomodoroTimer.timer import addPomodoroSession, getAllPomodoroSessions
 EMAILREG = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 USERREG = r'\b^[a-zA-Z0-9]+$\b'
 models.Base.metadata.create_all(bind=engine)
@@ -1784,6 +1785,41 @@ async def importTopic(request: Request, details: schemas.importTopic, db: Sessio
         )
     
     return helper.topicImport(db, details.file, user1)
+
+@app.post("/createPomodoroSession")
+def createPomodoroSession(session_data: schemas.PomodoroSession,request: Request,db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    currentUser = helper.extract_user(db,token)
+
+    if currentUser is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    success = addPomodoroSession(db,currentUser, session_data)
+    
+    if success:
+        return {"message": "Pomodoro Session Created Successful"}
+    else: 
+        return {"message": "Pomodoro Session Creation Failed"}
+    
+@app.get("/getAllPomodoroSessions")
+def getPomodoroSessions(request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    current_user = helper.extract_user(db, token)
+      
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    pomodoro_sessions = getAllPomodoroSessions(db, current_user.username)
+
+    return {"pomodoro_sessions": pomodoro_sessions}
+
 
 if __name__ == "__main__":
     print(datetime.now())
