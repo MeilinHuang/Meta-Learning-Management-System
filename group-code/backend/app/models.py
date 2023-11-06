@@ -431,14 +431,8 @@ class topicExportLog(Base):
 
 class PomodoroSession(Base):
     __tablename__ = "pomodoro_sessions"
-
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     username = Column(String, index=True)
     email = Column(String, index=True)
     time = Column(DateTime, server_default=func.now())
     focusTimeMinutes = Column(Integer)
-
-    def __init__(self, username: str, email: str, focusTimeMinutes: int):
-        self.username = username
-        self.email = email
-        self.focusTimeMinutes = focusTimeMinutes

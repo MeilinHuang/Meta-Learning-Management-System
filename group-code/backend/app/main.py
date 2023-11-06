@@ -1790,15 +1790,16 @@ async def importTopic(request: Request, details: schemas.importTopic, db: Sessio
 def createPomodoroSession(session_data: schemas.PomodoroSession,request: Request,db: Session = Depends(get_db)):
     token = request.headers.get('Authorization')
     currentUser = helper.extract_user(db,token)
-
+    
     if currentUser is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    success = addPomodoroSession(db,currentUser, session_data)
     
+    success = addPomodoroSession(db, session_data)
+
     if success:
         return {"message": "Pomodoro Session Created Successful"}
     else: 
@@ -1808,7 +1809,7 @@ def createPomodoroSession(session_data: schemas.PomodoroSession,request: Request
 def getPomodoroSessions(request: Request, db: Session = Depends(get_db)):
     token = request.headers.get('Authorization')
     current_user = helper.extract_user(db, token)
-      
+        
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
