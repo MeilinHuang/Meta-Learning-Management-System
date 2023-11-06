@@ -7,9 +7,11 @@ import CircleRating from './CircleRating';
 import Report from './Report';
 import Settings from './Settings';
 import SettingsSaveDialog from './SettingsSaveDialog';
+import PomodoroService from './PomodoroService';
 
 type PomodoroSession = {
-    time: Date;
+    username: string,
+    email: string,
     focusTimeMinutes: number;
 };
 
@@ -73,7 +75,8 @@ const Timer = () => {
     }, [isRunning, time]);
 
     let pomodoroSession: PomodoroSession = {
-        time: new Date(), // Initialize with default values
+        username: localStorage.getItem("user_name") ?? "",
+        email: localStorage.getItem("email") ?? "",
         focusTimeMinutes: 0,
     };
     const pomodoroSkipped = false; // Initialize with false
@@ -98,7 +101,8 @@ const Timer = () => {
 
                 // Log the pomodoro session
                 pomodoroSession = {
-                    time: pomodoroSession.time,
+                    username: localStorage.getItem("user_name") ?? "",
+                    email: localStorage.getItem("email") ?? "",
                     focusTimeMinutes: (pomodoroDuration - time) / 60, // Time focused in minutes
                 };
                 logPomodoroSession(pomodoroSession);
@@ -128,11 +132,13 @@ const Timer = () => {
 
 
     const logPomodoroSession = (pomodoroSession: PomodoroSession,) => {
-        const { time, focusTimeMinutes } = pomodoroSession;
-
+        const { username, email, focusTimeMinutes } = pomodoroSession;
+        const token = localStorage.getItem('access_token') ?? "";
         console.log('Pomodoro Session Log:');
-        console.log('Start Time:', time);
-        console.log('Focus Time (minutes):', focusTimeMinutes);
+        // console.log('Email:', email, ',Username:', username, ',Focus Time (minutes):', focusTimeMinutes);
+        // console.log(token);
+        // PomodoroService.createPomodoroLog(pomodoroSession, token);
+
     };
 
 
