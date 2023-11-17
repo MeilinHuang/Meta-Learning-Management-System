@@ -244,7 +244,8 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
                     ]}
                     series={[
                         {
-                            data: graphData
+                            // data: graphData
+                            data: [0, 3, 5, 1, 4, 6, 4]
                         },
                     ]}
                 />

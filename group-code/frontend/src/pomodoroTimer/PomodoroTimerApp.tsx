@@ -15,6 +15,11 @@ type PomodoroSession = {
     focusTimeMinutes: number;
 };
 
+// interface TimerProps {
+//     setTimerCount: any,
+//     timerCount: number;
+// }
+
 const Timer = () => {
     // Timer durations in seconds
     const [cookies, setCookie] = useCookies(['timerSettings']);
@@ -126,8 +131,6 @@ const Timer = () => {
 
         // You can now use pomodoroSkipped and pomodoroSession for logging.
     };
-
-
 
     const logPomodoroSession = (pomodoroSession: PomodoroSession,) => {
         const { username, email, focusTimeMinutes } = pomodoroSession;
