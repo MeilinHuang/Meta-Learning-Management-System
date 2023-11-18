@@ -16,7 +16,7 @@ from datetime import datetime
 import os
 import logging
 import re
-from .pomodoroTimer.timer import addPomodoroSession, getAllPomodoroSessions
+from .pomodoroTimer.timer import *
 EMAILREG = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 USERREG = r'\b^[a-zA-Z0-9]+$\b'
 models.Base.metadata.create_all(bind=engine)
@@ -1786,24 +1786,7 @@ async def importTopic(request: Request, details: schemas.importTopic, db: Sessio
     
     return helper.topicImport(db, details.file, user1)
 
-@app.post("/createPomodoroSession")
-def createPomodoroSession(session_data: schemas.PomodoroSession,request: Request,db: Session = Depends(get_db)):
-    token = request.headers.get('Authorization')
-    currentUser = helper.extract_user(db,token)
-    
-    if currentUser is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorised",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    success = addPomodoroSession(db, session_data)
 
-    if success:
-        return {"message": "Pomodoro Session Created Successful"}
-    else: 
-        return {"message": "Pomodoro Session Creation Failed"}
     
 @app.get("/getAllPomodoroSessions")
 def getPomodoroSessions(request: Request, db: Session = Depends(get_db)):
@@ -1820,6 +1803,52 @@ def getPomodoroSessions(request: Request, db: Session = Depends(get_db)):
     pomodoro_sessions = getAllPomodoroSessions(db, current_user.username)
 
     return {"pomodoro_sessions": pomodoro_sessions}
+
+@app.get("/getWeekPomodoroSessions")
+def getWeekPomodoroSessions(request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    startDate = request.headers.get('startDate')
+    endDate = request.headers.get('endDate')
+    current_user = helper.extract_user(db, token)
+        
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    pomodoro_sessions = getSessionsWithinDateRange(db,startDate, endDate, current_user.username)
+    return {"Sessions": pomodoro_sessions}
+
+@app.post("/createPomodoroSession")
+def createPomodoroSession(session_data: schemas.PomodoroSession,request: Request,db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    currentUser = helper.extract_user(db,token)
+    if currentUser is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    success = addPomodoroSession(db, session_data)
+
+    if success:
+        return {"message": "Pomodoro Session Created Successful"}
+    else: 
+        return {"message": "Pomodoro Session Creation Failed"}
+
+@app.post("/createDummyData")
+def createDummyData(request: Request, db: Session = Depends(get_db)):
+
+    token = request.headers.get('Authorization')
+    current_user = helper.extract_user(db,token)
+    email = "eddyxwong@gmail.com"
+    try:
+        addDummyPomodoroSessions(db, current_user.username,email)
+        return {"message": "Dummy data created successfully"}
+    except Exception as e:
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 if __name__ == "__main__":
