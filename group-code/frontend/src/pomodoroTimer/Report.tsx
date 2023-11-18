@@ -52,14 +52,42 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
                     console.log(aggregate)
                     const aggregateValues: number[] = Object.values(aggregate)
                     console.log(aggregateValues)
-
                     const updateGraphData = aggregateValues.map(value => value / 60)
 
+                    // Calculate total hours focused this week
+                    const totalHoursFocused = aggregateValues.reduce((acc, value) => acc + value / 60, 0);
+
+                    // Calculate the fraction of days focused
+                    const daysFocused = aggregateValues.filter(value => value > 0).length
+
+                    // Calculate the day streak
+                    const dayStreak = calculateDayStreak(aggregateValues);
+
                     setGraphData(updateGraphData)
+                    setHoursFocusedThisWeek(totalHoursFocused)
+                    setCurrentDayStreak(dayStreak)
+                    setDaysFocusedThisWeek(daysFocused)
                 })
     }
 
+    function calculateDayStreak(aggregateValues: number[]): number {
+        let streak = 0;
+        let currentStreak = 0;
 
+        for (let i = aggregateValues.length - 1; i >= 0; i--) {
+            if (aggregateValues[i] > 0) {
+                currentStreak++;
+            } else {
+                // Reset the streak if encountering a day with zero focus time
+                currentStreak = 0;
+            }
+
+            // Update the overall streak if the current streak is longer
+            streak = Math.max(streak, currentStreak);
+        }
+
+        return streak;
+    }
 
     useEffect(() => {
         if (showReport) {
