@@ -27,6 +27,7 @@ class Week {
         this.pomodoroSessions.push(session);
         this.totalFocusTime += session.focusTimeMinutes;
     }
+
     getDaysFocused(): number {
         const uniqueDays = new Set<string>();
         this.pomodoroSessions.forEach((session) => {
@@ -131,23 +132,35 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
 
     }, [currentWeekIndex, pomodoros, graphData]);
 
+    const formatDate = (date: Date): string => {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+    }
     const handlePomodoroLogs = () => {
         const token = localStorage.getItem('access_token')
         console.log(token)
-        PomodoroService.getAllPomodoroLogs(token)
+        const startDateFormatted = formatDate(startDate)
+        const endDateFormatted = formatDate(endDate)
+
+        console.log(startDateFormatted, endDateFormatted)
+        PomodoroService.getThisWeeksLogs(token, startDateFormatted, endDateFormatted)
             .then(
                 (e) => {
-                    const logs = e.data.pomodoro_sessions;
-                    const weeks = groupLogsIntoPastTwoWeeks(logs)
-                    console.log(weeks)
-                    setDaysFocusedThisWeek(weeks[currentWeekIndex].getDaysFocused())
-                    setCurrentDayStreak(weeks[currentWeekIndex].getCurrentDayStreak())
-                    setHoursFocusedThisWeek(weeks[currentWeekIndex].totalFocusTime / 60)
-                    const updatedGraphData = weeks[currentWeekIndex].calculateDailyData()
-                    setGraphData(updatedGraphData);
-                }
-            )
+                    const aggregate = e.data.Sessions
+                    console.log(aggregate)
+                    const aggregateValues: number[] = Object.values(aggregate)
+                    console.log(aggregateValues)
+
+                    const updateGraphData = aggregateValues.map(value => value / 60)
+
+                    setGraphData(updateGraphData)
+                })
     }
+
+
 
     useEffect(() => {
         if (showReport) {
@@ -244,8 +257,8 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
                     ]}
                     series={[
                         {
-                            // data: graphData
-                            data: [0, 3, 5, 1, 4, 6, 4]
+                            data: graphData
+                            // data: [0, 3, 5, 1, 4, 6, 4]
                         },
                     ]}
                 />

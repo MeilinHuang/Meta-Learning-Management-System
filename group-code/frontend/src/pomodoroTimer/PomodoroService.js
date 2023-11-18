@@ -37,6 +37,18 @@ class PomodoroService {
             }
         });
     }
+
+    getThisWeeksLogs(token, startDate, endDate) {
+        return axios.get(`${API_URL}/getWeekPomodoroSessions`, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': 'true',
+                Authorization: token,
+                startDate: startDate,
+                endDate: endDate
+            }
+        });
+    }
 }
 
 export default new PomodoroService();

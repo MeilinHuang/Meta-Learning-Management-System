@@ -30,24 +30,17 @@ def getAllPomodoroSessions(db:Session, username: str) -> []:
             "focusTimeMinutes": session.focusTimeMinutes
         })
         
-    # file_path = "pomodoro_data.txt"
-    # with open(file_path, "a") as file:
-    #     file.write(f"username: {username} pomodoro_sessions: {pomodoro_sessions}, values:{extracted_values}\n")
     return extracted_values
 
 def getSessionsWithinDateRange(db: Session, start_date, end_date, username:str):
-    # sessions_within_range = db.query(models.PomodoroSession).filter_by(username=username).all()
     start_week = datetime.strptime(start_date, "%d/%m/%Y")
     end_week=datetime.strptime(end_date, "%d/%m/%Y")
     print(start_date, end_date)
     sessions_within_range = (
         db.query(models.PomodoroSession)
         .filter(models.PomodoroSession.username == username)
-        # .filter(models.PomodoroSession.time >= start_week, models.PomodoroSession.time <= end_week)
         .all()
     )
-    # print(sessions_within_range)
-
     daily_accumulation = defaultdict(int, {day: 0 for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']})
 
     for session in sessions_within_range:
@@ -73,7 +66,7 @@ def addDummyPomodoroSessions(db:Session, username: str, email: str):
 
         # Add the generated datetime to the Pomodoro session
         new_pomodoro.time = session_datetime
-
+        
         # Add the Pomodoro session to the database
         db.add(new_pomodoro)
         db.commit()
