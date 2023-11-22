@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import PomodoroService from "./PomodoroService";
-
+import { Tooltip, Typography } from '@mui/material';
+import { ChartsAxisHighlight, HighlightScope } from '@mui/x-charts';
 interface ReportProps {
     setShowReportDialog: (show: boolean) => void;
     pomodoros: Pomodoro[];
@@ -13,42 +14,44 @@ interface Pomodoro {
     duration: number; // Duration of the pomodoro in minutes
 }
 
+// const barChartParams = {
+//     series: [
+//         {
+//             label: 'Mon',
+//             data: 
+//         },
+//         {}
+//     ]
+
+// }
+
 const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showReport }) => {
     const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
-    const [startDate, setStartDate] = useState(calculateStartDate(0));
-    const [endDate, setEndDate] = useState(calculateEndDate(0));
+    const [startDate, setStartDate] = useState(calculateStartDate(currentWeekIndex));
+    const [endDate, setEndDate] = useState(calculateEndDate(currentWeekIndex));
     const [hoursFocusedThisWeek, setHoursFocusedThisWeek] = useState(0);
     const [daysFocusedThisWeek, setDaysFocusedThisWeek] = useState(0);
     const [currentDayStreak, setCurrentDayStreak] = useState(0);
     const [graphData, setGraphData] = useState<number[]>([0, 0, 0, 0, 0, 0, 0])
 
+
     useEffect(() => {
-        const start = calculateStartDate(currentWeekIndex);
-        const end = calculateEndDate(currentWeekIndex);
-        setStartDate(start);
-        setEndDate(end);
-        console.log(start, end)
-    }, [currentWeekIndex, pomodoros, graphData]);
+        // const start = calculateStartDate(currentWeekIndex);
+        // const end = calculateEndDate(currentWeekIndex);
+        // setStartDate(start);
+        // setEndDate(end);
+    }, [pomodoros, graphData]);
 
-    const formatDate = (date: Date): string => {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
 
-        return `${day}/${month}/${year}`;
-    }
-    const handlePomodoroLogs = () => {
+    const handlePomodoroLogs = (startDate: Date, endDate: Date) => {
         const token = localStorage.getItem('access_token')
-        console.log(token)
         const startDateFormatted = formatDate(startDate)
         const endDateFormatted = formatDate(endDate)
 
-        console.log(startDateFormatted, endDateFormatted)
         PomodoroService.getThisWeeksLogs(token, startDateFormatted, endDateFormatted)
             .then(
                 (e) => {
                     const aggregate = e.data.Sessions
-                    console.log(aggregate)
                     const aggregateValues: number[] = Object.values(aggregate)
                     console.log(aggregateValues)
                     const updateGraphData = aggregateValues.map(value => value / 60)
@@ -77,33 +80,48 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
             if (aggregateValues[i] > 0) {
                 currentStreak++;
             } else {
-                // Reset the streak if encountering a day with zero focus time
                 currentStreak = 0;
             }
-
-            // Update the overall streak if the current streak is longer
             streak = Math.max(streak, currentStreak);
         }
-
         return streak;
     }
 
     useEffect(() => {
         if (showReport) {
-            handlePomodoroLogs()
+            handlePomodoroLogs(startDate, endDate)
         }
     }, [showReport])
 
     const goToPreviousWeek = () => {
-        setCurrentWeekIndex(currentWeekIndex - 1);
-        handlePomodoroLogs();
+        setCurrentWeekIndex((prevWeekIndex) => {
+            const newWeekIndex = prevWeekIndex - 1;
+            const startDate = calculateStartDate(newWeekIndex);
+            const endDate = calculateEndDate(newWeekIndex);
+            handlePomodoroLogs(startDate, endDate);
+            handleDateRange(newWeekIndex)
+            return newWeekIndex;
+        });
+        // handleDateRange()
     };
 
     const goToNextWeek = () => {
-        setCurrentWeekIndex(currentWeekIndex + 1);
+        setCurrentWeekIndex((prevWeekIndex) => {
+            const newWeekIndex = prevWeekIndex + 1;
+            const startDate = calculateStartDate(newWeekIndex);
+            const endDate = calculateEndDate(newWeekIndex);
+            handlePomodoroLogs(startDate, endDate);
+            handleDateRange(newWeekIndex)
+            return newWeekIndex;
+        });
 
-        handlePomodoroLogs();
     };
+
+    const handleDateRange = (newIndex: number) => {
+        console.log("current week index: ", newIndex)
+        setStartDate(calculateStartDate(newIndex))
+        setEndDate(calculateEndDate(newIndex))
+    }
 
     return (
         <div className="report-dialog bg-white shadow-lg rounded-lg fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-96">
@@ -155,28 +173,30 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
                             data: graphData
                         },
                     ]}
+                // tooltip={ }
                 />
+
             </div>
             <div className="week-navigation flex justify-center mt-4">
-                {/* <button
+                <button
                     onClick={goToNextWeek}
                     className="text-s bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-full mr-2"
                 >
                     Prev
-                </button> */}
+                </button>
                 <div className="date-range-pill mx-2">
                     {startDate.toLocaleDateString(undefined, { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('/', '/')}
                     {" - "}
                     {endDate.toLocaleDateString(undefined, { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('/', '/')}
                 </div>
 
-                {/* <button
+                <button
                     onClick={goToPreviousWeek}
                     disabled={currentWeekIndex === 0}
                     className={`text-s bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-full ${currentWeekIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                     Next
-                </button> */}
+                </button>
             </div>
 
 
@@ -198,5 +218,13 @@ const calculateEndDate = (currentWeekIndex: number): Date => {
     endOfWeek.setDate(endOfWeek.getDate() + 6);
     return endOfWeek;
 };
+
+const formatDate = (date: Date): string => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+}
 
 export default Report;

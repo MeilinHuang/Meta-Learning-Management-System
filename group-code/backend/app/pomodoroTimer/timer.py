@@ -35,14 +35,17 @@ def getAllPomodoroSessions(db:Session, username: str) -> []:
 def getSessionsWithinDateRange(db: Session, start_date, end_date, username:str):
     start_week = datetime.strptime(start_date, "%d/%m/%Y")
     end_week=datetime.strptime(end_date, "%d/%m/%Y")
-    print(start_date, end_date)
+    print(start_date, end_date) 
     sessions_within_range = (
         db.query(models.PomodoroSession)
         .filter(models.PomodoroSession.username == username)
         .filter(models.PomodoroSession.time.between(start_week, end_week))
         .all()
     )
-    print(sessions_within_range)
+
+    for session in sessions_within_range:
+        print(session.time.date(), session.focusTimeMinutes)
+
     daily_accumulation = defaultdict(int, {day: 0 for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']})
 
     for session in sessions_within_range:
@@ -57,7 +60,7 @@ def addDummyPomodoroSessions(db:Session, username: str, email: str):
     
     for day in range(1, 6):  # Monday to Friday
         # Generate a datetime object for the specific day at 12:00 PM
-        session_datetime = datetime(2023, 11, 13 + day, 13, 0)
+        session_datetime = datetime(2023, 11, 20 + day, 13, 0)
 
         # Create a PomodoroSession using the model
         new_pomodoro = models.PomodoroSession(

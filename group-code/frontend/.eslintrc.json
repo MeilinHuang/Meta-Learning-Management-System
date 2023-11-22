@@ -31,8 +31,6 @@
   "ignorePatterns": [
     "src/**/*.test.ts",
     "src/frontend/generated/*",
-    "src/topictree/Add.tsx",
-    "src/topictree/AddPathway.tsx",
-    "src/topictree/AddPrerequisite.tsx"
+    "src/topictree/*"
   ]
 }
