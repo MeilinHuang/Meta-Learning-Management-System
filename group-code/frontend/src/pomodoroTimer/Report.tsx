@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import PomodoroService from "./PomodoroService";
-import { Tooltip, Typography } from '@mui/material';
-import { ChartsAxisHighlight, HighlightScope } from '@mui/x-charts';
+import { HighlightScope } from '@mui/x-charts';
+
+
 interface ReportProps {
     setShowReportDialog: (show: boolean) => void;
     pomodoros: Pomodoro[];
@@ -14,16 +15,6 @@ interface Pomodoro {
     duration: number; // Duration of the pomodoro in minutes
 }
 
-// const barChartParams = {
-//     series: [
-//         {
-//             label: 'Mon',
-//             data: 
-//         },
-//         {}
-//     ]
-
-// }
 
 const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showReport }) => {
     const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
@@ -33,13 +24,10 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
     const [daysFocusedThisWeek, setDaysFocusedThisWeek] = useState(0);
     const [currentDayStreak, setCurrentDayStreak] = useState(0);
     const [graphData, setGraphData] = useState<number[]>([0, 0, 0, 0, 0, 0, 0])
-
+    const [color, setColor] = React.useState('#5c6bc0');
 
     useEffect(() => {
-        // const start = calculateStartDate(currentWeekIndex);
-        // const end = calculateEndDate(currentWeekIndex);
-        // setStartDate(start);
-        // setEndDate(end);
+        //
     }, [pomodoros, graphData]);
 
 
@@ -161,19 +149,33 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
             </div>
             <div className="chart-container" style={{ width: "100%", height: "300px" }}>
                 <BarChart
+                    axisHighlight={{ x: 'band', y: 'none' }}
+                    yAxis={[
+                        {
+                            id: "hoursAxis",
+                            label: 'Hours (hr)',
+                        },
+                    ]}
                     xAxis={[
                         {
                             id: "barCategories",
                             data: ["Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"],
                             scaleType: "band",
+                            label: 'Days of the Week'
                         },
                     ]}
                     series={[
                         {
-                            data: graphData
+                            data: graphData,
+                            label: 'Hours',
+                            color,
+                            highlightScope: {
+                                highlighted: 'item',
+                                faded: 'global'
+                            } as HighlightScope,
                         },
                     ]}
-                // tooltip={ }
+
                 />
 
             </div>
