@@ -41,7 +41,7 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
                 (e) => {
                     const aggregate = e.data.Sessions
                     const aggregateValues: number[] = Object.values(aggregate)
-                    console.log(aggregateValues)
+                    // console.log(aggregateValues)
                     const updateGraphData = aggregateValues.map(value => value / 60)
 
                     // Calculate total hours focused this week
@@ -106,7 +106,7 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
     };
 
     const handleDateRange = (newIndex: number) => {
-        console.log("current week index: ", newIndex)
+        // console.log("current week index: ", newIndex)
         setStartDate(calculateStartDate(newIndex))
         setEndDate(calculateEndDate(newIndex))
     }
