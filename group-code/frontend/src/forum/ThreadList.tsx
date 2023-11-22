@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 
 import { FixedSizeList as List } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
-import AutoSizer from 'react-virtualized-auto-sizer';
+import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
 
 import { useMemo, useRef, useState } from 'react';
 import { useGetThreadsQuery } from '../features/api/apiSlice';
@@ -43,16 +43,36 @@ export default function ThreadList(props: ThreadListProps) {
   // States of parameters are in Forum.tsx such that Thread.tsx can use them.
   // An attributes of reRender are added with Math.Random to manually update Forum component (a nasty approach)
   // Hence we need to extract other attributes.
-  const { offset: lastOffset, limit: lastLimit, sectionId: lastSectionId } = props.lastResultParams;
-  const { offset: currOffset, limit: currLimit, sectionId: currSectionId } = props.currentResultParams;
-  const { offset: nextOffset, limit: nextLimit, sectionId: nextSectionId } = props.nextResultParams;
+  const {
+    offset: lastOffset,
+    limit: lastLimit,
+    sectionId: lastSectionId
+  } = props.lastResultParams;
+  const {
+    offset: currOffset,
+    limit: currLimit,
+    sectionId: currSectionId
+  } = props.currentResultParams;
+  const {
+    offset: nextOffset,
+    limit: nextLimit,
+    sectionId: nextSectionId
+  } = props.nextResultParams;
 
   const lastResult = useGetThreadsQuery(
     { offset: lastOffset, limit: lastLimit, sectionId: lastSectionId },
     { skip: currentOffset < LIMIT }
   );
-  const currentResult = useGetThreadsQuery({ offset: currOffset, limit: currLimit, sectionId: currSectionId });
-  const nextResult = useGetThreadsQuery({ offset: nextOffset, limit: nextLimit, sectionId: nextSectionId });
+  const currentResult = useGetThreadsQuery({
+    offset: currOffset,
+    limit: currLimit,
+    sectionId: currSectionId
+  });
+  const nextResult = useGetThreadsQuery({
+    offset: nextOffset,
+    limit: nextLimit,
+    sectionId: nextSectionId
+  });
 
   const hasNextPage = useMemo(() => {
     if (nextResult.data === undefined) {
@@ -130,20 +150,20 @@ export default function ThreadList(props: ThreadListProps) {
         combined[index] !== undefined
           ? combined[index]
           : {
+            id: -1,
+            title: 'Loading...',
+            content: 'Loading...',
+            time: new Date(1970, 1, 1, 0, 0, 0),
+            preview: '',
+            author: {
               id: -1,
-              title: 'Loading...',
-              content: 'Loading...',
-              time: new Date(1970, 1, 1, 0, 0, 0),
-              preview: '',
-              author: {
-                id: -1,
-                name: 'Loading...',
-                username: 'Loading...'
-              },
-              posts: [],
-              upvotes: 0,
-              stickied: false
-            };
+              name: 'Loading...',
+              username: 'Loading...'
+            },
+            posts: [],
+            upvotes: 0,
+            stickied: false
+          };
       // manually update the thread after posting
       if (props.currentResultParams.reRender) {
         props.selectThreadCallback(item);
@@ -206,7 +226,7 @@ export default function ThreadList(props: ThreadListProps) {
   return (
     <div className="h-full overflow-hidden">
       <AutoSizer>
-        {({ height, width }: { height: number, width: number }) => (
+        {(props: Size) => (
           <InfiniteLoader
             isItemLoaded={isItemLoaded}
             itemCount={itemCount}
@@ -215,12 +235,12 @@ export default function ThreadList(props: ThreadListProps) {
             {({ onItemsRendered, ref }) => (
               <List
                 className="List"
-                height={height}
+                height={props.height}
                 itemCount={itemCount}
                 itemSize={84}
                 onItemsRendered={onItemsRendered}
                 ref={ref}
-                width={width}
+                width={props.width}
               >
                 {Item}
               </List>

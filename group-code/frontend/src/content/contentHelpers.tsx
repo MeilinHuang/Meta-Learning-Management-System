@@ -191,10 +191,16 @@ const permittedFormats = {
 };
 
 export function getPermittedFormats(resource_type: string) {
-  const formats = permittedFormats[resource_type].join(', ');
-  if (permittedFormats[resource_type].length === 0) {
+  const currResourceType = resource_type as
+    | 'video'
+    | 'audio'
+    | 'document'
+    | 'slides'
+    | 'file';
+  const formats = permittedFormats[currResourceType].join(', ');
+  if (permittedFormats[currResourceType].length === 0) {
     return '';
-  } else if (permittedFormats[resource_type].length === 1) {
+  } else if (permittedFormats[currResourceType].length === 1) {
     return 'Permitted format: ' + formats;
   } else {
     return 'Permitted formats: ' + formats;
@@ -202,7 +208,12 @@ export function getPermittedFormats(resource_type: string) {
 }
 
 export function isPermittedFormat(resource_type: string, format: string) {
-  if (permittedFormats[resource_type].includes(format)) {
+  const currResourceType = resource_type as
+    | 'video'
+    | 'audio'
+    | 'document'
+    | 'slides';
+  if (permittedFormats[currResourceType].includes(format)) {
     return true;
   }
   return false;

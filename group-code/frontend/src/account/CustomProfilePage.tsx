@@ -25,7 +25,7 @@ import { parse } from 'path';
 import memberImg from '../Icons/member.png';
 import studentImg from '../Icons/student.png';
 import teacherImg from '../Icons/teacher.png';
-import forumStaffImg from '../Icons/forumStaff.png'
+import forumStaffImg from '../Icons/forumStaff.png';
 import defaultImg from '../default.jpg';
 
 export default function CustomProfilePage(props: any) {
@@ -40,13 +40,13 @@ export default function CustomProfilePage(props: any) {
   });
 
   const [activityStatus, setActivityStatus] = useState({
-    status:'Offline', 
-    delta:-1,
-    details: ""
+    status: 'Offline',
+    delta: -1,
+    details: ''
   });
 
-  const [statusColour, setStatusColour] = useState(" bg-gray-500")
-  const [mutalRoles, setMutalRoles] = useState({});
+  const [statusColour, setStatusColour] = useState(' bg-gray-500');
+  const [mutualRoles, setMutualRoles] = useState<{ [key: string]: any }>({});
   const { id } = useParams(); // :id 是这个id
   const [conversation_name, setConversation_name] = useState('');
   const navigate = useNavigate();
@@ -60,36 +60,31 @@ export default function CustomProfilePage(props: any) {
   };
 
   const roleToImg = (role: string) => {
-      if (role == "Creator") {
-        return teacherImg;
-      } else if (role == "Student") {
-        return studentImg;
-      } else if (role == "Forum Staff") {
-        return forumStaffImg;
-      } else {
-        return memberImg;
-      }
+    if (role == 'Creator') {
+      return teacherImg;
+    } else if (role == 'Student') {
+      return studentImg;
+    } else if (role == 'Forum Staff') {
+      return forumStaffImg;
+    } else {
+      return memberImg;
+    }
+  };
 
-  }
-
-  const loadMutalRoles = () => {
+  const loadMutualRoles = () => {
     const res = [];
     let i = 0;
-    const keys = Object.keys(mutalRoles);
+    const keys = Object.keys(mutualRoles);
     while (i < keys.length) {
-      const topics = mutalRoles[keys[i]];
-      let roleName = keys[i]
-      if (roleName == null || roleName == "null") {
-        roleName = "Member"
+      const topics = mutualRoles[keys[i]];
+      let roleName = keys[i];
+      if (roleName == null || roleName == 'null') {
+        roleName = 'Member';
       }
-      const roleText = `${roleName} in ${topics.join(', ')}.`; 
+      const roleText = `${roleName} in ${topics.join(', ')}.`;
       res.push(
         <div className="px-1 flex">
-          <img
-            className="h-7 w-7"
-            src={roleToImg(keys[i])}
-            alt=""
-          />
+          <img className="h-7 w-7" src={roleToImg(keys[i])} alt="" />
           <dd className="mt-1.5 text-sm text-gray-900 sm:col-span-2 sm:mt-0 ml-2">
             {roleText}
           </dd>
@@ -101,34 +96,34 @@ export default function CustomProfilePage(props: any) {
   };
 
   const loadOneRole = () => {
-    const keys = Object.keys(mutalRoles)
-    if (keys.includes("Creator")) {
-      return "Creator"
-    } else if (keys.includes("Forum Staff")) {
-      return "Forum Staff"
-    } else if (keys.includes("Student")) {
-      return "Student"
+    const keys = Object.keys(mutualRoles);
+    if (keys.includes('Creator')) {
+      return 'Creator';
+    } else if (keys.includes('Forum Staff')) {
+      return 'Forum Staff';
+    } else if (keys.includes('Student')) {
+      return 'Student';
     } else if (keys.length > 0) {
-      return "Member"
+      return 'Member';
     }
-    return "User"
-  }
+    return 'User';
+  };
 
   useEffect(() => {
     console.log(id);
-    AccountService.getOneUser({ 
+    AccountService.getOneUser({
       id: id,
-      access_token: localStorage.getItem('access_token') 
+      access_token: localStorage.getItem('access_token')
     }).then((response) => {
       setUser(response.data.user);
-      console.log(response.data);
+      // console.log(response.data);
     });
 
-    AccountService.mutalTopicsRoless({
+    AccountService.mutualTopicRoles({
       id2: id,
-      access_token: localStorage.getItem('access_token') 
+      access_token: localStorage.getItem('access_token')
     }).then((response) => {
-      setMutalRoles(response.data);
+      setMutualRoles(response.data);
     });
 
     AccountService.activityStatus({
@@ -137,23 +132,23 @@ export default function CustomProfilePage(props: any) {
       console.log(response.data);
       setActivityStatus(response.data);
       if (response.data) {
-        if (response.data.status == "Online") {
-          setStatusColour(" bg-green-500");
-        } else if (response.data.status == "Away") {
-          setStatusColour(" bg-orange-500");
+        if (response.data.status == 'Online') {
+          setStatusColour(' bg-green-500');
+        } else if (response.data.status == 'Away') {
+          setStatusColour(' bg-orange-500');
         } else {
-          setStatusColour(" bg-gray-500");
+          setStatusColour(' bg-gray-500');
         }
       }
       console.log(statusColour);
-    })
+    });
   }, []);
-  
+
   const getProfilePic = () => {
     const dp = user.profilePic;
-    if (dp != "" && dp != null) {
+    if (dp != '' && dp != null) {
       return dp;
-    } 
+    }
     return defaultImg;
   };
 
@@ -162,9 +157,11 @@ export default function CustomProfilePage(props: any) {
       <main className="">
         <div className=" py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-          <div className='ml-4 mt-4'>
-              <div className='bg-indigo-100 shadow sm:rounded-t-lg w-full flex flex-col items-center mb-1'>
-                <div className={'w-full h-4 shadow sm:rounded-t-lg' + statusColour}></div>
+            <div className="ml-4 mt-4">
+              <div className="bg-indigo-100 shadow sm:rounded-t-lg w-full flex flex-col items-center mb-1">
+                <div
+                  className={'w-full h-4 shadow sm:rounded-t-lg' + statusColour}
+                ></div>
                 <img
                   className="h-12 w-12 rounded-full mt-4 justify-center"
                   src={getProfilePic()}
@@ -180,11 +177,12 @@ export default function CustomProfilePage(props: any) {
             </div>
             <div className="divide-solid flex">
               <dl>
-                <div className={
-                  (user.full_name != "")
-                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
-                }
+                <div
+                  className={
+                    user.full_name != ''
+                      ? 'bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'
+                      : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                  }
                 >
                   <dt className="text-sm font-medium text-gray-500">
                     Full name
@@ -193,11 +191,12 @@ export default function CustomProfilePage(props: any) {
                     {user.full_name}
                   </dd>
                 </div>
-                <div className={
-                  (user.email != "")
-                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
-                }
+                <div
+                  className={
+                    user.email != ''
+                      ? 'bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'
+                      : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                  }
                 >
                   <dt className="text-sm font-medium text-gray-500">
                     Email address
@@ -207,11 +206,12 @@ export default function CustomProfilePage(props: any) {
                   </dd>
                 </div>
 
-                <div className={
-                  (user.introduction != "")
-                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
-                }
+                <div
+                  className={
+                    user.introduction != ''
+                      ? 'bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'
+                      : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                  }
                 >
                   <dt className="text-sm font-medium text-gray-500">
                     Introduction
@@ -220,19 +220,18 @@ export default function CustomProfilePage(props: any) {
                     {user.introduction}
                   </dd>
                 </div>
-                <div className={
-                  (Object.keys(mutalRoles).length != 0)
-                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
-                }
+                <div
+                  className={
+                    Object.keys(mutualRoles).length != 0
+                      ? 'bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'
+                      : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                  }
                 >
                   <dt className="text-sm font-medium text-gray-500">
-                    Mutal Roles
+                    Mutual Roles
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 flex">
-                    
-                    {loadMutalRoles()}
-        
+                    {loadMutualRoles()}
                   </dd>
                 </div>
                 <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -243,11 +242,12 @@ export default function CustomProfilePage(props: any) {
                     {activityStatus.status}
                   </dd>
                 </div>
-                <div className={
-                  (activityStatus.details != "")
-                  ? "bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                  : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
-                }
+                <div
+                  className={
+                    activityStatus.details != ''
+                      ? 'bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'
+                      : 'hidden overflow-hidden bg-white shadow sm:rounded-lg'
+                  }
                 >
                   <dt className="text-sm font-medium text-gray-500">
                     Recent Activity
@@ -258,36 +258,38 @@ export default function CustomProfilePage(props: any) {
                 </div>
               </dl>
             </div>
-            <div className='flex flex-row-reverse'>
+            <div className="flex flex-row-reverse">
               <button
-              className="mt-6 flex basis-1/8 justify-center rounded-md border border-transparent bg-indigo-300 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
-              onClick={() => {
-                sendOrProfile();
-                const param = {
-                  sender: localStorage.getItem('user_name'),
-                  sender_id: parseInt(
-                    localStorage.getItem('user_id') as string
-                  ),
-                  receiver: user.username,
-                  receiver_id: user.id
-                };
-                AccountService.createConversation(param)
-                  .then((response: any) => {
-                    console.log(response);
-                    setConversation_name(response.data.conversation_name);
+                className="mt-6 flex basis-1/8 justify-center rounded-md border border-transparent bg-indigo-300 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+                onClick={() => {
+                  sendOrProfile();
+                  const param = {
+                    sender: localStorage.getItem('user_name'),
+                    sender_id: parseInt(
+                      localStorage.getItem('user_id') as string
+                    ),
+                    receiver: user.username,
+                    receiver_id: user.id
+                  };
+                  AccountService.createConversation(param)
+                    .then((response: any) => {
+                      console.log(response);
+                      setConversation_name(response.data.conversation_name);
 
-                    console.log(`/details/${response.data.conversation_name}`);
-                    navigate(`/details/${response.data.conversation_name}`);
-                  })
-                  .catch((error: any) => {
-                    console.log(error);
-                  });
-              }}
+                      console.log(
+                        `/details/${response.data.conversation_name}`
+                      );
+                      navigate(`/details/${response.data.conversation_name}`);
+                    })
+                    .catch((error: any) => {
+                      console.log(error);
+                    });
+                }}
               >
                 leave message
               </button>
             </div>
-            
+
             {/* /End replace */}
           </div>
         </div>

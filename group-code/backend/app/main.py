@@ -1422,11 +1422,14 @@ async def create_pathway(details: schemas.PathwayCreate, db: Session = Depends(g
         db, name=details.name, core_ids=details.core, elective_ids=details.electives)
     return {"pathway_id": pathway.id}
 
+@app.delete('/delete_pathway')
+async def delete_pathway(details: schemas.PathwayDelete, db: Session = Depends(get_db)):
+    helper.delete_pathway(db, pathway_id=details.pathway_id)
 
 @app.put('/edit_pathway')
 async def edit_pathway(details: schemas.PathwayEdit, db: Session = Depends(get_db)):
     pathway = helper.edit_pathway(
-        db, pathway_id=details.pathway_id, core_ids=details.core, elective_ids=details.electives)
+        db, pathway_name=details.pathway_name, pathway_id=details.pathway_id, core_ids=details.core, elective_ids=details.electives)
 
     return pathway
 
@@ -1436,6 +1439,10 @@ async def enrol_user_in_pathway(details: schemas.PathwayEnrol, db: Session = Dep
     enrollment = helper.enrol_user_in_pathway(
         db, user_id=details.user_id, pathway_id=details.pathway_id)
     return enrollment
+
+@app.delete('/unenrol_in_pathway')
+async def unenrol_user_in_pathway(details: schemas.PathwayEnrol, db: Session = Depends(get_db)):
+    helper.unenrol_user_in_pathway(db, user_id=details.user_id, pathway_id=details.pathway_id)
 
 
 @app.put('/edit_topic')
@@ -1464,6 +1471,10 @@ async def enrol_user_in_topic(details: schemas.TopicEnrol, db: Session = Depends
         return {"enrollment_id": enrollment.id}
     return {"status": "error"}
 
+@app.delete('/unenrol_in_topic')
+async def unenrol_user_in_topic(details: schemas.TopicEnrol, db: Session = Depends(get_db)):
+    helper.unenrol_user_in_topic(db, user_id=details.user_id, topic_id=details.topic_id)
+
 
 @app.post("/create_topic")
 async def create_topic(details: schemas.PathwayTopicCreate, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
@@ -1488,7 +1499,7 @@ async def get_prereq_info(prerequisite_id: int, db: Session = Depends(get_db)):
 
 @app.delete('/delete_prerequisite')
 async def delete_prerequisite(details: schemas.PathwayTopicPrerequisiteSetDelete, db: Session = Depends(get_db)):
-    helper.delete_prerequisite(db, id=details.id)
+    helper.delete_prerequisite_set(db, prereq_id=details.id)
 
 
 @app.post("/create_prerequisite_sets")
@@ -1678,8 +1689,8 @@ async def getPicture(id: int, db: Session = Depends(get_db)):
         return helper.getPicture(user)
     return ""
     
-@app.get("/mutalTopicsRoles/{id2}")
-async def mutalTopicsRoles(request: Request, id2: int, db: Session = Depends(get_db)):
+@app.get("/mutualTopicRoles/{id2}")
+async def mutualTopicRoles(request: Request, id2: int, db: Session = Depends(get_db)):
     token = request.headers.get('Authorization')
     user1 = helper.extract_user(db, token)
     user2 = helper.get_user_by_id(db, id2,user1.superuser)
@@ -1690,7 +1701,7 @@ async def mutalTopicsRoles(request: Request, id2: int, db: Session = Depends(get
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return helper.mutalTopicRoles(db, user1, user2)
+    return helper.mutualTopicRoles(db, user1, user2)
 
 @app.get("/notifications")
 async def notifications(request: Request, db: Session = Depends(get_db)):

@@ -40,7 +40,7 @@ export const apiSlice = createApi({
         url: '/logout',
         method: 'POST'
       }),
-      invalidatesTags: ['UserRoles', 'Superuser', 'TopicRole']
+      invalidatesTags: ['UserRoles', 'Superuser', 'TopicRole', 'Pathways', 'Topics', 'Topic']
     }),
     getTopicPermission: builder.query({
       query: ({ topic_id, permission }) => ({
@@ -251,11 +251,11 @@ export const apiSlice = createApi({
     }),
     getPathways: builder.query({
       query: (user) => `/pathways?user=${user}`,
-      providesTags: ['Pathways']
+      providesTags: ['Topics', 'Pathways', 'Prerequisite']
     }),
     getPathway: builder.query({
       query: ({ pathway_id, user }) => `/pathway/${pathway_id}?user=${user}`,
-      providesTags: ['Topics']
+      providesTags: ['Topics', 'Pathways', 'Prerequisite']
     }),
     createPathway: builder.mutation({
       query: ({ name, core, electives }) => ({
@@ -269,17 +269,28 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Pathways']
     }),
+    deletePathway: builder.mutation({
+      query: ({ pathway_id }) => ({
+        url: 'delete_pathway',
+        method: 'DELETE',
+        body: {
+          pathway_id,
+        }
+      }),
+      invalidatesTags: ['Pathways']
+    }),
     editPathway: builder.mutation({
-      query: ({ pathway_id, core, electives }) => ({
+      query: ({ pathway_name, pathway_id, core, electives }) => ({
         url: 'edit_pathway',
         method: 'PUT',
         body: {
+          pathway_name,
           pathway_id,
           core,
           electives
         }
       }),
-      invalidatesTags: ['Topics']
+      invalidatesTags: ['Topics', 'Pathways']
     }),
     createTopic: builder.mutation({
       query: ({ name, topic_group_id, image_url, archived, description }) => ({
@@ -337,7 +348,7 @@ export const apiSlice = createApi({
         method: 'POST',
         body: { topic: topic_id, amount, choices }
       }),
-      invalidatesTags: ['Topics']
+      invalidatesTags: ['Topics', 'Topic', 'Prerequisite', 'Pathways']
     }),
     editPrerequisite: builder.mutation({
       query: ({ prerequisite_id, topic, amount, choices }) => ({
@@ -420,13 +431,29 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Pathways', 'Topics']
     }),
+    unenrolInPathway: builder.mutation({
+      query: ({ user_id, pathway_id }) => ({
+        url: 'unenrol_in_pathway',
+        method: 'DELETE',
+        body: { user_id, pathway_id }
+      }),
+      invalidatesTags: ['Pathways', 'Topics']
+    }),
     enrolInTopic: builder.mutation({
       query: ({ user_id, topic_id }) => ({
         url: 'enrol_in_topic',
         method: 'POST',
         body: { user_id, topic_id }
       }),
-      invalidatesTags: ['Topics']
+      invalidatesTags: ['Topics', 'Topic']
+    }),
+    unenrolInTopic: builder.mutation({
+      query: ({ user_id, topic_id }) => ({
+        url: 'unenrol_in_topic',
+        method: 'DELETE',
+        body: { user_id, topic_id }
+      }),
+      invalidatesTags: ['Topics', 'Topic']
     }),
     // Content endpoints
     getIsEnrolledInTopic: builder.query({
@@ -436,7 +463,10 @@ export const apiSlice = createApi({
       query: () => `/user_resources`
     }),
     getEnrolledTopics: builder.query({
-      query: () => `/enrolled_topics`
+      query: ({ access_token, forceRefresh }) => ({
+        url: `/enrolled_topics`,
+        providesTags: ['Topic', 'Topics']
+      })
     }),
     getTopicInfo: builder.query({
       query: ({ topic_id }) => `/topic/${topic_id}`,
@@ -685,9 +715,12 @@ export const {
   useDeletePrerequisiteMutation,
   useCreatePrerequisiteSetsMutation,
   useCreatePathwayMutation,
+  useDeletePathwayMutation,
   useEditPathwayMutation,
   useEnrolInPathwayMutation,
+  useUnenrolInPathwayMutation,
   useEnrolInTopicMutation,
+  useUnenrolInTopicMutation,
   useGetTopicRolesQuery,
   useGetRoleQuery,
   useCreateRoleMutation,

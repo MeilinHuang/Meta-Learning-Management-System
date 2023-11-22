@@ -129,7 +129,7 @@ export default function ConfirmPage() {
                       AccountService.login(param)
                         .then((response: any) => {
                           localStorage.clear()
-                          console.log(response)
+                          // console.log(response)
                           // console.log(response.data.access_token);
                           // console.log(response.data.user_name);
                           // console.log(response.data.email);
@@ -147,9 +147,7 @@ export default function ConfirmPage() {
                         })
                         .catch((error: any) => {
                           if (error.response) {
-                            console.log(error.response.data);
-                            console.log(error.response.status);
-                            console.log(error.response.headers);
+                            console.error(error.response.data, error.response.status, error.response.headers);
                             setCode(error.response.status);
                             if (error.response.status == 401) {
                               setErrorMessage(

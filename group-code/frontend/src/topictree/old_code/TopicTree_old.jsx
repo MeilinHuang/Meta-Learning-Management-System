@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { PencilIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import Select, { components, DropdownIndicatorProps } from 'react-select';
 
+//Need to replace cytoscape with reactflow! - SIM TO DO
 import Cytoscape from 'cytoscape';
 import ReactDOM from 'react-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
@@ -33,7 +34,7 @@ import {
   useEnrolInPathwayMutation,
   useGetPathwayQuery,
   useIsSuperuserQuery
-} from '../features/api/apiSlice';
+} from '../../features/api/apiSlice';
 
 Cytoscape.use(dagre);
 Cytoscape.use(undoRedo);
@@ -190,9 +191,9 @@ export default function TopicTree() {
 
   const [enrolInPath, { data: pathEnrolData, isSuccess: isSuccessPathEnrol }] =
     useEnrolInPathwayMutation();
+    
 
   useEffect(() => {
-    console.log(superuserData);
     if (superuserData && superuserData['is_superuser']) {
       setIsSuperuser(true);
     }
@@ -563,6 +564,7 @@ export default function TopicTree() {
         layout={layout}
         stylesheet={stylesheet}
       />
+      {console.log(pathwayData)}
     </div>
   );
 }
