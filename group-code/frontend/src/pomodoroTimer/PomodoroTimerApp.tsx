@@ -293,15 +293,16 @@ const Timer = () => {
             <div className="pomodoro-timer flex flex-col items-center justify-center bg-gray-100 mb-4">
                 <div className="buttons flex gap-4">
                     {[
-                        { type: 'pomodoro', label: 'Pomodoro', onClick: handlePomodoro },
-                        { type: 'shortBreak', label: 'Short Break', onClick: handleShortBreak },
-                        { type: 'longBreak', label: 'Long Break', onClick: handleLongBreak },
-                        { type: 'settings', label: <FontAwesomeIcon icon={faCog} />, onClick: handleCogIconClick },
+                        { type: 'pomodoro', label: 'Pomodoro', onClick: handlePomodoro, ariaLabel: 'Pomodoro Button' },
+                        { type: 'shortBreak', label: 'Short Break', onClick: handleShortBreak, ariaLabel: 'Short Break Button' },
+                        { type: 'longBreak', label: 'Long Break', onClick: handleLongBreak, ariaLabel: 'Long Break Button' },
+                        { type: 'settings', label: <FontAwesomeIcon icon={faCog} />, onClick: handleCogIconClick, ariaLabel: 'Settings' },
                     ].map((button) => (
                         <button
                             key={button.type}
                             className={`${currentTimer === button.type ? 'bg-indigo-500' : 'bg-gray-500'} hover:bg-indigo-700 text-white px-4 py-2 rounded-full`}
                             onClick={button.onClick}
+                            aria-label={button.ariaLabel}
                         >
                             {button.label}
                         </button>
@@ -349,6 +350,7 @@ const Timer = () => {
                     <button
                         className="bg-gray-500 hover:bg-indigo-700 text-white px-4 py-2 rounded-full"
                         onClick={() => { setShowReportDialog(true) }}
+                        aria-label='Report Button'
                     >
                         <i className="fa-solid fa-chart-simple fa-lg"></i>
                     </button>

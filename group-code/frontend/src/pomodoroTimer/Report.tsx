@@ -22,13 +22,12 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
     const [currentDayStreak, setCurrentDayStreak] = useState(0);
     const [graphData, setGraphData] = useState<number[]>([0, 0, 0, 0, 0, 0, 0])
 
-
-
     useEffect(() => {
         const start = calculateStartDate(currentWeekIndex);
         const end = calculateEndDate(currentWeekIndex);
         setStartDate(start);
         setEndDate(end);
+        console.log(start, end)
     }, [currentWeekIndex, pomodoros, graphData]);
 
     const formatDate = (date: Date): string => {
@@ -97,10 +96,13 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
 
     const goToPreviousWeek = () => {
         setCurrentWeekIndex(currentWeekIndex - 1);
+        handlePomodoroLogs();
     };
 
     const goToNextWeek = () => {
         setCurrentWeekIndex(currentWeekIndex + 1);
+
+        handlePomodoroLogs();
     };
 
     return (
@@ -151,35 +153,32 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
                     series={[
                         {
                             data: graphData
-                            // data: [0, 3, 5, 1, 4, 6, 4]
                         },
                     ]}
                 />
             </div>
             <div className="week-navigation flex justify-center mt-4">
                 {/* <button
-                    onClick={goToPreviousWeek}
-                    // disabled={currentWeekIndex === 0}
-                    className="text-s bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-full"
+                    onClick={goToNextWeek}
+                    className="text-s bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-full mr-2"
                 >
                     Prev
                 </button> */}
-                <div className="date-range-pill">
-                    {startDate.toLocaleDateString(undefined, { weekday: 'short' })} {startDate.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })} - {endDate.toLocaleDateString(undefined, { weekday: 'short' })} {endDate.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })}
+                <div className="date-range-pill mx-2">
+                    {startDate.toLocaleDateString(undefined, { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('/', '/')}
+                    {" - "}
+                    {endDate.toLocaleDateString(undefined, { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('/', '/')}
                 </div>
+
                 {/* <button
-                    onClick={goToNextWeek}
-                    className="text-s bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-full"
+                    onClick={goToPreviousWeek}
+                    disabled={currentWeekIndex === 0}
+                    className={`text-s bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-full ${currentWeekIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                     Next
                 </button> */}
-                {/* <button
-                    onClick={handlePomodoroLogs}  // Add this line to trigger the function
-                    className="text-s bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-full"
-                >
-                    Get Pomodoro Logs
-                </button> */}
             </div>
+
 
         </div >
     );
@@ -188,7 +187,7 @@ const Report: React.FC<ReportProps> = ({ setShowReportDialog, pomodoros, showRep
 const calculateStartDate = (currentWeekIndex: number): Date => {
     const currentDate = new Date(); // Current date
     const startOfWeek = new Date(currentDate);
-    startOfWeek.setDate(startOfWeek.getDate() - (currentWeekIndex * 7 + currentDate.getDay()));
+    startOfWeek.setDate(startOfWeek.getDate() - currentDate.getDay() + 1 - (currentWeekIndex * 7));
     return startOfWeek;
 };
 
@@ -196,60 +195,8 @@ const calculateStartDate = (currentWeekIndex: number): Date => {
 const calculateEndDate = (currentWeekIndex: number): Date => {
     const startDate = calculateStartDate(currentWeekIndex);
     const endOfWeek = new Date(startDate);
-    endOfWeek.setDate(endOfWeek.getDate() + 6); // Assuming a week has 7 days
+    endOfWeek.setDate(endOfWeek.getDate() + 6);
     return endOfWeek;
-};
-
-// Function to calculate hours focused for a specific week
-const calculateHoursFocusedForWeek = (pomodoros: Pomodoro[], startDate: Date, endDate: Date): number => {
-    const pomodorosThisWeek = pomodoros.filter((pomodoro) => {
-        const pomodoroDate = new Date(pomodoro.date);
-        return pomodoroDate >= startDate && pomodoroDate <= endDate;
-    });
-
-    const hoursFocused = pomodorosThisWeek.reduce((total, pomodoro) => total + pomodoro.duration / 60, 0);
-    return hoursFocused;
-};
-
-// Function to calculate days focused for a specific week
-const calculateDaysFocusedForWeek = (pomodoros: Pomodoro[], startDate: Date, endDate: Date): number => {
-    const daysFocused = new Set<string>();
-    pomodoros.forEach((pomodoro) => {
-        const pomodoroDate = new Date(pomodoro.date);
-        if (pomodoroDate >= startDate && pomodoroDate <= endDate) {
-            daysFocused.add(pomodoroDate.toDateString());
-        }
-    });
-
-    return daysFocused.size;
-};
-
-// Function to calculate the current day streak for a specific week
-const calculateCurrentDayStreakForWeek = (pomodoros: Pomodoro[], startDate: Date, endDate: Date): number => {
-    const sortedPomodoros = pomodoros
-        .filter((pomodoro) => {
-            const pomodoroDate = new Date(pomodoro.date);
-            return pomodoroDate >= startDate && pomodoroDate <= endDate;
-        })
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-    const currentDate = new Date();
-    let streak = 0;
-    let currentStreakDate = currentDate;
-
-    for (const pomodoro of sortedPomodoros) {
-        const pomodoroDate = new Date(pomodoro.date);
-        const timeDifference = currentStreakDate.getTime() - pomodoroDate.getTime();
-
-        if (timeDifference <= 24 * 60 * 60 * 1000) {
-            currentStreakDate = pomodoroDate;
-            streak++;
-        } else {
-            break;
-        }
-    }
-
-    return streak;
 };
 
 export default Report;

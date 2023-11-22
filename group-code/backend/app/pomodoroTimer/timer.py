@@ -39,8 +39,10 @@ def getSessionsWithinDateRange(db: Session, start_date, end_date, username:str):
     sessions_within_range = (
         db.query(models.PomodoroSession)
         .filter(models.PomodoroSession.username == username)
+        .filter(models.PomodoroSession.time.between(start_week, end_week))
         .all()
     )
+    print(sessions_within_range)
     daily_accumulation = defaultdict(int, {day: 0 for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']})
 
     for session in sessions_within_range:
