@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faChartBar, faChartColumn, faChartArea } from '@fortawesome/free-solid-svg-icons';
+import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { useCookies } from 'react-cookie';
 import './Timer.css'; // Import custom CSS for styling
 import CircleRating from './CircleRating';
@@ -8,17 +8,17 @@ import Report from './Report';
 import Settings from './Settings';
 import SettingsSaveDialog from './SettingsSaveDialog';
 import PomodoroService from './PomodoroService';
+import useSound from 'use-sound';
+// import boopSound from '../sounds/boop.mp3';
+// import boop from 'boop.mp3'
+// import boopSound from './boop.mp3'
 
+const boopDataUri = 'https://cdn.freesound.org/previews/487/487531_5382295-lq.mp3'
 type PomodoroSession = {
     username: string,
     email: string,
     focusTimeMinutes: number;
 };
-
-// interface TimerProps {
-//     setTimerCount: any,
-//     timerCount: number;
-// }
 
 const Timer = () => {
     // Timer durations in seconds
@@ -30,6 +30,10 @@ const Timer = () => {
         longBreakDuration: 15 * 60,
         longBreakInterval: 3,
     })
+    const [play] = useSound(boopDataUri)
+    const playSound = () => {
+        play()
+    }
 
     // Retrieve settings from cookies or use default settings
     const [pomodoroDuration, setPomodoroDuration] = useState(
@@ -113,23 +117,25 @@ const Timer = () => {
                 pomodoroSkipped = !canSkip;
 
                 setPomodoroSessions([...pomodoroSessions, pomodoroSession]);
+                playSound()
                 break;
 
             case 'shortBreak':
                 setCurrentTimer('pomodoro');
                 setTime(pomodoroDuration);
+                playSound()
                 break;
 
             case 'longBreak':
                 setCurrentTimer('pomodoro');
                 setTime(pomodoroDuration);
+                playSound()
                 break;
 
             default:
                 break;
         }
 
-        // You can now use pomodoroSkipped and pomodoroSession for logging.
     };
 
     const logPomodoroSession = (pomodoroSession: PomodoroSession,) => {
@@ -141,7 +147,6 @@ const Timer = () => {
         console.log(PomodoroService.createPomodoroLog(pomodoroSession, token));
 
     };
-
 
     const logSkippedTimer = () => {
         if (canSkip) {

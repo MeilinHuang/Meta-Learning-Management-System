@@ -22,9 +22,10 @@
     "jsx": "preserve",
     "suppressImplicitAnyIndexErrors": true,
     "ignoreDeprecations": "5.0",
-    "downlevelIteration": true
+    "downlevelIteration": true,
   },
   "include": [
-    "src"
+    "src",
+    "src/sounds/*.mp3"
   ]
 }
