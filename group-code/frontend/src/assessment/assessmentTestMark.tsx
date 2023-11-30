@@ -87,7 +87,6 @@ export default function AssessmentTestMark() {
     };
 
     const handleChangeMark = (event: React.ChangeEvent<HTMLInputElement>, questionID: string) => {
-        // setMark(event.target.value);
         const newMarks = { ...problemMarks };
         newMarks[questionID] = event.target.value;
         setProblemMarks(newMarks);

@@ -48,7 +48,9 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <Provider store={store}>
+    {/* Sidebar Provider */}
     <SidebarProvider>
+      {/* Breadcrumb Provider */}
       <BreadcrumbProvider>
         <BrowserRouter>
           <Routes>
