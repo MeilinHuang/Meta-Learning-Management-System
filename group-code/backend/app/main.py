@@ -164,6 +164,7 @@ async def editPassword(details: schemas.UserPassword, db: Session = Depends(get_
 @app.get("/loadUsers")
 async def loadUsers(db: Session = Depends(get_db)):
     users = helper.get_all_user_list(db)
+    print("super user:", helper.get_superuser_list(db))
     print(users)
     return users
 

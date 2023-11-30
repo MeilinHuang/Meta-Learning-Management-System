@@ -21,12 +21,15 @@ import {
   Link,
   Navigate,
   useNavigate,
-  To
+  To,
+  useLocation
 } from 'react-router-dom';
 import AccountService from './AccountService';
 import { FaceSmileIcon } from '@heroicons/react/24/solid';
 import EnrolledTopics from '../content/EnrolledTopics';
 import CreatedResources from '../content/CreatedResources';
+import Sidebar from 'common/Sidebar';
+import { useSidebar } from 'content/SidebarContext';
 
 // import Detail from '@/Detail';
 
@@ -40,14 +43,14 @@ function classNames(...classes: any[]) {
 }
 
 export default function AdminUserPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [topicsShow, setTopicsShow] = useState(true);
-  const [materialShow, setMaterialShow] = useState(false);
-  const [conversationShow, setConversationShow] = useState(false);
-  const [usersShow, setUsersShow] = useState(false);
-  const [adminShow, setAdminShow] = useState(false);
+  // const [sidebarOpen, setSidebarOpen] = useState(false);
+  // const [topicsShow, setTopicsShow] = useState(true);
+  // const [materialShow, setMaterialShow] = useState(false);
+  // const [conversationShow, setConversationShow] = useState(false);
+  // const [usersShow, setUsersShow] = useState(false);
+  // const [adminShow, setAdminShow] = useState(false);
   const [friendsList, setFriendsList] = useState<any[]>([]);
-  const [usersList, setUsersList] = useState<any[]>([]);
+  // const [usersList, setUsersList] = useState<any[]>([]);
   const [addAdmin, setAddAdmin] = useState(false);
   const [accessmentShow, setAccessmentShow] = useState(false);
   const [deleteAdmin, setDeleteAdmin] = useState(false);
@@ -57,10 +60,40 @@ export default function AdminUserPage() {
   const [detail1, setDetail1] = useState(false);
   const [detail2, setDetail2] = useState(false);
   const navigate = useNavigate();
+
   const routeChange = (path: To) => {
     //let path = `newPath`;
     navigate(path);
   };
+
+  // const handleSidebarToggleButton = () => {
+  //   setSidebarOpen(!sidebarOpen)
+  // }
+  // const { sidebarOpen, toggleSidebar, topicsShow, adminShow } = useSidebar();
+  const {
+    sidebarOpen,
+    toggleSidebar,
+    topicsShow,
+    adminShow,
+    materialShow,
+    resultShow,
+    conversationShow,
+    usersShow,
+    deadlineShow,
+    assessmentShow,
+    conversationList,
+    usersList,
+    setUsersList,
+    deadlineList,
+    resultList,
+  } = useSidebar();
+  
+  const location = useLocation()
+    useEffect(() => {
+        if (sidebarOpen === true) {
+            toggleSidebar()
+        }
+    }, [location])
 
   const updateAdminList = () => {
     AccountService.getAdmins()
@@ -115,8 +148,8 @@ export default function AdminUserPage() {
 
     updateNonAdminList()
     console.log(localStorage.getItem('admin'))
-    
-  },[])
+
+  }, [])
 
   const loadConversationList = () => {
     const res = [];
@@ -138,11 +171,11 @@ export default function AdminUserPage() {
               }
             >
               <ul>
-                <li 
+                <li
                   className='p-3'
                   key={friendsList[i].id}
                 >
-                  
+
                   {friendsList[i].conver.conversation_name.replace(/_/g, " ").replace(localStorage.getItem("user_name"), "")}
                 </li>
               </ul>
@@ -167,14 +200,14 @@ export default function AdminUserPage() {
         if (usersList[i].username != localStorage.getItem("user_name")) {
           res.push(<Link to={`/users/${usersList[i].id}`}>
             <div className={
-                'bg-gray-50 h-10 font-sans font-medium hover:bg-gray-100 m-2'
-              }
+              'bg-gray-50 h-10 font-sans font-medium hover:bg-gray-100 m-2'
+            }
             >
               <li key={usersList[i].id}>
-                  {usersList[i].username}
+                {usersList[i].username}
               </li>
             </div>
-            </Link>
+          </Link>
           )
         }
         i += 1;
@@ -184,214 +217,18 @@ export default function AdminUserPage() {
   };
 
   return (
-    <div>
-      <div className="z-50 md:fixed md:top-16 md:bottom-0 md:flex md:w-64 md:flex-col">
-        <div className="flex flex-grow flex-col overflow-y-auto bg-indigo-500 pt-5">
-          <div className="flex flex-shrink-0 items-center px-4">
-            {/* <img
-              className="h-8 w-auto"
-              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
-              alt="Your Company"
-            /> */}
-          </div>
-          <div className="flex flex-init1ial flex-col overflow-y-auto">
-            <div className="flex-1 space-y-1 px-2 pb-4">
-              <button>Menu</button>
-            </div>
-            <div className="flex-1 space-y-1 px-2 pb-4">
-              <button>
-                <div
-                  className={
-                    topicsShow
-                      ? 'bg-indigo-800 text-white group w-48 flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                      : 'text-white hover:bg-indigo-600 w-48 group flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                  }
-                  onClick={() => {
-                    setTopicsShow(true);
-                    setAdminShow(false);
-                    setConversationShow(false);
-                    setUsersShow(false);
-                    setMaterialShow(false);
-                  }}
-                >
-                  <HomeIcon
-                    className="mr-3 h-6 w-6 flex-shrink-0 text-indigo-300"
-                    aria-hidden="true"
-                  />
-                  Topics
-                </div>
-              </button>
-            </div>
-
-            <div className="flex-1 space-y-1 px-2 pb-4">
-              <button>
-                <div
-                  className={
-                    materialShow
-                      ? 'bg-indigo-800 text-white group w-48 flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                      : 'text-white hover:bg-indigo-600 w-48 group flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                  }
-                  onClick={() => {
-                    setTopicsShow(false);
-                    setAdminShow(false);
-                    setConversationShow(false);
-                    setUsersShow(false);
-                    setMaterialShow(true);
-                  }}
-                >
-                  <FolderIcon
-                    className="mr-3 h-6 w-6 flex-shrink-0 text-indigo-300"
-                    aria-hidden="true"
-                  />
-                  Resources
-                </div>
-              </button>
-            </div>
-
-            <div className="flex-1 space-y-1 px-2 pb-4">
-              <button>
-                <div
-                  className={
-                    adminShow
-                      ? 'bg-indigo-800 text-white group w-48 flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                      : 'text-white hover:bg-indigo-600 w-48 group flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                  }
-                  onClick={() => {
-                    AccountService.loadUsers()
-                      .then((response) => {
-                        console.log('users got: ');
-                        console.log(response.data);
-                        // let i = 0
-                        console.log(response.data.length);
-                        setUsersList(response.data);
-                      })
-                      .catch((error) => {
-                        console.log('error');
-                      });
-                    setTopicsShow(false);
-                    setAdminShow(true);
-                    setConversationShow(false);
-                    setUsersShow(false);
-                    setMaterialShow(false);
-                  }}
-                >
-                  <CalendarIcon
-                    className="mr-3 h-6 w-6 flex-shrink-0 text-indigo-300"
-                    aria-hidden="true"
-                  />
-                  Admin Management
-                </div>
-              </button>
-            </div>
-
-            <div className="flex-1 space-y-1 px-2 pb-4">
-              <button>
-                <div
-                  className={
-                    conversationShow
-                      ? 'bg-indigo-800 text-white group w-48 flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                      : 'text-white hover:bg-indigo-600 w-48 group flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                  }
-                  onClick={() => {
-                    const param = { id: localStorage.getItem('user_id') };
-
-                    AccountService.getConversations(param)
-                      .then((response) => {
-                        console.log('users got: ');
-                        console.log(response.data);
-                        localStorage.setItem('friends', response.data);
-                        console.log(response.data.length);
-                        setFriendsList(response.data.friends);
-                      })
-                      .catch((error) => {
-                        console.log('error');
-                      });
-                    setTopicsShow(false);
-                    setAdminShow(false);
-                    setConversationShow(true);
-                    setUsersShow(false);
-                    setMaterialShow(false);
-                  }}
-                >
-                  <InboxIcon
-                    className="mr-3 h-6 w-6 flex-shrink-0 text-indigo-300"
-                    aria-hidden="true"
-                  />
-                  Conversations
-                </div>
-              </button>
-            </div>
-
-            {/* <div className="flex-1 space-y-1 px-2 pb-4">
-              <Link to="/assessmentOverviewEdit">
-                <button>
-                  <div
-                    className={
-                      accessmentShow
-                        ? 'bg-indigo-800 text-white group w-48 flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                        : 'text-black hover:bg-indigo-600 w-48 group flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                    }
-                  >
-                    <FolderIcon
-                      className="mr-3 h-6 w-6 flex-shrink-0 text-indigo-300"
-                      aria-hidden="true"
-                    />
-                    Assessment
-                  </div>
-                </button>
-              </Link>
-            </div> */}
-
-            <div className="flex-1 space-y-1 px-2 pb-4">
-              <button>
-                <div
-                  className={
-                    usersShow
-                      ? 'bg-indigo-800 text-white group w-48 flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                      : 'text-white hover:bg-indigo-600 w-48 group flex items-center px-2 py-2 text-sm font-medium rounded-md'
-                  }
-                  onClick={() => {
-                    AccountService.loadUsers()
-                      .then((response) => {
-                        console.log('users got: ');
-                        console.log(response.data);
-                        let i = 0;
-                        console.log(response.data.length);
-                        while (i < response.data.length) {
-                          console.log(response.data[i]);
-
-                          i += 1;
-                        }
-                        setUsersList(response.data);
-                      })
-                      .catch((error) => {
-                        console.log('error');
-                      });
-                    setTopicsShow(false);
-                    setAdminShow(false);
-                    setConversationShow(false);
-                    setUsersShow(true);
-                    setMaterialShow(false);
-                  }}
-                >
-                  <UsersIcon
-                    className="mr-3 h-6 w-6 flex-shrink-0 text-indigo-300"
-                    aria-hidden="true"
-                  />
-                  Users
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
+    <div className='flex flex-row'>
+      <div className="z-50 order-1 md:fixed md:top-16 md:bottom-0 md:flex md:flex-col">
+        {/* <Sidebar isOpened={sidebarOpen}></Sidebar> */}
+        <Sidebar></Sidebar>
         {/* </div> */}
       </div>
 
-      <div className="absolute w-full top-16 flex flex-col md:pl-64">
+      <div className={`absolute w-full top-16 flex flex-col md:w-auto px-4 ${sidebarOpen ? 'ml-60' : 'ml-16'}`}>
         <main className={topicsShow ? '' : 'hidden'}>
-          <div className="py-6">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-              <h1 className="text-2xl font-semibold text-gray-900">Topics</h1>
+          <div className="py-10">
+            <div className="mx-auto max-w-full px-4 sm:px-6 md:px-8">
+              <h1 className="text-3xl font-semibold text-gray-900">Topics</h1>
             </div>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
               <div className="py-4">
@@ -405,13 +242,13 @@ export default function AdminUserPage() {
 
         {/* List of resources user has created */}
         <main className={materialShow ? '' : 'hidden'}>
-          <div className="py-6">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+          <div className="py-10">
+            <div className="mx-auto max-w-full px-4 sm:px-6 md:px-8">
               <h1 className="text-2xl font-semibold text-gray-900">
                 Resources
               </h1>
             </div>
-            <div className="mx-auto max-w-7x px-4 sm:px-6 md:px-8">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
               <div className="py-4">
                 <div className="h-96 rounded-lg border-gray-200">
                   <CreatedResources />
@@ -422,7 +259,7 @@ export default function AdminUserPage() {
         </main>
 
         <main className={adminShow ? '' : 'hidden'}>
-          <div className="py-6 bg-green-">
+          <div className="py-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
               <h1 className="text-2xl font-semibold text-gray-900">
                 Admin Management
@@ -651,7 +488,7 @@ export default function AdminUserPage() {
         </main>
 
         <main className={conversationShow ? '' : 'hidden'}>
-          <div className="py-6">
+          <div className="py-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
               <h1 className="text-2xl font-semibold text-gray-900">Conversation</h1>
             </div>
@@ -672,7 +509,7 @@ export default function AdminUserPage() {
         </main>
 
         <main className={usersShow ? '' : 'hidden'}>
-          <div className="py-6">
+          <div className="py-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
               <h1 className="text-2xl font-semibold text-gray-900">Users</h1>
             </div>

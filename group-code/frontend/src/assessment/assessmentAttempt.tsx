@@ -11,6 +11,11 @@ import {
 import { CheckIcon } from '@heroicons/react/24/outline';
 import AssessmentService from './AssessmentService';
 import { json } from 'stream/consumers';
+import { capitalise } from 'content/contentHelpers';
+import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
+import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
+import { ChevronRight } from '@mui/icons-material';
+import { Divider } from '@mui/material';
 
 export default function AssessmentAttempt() {
   const param = useParams();
@@ -23,35 +28,16 @@ export default function AssessmentAttempt() {
   const [isActive, setIsActive] = useState('-1');
   const [problem, setProblem] = useState([
     {
-      questionID: '1',
-      problemDescription:
-        'What is a correct syntax to output "Hello World" in C++?',
-      type: 'singleChoice',
-      choice: [
-        'A. cout << "Hello World";',
-        'B. Console.WriteLine("Hello World");',
-        'C. print ("Hello World");',
-        'D. System.out.println("Hello World");'
-      ],
+      questionID: "",
+      problemDescription: "",
+      type: "",
+      choice: [""],
       answerAttempt: [] as any,
-      answer: ['A. cout << "Hello World";']
+      answer: [""]
     },
-    // {
-    //   questionID: '2',
-    //   problemDescription: 'which of the functions below can be used Allocate space for array in memory',
-    //   type: 'multipleChoice',
-    //   choice: ['A. calloc()', 'B. malloc()', 'C. realloc()', 'D. free()'],
-    //   answerAttempt: [] as any,
-    //   answer: ['A. calloc()', 'B. malloc()']
-    // },
-    {
-      questionID: '3',
-      problemDescription: 'What is the best programming language',
-      type: 'Essay',
-      answerAttempt: [] as any,
-      answer: ['']
-    }
   ]);
+
+  const [isAnswered, setIsAnswered] = useState(false);
 
   const singleSelect = async (cho: string) => {
     console.log(cho);
@@ -122,7 +108,6 @@ export default function AssessmentAttempt() {
     const para = { assessment_id: param.assessmentId }
     AssessmentService.renderAssessmentAttempt(para)
       .then(res => {
-        console.log(res.data)
         const arr = []
         for (let index = 0; index < res.data.length; index++) {
           const question = {
@@ -144,6 +129,41 @@ export default function AssessmentAttempt() {
           console.log(question)
           arr.push(question)
         }
+        console.log('arr: ' + arr.length)
+        const newData = [
+          {
+            questionID: '1',
+            problemDescription:
+              'What is a correct syntax to output "Hello World" in C++?',
+            type: 'singleChoice',
+            choice: [
+              'A. cout << "Hello World";',
+              'B. Console.WriteLine("Hello World");',
+              'C. print ("Hello World");',
+              'D. System.out.println("Hello World");'
+            ],
+            answerAttempt: [] as any,
+            answer: ['A. cout << "Hello World";']
+          },
+          {
+            questionID: '2',
+            problemDescription: 'which of the functions below can be used Allocate space for array in memory',
+            type: 'multipleChoice',
+            choice: ['A. calloc()', 'B. malloc()', 'C. realloc()', 'D. free()'],
+            answerAttempt: [] as any,
+            answer: ['A. calloc()', 'B. malloc()']
+          },
+          {
+            questionID: '3',
+            problemDescription: 'What is the best programming language',
+            type: 'Essay',
+            answerAttempt: [] as any,
+            answer: ['']
+          },
+        ]
+        newData.map((elem) => {
+          arr.push(elem)
+        })
         setProblem(arr);
         setLoaded(!loaded)
         //setProbShow()
@@ -170,35 +190,73 @@ export default function AssessmentAttempt() {
     <>
       <div>
         {/* Static sidebar for desktop */}
-        <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
+        <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col mt-16">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-grow flex-col overflow-y-auto border-r border-gray-200 bg-white pt-5">
-            <div className="flex flex-shrink-0 items-center px-4">
-              <h3>{param.topicName + ' ' + param.assessmentName}</h3>
+            <div className="flex flex-shrink-0 items-center align-center justify-center px-4">
+              <h2 className='ml-2 text-lg font-bold'>
+                {param.topicName + ' ' + param.assessmentName}
+              </h2>
             </div>
-            <div className="mt-5 flex flex-grow flex-col">
+            <div className="mt-5 flex flex-none flex-col">
               <nav className="flex-1 space-y-1 px-2 pb-4">
                 {problem.map((prob) => (
-                  <div
-                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md"
-                    style={{
-                      backgroundColor:
-                        prob.questionID == isActive ? 'green' : ''
+                  <button
+                    className={`w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md ${prob.questionID == isActive ? 'text-white bg-indigo-500' : ''}`}
+                    onClick={() => {
+                      setIsActive(prob.questionID);
+                      //console.log('selectProblemID: ' + isActive);
+                      setProbShow(prob);
                     }}
                   >
-                    <button
-                      onClick={() => {
-                        setIsActive(prob.questionID);
-                        //console.log('selectProblemID: ' + isActive);
-                        setProbShow(prob);
-                      }}
-                    >
-                      {'Question' + (problem.indexOf(prob) + 1)}
-                      {prob.answerAttempt[0] != null ? <CheckIcon className="h-6 w-6 text-green-600" aria-hidden="true" /> : null}
-                    </button>
-                  </div>
+                    <div className='flex flex-row'>
+                      <div>
+                        {'Question ' + (problem.indexOf(prob) + 1)}
+                        {/* {'Question ' + (prob.questionID)} */}
+                      </div>
+                      <div>
+                        {
+                          prob.answerAttempt[0] != null
+                            ? <DoneAllOutlinedIcon className={`h-6 w-6 text-black`}></DoneAllOutlinedIcon>
+                            : <></>
+                        }
+                      </div>
+                    </div>
+                  </button>
                 ))}
               </nav>
+            </div>
+            <div className='flex justify-center my-4'>
+              <button
+                type="button"
+                className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                onClick={() => {
+                  // console.log(problem)
+                  console.log(param)
+                  const para = {
+                    token: localStorage.getItem("access_token"),
+                    enroll_id: param.enrollId,
+                    assessment_id: param.assessmentId,
+                    problem: problem
+                  }
+                  console.log(para)
+                  AssessmentService.submitPracAttempt(para)
+                    .then((res) => {
+                      console.log(res.data)
+                      alert('Submit successfully');
+                      routeChange(
+                        '/assessmentDetail/' +
+                        param.enrollId +
+                        '/' +
+                        param.topicName +
+                        '/' +
+                        param.topicId
+                      );
+                    })
+                }}
+              >
+                Submit
+              </button>
             </div>
           </div>
         </div>
@@ -209,15 +267,15 @@ export default function AssessmentAttempt() {
               <div className="py-6">
                 <div className="px-4 sm:px-6 md:px-0">
                   <h1 className="text-2xl font-semibold text-gray-900">
-                    {'Question' + probShow.questionID}
+                    {'Question ' + (problem.indexOf(probShow) + 1)}
                   </h1>
                 </div>
                 <div className="px-4 sm:px-6 md:px-0">
                   {/* Replace with your content */}
                   <div className="py-4">
-                    <div className="h-96 rounded-lg border-4 border-dashed border-gray-200">
-                      <div className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                        {probShow.problemDescription}
+                    <div className="h-max rounded-lg border-4 border-gray-200">
+                      <div className="flex flex-row whitespace-nowrap py-4 pl-4 pr-3 text-sm font-bold text-gray-900 sm:pl-6">
+                        {capitalise(probShow.problemDescription)}
                         {probShow.type == 'singleChoice' && (
                           <h2>(single choice)</h2>
                         )}
@@ -225,11 +283,11 @@ export default function AssessmentAttempt() {
                           <h2>(multiple choice)</h2>
                         )}
                       </div>
-                      <div className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                      <div className="flex flex-col whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                         {probShow.type == 'singleChoice' &&
                           probShow.choice?.map((cho) => (
-                            <div className="relative flex items-start">
-                              <div className="flex h-5 items-center">
+                            <div className="relative flex items-start pb-2">
+                              <div className="flex flex-row h-5 items-center">
                                 <input
                                   id="comments"
                                   aria-describedby="comments-description"
@@ -304,36 +362,71 @@ export default function AssessmentAttempt() {
                   </div>
                   {/* /End replace */}
                 </div>
-                <button
-                  type="button"
-                  className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                  onClick={() => {
-                    // console.log(problem)
-                    console.log(param)
-                    const para = {
-                      token: localStorage.getItem("access_token"),
-                      enroll_id: param.enrollId,
-                      assessment_id: param.assessmentId,
-                      problem: problem
-                    }
-                    console.log(para)
-                    AssessmentService.submitPracAttempt(para)
-                      .then((res) => {
-                        console.log(res.data)
-                        alert('Submit successfully');
-                        routeChange(
-                          '/assessmentDetail/' +
-                          param.enrollId +
-                          '/' +
-                          param.topicName +
-                          '/' +
-                          param.topicId
-                        );
-                      })
-                  }}
-                >
-                  Submit
-                </button>
+                <div className='flex flex-row justify-between'>
+                  <button type="button"
+                    // the last effect is not working, hence add one duplicate hover effect to avoid the problem
+                    className={`${problem[0] == probShow ? 'invisible' : ''} inline-flex items-center justify-center rounded-md border border-transparent text-indigo-600 px-3 py-2 text-sm font-medium leading-4 shadow-md hover:bg-indigo-700 hover:text-white hover:text-white}`}
+                    onClick={() => {
+                      const currentIndex = problem.findIndex((item) => item.questionID === probShow.questionID);
+                      if (currentIndex > 0) {
+                        const prevQuestion = problem[currentIndex - 1];
+                        setIsActive(prevQuestion.questionID);
+                        setProbShow(prevQuestion);
+                      }
+                    }}>
+                    <ChevronLeftIcon className='h-6 w-6'></ChevronLeftIcon>
+                    <p>Prev</p>
+                  </button>
+                  <button type="button"
+                    // the last effect is not working, hence add one duplicate hover effect to avoid the problem
+                    className={`${problem[problem.length - 1] == probShow ? 'invisible' : ''} inline-flex items-center justify-center rounded-md border border-transparent text-indigo-600 px-3 py-2 text-sm font-medium leading-4 shadow-md hover:bg-indigo-700 hover:text-white hover:text-white}`}
+                    onClick={() => {
+                      const currentIndex = problem.findIndex((item) => item.questionID === probShow.questionID); 7
+                      if (currentIndex < problem.length - 1) {
+                        const nextQuestion = problem[currentIndex + 1];
+                        setIsActive(nextQuestion.questionID);
+                        setProbShow(nextQuestion);
+                      }
+                    }}
+                  >
+                    <p>Next</p>
+                    <ChevronRightIcon className='h-6 w-6'></ChevronRightIcon>
+                  </button>
+                </div>
+
+                {/* {problem[problem.length - 1].questionID === probShow.questionID
+                  ? <button
+                    type="button"
+                    className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    onClick={() => {
+                      // console.log(problem)
+                      console.log(param)
+                      const para = {
+                        token: localStorage.getItem("access_token"),
+                        enroll_id: param.enrollId,
+                        assessment_id: param.assessmentId,
+                        problem: problem
+                      }
+                      console.log(para)
+                      AssessmentService.submitPracAttempt(para)
+                        .then((res) => {
+                          console.log(res.data)
+                          alert('Submit successfully');
+                          routeChange(
+                            '/assessmentDetail/' +
+                            param.enrollId +
+                            '/' +
+                            param.topicName +
+                            '/' +
+                            param.topicId
+                          );
+                        })
+                    }}
+                  >
+                    Submit
+                  </button>
+                  : <></>} */}
+
               </div>
             </main>
           </div>

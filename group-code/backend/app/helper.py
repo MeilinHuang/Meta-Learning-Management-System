@@ -832,7 +832,8 @@ def submit_assessment_attempt(db: Session, user_id: int, enroll_id: int,
                                            topic_enrollment=topicEnrollment)
 
     for q in questions:
-        choices = {"choices": q["choice"]}
+        # choices = {"choices": q["choice"]}
+        choices = {"choices": q.get("choice", [])}
         answer_attempt = {"answer_attempt": q["answerAttempt"]}
         answer = {"answer": q["answer"]}
         question_obj = models.Question(id=question_id, type=q["type"], choices=json.dumps(choices),

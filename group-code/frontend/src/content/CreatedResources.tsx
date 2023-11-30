@@ -12,43 +12,52 @@ export default function CreatedResources() {
   const navigate = useNavigate();
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="mt-8 flow-root">
-        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <table className="min-w-full divide-y divide-gray-300">
-              <thead>
+    <div className="mt-8 flex flex-col">
+      <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+          <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+            <table className="min-w-full text-sm text-left divide-y divide-gray-300 text-gray-500 dark:text-gray-400">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                    className="px-10 py-3.5 text-sm font-bold text-gray-900 sm:pl-6"
                   >
                     Title
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="px-10 py-3.5 text-sm font-bold text-gray-900"
                   >
                     Type
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="px-10 py-3.5 text-sm font-bold text-gray-900"
                   >
                     Topic
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="px-10 py-3.5 text-sm font-bold text-gray-900"
                   >
                     Section
                   </th>
-                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
+                  <th scope="col" className="px-10 relative py-3.5 sm:pr-6">
                     <span className="sr-only">View in browser</span>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
+                {(resourcesData === undefined || resourcesData.length === 0) && (
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td className="h-10 col-span-5 text-center font-semibold text-sm capitalize">No resources Data Available</td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                )}
                 {resourcesData &&
                   resourcesData.map(
                     (resource: {
@@ -70,19 +79,19 @@ export default function CreatedResources() {
                           );
                         }}
                       >
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                        <td className="whitespace-normal px-10 py-4 text-sm font-semibold text-gray-900 sm:pl-0 capitalize">
                           {resource.title}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <td className="whitespace-normal px-10 py-4 text-sm text-gray-500">
                           {resource.resource_type}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <td className="whitespace-normal px-10 py-4 text-sm text-gray-500">
                           {resource.topic}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <td className="whitespace-normal px-10 py-4 text-sm text-gray-500">
                           {resource.section}
                         </td>
-                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                        <td className="relative whitespace-normal px-10 py-4 text-right text-sm font-semibold sm:pr-6">
                           <a
                             title="View in browser"
                             href={getResourceLink({

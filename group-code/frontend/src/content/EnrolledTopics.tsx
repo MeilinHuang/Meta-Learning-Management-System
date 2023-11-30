@@ -10,6 +10,8 @@ export default function EnrolledTopics() {
     isLoading: topicsIsLoading
   } = useGetEnrolledTopicsQuery({});
 
+  console.log(topicsData)
+
   const navigate = useNavigate();
 
   const [topics, setTopics] = useState<
