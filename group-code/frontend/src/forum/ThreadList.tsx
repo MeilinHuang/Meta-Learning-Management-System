@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 
 import { FixedSizeList as List } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
-import AutoSizer from 'react-virtualized-auto-sizer';
+import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
 
 import { useMemo, useRef, useState } from 'react';
 import { useGetThreadsQuery } from '../features/api/apiSlice';
@@ -10,13 +10,19 @@ import { useGetThreadsQuery } from '../features/api/apiSlice';
 import { formatDistance, subDays } from 'date-fns';
 import parseISO from 'date-fns/parseISO';
 
-import { Thread } from './forum.types';
+import { Thread, ResultParams } from './forum.types';
+import { BATCH_SIZE, LIMIT } from './constants';
 
 import { ArrowUpIcon } from '@heroicons/react/20/solid';
 
 type ThreadListProps = {
   sectionId: number;
   selectThreadCallback: (thread: Thread) => void;
+  currentBatch: number;
+  setCurrentBatch: React.Dispatch<React.SetStateAction<number>>;
+  lastResultParams: ResultParams;
+  currentResultParams: ResultParams;
+  nextResultParams: ResultParams;
 };
 
 function convertDateToUTC(date: Date) {
@@ -31,26 +37,41 @@ function convertDateToUTC(date: Date) {
 }
 
 export default function ThreadList(props: ThreadListProps) {
-  const [currentBatch, setCurrentBatch] = useState(0);
   const [lastStartIndex, setLastStartIndex] = useState<number>();
 
-  const batchSize = 20;
-  const currentOffset = currentBatch * batchSize;
-  const limit = 20;
+  const currentOffset = props.currentBatch * BATCH_SIZE;
+  // States of parameters are in Forum.tsx such that Thread.tsx can use them.
+  // An attributes of reRender are added with Math.Random to manually update Forum component (a nasty approach)
+  // Hence we need to extract other attributes.
+  const {
+    offset: lastOffset,
+    limit: lastLimit,
+    sectionId: lastSectionId
+  } = props.lastResultParams;
+  const {
+    offset: currOffset,
+    limit: currLimit,
+    sectionId: currSectionId
+  } = props.currentResultParams;
+  const {
+    offset: nextOffset,
+    limit: nextLimit,
+    sectionId: nextSectionId
+  } = props.nextResultParams;
 
   const lastResult = useGetThreadsQuery(
-    { offset: currentOffset - 20, limit, sectionId: props.sectionId },
-    { skip: currentOffset < limit }
+    { offset: lastOffset, limit: lastLimit, sectionId: lastSectionId },
+    { skip: currentOffset < LIMIT }
   );
   const currentResult = useGetThreadsQuery({
-    offset: currentOffset,
-    limit,
-    sectionId: props.sectionId
+    offset: currOffset,
+    limit: currLimit,
+    sectionId: currSectionId
   });
   const nextResult = useGetThreadsQuery({
-    offset: currentOffset + 20,
-    limit,
-    sectionId: props.sectionId
+    offset: nextOffset,
+    limit: nextLimit,
+    sectionId: nextSectionId
   });
 
   const hasNextPage = useMemo(() => {
@@ -67,8 +88,9 @@ export default function ThreadList(props: ThreadListProps) {
     total_count: number;
   };
 
+  const limit = LIMIT;
   const combined = useMemo(() => {
-    const arr = new Array(limit * (batchSize + limit));
+    const arr = new Array(limit * (BATCH_SIZE + limit));
     for (const data of [lastResult.data, currentResult.data, nextResult.data]) {
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (data) {
@@ -106,9 +128,9 @@ export default function ThreadList(props: ThreadListProps) {
       setLastStartIndex(startIndex);
     }
     if (lastStartIndex !== undefined && startIndex > lastStartIndex) {
-      setCurrentBatch(currentBatch + 1);
+      props.setCurrentBatch(props.currentBatch + 1);
     } else if (lastStartIndex !== undefined && startIndex < lastStartIndex) {
-      setCurrentBatch(currentBatch - 1);
+      props.setCurrentBatch(props.currentBatch - 1);
     }
     setLastStartIndex(startIndex);
   };
@@ -128,20 +150,25 @@ export default function ThreadList(props: ThreadListProps) {
         combined[index] !== undefined
           ? combined[index]
           : {
+            id: -1,
+            title: 'Loading...',
+            content: 'Loading...',
+            time: new Date(1970, 1, 1, 0, 0, 0),
+            preview: '',
+            author: {
               id: -1,
-              title: 'Loading...',
-              content: 'Loading...',
-              time: new Date(1970, 1, 1, 0, 0, 0),
-              preview: '',
-              author: {
-                id: -1,
-                name: 'Loading...',
-                username: 'Loading...'
-              },
-              posts: [],
-              upvotes: 0,
-              stickied: false
-            };
+              name: 'Loading...',
+              username: 'Loading...'
+            },
+            posts: [],
+            upvotes: 0,
+            stickied: false
+          };
+      // manually update the thread after posting
+      if (props.currentResultParams.reRender) {
+        props.selectThreadCallback(item);
+      }
+
       content = (
         <div
           key={item.id}
@@ -199,7 +226,7 @@ export default function ThreadList(props: ThreadListProps) {
   return (
     <div className="h-full overflow-hidden">
       <AutoSizer>
-        {({ height, width }) => (
+        {(props: Size) => (
           <InfiniteLoader
             isItemLoaded={isItemLoaded}
             itemCount={itemCount}
@@ -208,12 +235,12 @@ export default function ThreadList(props: ThreadListProps) {
             {({ onItemsRendered, ref }) => (
               <List
                 className="List"
-                height={height}
+                height={props.height}
                 itemCount={itemCount}
                 itemSize={84}
                 onItemsRendered={onItemsRendered}
                 ref={ref}
-                width={width}
+                width={props.width}
               >
                 {Item}
               </List>

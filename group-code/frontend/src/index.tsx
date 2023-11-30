@@ -19,7 +19,9 @@ import ProfilePage from 'account/profilePage';
 import ConversationPage from 'account/ConversationPage';
 import CustomProfilePage from 'account/CustomProfilePage';
 import VEmail from 'account/vEmail';
+import UpdatePicture from 'account/updatePicture';
 import RecoverPass from 'account/recoverPass';
+import PrivacySettings from 'account/privacySettings';
 import TopicPage from 'content/TopicPage';
 import Forum from 'forum/Forum';
 import AssessmentMain from 'assessment/assessmentMain';
@@ -38,6 +40,7 @@ import AssessmentAssignmentAttemptDetail from 'assessment/assessmentAssignmentAt
 import AssessmentEditTestDetail from 'assessment/assessmentEditTestDetail';
 import AssessmentAssignmentEditDetail from 'assessment/assessmentAssignmentEditDetail';
 import { Layout, LayoutNoPadding } from 'common/Layout';
+import Timer from 'pomodoroTimer/PomodoroTimerApp';
 
 import RoleEditor from 'account/RoleEditor';
 import { SidebarProvider } from 'content/SidebarContext';
@@ -60,10 +63,13 @@ root.render(
             <Route path="register" element={<SignupPage />} />
             <Route path="pwchang" element={<ChangePassword />} />
             <Route path="vEmail" element={<VEmail />} />
+            <Route path="updatePicture" element={<UpdatePicture />} />
             <Route path="welcome" element={<WelcomePage />} />
             <Route path="recoverPass" element={<RecoverPass />} />
+            <Route path="PrivacySettings" element={<PrivacySettings />} />
             {/* Routes with navbar layout */}
             <Route element={<LayoutNoPadding />}>
+              <Route path="pomodoro-timer" element={<Timer />} />
               <Route path="test-forum" element={<Forum />} />
               <Route path="forum/:topicId" element={<Forum />} />
               <Route path="forum/:topicId/:sectionId" element={<Forum />} />

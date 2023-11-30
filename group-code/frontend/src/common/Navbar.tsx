@@ -1,37 +1,64 @@
-import { Fragment, useEffect, useState } from 'react';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-
-import { Link, useNavigate } from 'react-router-dom';
-import { useLogoutMutation, useIsSuperuserQuery } from 'features/api/apiSlice';
-import AccountService from 'account/AccountService';
-import { useSidebar } from 'content/SidebarContext'
+import { Fragment, useEffect, useState } from "react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import defaultImg from "../default.jpg";
+import { Link, useNavigate } from "react-router-dom";
+import { useLogoutMutation, useIsSuperuserQuery } from "features/api/apiSlice";
+import AccountService from "account/AccountService";
+import { useSidebar } from "content/SidebarContext";
+import msgIcon from "../Icons/newMsgF.png";
 
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const [path, setPath] = useState('');
-
+  const [path, setPath] = useState("");
   const [logout] = useLogoutMutation();
   const [isSuperuser, setIsSuperUser] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [lastMsgLink, setLastMsgLink] = useState("");
+
+  const getProfilePic = () => {
+    const dp = localStorage.getItem("profilePic");
+    if (dp != "" && dp != null) {
+      return dp;
+    }
+    return defaultImg;
+  };
+
+  useEffect(() => {
+    AccountService.notifications().then((response) => {
+      setNotifications(response.data.notifications);
+      console.log(response.data.notifications);
+    });
+    console.log(notifications);
+  }, []);
+
+  useEffect(() => {
+    console.log(notifications);
+    if (notifications.length > 0) {
+      setLastMsgLink("/details/" + notifications[0]["conversation_name"]);
+    }
+    console.log(lastMsgLink);
+  }, [notifications]);
 
   useEffect(() => {
     setPath(window.location.pathname);
   }, [window.location.pathname]);
 
-  const { data: superuserData, error: superuserError } =
-    useIsSuperuserQuery(null);
+  const { data: superuserData, error: superuserError } = useIsSuperuserQuery(
+    null
+  );
 
   useEffect(() => {
-    if (superuserData && superuserData['is_superuser']) {
+    if (superuserData && superuserData["is_superuser"]) {
       setIsSuperUser(true);
     }
   }, [superuserData]);
 
-  const { resetSidebarState } = useSidebar()
+  const { resetSidebarState } = useSidebar();
 
   return (
     <Disclosure as="nav" className="bg-indigo-600 shadow fixed w-full z-50">
@@ -67,19 +94,19 @@ export default function Navbar() {
                   {/* Current: "border-indigo-500 text-white", Default: "border-transparent text-gray-300 hover:border-b-gray-300 hover:text-white" */}
                   <Link
                     className={
-                      path === '/user' || path === '/adminuser'
-                        ? 'inline-flex items-center border-b-4 border-indigo-500 px-1 pt-1 text-sm font-bold text-base text-white border-b-white'
-                        : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-base text-gray-300 hover:border-b-gray-300 hover:text-white'
+                      path === "/user" || path === "/adminuser"
+                        ? "inline-flex items-center border-b-4 border-indigo-500 px-1 pt-1 text-sm font-bold text-base text-white border-b-white"
+                        : "inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-base text-gray-300 hover:border-b-gray-300 hover:text-white"
                     }
-                    to={isSuperuser ? '/adminuser' : '/user'}
+                    to={isSuperuser ? "/adminuser" : "/user"}
                   >
                     Home
                   </Link>
                   <Link
                     className={
-                      path === '/topictree'
-                        ? 'inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-bold text-base text-white border-b-white'
-                        : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-base text-gray-300 hover:border-b-gray-300 hover:text-white'
+                      path === "/topictree"
+                        ? "inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-bold text-base text-white border-b-white"
+                        : "inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-base text-gray-300 hover:border-b-gray-300 hover:text-white"
                     }
                     to="/topictree"
                   >
@@ -87,24 +114,34 @@ export default function Navbar() {
                   </Link>
                   <Link
                     className={
-                      path === '/assessmentMain'
-                        ? 'inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-bold text-base text-white border-b-white'
-                        : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-base text-gray-300 hover:border-b-gray-300 hover:text-white'
+                      path === "/assessmentMain"
+                        ? "inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-bold text-base text-white border-b-white"
+                        : "inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-base text-gray-300 hover:border-b-gray-300 hover:text-white"
                     }
                     to="/assessmentMain"
-                    // onClick={() => assessmentClick()}
+                  // onClick={() => assessmentClick()}
                   >
                     Assessments
                   </Link>
                   <Link
                     className={
-                      path === '/assessmentOverviewEdit'
-                        ? 'inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-bold text-base text-white border-b-white'
-                        : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-base text-gray-300 hover:border-b-gray-300 hover:text-white'
+                      path === "/assessmentOverviewEdit"
+                        ? "inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-bold text-base text-white border-b-white"
+                        : "inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-base text-gray-300 hover:border-b-gray-300 hover:text-white"
                     }
                     to="/assessmentOverviewEdit"
                   >
                     Edit Assessments
+                  </Link>
+                  <Link
+                    className={
+                      path === "/pomodoro-timer"
+                        ? "inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900"
+                        : "inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    }
+                    to="/pomodoro-timer"
+                  >
+                    Timer
                   </Link>
                   {/* <Link
                     className={
@@ -119,6 +156,16 @@ export default function Navbar() {
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                <Link to={lastMsgLink}>
+                  <img
+                    className={
+                      notifications.length != 0
+                        ? "h-8 w-8"
+                        : "hidden overflow-hidden bg-white shadow sm:rounded-lg"
+                    }
+                    src={msgIcon}
+                  ></img>
+                </Link>
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
                   <div>
@@ -126,7 +173,7 @@ export default function Navbar() {
                       <span className="sr-only">Open user menu</span>
                       <img
                         className="h-8 w-8 rounded-full"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                        src={getProfilePic()}
                         alt=""
                       />
                     </Menu.Button>
@@ -146,45 +193,49 @@ export default function Navbar() {
                           <a
                             href="#"
                             className={classNames(
-                              active ? 'bg-gray-100' : '',
-                              'block px-4 py-2 text-sm'
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm"
                             )}
-                            onClick={() => navigate('/profile')}
+                            onClick={() => navigate("/profile")}
                           >
                             Profile
                           </a>
                         )}
                       </Menu.Item>
-                      <Link to="/welcome"
-                      >
-                        <Menu.Item>
-                          {({ active }) => (
-                            <a
-                              href="#"
-                              className={classNames(
-                                active ? 'bg-gray-100' : '',
-                                'block px-4 py-2 text-sm'
-                              )}
-                              onClick={() => {
-                                resetSidebarState()
-                                AccountService.logout({ "access_token": localStorage.getItem("access_token") })
-                                  .then((response) => {
-                                    console.log(response)
-                                  })
-                                  .catch((error) => {
-                                    console.log(error)
-                                  })
+                      {/* <Link to="/welcome"
+                      > */}
+                      <Menu.Item>
+                        {({ active }) => (
+                          <a
+                            href="#"
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700"
+                            )}
+                            onClick={() => {
+                              AccountService.logout({
+                                access_token: localStorage.getItem(
+                                  "access_token"
+                                ),
+                              })
+                                .then((response) => {
+                                  console.log(response);
+                                })
+                                .catch((error) => {
+                                  console.log(error);
+                                });
 
-                                localStorage.clear();
-                                logout(null);
-                                navigate('/welcome');
-                              }}
-                            >
-                              Sign out
-                            </a>
-                          )}
-                        </Menu.Item>
-                      </Link>
+                              localStorage.clear();
+                              logout(null);
+                              navigate("/welcome");
+                              location.reload();
+                            }}
+                          >
+                            Sign out
+                          </a>
+                        )}
+                      </Menu.Item>
+                      {/* </Link> */}
                     </Menu.Items>
                   </Transition>
                 </Menu>
@@ -199,9 +250,9 @@ export default function Navbar() {
                 as="a"
                 href="#"
                 className={
-                  path === '/user' || path === '/adminuser'
-                    ? 'block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-base text-indigo-700'
-                    : 'block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-base text-gray-300 hover:border-gray-300 hover:bg-gray-50 hover:bg-indigo-400 hover:text-white'
+                  path === "/user" || path === "/adminuser"
+                    ? "block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-base text-indigo-700"
+                    : "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-base text-gray-300 hover:border-gray-300 hover:bg-gray-50 hover:bg-indigo-400 hover:text-white"
                 }
               >
                 <Link to="/user">Home</Link>
@@ -210,9 +261,9 @@ export default function Navbar() {
                 as="a"
                 href="#"
                 className={
-                  path === '/topictree'
-                    ? 'block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-base text-indigo-700'
-                    : 'block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-base text-gray-300 hover:border-gray-300 hover:bg-gray-50 hover:bg-indigo-400 hover:text-white'
+                  path === "/topictree"
+                    ? "block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-base text-indigo-700"
+                    : "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-base text-gray-300 hover:border-gray-300 hover:bg-gray-50 hover:bg-indigo-400 hover:text-white"
                 }
               >
                 <Link to="/topictree">Topic Tree</Link>
@@ -221,9 +272,9 @@ export default function Navbar() {
                 as="a"
                 href="#"
                 className={
-                  path === '/test-forum'
-                    ? 'block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-base text-indigo-700'
-                    : 'block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-base text-gray-300 hover:border-gray-300 hover:bg-gray-50 hover:bg-indigo-400 hover:text-white'
+                  path === "/test-forum"
+                    ? "block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-base text-indigo-700"
+                    : "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-base text-gray-300 hover:border-gray-300 hover:bg-gray-50 hover:bg-indigo-400 hover:text-white"
                 }
               >
                 <Link to="/test-forum">Forum</Link>
@@ -232,30 +283,28 @@ export default function Navbar() {
                 as="a"
                 href="#"
                 className={
-                  path === '/assessmentMain'
-                    ? 'block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-base text-indigo-700'
-                    : 'block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-base text-gray-300 hover:border-gray-300 hover:bg-gray-50 hover:bg-indigo-400 hover:text-white'
+                  path === "/assessmentMain"
+                    ? "block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-base text-indigo-700"
+                    : "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-base text-gray-300 hover:border-gray-300 hover:bg-gray-50 hover:bg-indigo-400 hover:text-white"
                 }
               >
                 <Link to="/assessmentMain">Assessments</Link>
               </Disclosure.Button>
-              {
-                localStorage.getItem("admin") === "true"
-                  ?
-                  <Disclosure.Button
-                    as="a"
-                    href="#"
-                    className={
-                      path === '/assessmentOverviewEdit'
-                        ? 'block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-base text-indigo-700'
-                        : 'block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-base text-gray-300 hover:border-gray-300 hover:bg-gray-50 hover:bg-indigo-400 hover:text-white'
-                    }
-                  >
-                    <Link to="/assessmentOverviewEdit">Edit Assessments</Link>
-                  </Disclosure.Button>
-                  :
-                  <></>
-              }
+              {localStorage.getItem("admin") === "true" ? (
+                <Disclosure.Button
+                  as="a"
+                  href="#"
+                  className={
+                    path === "/assessmentOverviewEdit"
+                      ? "block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-base text-indigo-700"
+                      : "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-base text-gray-300 hover:border-gray-300 hover:bg-gray-50 hover:bg-indigo-400 hover:text-white"
+                  }
+                >
+                  <Link to="/assessmentOverviewEdit">Edit Assessments</Link>
+                </Disclosure.Button>
+              ) : (
+                <></>
+              )}
               {/* <Disclosure.Button
                 as="a"
                 href="#"

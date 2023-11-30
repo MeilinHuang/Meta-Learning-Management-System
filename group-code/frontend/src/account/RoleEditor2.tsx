@@ -58,7 +58,7 @@ function RoleSettings(props: {
       fixedPermName: string;
     }[]
   ) {
-    const result = {};
+    const result: { [key: string]: any } = {};
     toFormat.forEach((perm) => {
       result[perm.originalPermName] = perm.value;
     });

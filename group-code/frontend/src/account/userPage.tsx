@@ -1,6 +1,6 @@
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 
-import { Fragment, MouseEventHandler, useState, useEffect } from "react";
+import { ChangeEvent, Fragment, MouseEventHandler, useState, useEffect } from 'react';
 // import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
@@ -13,8 +13,8 @@ import {
   InboxIcon,
   UsersIcon,
   XMarkIcon,
-} from "@heroicons/react/24/outline";
-import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+} from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import {
   BrowserRouter as Router,
   Routes,
@@ -29,17 +29,21 @@ import AccountService from "./AccountService";
 import { errorMonitor } from "events";
 import {
   convertCompilerOptionsFromJson,
-  isConstructorDeclaration,
-} from "typescript";
-import ConversationPage from "./ConversationPage";
-import { Form } from "react-bootstrap";
-import CustomProfilePage from "./CustomProfilePage";
-import axios from "axios";
-import EnrolledTopics from "../content/EnrolledTopics";
-import CreatedResources from "../content/CreatedResources";
+  isConstructorDeclaration
+} from 'typescript';
+import ConversationPage from './ConversationPage';
+import { Form } from 'react-bootstrap';
+import CustomProfilePage from './CustomProfilePage';
+import axios from 'axios';
+import EnrolledTopics from '../content/EnrolledTopics';
+import CreatedResources from '../content/CreatedResources';
 import Sidebar from "common/Sidebar";
 import { useSidebar } from "content/SidebarContext";
 import AssessmentMain from "assessment/assessmentMain";
+import defaultImg from '../default.jpg';
+import { response } from 'express';
+
+// import Detail from '@/Detail';
 
 const navigation = [
   { name: "Topics", href: "#", icon: HomeIcon, current: true },
@@ -70,6 +74,7 @@ export default function UserPage() {
   // const [resultList, setResultList] = useState<any[]>([]);
   const [loaded, setLoaded] = useState(false);
   const navigate = useNavigate();
+  const [userSearch, setUserSearch] = useState("@");
   const routeChange = (path: To) => {
     //let path = `newPath`;
     navigate(path);
@@ -98,6 +103,30 @@ export default function UserPage() {
     resultList,
     setResultList,
   } = useSidebar();
+  const handleInputSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    setUserSearch(event.target.value);
+    updateUserList(userSearch);
+  };
+
+  const clearSearch = () => {
+    (document.getElementById("searchBar") as HTMLInputElement).value = "";
+    updateUserList("@");
+  }
+
+  const updateUserList = (search: string) => {
+    const param = { search: search };
+    AccountService.loadUsers(param)
+      .then((response) => {
+        // console.log("users got: ")
+        console.log(response.data);
+        // console.log(response.data.length)
+
+        setUsersList(response.data);
+      })
+      .catch((error) => {
+        console.log('error');
+      });
+  };
 
   useEffect(() => {
     const param = { token: localStorage.getItem("access_token") };
@@ -247,6 +276,12 @@ export default function UserPage() {
                 <li className="p-3" key={usersList[i].id}>
                   {usersList[i].username}
                 </li>
+                {/*<img
+                  className="h-8 w-8 rounded-full"
+                  src={getProfilePic(usersList[i].id)}
+                  alt=""
+                />
+                */}
               </Link>
             </div>
           );
@@ -378,6 +413,111 @@ export default function UserPage() {
                     {loadResults()}
                   </div>
                 </div>
+              </div>
+            </div>
+          </main>
+
+          <main className={conversationShow ? '' : 'hidden'}>
+            <div className="py-6">
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+                <h1 className="text-2xl font-semibold text-gray-900">Conversations</h1>
+              </div>
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+                <div></div>
+                <div className="py-4">
+                  <div className=" rounded-lg border-4 border-dashed border-gray-200">
+                    <div className="overflow-hidden bg-white shadow sm:rounded-lg">
+                      <div className="border-t border-gray-200">
+                        {loadConversationList()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* /End replace */}
+              </div>
+            </div>
+          </main>
+
+          <main className={assessmentShow ? '' : 'hidden'}>
+            <div className="py-6">
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+                <h1 className="text-2xl font-semibold text-gray-900">
+                  Accessment
+                </h1>
+              </div>
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+                {/* Replace with your content */}
+                <div className="py-4">
+                  <div className="h-96 rounded-lg border-4 border-dashed border-gray-200" />
+                </div>
+                {/* /End replace */}
+              </div>
+            </div>
+          </main>
+
+          <main className={resultShow ? '' : 'hidden'}>
+            <div className="py-6">
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+                <h1 className="text-2xl font-semibold text-gray-900">Results</h1>
+              </div>
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+                {/* Replace with your content */}
+                <div className="py-4">
+                  <div className=" rounded-lg border-4 border-dashed border-gray-200 ">
+                    <div>
+                      <div
+                        className={
+                          'bg-indigo-200 text-xl text_black font-bold px-5 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'
+                        }
+                      >
+                        <dt className="text-sm font-large text-black">
+                          Topic Name
+                        </dt>
+                        <dt className="text-sm font-large text-black">
+                          Overall Mark
+                        </dt>
+                      </div>
+                    </div>
+                    {loadResults()}
+                  </div>
+                </div>
+                {/* /End replace */}
+              </div>
+            </div>
+          </main>
+
+          <main className={usersShow ? '' : 'hidden'}>
+            <div className="py-6">
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+                <h1 className="text-2xl font-semibold text-gray-900">Users</h1>
+              </div>
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 flex margin-left h-15 mt-4">
+                <input
+                  className="text-sm text-gray-900 sm:col-span-2 sm:mt-0"
+                  placeholder="Enter Username"
+                  onChange={handleInputSearch}
+                  id="searchBar"
+                ></input>
+                <button
+                  type="submit"
+                  className="ml-4 flex justify-right rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+                  onClick={clearSearch}
+                >
+                  Clear
+                </button>
+              </div>
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+                <div></div>
+                <div className="py-4">
+                  <div className="rounded-lg border-4 border-dashed border-gray-200">
+                    <div className="overflow-hidden bg-white shadow sm:rounded-lg">
+                      <div className="border-t border-gray-200 flex flex-col gap-2">
+                        {loadUsersList()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* /End replace */}
               </div>
             </div>
           </main>

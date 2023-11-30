@@ -21,10 +21,11 @@
     "noEmit": true,
     "jsx": "preserve",
     "suppressImplicitAnyIndexErrors": true,
-    "downlevelIteration": true,
     "ignoreDeprecations": "5.0",
+    "downlevelIteration": true,
   },
   "include": [
-    "src"
+    "src",
+    "src/sounds/*.mp3"
   ]
 }

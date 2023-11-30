@@ -30,6 +30,7 @@
   },
   "ignorePatterns": [
     "src/**/*.test.ts",
-    "src/frontend/generated/*"
+    "src/frontend/generated/*",
+    "src/topictree/*"
   ]
 }

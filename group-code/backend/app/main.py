@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException, Request, status, Query, Form, UploadFile, File
+from fastapi import Depends, FastAPI, HTTPException, Request, status, Query, Form, UploadFile, File, BackgroundTasks
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,11 +12,13 @@ from .auth import JWTBearer
 from pathlib import Path
 from io import BytesIO
 from .chatgpt.chatgpt import send_message as chatgpt_send_message
+from datetime import datetime
 import os
 import logging
 import re
+from .pomodoroTimer.timer import *
 EMAILREG = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
-
+USERREG = r'\b^[a-zA-Z0-9]+$\b'
 models.Base.metadata.create_all(bind=engine)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -83,19 +85,31 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
     if (helper.usernameNotexists(db, details.username) == False):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name already exists",
+            detail="User name already exists.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     elif (helper.emailNotexists(db, details.email) == False):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Email already exists",
+            detail="Email already exists.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     elif not re.fullmatch(EMAILREG, details.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email not valid",
+            detail="Email not valid.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    elif not re.fullmatch(USERREG, details.username):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username can only contain alphanumericals.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    elif len(details.full_name) >= 40 or len(details.username) >= 40 or len(details.email) >= 40:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inputs must be shorter than 40 characters.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = helper.create_user(
@@ -121,8 +135,9 @@ async def register(details: schemas.UserCreate, db: Session = Depends(get_db)):
 
 # }
 
+
 @app.post("/logout")
-async def logout(details:schemas.OnlyToken, db: Session = Depends(get_db)):
+async def logout(details: schemas.OnlyToken, db: Session = Depends(get_db)):
     print("loging out")
     user = helper.extract_user(db, details.access_token.encode())
     if user is None:
@@ -147,7 +162,6 @@ async def editProfile(details: schemas.UserEdit, db: Session = Depends(get_db)):
     )
 
 
-
 @app.post("/changePassword")
 async def editPassword(details: schemas.UserPassword, db: Session = Depends(get_db)):
     print(details)
@@ -161,31 +175,44 @@ async def editPassword(details: schemas.UserPassword, db: Session = Depends(get_
     )
 
 
-@app.get("/loadUsers")
-async def loadUsers(db: Session = Depends(get_db)):
-    users = helper.get_all_user_list(db)
-    print("super user:", helper.get_superuser_list(db))
-    print(users)
-    return users
-
-
-@app.get("/is_superuser")
-async def is_superuser(token: str = Depends(JWTBearer(db_generator=get_db())), db: Session = Depends(get_db)):
+@app.get("/loadUsers/{search}")
+async def loadUsers(request: Request, search: str, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
     user = helper.extract_user(db, token)
-    return {'is_superuser': user.superuser}
-
-
-@app.get("/user/{id}")
-async def getOneUser(id: int, db: Session = Depends(get_db)):
-    print(id)
-    user = helper.get_user_by_id(db, id)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorised",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return {"user": user}
+
+    isSuper = False
+    if user.superuser == 1:
+        isSuper = True
+    if search != "@":
+        return helper.get_users_search(db, search, isSuper)
+    return helper.get_all_user_list(db, isSuper)
+
+
+@app.get("/is_superuser")
+async def is_superuser(token: str = Depends(JWTBearer(db_generator=get_db())), db: Session = Depends(get_db)):
+    user = helper.extract_user(db, token)
+    helper.updateLog(db, user, "")
+    return {'is_superuser': user.superuser}
+
+
+@app.get("/user/{id}")
+async def getOneUser(request: Request, id: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user = helper.extract_user(db, token)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return {"user": helper.get_user_by_id(db, id, user.superuser == 1)}
 
 
 @app.get("/authed")
@@ -228,7 +255,6 @@ async def list_non_super_users(db: Session = Depends(get_db)):
     #         headers={"WWW-Authenticate": "Bearer"},
     #     )
     res = helper.get_non_superuser_list(db)
-    print(res)
     return res
 
 
@@ -298,21 +324,23 @@ async def get_topic_roles(topic_id: int, db: Session = Depends(get_db), token: s
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+
 @app.get("/dummy")
 async def dummy(db: Session = Depends(get_db)):
     topic = db.query(models.Topic).filter_by(topic_name="Linked Lists").first()
     if topic:
-        enrollment = db.query(models.TopicEnrollment).filter_by(user_id=8, topic_id=topic.id).one()
+        enrollment = db.query(models.TopicEnrollment).filter_by(
+            user_id=8, topic_id=topic.id).one()
         enrollment.complete = True
         db.commit()
-    
+
 
 @app.get("/users/{user_id}/{topic_id}/roles")
 async def get_user_roles(user_id: int, topic_id: int = Query(None), db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     authenticator = helper.extract_user(db, token)
     topic = db.query(models.Topic).filter_by(id=topic_id).one()
     if helper.check_permission(db, authenticator, topic, "can_view_topic_roles"):
-        return helper.get_user_roles(db, helper.get_user_by_id(db, user_id), topic)
+        return helper.get_user_roles(db, helper.get_user_by_id(db, user_id, True), topic)
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Unauthorised",
@@ -478,11 +506,21 @@ async def addUserToConversation(details: schemas.addNameToConversation, db: Sess
 
 
 @app.get("/api/items/{conversation_name}")
-async def get_One_conversation(conversation_name, db: Session = Depends(get_db)):
+async def get_One_conversation(request: Request, conversation_name, db: Session = Depends(get_db)):
     print(conversation_name)
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 == None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     conver = helper.getOneConversation(db, conversation_name=conversation_name)
     # print(conver)
     if conver is not None:
+        helper.updateLastSeen(db, user1, conver)
         # user1, user2 = helper.getBothSidesName(db, conversation_id=conver.id)
         messages = helper.getMessagesOnCon(db, conversation_id=conver.id)
         return {"conversation": conver, "mlist": messages}
@@ -492,7 +530,7 @@ async def get_One_conversation(conversation_name, db: Session = Depends(get_db))
 @app.post("/sendMessage")
 async def send_message(details: schemas.SendMessage, db: Session = Depends(get_db)):
     new_nessage = helper.create_message(
-        db, details.conversation_id, details.content, details.time_created, details.sender_name)
+        db, details.conversation_id, details.content, details.sender_name)
     if new_nessage is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -544,7 +582,6 @@ async def loadAssessmentMain(token: schemas.UserToken, db: Session = Depends(get
             detail="Not login"
         )
     result = helper.get_assessment_overview(db, user.id)
-
     return result
 
 
@@ -558,6 +595,7 @@ async def assessmentEditOverview(token: schemas.UserToken, db: Session = Depends
             detail="Not login"
         )
     result = helper.get_assessment_edit_overview(db=db)
+    helper.updateLog(db, user, "Editing Assessments")
     return result
 
 
@@ -1247,6 +1285,8 @@ async def get_resource_section(resource_id, db: Session = Depends(get_db)):
     return section
 
 # === CONTENT ===
+
+
 @app.get("/user_resources")
 async def get_created_resources(db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
@@ -1258,12 +1298,15 @@ async def get_created_resources(db: Session = Depends(get_db), token: str = Depe
 async def get_enrolled_topics(db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     return {"topics": helper.get_enrolled_topics(db, helper.extract_user(db, token))}
 
+
 @app.get("/is_enrolled/{topic_id}")
 async def get_is_enrolled(topic_id: int, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
     if user:
-        status = helper.is_enrolled_in_topic(db, user_id=user.id, topic_id=topic_id)
+        status = helper.is_enrolled_in_topic(
+            db, user_id=user.id, topic_id=topic_id)
         return {"status": status}
+
 
 @app.get("/topic/{topic_id}")
 async def get_topic_info(topic_id: int, db: Session = Depends(get_db)):
@@ -1276,6 +1319,24 @@ async def get_topic_info(topic_id: int, db: Session = Depends(get_db)):
 async def get_resources(topic_id: int, section: str, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
     resources = helper.get_resources(db, user.id, section, topic_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    try:
+        helper.updateLog(
+            db, user, f"Browsing {resources.title}'s {resources.section}")
+    except:
+        helper.updateLog(db, user, f"Browsing Topic Resources")
+    if not resources:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Resource not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     return {"resources": resources}
 
 
@@ -1298,12 +1359,15 @@ async def edit_resource(details: schemas.ResourceEdit, db: Session = Depends(get
                                     url=details.url, duration=details.duration, section=details.section, description=details.description)
 
     return resource
-    
+
+
 @app.put('/rearrange_resource')
 async def rearrange_resource(details: schemas.RearrangeResource, db: Session = Depends(get_db)):
-    resource = helper.rearrange_resource(db, resource_id=details.resource_id, direction=details.direction, topic_id=details.topic_id, section=details.section)
+    resource = helper.rearrange_resource(db, resource_id=details.resource_id,
+                                         direction=details.direction, topic_id=details.topic_id, section=details.section)
 
     return resource
+
 
 @app.delete('/delete_resource')
 async def delete_resource(details: schemas.ResourceDelete, db: Session = Depends(get_db)):
@@ -1336,17 +1400,22 @@ async def get_zip_path(topic_id: int, section: str):
     path = helper.get_zip_path(topic_id, section)
     return {"server_path": path}
 
+
 @app.post("/complete_resource")
 async def mark_resource_complete(details: schemas.ResourceComplete, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
     return helper.mark_resource_complete(db, user_id=user.id, resource_id=details.resource_id)
 
+
 @app.delete('/reset_progress')
 async def reset_progress(details: schemas.ResetProgress, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
-    helper.reset_progress(db, user_id=user.id, topic_id=details.topic_id, section=details.section)
+    helper.reset_progress(db, user_id=user.id,
+                          topic_id=details.topic_id, section=details.section)
 
 # === TOPIC TREE ===
+
+
 @app.get('/{topic_id}/users')
 async def get_enrolled_users(topic_id, token: str = Depends(JWTBearer(db_generator=get_db())), db: Session = Depends(get_db)):
     return helper.get_enrolled_users(db, topic_id)
@@ -1369,10 +1438,15 @@ async def create_pathway(details: schemas.PathwayCreate, db: Session = Depends(g
     return {"pathway_id": pathway.id}
 
 
+@app.delete('/delete_pathway')
+async def delete_pathway(details: schemas.PathwayDelete, db: Session = Depends(get_db)):
+    helper.delete_pathway(db, pathway_id=details.pathway_id)
+
+
 @app.put('/edit_pathway')
 async def edit_pathway(details: schemas.PathwayEdit, db: Session = Depends(get_db)):
     pathway = helper.edit_pathway(
-        db, pathway_id=details.pathway_id, core_ids=details.core, elective_ids=details.electives)
+        db, pathway_name=details.pathway_name, pathway_id=details.pathway_id, core_ids=details.core, elective_ids=details.electives)
 
     return pathway
 
@@ -1382,6 +1456,12 @@ async def enrol_user_in_pathway(details: schemas.PathwayEnrol, db: Session = Dep
     enrollment = helper.enrol_user_in_pathway(
         db, user_id=details.user_id, pathway_id=details.pathway_id)
     return enrollment
+
+
+@app.delete('/unenrol_in_pathway')
+async def unenrol_user_in_pathway(details: schemas.PathwayEnrol, db: Session = Depends(get_db)):
+    helper.unenrol_user_in_pathway(
+        db, user_id=details.user_id, pathway_id=details.pathway_id)
 
 
 @app.put('/edit_topic')
@@ -1411,6 +1491,12 @@ async def enrol_user_in_topic(details: schemas.TopicEnrol, db: Session = Depends
     return {"status": "error"}
 
 
+@app.delete('/unenrol_in_topic')
+async def unenrol_user_in_topic(details: schemas.TopicEnrol, db: Session = Depends(get_db)):
+    helper.unenrol_user_in_topic(
+        db, user_id=details.user_id, topic_id=details.topic_id)
+
+
 @app.post("/create_topic")
 async def create_topic(details: schemas.PathwayTopicCreate, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
     user = helper.extract_user(db, token)
@@ -1434,7 +1520,7 @@ async def get_prereq_info(prerequisite_id: int, db: Session = Depends(get_db)):
 
 @app.delete('/delete_prerequisite')
 async def delete_prerequisite(details: schemas.PathwayTopicPrerequisiteSetDelete, db: Session = Depends(get_db)):
-    helper.delete_prerequisite(db, id=details.id)
+    helper.delete_prerequisite_set(db, prereq_id=details.id)
 
 
 @app.post("/create_prerequisite_sets")
@@ -1534,6 +1620,7 @@ async def test_forum(db: Session = Depends(get_db)):
 
 # Meta LMS 23T2
 
+
 @app.post("/login")
 async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
     """
@@ -1542,7 +1629,7 @@ async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     if (user is not None and helper.verify_password(details.password, user.password)):
         if user.mfa == "email":
-            helper.getVerifyEmail(db, user)
+            helper.getVerifyEmail(db, user, False)
             return {"mfa": user.mfa, "username": user.username}
         else:
             return helper.loginUser(db, user)
@@ -1552,10 +1639,12 @@ async def login(details: schemas.UserLogin, db: Session = Depends(get_db)):
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+
 @app.post("/vEmail")
 async def vEmail(details: schemas.onlyId, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.id)
-    return helper.getVerifyEmail(db, user)
+    return helper.getVerifyEmail(db, user, False)
+
 
 @app.post("/putOtp")
 async def putOtp(details: schemas.userOtp, db: Session = Depends(get_db)):
@@ -1568,15 +1657,18 @@ async def putOtp(details: schemas.userOtp, db: Session = Depends(get_db)):
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+
 @app.post("/recoverPass")
 async def recoverPass(details: schemas.recoverPass, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     return helper.recoveryAcc(db, user, details.inputOtp, details.newPassword)
 
+
 @app.post("/chatgpt/sendMessage")
 async def chatgpt_api_send_message(details: schemas.GenerativeAI_SendMessage):
     response = chatgpt_send_message(details.message)
     print(f"ChatGPT Response: {response}")
+
 
 @app.post("/generativeai/sendMessage")
 # async def generativeai_send_message(details: schemas.GenerativeAI_SendMessage, db: Session = Depends(get_db), token: str = Depends(JWTBearer(db_generator=get_db()))):
@@ -1590,10 +1682,11 @@ async def generativeai_send_message(details: schemas.GenerativeAI_SendMessage):
     response = chatgpt_send_message(details.message)
     print(f"ChatGPT Response: {response}")
 
+
 @app.post("/setMFA")
 async def setMFA(details: schemas.setMFA, db: Session = Depends(get_db)):
     user = helper.extract_user(db, details.token)
-    if user != None and user.username == details.id:
+    if user != None and user.username == details.id and user.vEmail == user.email:
         return helper.setMFA(db, user, details.mfa)
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -1601,8 +1694,214 @@ async def setMFA(details: schemas.setMFA, db: Session = Depends(get_db)):
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+
 @app.post("/verifyMFA")
 async def verifyMFA(details: schemas.userOtp, db: Session = Depends(get_db)):
     user = helper.get_user_by_username(db, details.username)
     return helper.verifyMFA(db, user, details.inputOtp)
 
+
+@app.post("/putPicture")
+async def putPicture(details: schemas.userImage, db: Session = Depends(get_db)):
+    user = helper.extract_user(db, details.token)
+    if user != None and user.username == details.id:
+        return helper.putPicture(user, details.image)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorised",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
+@app.get("/getPicture/{id}")
+async def getPicture(id: int, db: Session = Depends(get_db)):
+    user = helper.get_user_by_id(db, id)
+    if user:
+        return helper.getPicture(user)
+    return ""
+
+
+@app.get("/mutualTopicRoles/{id2}")
+async def mutualTopicRoles(request: Request, id2: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    user2 = helper.get_user_by_id(db, id2, user1.superuser)
+    if user1 is None or user2 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return helper.mutualTopicRoles(db, user1, user2)
+
+
+@app.get("/notifications")
+async def notifications(request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    helper.updateLog(db, user1, "")
+    return helper.getNotifications(db, user1)
+
+
+@app.get("/activityStatus/{id}")
+async def activityStatus(request: Request, id: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    user2 = helper.get_user_by_id(db, id, True)
+
+    if user1 is None or user2 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return helper.getActivityStatus(db, user2, user1.superuser)
+
+
+@app.post("/setPrivacy")
+async def setPrivacy(request: Request, details: schemas.privacy, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    print(f"id: {user1.id}, full_name: {details.full_name}, email: {details.email}, recent: {details.recent_activity}, invisible: {details.invisible}")
+    privUser = models.Privacy(user_id=user1.id, full_name=details.full_name, email=details.email,
+                              recent_activity=details.recent_activity, invisible=details.invisible)
+    helper.setPrivacy(db, user1, privUser)
+    return {"message": "Updated"}
+
+
+@app.get("/getPrivacy/{id}")
+async def getPrivacy(request: Request, id: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    user2 = helper.get_user_by_id(db, id, True)
+
+    if user1 is None or user2 is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    priv = helper.getPrivacy(db, user2)
+    if priv:
+        return {"email": priv.email, "recent_activity": priv.recent_activity, "invisible": priv.invisible, "full_name": priv.full_name}
+    return None
+
+
+@app.get("/exportTopic/{topicId}")
+async def exportTopic(request: Request, topicId: int, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None or not user1.superuser:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    topic = helper.topicExport(db, topicId)
+    if topic is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Topic not found"
+        )
+
+    return {"topic": topic[0], "topic_name": topic[1]}
+
+
+@app.post("/importTopic")
+async def importTopic(request: Request, details: schemas.importTopic, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    user1 = helper.extract_user(db, token)
+    if user1 is None or not user1.superuser:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return helper.topicImport(db, details.file, user1)
+
+
+@app.get("/getAllPomodoroSessions")
+def getPomodoroSessions(request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    current_user = helper.extract_user(db, token)
+
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    pomodoro_sessions = getAllPomodoroSessions(db, current_user.username)
+
+    return {"pomodoro_sessions": pomodoro_sessions}
+
+
+@app.get("/getWeekPomodoroSessions")
+def getWeekPomodoroSessions(request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    startDate = request.headers.get('startDate')
+    endDate = request.headers.get('endDate')
+    current_user = helper.extract_user(db, token)
+
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    pomodoro_sessions = getSessionsWithinDateRange(
+        db, startDate, endDate, current_user.username)
+    return {"Sessions": pomodoro_sessions}
+
+
+@app.post("/createPomodoroSession")
+def createPomodoroSession(session_data: schemas.PomodoroSession, request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization')
+    currentUser = helper.extract_user(db, token)
+    if currentUser is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    success = addPomodoroSession(db, session_data)
+
+    if success:
+        return {"message": "Pomodoro Session Created Successful"}
+    else:
+        return {"message": "Pomodoro Session Creation Failed"}
+
+
+@app.post("/createDummyData")
+def createDummyData(request: Request, db: Session = Depends(get_db)):
+
+    token = request.headers.get('Authorization')
+    current_user = helper.extract_user(db, token)
+    email = "eddyxwong@gmail.com"
+    try:
+        addDummyPomodoroSessions(db, current_user.username, email)
+        return {"message": "Dummy data created successfully"}
+    except Exception as e:
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+if __name__ == "__main__":
+    print(datetime.now())

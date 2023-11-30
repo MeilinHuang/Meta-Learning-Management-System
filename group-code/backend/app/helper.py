@@ -1,6 +1,6 @@
 import random
 import string
-
+from fastapi import Form, File, UploadFile
 from re import L
 from typing import List, Optional, TypedDict
 import os
@@ -15,10 +15,14 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 import shutil
 import smtplib
+from mdtex2html import convert
+from weasyprint import HTML
 import pyotp
-
+from .database import SessionLocal, engine
 from . import models, schemas
-
+from datetime import datetime
+from base64 import b64decode
+import hashlib
 TOKEN_SECRET = "1fa35d8e94b996509dde52942120251b02ed236abad89b5c347d849849ee3d4c"
 
 # ===== Auth =====
@@ -35,7 +39,6 @@ def generate_auth_token():
 
 def invalidate_auth_token(db: Session, user: models.User):
     # user.auth_token = None
-    print("here1")
     setattr(user, "auth_token", None)
     db.add(user)
     db.commit()
@@ -106,15 +109,13 @@ def create_user(db: Session, username: str, password: str, email: str, name: str
 
 
 def usernameNotexists(db: Session, username: str):
-    user_name_exists = db.query(exists().where(
-        models.User.username == username))
+    user_name_exists = select(models.User).where(models.User.username == username)
     if db.execute(user_name_exists).scalar():
         return False
     return True
 
 def emailNotexists(db: Session, email: str):
-    email_name_exists = db.query(exists().where(
-        models.User.email == email))
+    email_name_exists = select(models.User).where(models.User.email == email)
     if db.execute(email_name_exists).scalar():
         return False
     return True
@@ -133,9 +134,9 @@ def check_permission(db: Session, user: models.User, topic: models.Topic, permis
     return False
 
 
-def create_message(db: Session, conversation_id: int, content: str, time_created: str, sender_name: str):
+def create_message(db: Session, conversation_id: int, content: str, sender_name: str):
     new_message = models.Message(
-        conversation_id=conversation_id, content=content, sender_name=sender_name)
+        conversation_id=conversation_id, content=content, time_created=datetime.now(),sender_name=sender_name)
     db.add(new_message)
     db.commit()
     db.refresh(new_message)
@@ -148,7 +149,7 @@ def create_group_member(db: Session, user_id: int, conversation_id: int):
     if exist is not None:
         return None
     new_group_member = models.Group_member(
-        user_id=user_id, conversation_id=conversation_id)
+        user_id=user_id, conversation_id=conversation_id, lastSeen=datetime.now())
     db.add(new_group_member)
     db.commit()
     db.refresh(new_group_member)
@@ -158,30 +159,20 @@ def create_group_member(db: Session, user_id: int, conversation_id: int):
 def create_conversation(db: Session, sender: str, receiver: str, sender_id: int, receiver_id: int):
     new_conversation = models.Conversation(
         conversation_name=get_conversation_id_from_user_name(sender, receiver))
-    print(new_conversation.id)
     db.add(new_conversation)
     db.commit()
     db.refresh(new_conversation)
-    print("here1")
     return db.query(models.Conversation).filter_by(id=new_conversation.id).first()
 
 
 def findConversations(db: Session, user_id: str):
     # return all the conversation related to this user.
-    print("getting conversation")
     group_members = db.query(models.Group_member).filter_by(
         user_id=user_id).all()
-    print("group_members:")
-    print(group_members)
     res = []
     for group_member in group_members:
-        print(group_member)
-        print(group_member.user_id)
-        print(group_member.id)
-        print(group_member.conversation_id)
         conversation = db.query(models.Conversation).filter_by(
             id=group_member.conversation_id).first()
-        print(conversation)
         if conversation is not None:
             group_member2 = db.query(models.Group_member).filter_by(
                 conversation_id=conversation.id).all()
@@ -192,7 +183,6 @@ def findConversations(db: Session, user_id: str):
             if user0 is not None and user1 is not None:
                 res.append({"conver": conversation,
                            "user0": user0.username, "user1": user1.username})
-        print(res)
     return res
 
 
@@ -263,7 +253,7 @@ def edit_password(db: Session, user: models.User, newpassword):
     setattr(user, "password", hash_password(newpassword))
     db.commit()
     db.refresh(user)
-    return {"message", "successed"}
+    return {"message": "successed"}
 
 
 def get_user_by_username(db: Session, username: str):
@@ -272,13 +262,34 @@ def get_user_by_username(db: Session, username: str):
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter_by(email=str).first()
 
-def get_all_user_list(db: Session):
+def get_all_user_list(db: Session, admin: bool):
     query = db.query(models.User).all()
+    for user in query:
+        if not admin:
+            user.email = ""
+            user.full_name = ""
+            user.auth_token = ""
+            user.password = ""
+            user.mfa = ""
+        user.profilePic = getPicture(user)
     return query
 
-
-def get_user_by_id(db: Session, user_id: int):
-    return db.query(models.User).filter_by(id=user_id).one()
+def get_user_by_id(db: Session, user_id: int, admin=False):
+    try:
+        user = db.query(models.User).filter_by(id=user_id).one()
+        if not admin:
+            privSet = getPrivacy(db, user)
+            if not privSet.email:
+                user.email = ""
+            if not privSet.full_name:
+                user.full_name = ""
+            user.auth_token = ""
+            user.password = ""
+            user.mfa = ""
+        user.profilePic = getPicture(user)
+        return user
+    except:
+        return None
 
 
 def promote_user(db: Session, target: models.User, authenticator: models.User) -> bool:
@@ -517,9 +528,10 @@ def get_assessment_overview(db: Session, user_id: int):
     result = []
     for ele in overview:
         res_dict = {}
-        res_dict["topic"] = ele.topic
+        res_dict["topic"] = modelToDict(ele.topic)
         res_dict["year"] = str(ele.year)
         res_dict["term"] = str(ele.term)
+        res_dict["complete"] = ele.complete
         mark = 0
         assessment_id = 0
         max_mark = 0
@@ -972,7 +984,7 @@ def get_post_by_id(db: Session, post_id: int):
     post = db.query(models.Post).filter_by(id=post_id).first()
     if post is None:
         return None
-    return format_post(post)
+    return format_post(db, post)
 
 
 def get_thread_by_id(db: Session, thread_id: int):
@@ -986,7 +998,8 @@ def get_thread_by_id(db: Session, thread_id: int):
         "author": {
             "id": thread.author.id,
             "name": thread.author.full_name,
-            "username": thread.author.username
+            "username": thread.author.username,
+            "profilePic": getPicture(get_user_by_id(db,thread.author.id,True))
         },
         "content": thread.content,
         "upvotes": thread.num_upvotes,
@@ -1012,7 +1025,8 @@ def get_threads_lite(db: Session, section_id: int, limit: int, offset: int):
             "author": {
                 "id": 0,
                 "name": "",
-                "username": ""
+                "username": "",
+                "profilePic": ""
             },
             "content": thread.content[:30] if len(thread.content) > 30 else thread.content[:len(thread.content)],
             "upvotes": 0,
@@ -1042,7 +1056,8 @@ def get_threads(db: Session, section_id: int, limit: int, offset: int):
             "author": {
                 "id": thread.author.id,
                 "name": thread.author.full_name,
-                "username": thread.author.username
+                "username": thread.author.username,
+                "profilePic": getPicture(get_user_by_id(db,thread.author.id,True))
             },
             "content": thread.content,
             "upvotes": thread.num_upvotes,
@@ -1056,7 +1071,7 @@ def get_threads(db: Session, section_id: int, limit: int, offset: int):
     return result
 
 
-def format_post(post: models.Post):
+def format_post(db: Session, post: models.Post):
     sorted_replies = sorted(
         post.replies, key=lambda x: x.num_upvotes, reverse=True)
     post_dict = {
@@ -1065,7 +1080,8 @@ def format_post(post: models.Post):
         "author": {
             "id": post.author.id,
             "name": post.author.full_name,
-            "username": post.author.username
+            "username": post.author.username,
+            "profilePic": getPicture(get_user_by_id(db,post.author.id,True))
         },
         "content": post.content,
         "time": post.time_created,
@@ -1126,10 +1142,26 @@ def get_enrolled_topics(db: Session, user: models.User):
 
     topics = []
     for enrollment in enrollments:
-        topic = db.query(models.Topic).filter_by(
-            id=enrollment.topic_id).first()
-        if topic:
-            topics.append(topic)
+      prereq_sets = db.query(models.Prerequisite).filter_by(
+        topic_id=enrollment.topic_id).all()
+      
+      formatted_prereq_sets = []
+
+      for prereq_set in prereq_sets:
+        formatted_prereq_sets.append({
+            "amount": prereq_set.amount,
+            "choices": [{
+                "id": choice.id,
+                "name": choice.topic_name
+            } for choice in prereq_set.choices]
+        })
+      
+      topic = db.query(models.Topic).filter_by(
+          id=enrollment.topic_id).first()
+      if topic:
+          topic.complete = enrollment.complete
+          topic.prereq_sets = formatted_prereq_sets
+          topics.append(topic)
 
     return topics
 
@@ -1189,7 +1221,6 @@ def get_resources(db: Session, user_id: int, section: str, topic_id: int):
         else:
             resource_res["complete"] = False
         res.append(resource_res)
-
     return res
 
 
@@ -1299,16 +1330,11 @@ def replace_resource(db: Session, prev_path: str, topic_id: str, section: str, f
 
 def upload_markdown(db: Session, topic_id: str, section: str, file_name: str, content: str):
     file_name = file_name.replace(' ', '-')
-    path = f"static/{topic_id}/{section}/{file_name}"
-    md_file = path + ".md"
-    with open(md_file, "w") as file:
-        file.write(content)
+    path = f"static/{topic_id}/{section}/{file_name}.pdf"
+    text = convert(content)
+    HTML(string=text).write_pdf(path)
 
-    # Convert to PDF
-    os.system(
-        f"node backend/node_modules/.bin/md-to-pdf static/{topic_id}/{section}/{file_name}.md")
-
-    return f"/{path}.pdf"
+    return f"/{path}"
 
 
 def replace_zip(topic_id: str, section: str):
@@ -1369,7 +1395,6 @@ def get_pathways(db: Session, for_user: bool, user: models.User):
             models.Pathway.users.contains(user)).all()
     else:
         query = db.query(models.Pathway).all()
-        print()
 
     pathways = []
     for pathway in query:
@@ -1381,7 +1406,7 @@ def get_pathways(db: Session, for_user: bool, user: models.User):
     # return [pathway.id for pathway in query]
 
 
-def calculate_pathway(db: Session, pathway_id: int, include_user_status: bool, user: models.User):
+def calculate_pathway(db: Session, pathway_id: int, notSuperuser: bool, user: models.User):
     # create global pathway if it doesn't exist
     if pathway_id == 0 and len(db.query(models.Pathway).filter_by(id=0).all()) == 0:
         global_pathway = models.Pathway(id=0, name="Global Pathway")
@@ -1394,37 +1419,62 @@ def calculate_pathway(db: Session, pathway_id: int, include_user_status: bool, u
         return {
             "id": pathway.id,
             "name": pathway.name,
-            "core": get_recursive_path(pathway.core, db, include_user_status, user),
-            "electives": get_recursive_path(pathway.electives, db, include_user_status, user)
+            "core": get_recursive_path(pathway.core, db, notSuperuser, user),
+            "electives": get_recursive_path(pathway.electives, db, notSuperuser, user)
         }
 
 
-def get_recursive_path(topics: List[models.Topic], db: Session, include_user_status: bool, user: models.User):
+def get_recursive_path(topics: List[models.Topic], db: Session, notSuperuser: bool, user: models.User):
     result = []
     for topic in topics:
         enrollment = db.query(models.TopicEnrollment).filter(
             models.TopicEnrollment.user == user, models.TopicEnrollment.topic == topic).first()
-        topic_dict = {
-            "id": topic.id,
-            "name": topic.topic_name,
-            "topic_group": {
-                "id": topic.topic_group.id if topic.topic_group is not None else None,
-                "name": topic.topic_group.name if topic.topic_group is not None else None,
-            },
-            "status": None if include_user_status is False else 'not-started' if enrollment is None else ('complete' if enrollment.complete == True else 'in-progress'),
-            "archived": topic.archived,
-            "needs": []
-        }
-        for prerequisite in topic.prerequisites:
-            prereq_dict = {
-                "id": prerequisite.id,
-                "amount": prerequisite.amount,
-                "choices": get_recursive_path(prerequisite.choices, db, include_user_status, user)
+        if (not notSuperuser) or (not topic.archived):
+            topic_dict = {
+                "id": topic.id,
+                "name": topic.topic_name,
+                "topic_group": {
+                    "id": topic.topic_group.id if topic.topic_group is not None else None,
+                    "name": topic.topic_group.name if topic.topic_group is not None else None,
+                },
+                "status": None if (not notSuperuser) else findAvailability(topic, db, user) if enrollment is None else ('complete' if enrollment.complete == True else 'in-progress'),
+                "archived": topic.archived,
+                "needs": [],
+                "year": None if enrollment is None else enrollment.year,
+                "term": None if enrollment is None else enrollment.term,
             }
-            topic_dict["needs"].append(prereq_dict)
-        result.append(topic_dict)
+            for prerequisite in topic.prerequisites:
+                # print(topic.topic_name)
+                # print()
+                # for choice in prerequisite.choices:
+                #   print(choice.topic_name)
+                # print()
+                prereq_dict = {
+                    "id": prerequisite.id,
+                    "amount": prerequisite.amount,
+                    "choices": get_recursive_path(prerequisite.choices, db, notSuperuser, user)
+                }
+                topic_dict["needs"].append(prereq_dict)
+            result.append(topic_dict)
     return result
 
+
+def findAvailability(topic: models.Topic, db: Session, user: models.User):
+    available = True
+    for prereq_set in topic.prerequisites:
+      needed = prereq_set.amount
+      for choice in prereq_set.choices:
+          enrollment = db.query(models.TopicEnrollment).filter(models.TopicEnrollment.user == user, models.TopicEnrollment.topic == choice).first()
+          if enrollment and enrollment.complete:
+            needed -=1
+          if needed <= 0:
+            break
+      if needed > 0:
+        available = False
+    if available:
+      return 'available'
+    else:
+      return 'unavailable'
 
 def create_topic(db: Session, topic_name: str, topic_group_id: Optional[int], image_url: Optional[str], created_by: models.User, archived: Optional[bool] = False, description: str = ""):
     if topic_group_id is None:
@@ -1449,7 +1499,7 @@ def create_topic(db: Session, topic_name: str, topic_group_id: Optional[int], im
     db.refresh(topic)
     # Set roles for the topic creator
     creator_role = db.query(models.Role).filter_by(
-        role_name="Creator", topic=topic).one()
+        role_name="Creator", topic=topic).first()
     # We need to enroll the creator into the topic
     creator_enrollment = models.TopicEnrollment(user=created_by, topic=topic)
     creator_enrollment.roles.append(creator_role)
@@ -1463,7 +1513,7 @@ def create_topic(db: Session, topic_name: str, topic_group_id: Optional[int], im
             os.mkdir(f"static/{topic.id}/preparation")
         if (not os.path.exists(f"static/{topic.id}/content")):
             os.mkdir(f"static/{topic.id}/content")
-
+    print(topic)
     return topic
 
 
@@ -1512,44 +1562,52 @@ def delete_topic(db: Session, id: int):
 
     db.query(models.Topic).filter_by(id=id).delete()
 
+    # Delete all enrollments in the topic
+    db.execute("DELETE from topic_enrollments where topic_id = " + str(id))
+
     db.commit()
 
 
 def create_prerequisite_sets(db: Session, topic_id: int, sets: List[schemas.PrerequisiteSet]):
     created_sets = []
-
     for set in sets:
         created_set = create_prerequisite(
             db, topic_id, set.amount, set.choices)
-        created_sets.append(created_set.id)
+        created_sets.append(created_set["id"])
 
     return created_sets
 
 
 def delete_prerequisite_set(db: Session, prereq_id: int):
-    deleted = db.query(models.Prerequisite).filter_by(id=prereq_id).delete()
+    prereqSet = db.query(models.Prerequisite).filter_by(id=prereq_id).delete()
+    print('prereq_id')
+    print(prereq_id)
+    print()
+    print("DELETE from prerequisite_assosciation where prerequisite_id = " + str(prereq_id))
+    db.execute("DELETE from prerequisite_assosciation where prerequisite_id = " + str(prereq_id))
 
     db.commit()
-    return deleted
+    return prereqSet
 
 # create prerequisite set given an amount and list of prerequisite topic ids
 
 
 def create_prerequisite(db: Session, topic_id: int, amount: int, choices: List[int]):
     topic = db.query(models.Topic).filter_by(id=topic_id).one()
-
-    prereqs = []
-    for prereq_id in choices:
-        prereq = db.query(models.Topic).filter_by(id=prereq_id).one()
-        prereqs.append(prereq)
-
-    prereq_set = models.Prerequisite(
-        topic=topic, amount=amount, choices=prereqs)
-    db.add(prereq_set)
+    
+    new_id = 1
+    if db.execute("SELECT COUNT(id) from prerequisites") != 0:
+      new_id = db.execute("SELECT MAX(id) from prerequisites").fetchone()[0]
+      new_id += 1
+    print("INSERT INTO prerequisites (id, topic_id, amount) VALUES " + "(" + str(new_id) + ", " + str(topic.id) + ", " + str(amount) + ")")
+    db.execute("INSERT INTO prerequisites (id, topic_id, amount) VALUES " + "(" + str(new_id) + ", " + str(topic.id) + ", " + str(amount) + ")")
     db.commit()
-    db.refresh(prereq_set)
+    for prereq_id in choices:
+      db.execute("INSERT INTO prerequisite_assosciation (prerequisite_id, topic_id) VALUES " + "(" + str(new_id) + ", " + str(prereq_id) + ")")
+    
+    db.commit()
 
-    return prereq_set
+    return {"id": new_id}
 
 
 def edit_prerequisite(db: Session, prerequisite_id: int, topic_id: int, amount: int, choices: List[int]):
@@ -1566,7 +1624,6 @@ def edit_prerequisite(db: Session, prerequisite_id: int, topic_id: int, amount: 
         prereqs.append(prereq)
 
     setattr(edited_prereq, "choices", prereqs)
-
     db.commit()
     db.refresh(edited_prereq)
 
@@ -1590,10 +1647,10 @@ def get_prereq_info(db: Session, prerequisite_id: int):
         }
 
 
-def delete_prerequisite(db: Session, id: int):
-    db.query(models.Prerequisite).filter_by(id=id).delete()
+# def delete_prerequisite(db: Session, id: int):
+#     db.query(models.Prerequisite).filter_by(id=id).delete()
 
-    db.commit()
+#     db.commit()
 
 
 def create_topic_group(db: Session, name: str, topics: List[int]):
@@ -1701,18 +1758,26 @@ def create_pathway(db: Session, name: str, core_ids: List[int], elective_ids: Li
     db.refresh(pathway)
     return pathway
 
+def delete_pathway(db: Session, pathway_id: int):
+    pathway = db.query(models.Pathway).filter_by(id=pathway_id)
 
-def edit_pathway(db: Session, pathway_id: int, core_ids: List[int], elective_ids: List[int]):
+    edit_pathway(db, pathway.first().name, pathway_id, [], [])
+    pathway.delete()
+    db.commit()
+
+
+def edit_pathway(db: Session, pathway_name: string, pathway_id: int, core_ids: List[int], elective_ids: List[int]):
     pathway = db.query(models.Pathway).filter_by(id=pathway_id).first()
 
     if (pathway):
-        topics = find_pathway_topics(db, core_ids, elective_ids)
-        pathway.core = topics["core_topics"]
-        pathway.electives = topics["elective_topics"]
+      topics = find_pathway_topics(db, core_ids, elective_ids)
+      pathway.name = pathway_name
+      pathway.core = topics["core_topics"]
+      pathway.electives = topics["elective_topics"]
 
-        db.commit()
-        db.refresh(pathway)
-        return pathway
+      db.commit()
+      db.refresh(pathway)
+      return pathway
 
 
 def enrol_user_in_pathway(db: Session, user_id: int, pathway_id: int):
@@ -1721,6 +1786,16 @@ def enrol_user_in_pathway(db: Session, user_id: int, pathway_id: int):
 
     if (user is not None and pathway is not None):
         user.pathways.append(pathway)
+        db.commit()
+        db.refresh(user)
+        return {"user_pathways": user.pathways}
+
+def unenrol_user_in_pathway(db: Session, user_id: int, pathway_id: int):
+    user = db.query(models.User).filter_by(id=user_id).first()
+    pathway = db.query(models.Pathway).filter_by(id=pathway_id).first()
+
+    if (user is not None and pathway is not None):
+        user.pathways.remove(pathway)
         db.commit()
         db.refresh(user)
         return {"user_pathways": user.pathways}
@@ -1736,6 +1811,13 @@ def enrol_user_in_topic(db: Session, user_id: int, topic_id: int):
         db.refresh(enrollment)
         return enrollment
 
+def unenrol_user_in_topic(db: Session, user_id: int, topic_id: int):
+    # user = db.query(models.User).filter_by(id=user_id).first()
+    # topic = db.query(models.Topic).filter_by(id=topic_id).first()
+    
+    # if (user is not None and topic is not None):
+    db.query(models.TopicEnrollment).filter_by(user_id=user_id, topic_id=topic_id).delete()
+    db.commit()
 
 # === DEBUG ===
 
@@ -2067,7 +2149,7 @@ def create_test_data(engine: Engine, db: Session):
     t6 = create_topic(db, "Topic 6", None, None, user2)
     t7 = create_topic(db, "Topic 7", None, None, user2)
     t8 = create_topic(db, "Elective 1", None, None, user2)
-    t9 = create_topic(db, "Elective 2", None, None, user2)
+    t9 = create_topic(db, "Elective 2", None, None, user2, True)
     pre1 = models.Prerequisite(topic=t1, amount=1, choices=[t2])
     pre2 = models.Prerequisite(topic=t1, amount=1, choices=[t3, t4])
     pre3 = models.Prerequisite(topic=t3, amount=1, choices=[t5])
@@ -2103,19 +2185,21 @@ def create_test_data(engine: Engine, db: Session):
     role2 = models.Role(id=102, topic=t7, can_edit_assessment=True)
     role3 = models.Role(id=103, topic=t8, can_edit_assessment=True)
     enrol9 = models.TopicEnrollment(
-        user=user4, topic=t6, year=2023, term="T1", roles=[role1])
+        user=user4, topic=t6, year=2022, term="T3", roles=[role1], complete=True)
     enrol10 = models.TopicEnrollment(
-        user=user4, topic=t7, year=2023, term="T1", roles=[role2])
+        user=user4, topic=t7, year=2022, term="T3", roles=[role2], complete=True)
     enrol11 = models.TopicEnrollment(
         user=user4, topic=t8, year=2023, term="T1", roles=[role3])
+    enrol15 = models.TopicEnrollment(
+        user=user4, topic=t2, year=2023, term="T1", roles=[role3])
 
     # enrolments to check homepage
     enrol12 = models.TopicEnrollment(
-        user=user1, topic=t1, year=2023, term="T1")
+        user=user1, topic=t5, year=2023, term="T1")
     enrol13 = models.TopicEnrollment(
-        user=user1, topic=t2, year=2023, term="T1")
+        user=user1, topic=t4, year=2023, term="T1")
     enrol14 = models.TopicEnrollment(
-        user=user1, topic=t3, year=2023, term="T1")
+        user=user1, topic=t8, year=2023, term="T1")
 
     # create assessment
     # q1 = create_question(db, id: int,type: str, choices: list answer_attempt: list,
@@ -2241,7 +2325,7 @@ def create_test_data_converstion(engine: Engine, db: Session):
 # MetaLMS 23T2
 
 # sends otp to user email
-def getVerifyEmail(db: Session, user: models.User):
+def getVerifyEmail(db: Session, user: models.User, sendEmail: bool):
     if user == None or usernameNotexists(db, user.username):
         return {"message": "Username doesn't exist"}
     otp = pyotp.TOTP('base32secret3232')
@@ -2251,19 +2335,20 @@ def getVerifyEmail(db: Session, user: models.User):
     db.refresh(user)
     message = f"Hi {user.full_name},\nYour code is {otpnumber}. Please enter this code in the prompt on Meta LMS."
 
-    # Unquote to send real emails, quoted as email quota reached on outlook account
+    if not sendEmail:
+        print(f"Email Sent to {user.email}\n{message}")
+        return {"message": "success", "text": f"Subject: Meta LMS verification code\n\n{message}", "recipient": f"{user.email}", "otp":f"{otpnumber}"}
     server = smtplib.SMTP("smtp-mail.outlook.com", 587)
     server.starttls()
     server.login('metalmsserviceteam@outlook.com', "Abc111111")
     server.sendmail('metalmsserviceteam@outlook.com', user.email, f"Subject: Meta LMS verification code\n\n{message}")
     server.quit()
-    
     #print(f"Email Sent to {user.email}\n{message}")
     return {"message": "success"}
 
 def putOtp(db: Session, user: models.User, inputOtp: str):
     if user == None or usernameNotexists(db, user.username):
-        return {"message", "Username doesn't exist"}
+        return {"message": "Username doesn't exist"}
     if useOtp(db, user, inputOtp):
         setattr(user, "vEmail", user.email)
         db.commit()
@@ -2273,14 +2358,14 @@ def putOtp(db: Session, user: models.User, inputOtp: str):
 
 def recoveryAcc(db: Session, user: models.User, inputOtp: str, newPass: str):
     if user == None:
-        return {"message", "Username doesn't exist"}
+        return {"message": "Username doesn't exist"}
     if useOtp(db, user, inputOtp):
         edit_password(db, user, newPass)
         return {"message": "true"}
     return {"message": "false"}
 
 def setMFA(db: Session, user: models.User, mfa: str):
-    if user != None:
+    if user != None and (mfa == "email" or mfa == ""):
         setattr(user, "mfa", mfa)
         db.commit()
         db.refresh(user)
@@ -2289,7 +2374,7 @@ def setMFA(db: Session, user: models.User, mfa: str):
 
 def verifyMFA(db: Session, user: models.User, inputOtp: str):
     if user == None or usernameNotexists(db, user.username):
-        return {"message", "Username doesn't exist"}
+        return {"message": "Username doesn't exist"}
     if useOtp(db, user, inputOtp):
         return loginUser(db, user)
     return {"message": "false"}
@@ -2308,13 +2393,286 @@ def loginUser(db: Session, user: models.User):
     res = {"access_token": token, "token_type": "Bearer",
             "user_name": username, "email": email, "user_id": userid,
             "full_name": fullname, "introduction": introduction,
-            "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp, "mfa": mfa, "message": "true"}
+            "admin": admin, "vEmail": vEmailv, "lastOtp": lastOtp, "mfa": mfa, "message": "true", "profilePic": getPicture(user)}
     return res
 
 def useOtp(db: Session, user: models.User, inputOtp: str):
-    if user.lastOtp != None and user.lastOtp == inputOtp:
+    if user != None and user.lastOtp != None and user.lastOtp == inputOtp:
         setattr(user, "lastOtp", None)
         db.commit()
         db.refresh(user)
         return True
     return False
+
+def putPicture(user: models.User, image: str):
+    with open(f"static/userPics/{user.username}", "w+") as file:
+        file.write(image)
+    return {"message": "true"}
+
+
+def getPicture(user: models.User):
+    try:
+        with open(f"static/userPics/{user.username}", "r") as file:
+            image = file.read()
+            file.close()
+            return image
+    except Exception as e:
+        return ""
+
+def get_users_search(db: Session, search: str, admin: bool):
+    query = db.query(models.User).filter(models.User.username.like(f"{search}%")).all()
+    for user in query:
+        if not admin:
+            user.email = ""
+            user.full_name = ""
+            user.auth_token = ""
+            user.password = ""
+            user.mfa = ""
+        user.profilePic = getPicture(user)
+    return query
+
+def mutualTopicRoles(db: Session, user1: models.User, user2: models.User):
+    mutualRoles = {}
+    for topic1 in user1.enrollments:
+        for topic2 in user2.enrollments:
+            if topic1.topic_id == topic2.topic_id:
+                if len(topic2.roles) != 0:
+                    for role in topic2.roles:
+                        if role.role_name in mutualRoles:
+                            mutualRoles[role.role_name] += [topic2.topic.topic_name]
+                        else:
+                            mutualRoles[role.role_name] = [topic2.topic.topic_name]
+                elif "Member" in mutualRoles:
+                    mutualRoles["Member"] += [topic1.topic.topic_name]
+                else:
+                    mutualRoles["Member"] = [topic1.topic.topic_name]
+    return mutualRoles
+
+def updateLastSeen(db: Session, user1: models.User, convo: models.Conversation):
+    gm = models.Group_member
+    db.query(gm).filter(
+        gm.user_id == user1.id, gm.conversation_id == convo.id
+    ).update(
+        {
+            "lastSeen" : datetime.now()
+        }
+    )
+    db.commit()
+
+def getNotifications(db: Session, user1: models.User):
+    notifications = []
+    gm = models.Group_member
+    msg = models.Message
+    convo = models.Conversation
+    currTime = datetime.now()
+    chats = db.query(gm).filter(gm.user_id == user1.id).all()
+    for chat in chats:
+        lastmessage = db.query(msg).filter(
+            msg.conversation_id == chat.conversation_id
+        ).order_by(msg.id.desc()).first()
+        if lastmessage and chat.lastSeen < lastmessage.time_created:
+            convoName = db.query(convo).filter(convo.id==chat.conversation_id).first()
+            notification = {"conversation_name":convoName.conversation_name}
+
+            notifications.append(notification)
+    return {"notifications":notifications}
+
+def updateLog(db: Session, user: models.User, activity: str):
+    if not user:
+        return
+    log = getUserLog(db, user)
+    if log:
+        newTime = datetime.now()
+        delta = (newTime - log.time_created).total_seconds() / 60
+        if not (delta <= 30 and activity == ""):
+            setattr(log, "details", activity)
+        setattr(log, "time_created", newTime)
+    else:
+        log = models.Log(user_id=user.id, time_created=datetime.now(), details=activity)
+        db.add(log)
+    db.commit()
+
+def getUserLog(db: Session, user: models.User):
+    ml = models.Log
+    return db.query(ml).filter(ml.user_id==user.id).first()
+
+def getActivityStatus(db: Session, user: models.User, isAdmin: bool):
+    delta = -1
+    status = "Offline"
+    details = ""
+    privSet = getPrivacy(db,user)
+    log = getUserLog(db, user)
+
+    if log:
+        delta = (datetime.now() - log.time_created).total_seconds() / 60
+        if delta <= 5:
+            status = "Online"
+        elif delta <= 30:
+            status = "Away"
+    
+    if log and log.details and status != "Offline":
+        details = log.details
+
+    if not isAdmin and privSet.invisible:
+        return {"status": "Offline", "delta": -1, "details": ""}
+    
+    return {"status": status, "delta": delta, "details": details}
+
+def setPrivacy(db: Session, user: models.User, privacySet: models.Privacy):
+    ps = models.Privacy
+    existingSet = db.query(ps).filter(ps.user_id==user.id)
+    if existingSet.first():
+        existingSet.update({
+            "full_name": privacySet.full_name,
+            "email": privacySet.email,
+            "recent_activity": privacySet.recent_activity,
+            "invisible": privacySet.invisible
+        })
+    else:
+        db.add(privacySet)
+    db.commit()
+
+def getPrivacy(db: Session, user: models.User):
+    ps = models.Privacy
+    privSet = db.query(ps).filter(ps.user_id==user.id).first()
+    if privSet:
+        return privSet
+    return models.Privacy(user_id=user.id, full_name=False,email=False,recent_activity=False,invisible=False)
+
+def topicExport(db: Session, topicId: int):
+    tp = models.Topic
+    rsc = models.Resource
+    ass = models.Assessment
+    qst = models.Question
+    rtnDict = {}
+    topic = db.query(tp).filter(tp.id==topicId).first()
+    topic_name = topic.topic_name
+    if not topic:
+        return None
+    
+    rtnDict["topic"] = modelToDict(topic)
+    rtnDict["resources"] = []
+
+    content = db.query(rsc).filter(rsc.topic_id==topicId, rsc.section=="content").all()
+    rtnDict["resources"] += list(map(lambda x: modelToDict(x), content))
+
+    content = db.query(rsc).filter(rsc.topic_id==topicId, rsc.section=="preparation").all()
+    rtnDict["resources"] += list(map(lambda x: modelToDict(x), content))
+
+    assList = []
+    assessments = db.query(ass).filter(ass.topic_id==topicId).all()
+    for assessment in assessments:
+        assessmentD = modelToDict(assessment)
+        questions = db.query(qst).filter(qst.assessment_id==assessmentD["id"]).all()
+        assessmentD["questions"] = list(map(lambda x: modelToDict(x), questions))
+        assList += [assessmentD.copy()]
+    rtnDict["assessments"] = assList
+
+    token = logTopicExport(db, [json.dumps(rtnDict), topic_name])
+
+    rtnDict["token"] = token
+    return [json.dumps(rtnDict), topic_name]
+
+def exportForum(db: Session, topicId):
+    fr = models.Forum
+    sc = models.Section
+    thrd = models.Thread
+    pst = models.Post
+    rtnDict = {}
+    forum = db.query(fr).filter(fr.id==topicId).first()
+    forum = modelToDict(forum)
+    forum["sections"] = []
+    sections = db.query(sc).filter(sc.forum_id==forum["id"]).all()
+    for section in sections:
+        sectionD = modelToDict(section)
+        sectionD["threads"] = []
+        threads = db.query(thrd).filter(thrd.section_id==sectionD["id"]).all()
+        for thread in threads:
+            threadD = modelToDict(thread)
+            posts = db.query(pst).filter(pst.thread_id==threadD["id"]).all()
+            threadD["posts"] = list(map(lambda x: modelToDict(x), posts))
+            sectionD["threads"] += [threadD.copy()]
+        forum["sections"] += [sectionD.copy()]
+    rtnDict["forum"] = forum
+    return rtnDict
+
+def topicImport(db: Session, fileStr: str, user: models.User):
+    try:
+        fileStr = decodeFile(fileStr)
+        fd = json.loads(fileStr)
+        # Integrity check
+        if not checkImportedFile(db, fd):
+            return {"message":"failure", "topic": None, "exception":"Failed integrity check"}
+
+
+        tpd = fd["topic"]
+        topic = create_topic(db, topic_name=tpd["topic_name"], topic_group_id=tpd["topic_group_id"], 
+                            image_url=tpd["image_url"], created_by=user, archived=tpd["archived"], description=tpd["description"])
+
+        for rscd in fd["resources"]:
+            create_resource(db, resource_type=rscd["resource_type"], title=rscd["title"], server_path=rscd["server_path"], url=rscd["url"],
+                            duration=rscd["duration"], section=rscd["section"], description=rscd["description"], topic_id=topic.id, creator_id=rscd["creator_id"])
+        for assd in fd["assessments"]:
+            assessment = add_new_assessment(db, topic.id, assd["type"], assd["assessmentName"], assd["proportion"], assd["status"], assd["timeRange"])
+            for questd in assd["questions"]:
+                add_new_question_to_assessment(db, assessment.id,
+                                               questd["type"],questd["question_description"],
+                                               questd["choices"], questd["answer"])
+
+        return {"message":"success", "topic": topic}
+    except Exception as e:
+        return {"message":"failure", "topic": None, "exception":e}
+
+def decodeFile(dataUrl: str):
+    encoded = dataUrl.split("base64,", 1)
+    fileStr = b64decode(encoded[1])
+    return fileStr
+
+def modelToDict(model):
+    model = model.__dict__
+    model.pop('_sa_instance_state')
+    return model.copy()
+
+def logTopicExport(db: Session, topic):
+    auth_token = generate_auth_token()
+    checksum = hashlib.md5(topic[0].encode('utf-8')).hexdigest()
+    id = len(db.query(models.topicExportLog).all()) + 1
+    payload = {
+        "id":id,
+        "auth_token": auth_token,
+        "checkSum": checksum,
+        "topic_name": topic[1]
+    }
+
+    topicExportLog = models.topicExportLog(id=id,auth_token=auth_token, 
+                                           checksum=checksum, topic_name=topic[1])
+    db.add(topicExportLog)
+    db.commit()
+    
+    return jwt.encode(payload, TOKEN_SECRET, algorithm="HS256")
+
+def checkImportedFile(db: Session, topic):
+    # Removes dict entry 'token'
+    try:
+        tel = models.topicExportLog
+        decoded = jwt.decode(topic["token"], TOKEN_SECRET, algorithms=["HS256"])
+        topicLog = db.query(tel).filter(tel.id==decoded["id"]).first()
+        topic.pop('token')
+        checksum = hashlib.md5(json.dumps(topic).encode('utf-8')).hexdigest()
+        if topicLog.checksum == checksum and topicLog.auth_token == decoded["auth_token"] and topicLog.topic_name == decoded["topic_name"]:
+            return True
+    except:
+        pass
+    return False
+
+def get_db_test():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+    
+if __name__ == "__main__":
+    db = next(get_db_test())
+    user1 = get_user_by_id(db,1,True)
+    print(topicImport(db,topicExport(db, 1)[0], user1))

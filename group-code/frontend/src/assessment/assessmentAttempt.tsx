@@ -17,6 +17,13 @@ import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/rea
 import { ChevronRight } from '@mui/icons-material';
 import { Divider } from '@mui/material';
 
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkToc from 'remark-toc';
+import rehypeHighlight from 'rehype-highlight';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+
 export default function AssessmentAttempt() {
   const param = useParams();
   const navigate = useNavigate();
@@ -24,7 +31,7 @@ export default function AssessmentAttempt() {
     navigate(path);
   };
   const [showMessage, setShowMessage] = useState(false);
-  const [isActive, setIsActive] = useState('-1');
+  const [isActive, setIsActive] = useState(1);
   const [problem, setProblem] = useState([
     {
       questionID: "",
@@ -65,16 +72,18 @@ export default function AssessmentAttempt() {
         }
         i++;
       }
-      const index = prev[i].answerAttempt.indexOf(cho)
-      console.log("index: " + index)
-      index == -1 ? prev[i].answerAttempt.push(cho) : prev[i].answerAttempt.splice(index, 1);
-      console.log(JSON.stringify(prev[i].answerAttempt))
+      const index = prev[i].answerAttempt.indexOf(cho);
+      console.log('index: ' + index);
+      index == -1
+        ? prev[i].answerAttempt.push(cho)
+        : prev[i].answerAttempt.splice(index, 1);
+      console.log(JSON.stringify(prev[i].answerAttempt));
       const arrCopy = prev.slice();
       return arrCopy;
     });
     console.log('problem: ' + JSON.stringify(problem));
-  }
-  const essayAnswer = async (e: { target: { value: any; }; }) => {
+  };
+  const essayAnswer = async (e: { target: { value: any } }) => {
     const ans = e.target.value;
     //console.log(ans);
     await setProblem((prev) => {
@@ -89,18 +98,17 @@ export default function AssessmentAttempt() {
       const arrCopy = prev.slice();
       return arrCopy;
     });
-    console.log('problem: ' + JSON.stringify(probShow))
-  }
+    console.log('problem: ' + JSON.stringify(probShow));
+  };
 
   const [probShow, setProbShow] = useState(problem[0]);
   //flag to see if back service loaded
-  const [loaded, setLoaded] = useState(true)
+  const [loaded, setLoaded] = useState(true);
 
   const listener = (e: any) => {
     e.preventDefault();
-    e.returnValue = 'Changes you made may not be saved.'
-  }
-
+    e.returnValue = 'Changes you made may not be saved.';
+  };
 
   useEffect(() => {
     console.log(param)
@@ -128,41 +136,41 @@ export default function AssessmentAttempt() {
           console.log(question)
           arr.push(question)
         }
-        console.log('arr: ' + arr.length)
-        const newData = [
-          {
-            questionID: '1',
-            problemDescription:
-              'What is a correct syntax to output "Hello World" in C++?',
-            type: 'singleChoice',
-            choice: [
-              'A. cout << "Hello World";',
-              'B. Console.WriteLine("Hello World");',
-              'C. print ("Hello World");',
-              'D. System.out.println("Hello World");'
-            ],
-            answerAttempt: [] as any,
-            answer: ['A. cout << "Hello World";']
-          },
-          {
-            questionID: '2',
-            problemDescription: 'which of the functions below can be used Allocate space for array in memory',
-            type: 'multipleChoice',
-            choice: ['A. calloc()', 'B. malloc()', 'C. realloc()', 'D. free()'],
-            answerAttempt: [] as any,
-            answer: ['A. calloc()', 'B. malloc()']
-          },
-          {
-            questionID: '3',
-            problemDescription: 'What is the best programming language',
-            type: 'Essay',
-            answerAttempt: [] as any,
-            answer: ['']
-          },
-        ]
-        newData.map((elem) => {
-          arr.push(elem)
-        })
+        // console.log('arr: ' + arr.length)
+        // const newData = [
+        //   {
+        //     questionID: '1',
+        //     problemDescription:
+        //       'What is a correct syntax to output "Hello World" in C++?',
+        //     type: 'singleChoice',
+        //     choice: [
+        //       'A. cout << "Hello World";',
+        //       'B. Console.WriteLine("Hello World");',
+        //       'C. print ("Hello World");',
+        //       'D. System.out.println("Hello World");'
+        //     ],
+        //     answerAttempt: [] as any,
+        //     answer: ['A. cout << "Hello World";']
+        //   },
+        //   {
+        //     questionID: '2',
+        //     problemDescription: 'which of the functions below can be used Allocate space for array in memory',
+        //     type: 'multipleChoice',
+        //     choice: ['A. calloc()', 'B. malloc()', 'C. realloc()', 'D. free()'],
+        //     answerAttempt: [] as any,
+        //     answer: ['A. calloc()', 'B. malloc()']
+        //   },
+        //   {
+        //     questionID: '3',
+        //     problemDescription: 'What is the best programming language',
+        //     type: 'Essay',
+        //     answerAttempt: [] as any,
+        //     answer: ['']
+        //   },
+        // ]
+        // newData.map((elem) => {
+        //   arr.push(elem)
+        // })
         setProblem(arr);
         setLoaded(!loaded)
         //setProbShow()
@@ -173,17 +181,16 @@ export default function AssessmentAttempt() {
 
   useEffect(() => {
     return () => {
-      window.removeEventListener('beforeunload', listener)
-    }
-  }, [])
+      window.removeEventListener('beforeunload', listener);
+    };
+  }, []);
 
   useEffect(() => {
-    console.log("After update" + JSON.stringify(problem))
-    setProbShow(problem[0])
-    setIsActive(problem[0].questionID)
+    console.log('After update' + JSON.stringify(problem));
+    setProbShow(problem[0]);
+    setIsActive(1);
     //console.log("probShow: " + JSON.stringify(probShow))
-  }, [loaded])
-
+  }, [loaded]);
 
   return (
     <>
@@ -201,9 +208,9 @@ export default function AssessmentAttempt() {
               <nav className="flex-1 space-y-1 px-2 pb-4">
                 {problem.map((prob) => (
                   <button
-                    className={`w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md ${prob.questionID == isActive ? 'text-white bg-indigo-500' : ''}`}
+                    className={`w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md ${prob.questionID == isActive.toString() ? 'text-white bg-indigo-500' : ''}`}
                     onClick={() => {
-                      setIsActive(prob.questionID);
+                      setIsActive(problem.indexOf(prob) + 1);
                       //console.log('selectProblemID: ' + isActive);
                       setProbShow(prob);
                     }}
@@ -274,7 +281,12 @@ export default function AssessmentAttempt() {
                   <div className="py-4">
                     <div className="h-max rounded-lg border-4 border-gray-200">
                       <div className="flex flex-row whitespace-nowrap py-4 pl-4 pr-3 text-sm font-bold text-gray-900 sm:pl-6">
-                        {capitalise(probShow.problemDescription)}
+                        <ReactMarkdown
+                          className="prose prose-sm max-w-none"
+                          children={capitalise(probShow.problemDescription)}
+                          remarkPlugins={[remarkGfm, remarkToc, remarkMath]}
+                          rehypePlugins={[rehypeHighlight, rehypeKatex]}
+                        />
                         {probShow.type == 'singleChoice' && (
                           <h2>(single choice)</h2>
                         )}
@@ -314,7 +326,7 @@ export default function AssessmentAttempt() {
                               </div>
                             </div>
                           ))}
-                        {probShow.type == 'multipleChoice' && (
+                        {probShow.type == 'multipleChoice' &&
                           probShow.choice?.map((cho) => (
                             <div className="relative flex items-start">
                               <div className="flex h-5 items-center">
@@ -344,9 +356,8 @@ export default function AssessmentAttempt() {
                                 </span>
                               </div>
                             </div>
-                          ))
-                        )}
-                        {probShow.type == 'Essay' &&
+                          ))}
+                        {probShow.type == 'Essay' && (
                           <div className="mt-1">
                             <textarea
                               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -355,7 +366,7 @@ export default function AssessmentAttempt() {
                               onChange={essayAnswer}
                             />
                           </div>
-                        }
+                        )}
                       </div>
                     </div>
                   </div>
@@ -369,7 +380,7 @@ export default function AssessmentAttempt() {
                       const currentIndex = problem.findIndex((item) => item.questionID === probShow.questionID);
                       if (currentIndex > 0) {
                         const prevQuestion = problem[currentIndex - 1];
-                        setIsActive(prevQuestion.questionID);
+                        setIsActive(parseInt(prevQuestion.questionID));
                         setProbShow(prevQuestion);
                       }
                     }}>
@@ -383,7 +394,7 @@ export default function AssessmentAttempt() {
                       const currentIndex = problem.findIndex((item) => item.questionID === probShow.questionID); 7
                       if (currentIndex < problem.length - 1) {
                         const nextQuestion = problem[currentIndex + 1];
-                        setIsActive(nextQuestion.questionID);
+                        setIsActive(parseInt(nextQuestion.questionID));
                         setProbShow(nextQuestion);
                       }
                     }}

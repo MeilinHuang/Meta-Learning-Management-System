@@ -88,12 +88,14 @@ class Prerequisite(Base):
         "Topic", secondary=prerequisite_assosciation, backref="prerequisite_of")
     amount = Column(Integer, default=1)
 
-    @validates(amount)
-    def validate_amount(self, key, amount):
-        if amount > len(self.choices):
-            raise ValueError(
-                "Amount cannot be greater than number of prerequisite choices")
-        return amount
+    # @validates(amount)
+    # def validate_amount(self, key, amount):
+    #     non_archived_choices = filter(lambda c: not c.archived, self.choices)
+    #     print('non_archived_choices', non_archived_choices)
+    #     if amount > len(non_archived_choices):
+    #         raise ValueError(
+    #             "Amount cannot be greater than number of prerequisite active (non-archived) topics")
+    #     return amount
 
 
 class Topic(Base):
@@ -395,7 +397,7 @@ class Message(Base):
     id = Column(Integer, primary_key=True, index=True)
     conversation_id = Column(Integer, ForeignKey("conversation.id"))
     sender_name = Column(Text)
-    time_created = Column(DateTime(timezone=True), server_default=func.now())
+    time_created = Column(DateTime(timezone=True))
     content = Column(Text)
 
 
@@ -404,3 +406,35 @@ class Group_member(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     conversation_id = Column(Integer, ForeignKey("conversation.id"))
+    lastSeen = Column(DateTime)
+
+class Log(Base):
+    __tablename__ = "log"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    time_created = Column(DateTime(timezone=True))
+    details = Column(Text) 
+
+class Privacy(Base):
+    __tablename__ = "privacy"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    full_name = Column(Boolean, default=False)
+    email = Column(Boolean, default=False)
+    recent_activity = Column(Boolean, default=False)
+    invisible = Column(Boolean, default=False)
+
+class topicExportLog(Base):
+    __tablename__ = "topicExportLog"
+    id = Column(Integer, primary_key=True, index=True)
+    auth_token = Column(String(16), nullable=True)
+    checksum = Column(Text)
+    topic_name = Column(String(32))
+
+class PomodoroSession(Base):
+    __tablename__ = "pomodoro_sessions"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    username = Column(String, index=True)
+    email = Column(String, index=True)
+    time = Column(DateTime, server_default=func.now())
+    focusTimeMinutes = Column(Integer)

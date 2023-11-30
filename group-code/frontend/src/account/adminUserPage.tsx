@@ -1,6 +1,6 @@
 import { PaperClipIcon } from '@heroicons/react/20/solid';
 
-import { Fragment, MouseEventHandler, useState, useEffect } from 'react';
+import { ChangeEvent, Fragment, MouseEventHandler, useState, useEffect } from 'react';
 // import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import {
@@ -60,7 +60,7 @@ export default function AdminUserPage() {
   const [detail1, setDetail1] = useState(false);
   const [detail2, setDetail2] = useState(false);
   const navigate = useNavigate();
-
+  const [userSearch, setUserSearch] = useState("@");
   const routeChange = (path: To) => {
     navigate(path);
   };
@@ -82,47 +82,57 @@ export default function AdminUserPage() {
     deadlineList,
     resultList,
   } = useSidebar();
-  
-  const location = useLocation()
-    useEffect(() => {
-        if (sidebarOpen === true) {
-            toggleSidebar()
-        }
-    }, [location])
 
+  const location = useLocation()
+  useEffect(() => {
+    if (sidebarOpen === true) {
+      toggleSidebar()
+    }
+  }, [location])
+
+  const handleInputSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    setUserSearch(event.target.value);
+    updateUserList(userSearch);
+  };
+
+  const clearSearch = () => {
+    (document.getElementById("searchBar") as HTMLInputElement).value = "";
+    updateUserList("@");
+  }
   const updateAdminList = () => {
     AccountService.getAdmins()
       .then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
         setAdminList(response.data);
       })
       .catch((error) => {
-        console.log('error');
+        console.error('error');
       });
   };
 
   const updateNonAdminList = () => {
     AccountService.getNonAdmins()
       .then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
         setNonAdminList(response.data);
       })
       .catch((error) => {
-        console.log('error');
+        console.error('error');
       });
   };
 
-  const updateUserList = () => {
-    AccountService.loadUsers()
+  const updateUserList = (search: string) => {
+    const param = { search: search };
+    AccountService.loadUsers(param)
       .then((response) => {
         // console.log("users got: ")
-        console.log(response.data);
+        // console.log(response.data);
         // console.log(response.data.length)
 
         setUsersList(response.data);
       })
       .catch((error) => {
-        console.log('error');
+        console.error('error');
       });
   };
 
@@ -133,16 +143,16 @@ export default function AdminUserPage() {
         setFriendsList(response.data.friends);
       })
       .catch((error) => {
-        console.log('error');
+        console.error('error');
       });
 
-    updateUserList();
+    updateUserList(userSearch);
 
     // get the current admins
     updateAdminList()
 
     updateNonAdminList()
-    console.log(localStorage.getItem('admin'))
+    // console.log(localStorage.getItem('admin'))
 
   }, [])
 
@@ -157,7 +167,7 @@ export default function AdminUserPage() {
         // console.log(friendsList[i].username)
         // console.log(i)
         res.push(
-          <Link to={`/details/${friendsList[i].conver.conversation_name}`}>
+          <Link key={friendsList[i].id} to={`/details/${friendsList[i].conver.conversation_name}`}>
             <div
               className={
                 i % 2 == 0
@@ -168,7 +178,7 @@ export default function AdminUserPage() {
               <ul>
                 <li
                   className='p-3'
-                  key={friendsList[i].id}
+                // key={friendsList[i].id}
                 >
 
                   {friendsList[i].conver.conversation_name.replace(/_/g, " ").replace(localStorage.getItem("user_name"), "")}
@@ -193,7 +203,7 @@ export default function AdminUserPage() {
       while (i < len) {
         // console.log(usersList[i].username)
         if (usersList[i].username != localStorage.getItem("user_name")) {
-          res.push(<Link to={`/users/${usersList[i].id}`}>
+          res.push(<Link key={usersList[i].id} to={`/users/${usersList[i].id}`}>
             <div className={
               'bg-gray-50 h-10 font-sans font-medium hover:bg-gray-100 m-2'
             }
@@ -225,13 +235,7 @@ export default function AdminUserPage() {
             <div className="mx-auto max-w-full px-4 sm:px-6 md:px-8">
               <h1 className="text-3xl font-semibold text-gray-900">Topics</h1>
             </div>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-              <div className="py-4">
-                <div className="rounded-lg border-gray-200">
-                  <EnrolledTopics />
-                </div>
-              </div>
-            </div>
+            <EnrolledTopics />
           </div>
         </main>
 
@@ -324,12 +328,12 @@ export default function AdminUserPage() {
                           <button
                             className="bg-neutral-200 w-64 text-indigo-600 h-10 font-mono rounded-md border-solid border-slate-300 hover:bg-neutral-300"
                             onClick={() => {
-                              console.log(selectedList);
+                              // console.log(selectedList);
                               AccountService.promoteAdmin({
                                 ids: selectedList,
                                 token: localStorage.getItem('access_token')
                               }).then((response) => {
-                                console.log(response);
+                                // console.log(response);
                                 updateAdminList();
                                 setAddAdmin(false);
                                 updateNonAdminList();
@@ -405,15 +409,15 @@ export default function AdminUserPage() {
                           <button
                             className="bg-neutral-200 w-64 text-indigo-600 h-10 font-mono rounded-md border-solid border-slate-300 hover:bg-neutral-300"
                             onClick={() => {
-                              console.log(selectedList);
+                              // console.log(selectedList);
                               AccountService.demoteAdmin({
                                 ids: selectedList,
                                 token: localStorage.getItem('access_token')
                               }).then((response) => {
-                                console.log(response);
+                                // console.log(response);
                                 updateAdminList();
                               });
-                              updateUserList();
+                              updateUserList(userSearch);
                               setDeleteAdmin(false);
                               setSelectedUsersList([]);
                               updateNonAdminList();
@@ -507,6 +511,21 @@ export default function AdminUserPage() {
           <div className="py-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
               <h1 className="text-2xl font-semibold text-gray-900">Users</h1>
+            </div>
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 flex margin-left h-15 mt-4">
+              <input
+                className="text-sm text-gray-900 sm:col-span-2 sm:mt-0"
+                placeholder="Enter Username"
+                onChange={handleInputSearch}
+                id="searchBar"
+              ></input>
+              <button
+                type="submit"
+                className="ml-4 flex justify-right rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+                onClick={clearSearch}
+              >
+                Clear
+              </button>
             </div>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
               <div></div>

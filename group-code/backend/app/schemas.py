@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from datetime import datetime, timezone
 from fastapi import Form, File, UploadFile
 
-
 class Message(BaseModel):
     id: str
     username: str
@@ -57,7 +56,7 @@ class User(BaseModel):
     lastOtp: str
     emailAuth: str
     mfa: str
-    
+    profilePic: str
     class Config:
         orm_mode = True
 
@@ -159,6 +158,7 @@ class AuthorDetails(BaseModel):
     id: int
     name: str
     username: str
+    profilePic: str
 
 
 class Post(BaseModel):
@@ -345,6 +345,8 @@ class PathwayTopicInfo(BaseModel):
     topic_group: PathwayTopicGroupInfo
     needs: List[PathwayTopicPrerequisite]
     archived: bool
+    year: Optional[int]
+    term: Optional[str]
 
 
 PathwayTopicPrerequisite.update_forward_refs()
@@ -394,7 +396,11 @@ class PathwayCreate(BaseModel):
     electives: List[int]
 
 
+class PathwayDelete(BaseModel):
+    pathway_id: int
+
 class PathwayEdit(BaseModel):
+    pathway_name: str
     pathway_id: int
     core: List[int]
     electives: List[int]
@@ -558,3 +564,29 @@ class setMFA(BaseModel):
 class idToken(BaseModel):
     id: str
     token: str
+
+class userImage(BaseModel):
+    id: str
+    token: str
+    image: Any
+
+class log(BaseModel):
+    id: int
+    user_id: int
+    time: datetime
+    details: str
+
+class privacy(BaseModel):
+    email: bool
+    recent_activity: bool
+    invisible: bool
+    full_name: bool
+
+class importTopic(BaseModel):
+    file: str
+    
+class PomodoroSession(BaseModel):
+    username: str  # User's username
+    email: str  # User's email
+    time: datetime
+    focusTimeMinutes: int

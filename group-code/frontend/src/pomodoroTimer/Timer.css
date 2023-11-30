@@ -1,0 +1,7 @@
+.float-component {
+  position: fixed;
+  border: 2px solid blue;
+  border-radius: 8px;
+  background-color: red;
+  cursor: move;
+}
