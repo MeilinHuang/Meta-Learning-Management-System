@@ -1,10 +1,22 @@
 // SidebarContext.tsx
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
+const DEFAULT_STATE = {
+    sidebarOpen: false,
+    topicsShow: true,
+    adminShow: false,
+    materialShow: false,
+    conversationShow: false,
+    usersShow: false,
+    resultShow: false,
+    deadlineShow: false,
+    assessmentShow: false,
+}
 interface SidebarContextType {
     sidebarOpen: boolean;
     // setSidebarOpen: (show: boolean) => void;
     toggleSidebar: () => void;
+    resetSidebarState: () => void;
     assessmentClick: () => void;
     topicsShow: boolean;
     setTopicsShow: (show: boolean) => void;
@@ -49,8 +61,14 @@ export const SidebarProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [deadlineList, setDeadlineList] = useState<any[]>([]);
     const [resultList, setResultList] = useState<any[]>([]);
 
+    const [sidebarState, setSidebarState] = useState(DEFAULT_STATE);
+
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
+    };
+
+    const resetSidebarState = () => {
+        setSidebarState(DEFAULT_STATE);
     };
 
     const assessmentClick = () => {
@@ -69,6 +87,7 @@ export const SidebarProvider: React.FC<{ children: ReactNode }> = ({ children })
             value={{
                 sidebarOpen,
                 toggleSidebar,
+                resetSidebarState,
                 assessmentClick,
                 topicsShow,
                 setTopicsShow,

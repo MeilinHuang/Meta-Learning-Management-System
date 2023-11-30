@@ -226,16 +226,16 @@ export default function AssessmentMain() {
           year: '2022',
           term: 'Term 3',
           mark: 'N/A',
-          topic_id: '2',
-          enroll_id: '1'
+          topic_id: '5',
+          enroll_id: '5'
         },
         {
           topic: 'Advanced algorithm',
           year: '2022',
           term: 'Term 2',
           mark: '89',
-          topic_id: '3',
-          enroll_id: '2'
+          topic_id: '6',
+          enroll_id: '6'
         }]
         newData.map((elem) => {
           arr.push(elem)

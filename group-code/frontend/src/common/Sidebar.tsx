@@ -752,7 +752,7 @@ export default function Sidebar() {
                                         </button>
                                         <button className={
                                             resultShow
-                                                ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 rounded-md'
+                                                ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center pl-2 py-1 rounded-md'
                                                 : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 rounded-md'}
                                             onClick={() => {
                                                 AccountService.loadUsers()

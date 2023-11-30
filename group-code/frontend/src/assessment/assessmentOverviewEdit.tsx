@@ -121,17 +121,17 @@ export default function AssessmentOverviewEdit() {
                     arr.push(item)
                 }
                 //console.log(arr)
-                // const newData = [
-                //     {
-                //         id: '1',
-                //         topic_name: 'c++',
-                //         description: 'This is a topic for c++',
-                //     },
+                const newData = [
+                    {
+                        id: '1',
+                        topic_name: 'C++',
+                        description: 'This is a topic for c++',
+                    },
 
-                // ]
-                // newData.map((elem) => {
-                //     arr.push(elem)
-                // })
+                ]
+                newData.map((elem) => {
+                    arr.push(elem)
+                })
                 setTopics(arr)
                 setSearchedTopics(arr)
             });
@@ -165,7 +165,7 @@ export default function AssessmentOverviewEdit() {
                             <div className='relative flex items-stretch overflow-x-auto'>
                                 <div className="relative max-w-xs">
                                     <label htmlFor="hs-table-search" className="sr-only">Search</label>
-                                    <input type="text" name="hs-table-search" id="hs-table-search" className="p-3 pl-10 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400" placeholder="Search" onChange={(e) => {handleChange(e, "search")}} onKeyDown={handleKeyDown} />
+                                    <input type="text" name="hs-table-search" id="hs-table-search" className="p-3 pl-10 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400" placeholder="Search" onChange={(e) => { handleChange(e, "search") }} onKeyDown={handleKeyDown} />
                                     {/* Search Icon */}
                                     <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
                                         <svg className="h-3.5 w-3.5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -223,7 +223,7 @@ export default function AssessmentOverviewEdit() {
                                         <input
                                             className="block w-20 appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                                             placeholder='Topic'
-                                            onChange={(e) => {handleChange(e, "topic")}}
+                                            onChange={(e) => { handleChange(e, "topic") }}
                                             value={topicField}
                                         // onChange={(e) => { setYear(e.target.value) }}
                                         // onChange={handleYearChange}

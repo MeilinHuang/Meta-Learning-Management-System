@@ -31,7 +31,7 @@ export default function Navbar() {
     }
   }, [superuserData]);
 
-  const { assessmentClick } = useSidebar()
+  const { resetSidebarState } = useSidebar()
 
   return (
     <Disclosure as="nav" className="bg-indigo-600 shadow fixed w-full z-50">
@@ -166,6 +166,7 @@ export default function Navbar() {
                                 'block px-4 py-2 text-sm'
                               )}
                               onClick={() => {
+                                resetSidebarState()
                                 AccountService.logout({ "access_token": localStorage.getItem("access_token") })
                                   .then((response) => {
                                     console.log(response)

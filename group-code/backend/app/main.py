@@ -512,6 +512,7 @@ async def assessmentEditCheckPermission(detail: schemas.CheckAssessmentPermissio
     res = False
     user_list = helper.verify_user(db, detail.token)
     user = user_list[1]
+
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -521,7 +522,6 @@ async def assessmentEditCheckPermission(detail: schemas.CheckAssessmentPermissio
         topic = db.query(models.Role).filter_by(id=detail.topic_id).one()
         result = db.query(models.TopicEnrollment).filter_by(
             user_id=user.id, topic_id=topic.id).all()
-        print(result)
         if result == []:
             return res
         if helper.check_permission(db, user, topic, "can_edit_assessment"):
