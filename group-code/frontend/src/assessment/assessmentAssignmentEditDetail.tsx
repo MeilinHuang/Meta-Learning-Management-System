@@ -8,7 +8,7 @@ import {
     useNavigate,
     To
 } from 'react-router-dom';
-import { CheckIcon } from '@heroicons/react/24/outline';
+// import { CheckIcon } from '@heroicons/react/24/outline';
 import AssessmentService from './AssessmentService';
 import axios from 'axios';
 

@@ -182,7 +182,6 @@ export default function AssessmentDetailEdit() {
     return (
         <div className='flex flex-row'>
             <div className="z-50 md:fixed md:top-16 md:bottom-0 md:flex md:flex-col">
-                {/* <Sidebar isOpened={sidebarOpen}></Sidebar> */}
                 <Sidebar></Sidebar>
                 {/* </div> */}
             </div>

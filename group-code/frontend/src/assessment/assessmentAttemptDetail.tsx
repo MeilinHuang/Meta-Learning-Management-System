@@ -95,9 +95,7 @@ export default function AssessmentAttemptDetail() {
                 //console.log(question)
                 arr.push(question);
             }
-            // arr.map((elem) => {
             console.log(arr.length);
-            // })
             // const newData = [
             //     {
             //         questionID: "1",

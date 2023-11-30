@@ -18,7 +18,6 @@ export default function AssessmentEditTestDetail() {
     const param = useParams();
     const navigate = useNavigate();
     const routeChange = (path: To) => {
-        //let path = `newPath`;
         navigate(path);
     };
     const [showMessage, setShowMessage] = useState(false);

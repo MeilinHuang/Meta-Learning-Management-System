@@ -62,14 +62,9 @@ export default function AdminUserPage() {
   const navigate = useNavigate();
 
   const routeChange = (path: To) => {
-    //let path = `newPath`;
     navigate(path);
   };
 
-  // const handleSidebarToggleButton = () => {
-  //   setSidebarOpen(!sidebarOpen)
-  // }
-  // const { sidebarOpen, toggleSidebar, topicsShow, adminShow } = useSidebar();
   const {
     sidebarOpen,
     toggleSidebar,

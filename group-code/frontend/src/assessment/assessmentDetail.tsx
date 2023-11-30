@@ -107,7 +107,6 @@ export default function AssessmentDetail() {
   // const updatedPaths = [...currentPaths, { name: `${param.topicName} Assessments`, path: `${location.pathname}` }];
 
   const routeChange = (path: To) => {
-    //let path = `newPath`;
     navigate(path);
   };
 

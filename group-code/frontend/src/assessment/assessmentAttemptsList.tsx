@@ -95,7 +95,6 @@ export default function AssessmentAttemptsList() {
                             <div
                                 className='w-max rounded-md flex flex-col'>
                                 <h1 className="text-3xl font-semibold text-gray-900">{param.assessmentName}</h1>
-                                {/* <BreadCrumb currName={param.assessmentName||""}></BreadCrumb> */}
                                 <BreadCrumb></BreadCrumb>
                             </div>
                             {/* <div

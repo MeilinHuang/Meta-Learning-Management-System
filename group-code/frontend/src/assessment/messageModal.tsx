@@ -13,7 +13,6 @@ const MessageModal = (props: { show: any; close: any; message: any }) => {
         show={props.show}
         onHide={props.close}
         className='z-50 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'
-      // className="fixed inset-0 z-10 overflow-y-auto justify-center items-center p-60"
       >
         <div className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left border-2 shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md sm:p-6">
           <Modal.Body>

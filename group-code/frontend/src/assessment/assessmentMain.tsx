@@ -221,13 +221,14 @@ export default function AssessmentMain() {
           console.log(item)
           arr.push(item)
         }
+        // Fake data needs to be deleted when data is updated
         const newData = [{
           topic: 'C++',
           year: '2022',
           term: 'Term 3',
           mark: 'N/A',
-          topic_id: '5',
-          enroll_id: '5'
+          topic_id: '1',
+          enroll_id: '1'
         },
         {
           topic: 'Advanced algorithm',
@@ -265,7 +266,6 @@ export default function AssessmentMain() {
                 <BreadCrumb></BreadCrumb>
 
               </div>
-              {/* <p className="mt-2 text-sm text-gray-700">Assessment overview</p> */}
             </div>
           </div>
 

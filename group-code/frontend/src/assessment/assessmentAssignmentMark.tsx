@@ -17,7 +17,6 @@ export default function AssessmentAssignmentMark() {
     const param = useParams();
     const navigate = useNavigate();
     const routeChange = (path: To) => {
-        //let path = `newPath`;
         navigate(path);
     };
     const [mark, setMark] = useState("0");

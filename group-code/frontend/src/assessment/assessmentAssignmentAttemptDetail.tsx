@@ -121,7 +121,6 @@ export default function AssessmentAssignmentAttemptDetail() {
                                             setIsActive('Description');
                                             //console.log('selectProblemID: ' + isActive);
                                             setcontentShow('Description');
-                                            //console.log(problemDesc.problemDesc)
                                         }}
                                     >
                                         Description

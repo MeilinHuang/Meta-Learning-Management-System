@@ -17,7 +17,6 @@ import BreadCrumb from 'common/BreadCrumb';
 export default function AssessmentAttempsTestOverview() {
     const navigate = useNavigate();
     const routeChange = (path: To) => {
-        //let path = `newPath`;
         navigate(path);
     };
     const param = useParams();

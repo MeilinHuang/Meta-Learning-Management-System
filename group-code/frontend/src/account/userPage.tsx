@@ -41,8 +41,6 @@ import Sidebar from "common/Sidebar";
 import { useSidebar } from "content/SidebarContext";
 import AssessmentMain from "assessment/assessmentMain";
 
-// import Detail from '@/Detail';
-
 const navigation = [
   { name: "Topics", href: "#", icon: HomeIcon, current: true },
   { name: "Deadlines", href: "#", icon: CalendarIcon, current: false },
