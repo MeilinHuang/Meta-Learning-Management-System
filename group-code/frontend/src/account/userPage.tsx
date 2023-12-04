@@ -317,7 +317,6 @@ export default function UserPage() {
           )}
           <Sidebar></Sidebar>
         </div>
-
         <div
           className={`absolute w-full top-16 flex flex-col md:w-auto ${sidebarOpen ? "ml-60" : "ml-16"
             }`}
@@ -331,7 +330,12 @@ export default function UserPage() {
               <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
                 <div className="py-4">
                   <div className="rounded-lg border-gray-200">
-                    <EnrolledTopics />
+                    {localStorage.getItem("admin") === null ?
+                      <div>
+                        An error has occured, please contact the site admin
+                      </div>
+                      : <EnrolledTopics />
+                    }
                   </div>
                 </div>
               </div>
@@ -341,7 +345,7 @@ export default function UserPage() {
           <main className={deadlineShow ? "" : "hidden"}>
             <div className="py-10">
               <div className="mx-auto max-w-full px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">
+                <h1 className="text-3xl font-semibold text-gray-900">
                   Deadline
                 </h1>
               </div>
@@ -365,20 +369,26 @@ export default function UserPage() {
           <main className={conversationShow ? "" : "hidden"}>
             <div className="py-10">
               <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">
+                <h1 className="text-3xl font-semibold text-gray-900">
                   Conversations
                 </h1>
               </div>
               <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
                 <div></div>
                 <div className="py-4">
-                  <div className=" rounded-lg border-4 border-dashed border-gray-200">
-                    <div className="overflow-hidden bg-white shadow sm:rounded-lg">
-                      <div className="border-t border-gray-200">
-                        {loadConversationList()}
+                  {localStorage.getItem("admin") === null ?
+                    <div>
+                      An error has occured, please contact the site admin
+                    </div>
+                    :
+                    <div className="rounded-lg border-4 border-dashed border-gray-200">
+                      <div className="overflow-hidden bg-white shadow sm:rounded-lg">
+                        <div className="border-t border-gray-200">
+                          {loadConversationList()}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  }
                 </div>
                 {/* /End replace */}
               </div>
@@ -388,7 +398,7 @@ export default function UserPage() {
           <main className={resultShow ? "" : "hidden"}>
             <div className="py-10">
               <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">
+                <h1 className="text-3xl font-semibold text-gray-900">
                   Results
                 </h1>
               </div>
@@ -417,147 +427,49 @@ export default function UserPage() {
             </div>
           </main>
 
-          <main className={conversationShow ? '' : 'hidden'}>
-            <div className="py-6">
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">Conversations</h1>
-              </div>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <div></div>
-                <div className="py-4">
-                  <div className=" rounded-lg border-4 border-dashed border-gray-200">
-                    <div className="overflow-hidden bg-white shadow sm:rounded-lg">
-                      <div className="border-t border-gray-200">
-                        {loadConversationList()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* /End replace */}
-              </div>
-            </div>
-          </main>
-
-          <main className={assessmentShow ? '' : 'hidden'}>
-            <div className="py-6">
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  Accessment
-                </h1>
-              </div>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                {/* Replace with your content */}
-                <div className="py-4">
-                  <div className="h-96 rounded-lg border-4 border-dashed border-gray-200" />
-                </div>
-                {/* /End replace */}
-              </div>
-            </div>
-          </main>
-
-          <main className={resultShow ? '' : 'hidden'}>
-            <div className="py-6">
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">Results</h1>
-              </div>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                {/* Replace with your content */}
-                <div className="py-4">
-                  <div className=" rounded-lg border-4 border-dashed border-gray-200 ">
-                    <div>
-                      <div
-                        className={
-                          'bg-indigo-200 text-xl text_black font-bold px-5 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'
-                        }
-                      >
-                        <dt className="text-sm font-large text-black">
-                          Topic Name
-                        </dt>
-                        <dt className="text-sm font-large text-black">
-                          Overall Mark
-                        </dt>
-                      </div>
-                    </div>
-                    {loadResults()}
-                  </div>
-                </div>
-                {/* /End replace */}
-              </div>
-            </div>
-          </main>
-
           <main className={usersShow ? '' : 'hidden'}>
             <div className="py-6">
               <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">Users</h1>
+                <h1 className="text-3xl font-semibold text-gray-900">Users</h1>
               </div>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 flex margin-left h-15 mt-4">
-                <input
-                  className="text-sm text-gray-900 sm:col-span-2 sm:mt-0"
-                  placeholder="Enter Username"
-                  onChange={handleInputSearch}
-                  id="searchBar"
-                ></input>
-                <button
-                  type="submit"
-                  className="ml-4 flex justify-right rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
-                  onClick={clearSearch}
-                >
-                  Clear
-                </button>
-              </div>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <div></div>
-                <div className="py-4">
-                  <div className="rounded-lg border-4 border-dashed border-gray-200">
-                    <div className="overflow-hidden bg-white shadow sm:rounded-lg">
-                      <div className="border-t border-gray-200 flex flex-col gap-2">
-                        {loadUsersList()}
+              {localStorage.getItem("admin") === null ?
+                <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8 flex margin-left h-15 mt-4'>
+                  An error has occured, please contact the site admin
+                </div>
+                :
+                <div>
+                  <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 flex margin-left h-15 mt-4">
+                    <input
+                      className="text-sm text-gray-900 sm:col-span-2 sm:mt-0"
+                      placeholder="Enter Username"
+                      onChange={handleInputSearch}
+                      id="searchBar"
+                    ></input>
+                    <button
+                      type="submit"
+                      className="ml-4 flex justify-right rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+                      onClick={clearSearch}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+                    <div></div>
+                    <div className="py-4">
+                      <div className="rounded-lg border-4 border-dashed border-gray-200">
+                        <div className="overflow-hidden bg-white shadow sm:rounded-lg">
+                          <div className="border-t border-gray-200">
+                            {loadUsersList()}
+                          </div>
+                        </div>
                       </div>
                     </div>
+                    {/* /End replace */}
                   </div>
                 </div>
-                {/* /End replace */}
-              </div>
+              }
             </div>
           </main>
-
-          {/* <main className={assessmentShow ? '' : 'hidden'}>
-            <div className="py-10">
-              <div className="mx-auto max-w-full px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  Assessment
-                </h1>
-              </div>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <div className="py-4">
-                  <div className="h-96 rounded-lg border-gray-200">
-                    <AssessmentMain />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </main> */}
-
-          {/* <main className={usersShow ? "" : "hidden"}>
-            <div className="py-10">
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">Users</h1>
-              </div>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <div></div>
-                <div className="py-4">
-                  <div className="rounded-lg border-4 border-dashed border-gray-200">
-                    <div className="overflow-hidden bg-white shadow sm:rounded-lg">
-                      <div className="border-t border-gray-200 flex flex-col gap-2">
-                        {loadUsersList()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </main> */}
         </div>
       </div>
     </>

@@ -159,7 +159,7 @@ export default function AssessmentEditTestDetail() {
         }
       ])
     }
-    setAdd(true)
+    // setAdd(true)
   }
 
   useEffect(() => {
@@ -330,7 +330,7 @@ export default function AssessmentEditTestDetail() {
                               <PencilIcon
                                 className='h-4 w-4'
                                 onClick={(() => {
-                                  setEdit(!edit)
+                                  // setEdit(!edit)
                                   setEditQuestionId(probShow.questionID)
                                   setModalType("edit")
                                   setIsModalOpen(true);
@@ -351,7 +351,7 @@ export default function AssessmentEditTestDetail() {
                 <div className='flex justify-center py-4'>
                   <button type="button"
                     className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    onClick={() => { setModalType("add"); setIsModalOpen(true); handleCreateNewQuestions() }}
+                    onClick={() => { setModalType("add"); setIsModalOpen(true); /*handleCreateNewQuestions()*/ }}
                   >
                     Create New Questions
                   </button>
@@ -360,6 +360,7 @@ export default function AssessmentEditTestDetail() {
             </div>
           </div>
         </div>
+        {/* This part has been hidden and used AssessmentEditTestModal instead */}
         {add ?
           <div className="md:pl-64">
             <div className="mx-auto flex max-w-4xl flex-col md:px-8 xl:px-0">
@@ -470,7 +471,7 @@ export default function AssessmentEditTestDetail() {
                           <button
                             type="button"
                             className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
-                            onClick={() => { setAdd(false) }}
+                            onClick={() => { setAdd(false); setIsModalOpen(false) }}
                           >
                             Cancel
                           </button>
@@ -557,7 +558,6 @@ export default function AssessmentEditTestDetail() {
                                   <input
                                     type="text"
                                     onChange={handleChangeEditAnswer}
-                                    // value={probShow.answer}
                                     value={editAnswer}
                                     placeholder='["A.xxx","B.xxx","C.xxx"] or empty if Essay'
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
@@ -568,7 +568,7 @@ export default function AssessmentEditTestDetail() {
                                 <button
                                   type="button"
                                   className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
-                                  onClick={() => { setEdit(false) }}
+                                  onClick={() => { setEdit(false); setIsModalOpen(false) }}
                                 >
                                   Cancel
                                 </button>
@@ -576,7 +576,7 @@ export default function AssessmentEditTestDetail() {
                                 <button
                                   className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
                                   onClick={() => {
-                                    setEdit(false)
+                                    // setEdit(false)
                                     console.log("edit Question api")
                                     let choices
                                     let answer
@@ -587,9 +587,7 @@ export default function AssessmentEditTestDetail() {
                                       answer = [""]
                                     }
                                     choices = { "choices": editChoices }
-                                    // choices = { "choices": editChoices }
                                     answer = { "answer": editAnswer }
-                                    // answer = { "answer": editAnswer }
 
                                     const para = {
                                       question_id: editQuestionId,
@@ -642,29 +640,29 @@ export default function AssessmentEditTestDetail() {
                               </div>
                               <div className="flex flex-col whitespace-normal py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                                 {probShow.type === 'singleChoice' && (
-                                  probShow.choice?.map((cho) => (
+                                  probShow.choice?.map((cho, index) => (
                                     <div className="relative flex items-start pb-2" key={cho}>
                                       <div className="flex flex-row ml-3 text-sm items-center">
                                         <label htmlFor="comments" className="font-medium text-gray-700">
-                                          {cho.split(/(?!.)/g).slice(0, 1) + " "}
+                                          {String.fromCharCode(65 + index) + ". " + cho}
                                         </label>
                                         <span id="comments-description" className="text-gray-500">
                                           <span className="sr-only">New comments </span>
-                                          {cho.split(/(?!.)/g).slice(1)}
+                                          {/* {cho} */}
                                         </span>
                                       </div>
                                     </div>
                                   ))
                                 )}
                                 {probShow.type == 'multipleChoice' && (
-                                  probShow.choice?.map((cho) => (
+                                  probShow.choice?.map((cho, index) => (
                                     <div className="relative flex items-start pb-2">
                                       <div className="flex flex-row ml-3 text-sm">
                                         <label
                                           htmlFor="comments"
                                           className="font-medium text-gray-700"
                                         >
-                                          {cho.split(/(?!.)/g).slice(0, 1) + ' '}
+                                          {String.fromCharCode(65 + index) + ". " + cho}
                                         </label>
                                         <span
                                           id="comments-description"
@@ -692,21 +690,21 @@ export default function AssessmentEditTestDetail() {
                             <div className="h-max rounded-lg border-4 border-gray-200 mt-6">
                               <div className="mt-2 ml-3 text-sm font-semibold text-green-600">
                                 Correct Answer: {
-                                  probShow.answer?.map((ans: any) => (
+                                  probShow.answer?.map((ans: any, index) => (
                                     <div className="relative flex items-start" >
                                       <div className="ml-3 text-sm" >
                                         <label
                                           htmlFor="comments"
                                           className="font-medium text-gray-700"
                                         >
-                                          {ans.split(/(?!.)/g).slice(0, 1) + ' '}
+                                          {String.fromCharCode(65 + index) + ". " + ans}
                                         </label>
                                         <span
                                           id="comments-description"
                                           className="text-gray-500"
                                         >
                                           <span className="sr-only">New comments </span>
-                                          {ans.split(/(?!.)/g).slice(1)}
+                                          {/* {ans.split(/(?!.)/g).slice(1)} */}
                                         </span>
                                       </div>
                                     </div>
@@ -785,9 +783,7 @@ export default function AssessmentEditTestDetail() {
                                     answer = [""]
                                   }
                                   choices = { "choices": JSON.parse(editChoices) }
-                                  // choices = { "choices": editChoices }
                                   answer = { "answer": JSON.parse(editAnswer) }
-                                  // answer = { "answer": editAnswer }
 
                                   const para = {
                                     question_id: editQuestionId,
@@ -822,7 +818,6 @@ export default function AssessmentEditTestDetail() {
                             close={() => setShowMessage(false)}
                             message={"The section is open you can not delete it"}
                           />
-                          {/* /End replace */}
                         </div>
                       }
 
@@ -833,15 +828,14 @@ export default function AssessmentEditTestDetail() {
               : <></>}
           </>
         }
-        {problem[0].problemDescription === "" ?
+        {/* {problem[0].problemDescription === "" ?
           <></>
           :
           <div className="md:pl-64">
             <div className="mx-auto flex max-w-4xl flex-col md:px-8 xl:px-0">
-
             </div>
           </div>
-        }
+        } */}
 
       </div>
     </>

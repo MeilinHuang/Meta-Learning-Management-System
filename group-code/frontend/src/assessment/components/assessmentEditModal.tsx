@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Input, message, Radio, DatePicker } from 'antd';
 import AssessmentService from '../AssessmentService';
+import { RadioChangeEvent } from 'antd/lib/radio';
 
 type AssessmentEditModalType = {
   isOpen: boolean;
@@ -17,6 +18,9 @@ const AssessmentEditModal = (props: AssessmentEditModalType) => {
 
   const [messageApi, contextHolder] = message.useMessage();
 
+  const [typeValue, setTypeValue] = useState("")
+  const [proportionValue, setProportionValue] = useState("")
+
   useEffect(() => {
     setModalType(props.modalType);
   }, [props.isOpen]);
@@ -27,9 +31,8 @@ const AssessmentEditModal = (props: AssessmentEditModalType) => {
   const handleOk = async (values: any) => {
     const start = values.timeRange[0];
     const end = values.timeRange[1];
-    const timeRange = `${start.$y}/${start.$M + 1}/${start.$D} to ${end.$y}/${
-      end.$M + 1
-    }/${end.$D}`;
+    const timeRange = `${start.$y}/${start.$M + 1}/${start.$D} to ${end.$y}/${end.$M + 1
+      }/${end.$D}`;
     let params;
     if (props.modalType === 'edit') {
       params = {
@@ -67,6 +70,10 @@ const AssessmentEditModal = (props: AssessmentEditModalType) => {
     }
   };
 
+  const handleProportionValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProportionValue(e.target.value)
+  }
+
   return (
     <>
       <Modal
@@ -95,20 +102,18 @@ const AssessmentEditModal = (props: AssessmentEditModalType) => {
               <Input placeholder="Please fill assessment name" />
             </Form.Item>
           )}
-          {modalType === 'add' && (
-            <Form.Item
-              name="type"
-              label="Type"
-              rules={[{ required: true, message: 'Please select type' }]}
-            >
-              <Radio.Group>
-                <Radio.Button value="exam">Exam</Radio.Button>
-                <Radio.Button value="assignment">Assignment</Radio.Button>
-                <Radio.Button value="quiz">Quiz</Radio.Button>
-                <Radio.Button value="essay">Essay</Radio.Button>
-              </Radio.Group>
-            </Form.Item>
-          )}
+          <Form.Item
+            name="type"
+            label="Type"
+            rules={[{ required: true, message: 'Please select type' }]}
+          >
+            <Radio.Group value={typeValue}>
+              <Radio.Button value="exam">Exam</Radio.Button>
+              <Radio.Button value="assignment">Assignment</Radio.Button>
+              <Radio.Button value="quiz">Quiz</Radio.Button>
+              <Radio.Button value="essay">Essay</Radio.Button>
+            </Radio.Group>
+          </Form.Item>
           {modalType === 'edit' && (
             <Form.Item
               name="status"
@@ -116,14 +121,14 @@ const AssessmentEditModal = (props: AssessmentEditModalType) => {
               rules={[{ required: true, message: 'Please select status' }]}
             >
               <Radio.Group>
-                <Radio.Button value="open">Open</Radio.Button>
+                <Radio.Button value="open" >Open</Radio.Button>
                 <Radio.Button value="close">Close</Radio.Button>
               </Radio.Group>
             </Form.Item>
           )}
           <Form.Item
             name="proportion"
-            label="proportion"
+            label="Proportion"
             rules={[
               {
                 required: true,
@@ -135,7 +140,7 @@ const AssessmentEditModal = (props: AssessmentEditModalType) => {
               }
             ]}
           >
-            <Input placeholder="Enter a number between 0 and 1. Example: 0.2" />
+            <Input placeholder="Enter a number between 0 and 1. Example: 0.2" value={parseInt(proportionValue)} onChange={handleProportionValue} />
           </Form.Item>
           <Form.Item
             name="timeRange"

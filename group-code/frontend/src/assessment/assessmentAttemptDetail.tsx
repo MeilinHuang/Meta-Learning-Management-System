@@ -23,13 +23,6 @@ import e from "express";
 import { capitalise } from "content/contentHelpers";
 import BreadCrumb from "common/BreadCrumb";
 
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkToc from 'remark-toc';
-import rehypeHighlight from 'rehype-highlight';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-
 export default function AssessmentAttemptDetail() {
   const param = useParams();
   const navigate = useNavigate();
@@ -37,7 +30,7 @@ export default function AssessmentAttemptDetail() {
     //let path = `newPath`;
     navigate(path);
   };
-  const [isActive, setIsActive] = useState(1);
+  const [isActive, setIsActive] = useState("-1");
   const [mark, setMark] = useState("0");
   const [feedback, setFeedback] = useState("");
   const [problem, setProblem] = useState([
@@ -49,40 +42,11 @@ export default function AssessmentAttemptDetail() {
       answerAttempt: [""],
       answer: [""],
     },
-    // {
-    //   questionID: '1',
-    //   problemDescription:
-    //     'What is a correct syntax to output "Hello World" in C++?',
-    //   type: 'singleChoice',
-    //   choice: [
-    //     'A. cout << "Hello World";',
-    //     'B. Console.WriteLine("Hello World");',
-    //     'C. print ("Hello World");',
-    //     'D. System.out.println("Hello World");'
-    //   ],
-    //   answerAttempt: ['A. cout << "Hello World";'],
-    //   answer: ['A. cout << "Hello World";']
-    // },
-    // {
-    //   questionID: '2',
-    //   problemDescription: 'which of the functions below can be used Allocate space for array in memory',
-    //   type: 'multipleChoice',
-    //   choice: ['A. calloc()', 'B. malloc()', 'C. realloc()', 'D. free()'],
-    //   answerAttempt: ['A. calloc()', 'B. malloc()'],
-    //   answer: ['A. calloc()', 'B. malloc()']
-    // },
-    // {
-    //   questionID: '3',
-    //   problemDescription: 'What is the best programming language',
-    //   type: 'Essay',
-    //   answerAttempt: [] as any,
-    //   answer: [''] as any
-    // }
   ]);
 
   const [probShow, setProbShow] = useState(problem[0]);
   //flag to see if back service loaded
-  const [loaded, setLoaded] = useState(true);;
+  const [loaded, setLoaded] = useState(true);
 
   const [attempt, setAttempt] = useState([""]);
   const [result, setResult] = useState([""]);
@@ -90,7 +54,7 @@ export default function AssessmentAttemptDetail() {
 
   const listener = (e: any) => {
     e.preventDefault();
-    e.returnValue = 'Changes you made may not be saved.';
+    e.returnValue = "Changes you made may not be saved.";
   };
 
   useEffect(() => {
@@ -131,22 +95,24 @@ export default function AssessmentAttemptDetail() {
         //console.log(question)
         arr.push(question);
       }
+      // arr.map((elem) => {
       console.log(arr.length);
+      // })
       // const newData = [
-      //     {
-      //         questionID: "1",
-      //         problemDescription:
-      //             "What is a correct syntax to output 'Hello World' in C++?",
-      //         type: "singleChoice",
-      //         choice: [
-      //             "A. cout << 'Hello World';",
-      //             "B. Console.WriteLine('Hello World');",
-      //             "C. print ('Hello World');",
-      //             "D. System.out.println('Hello World');"
-      //         ],
-      //         answerAttempt: ["A. cout << 'Hello World';"],
-      //         answer: ["A. cout << 'Hello World';"]
-      //     },
+      //   {
+      //     questionID: "1",
+      //     problemDescription:
+      //       "What is a correct syntax to output 'Hello World' in C++?",
+      //     type: "singleChoice",
+      //     choice: [
+      //       "A. cout << 'Hello World';",
+      //       "B. Console.WriteLine('Hello World');",
+      //       "C. print ('Hello World');",
+      //       "D. System.out.println('Hello World');"
+      //     ],
+      //     answerAttempt: ["A. cout << 'Hello World';"],
+      //     answer: ["A. cout << 'Hello World';"]
+      //   },
       //     {
       //         questionID: "2",
       //         problemDescription: "which of the functions below can be used Allocate space for array in memory",
@@ -166,7 +132,7 @@ export default function AssessmentAttemptDetail() {
       // ]
 
       // newData.map((elem) => {
-      //     arr.push(elem)
+      //   arr.push(elem)
       // })
       // arr.push(newData[0])
       // arr.push(newData[1])
@@ -183,7 +149,7 @@ export default function AssessmentAttemptDetail() {
   useEffect(() => {
     // console.log("After update" + JSON.stringify(problem))
     setProbShow(problem[0]);
-    setIsActive(parseInt(problem[0].questionID));
+    setIsActive(problem[0].questionID);
     setAttempt(probShow.answerAttempt);
     setResult(probShow.answer);
     setStatus(attempt === result);
@@ -231,14 +197,14 @@ export default function AssessmentAttemptDetail() {
               <nav className="flex-1 space-y-1 px-2 pb-4">
                 {problem.map((prob) => (
                   <div
-                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${prob.questionID == isActive.toString()
+                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${prob.questionID == isActive
                       ? "text-white bg-indigo-500"
                       : ""
                       }`}
                   >
                     <button
                       onClick={() => {
-                        setIsActive(parseInt(prob.questionID));
+                        setIsActive(prob.questionID);
                         console.log("length: " + problem.length);
                         setProbShow(prob);
                       }}
@@ -267,13 +233,7 @@ export default function AssessmentAttemptDetail() {
                     {/* Question */}
                     <div className="h-max rounded-lg border-4 border-gray-200">
                       <div className="flex flex-row whitespace-nowrap py-4 pl-4 pr-3 text-sm font-bold text-gray-900 sm:pl-6">
-                        {/* Actual problem description */}
-                        <ReactMarkdown
-                          className="prose prose-sm max-w-none"
-                          children={probShow.problemDescription}
-                          remarkPlugins={[remarkGfm, remarkToc, remarkMath]}
-                          rehypePlugins={[rehypeHighlight, rehypeKatex]}
-                        />
+                        {capitalise(probShow.problemDescription)}
                         {probShow.type == "singleChoice" && (
                           <h2>(single choice)</h2>
                         )}
@@ -353,87 +313,126 @@ export default function AssessmentAttemptDetail() {
                         )}
                       </div>
                     </div>
-                    <div className="h-96 rounded-lg border-4 border-dashed border-gray-200">
-                      <div className="ml-3 text-sm">
-                        AnswerAttempt: {
-                          probShow.answerAttempt?.map((att: any) => (
-                            < div className="relative flex items-start" >
-                              <div className="ml-3 text-sm" >
-                                <label
-                                  htmlFor="comments"
-                                  className="font-medium text-gray-700"
-                                >
-                                  {att.split(/(?!.)/g).slice(0, 1) + ' '}
-                                </label>
-                                <span
-                                  id="comments-description"
-                                  className="text-gray-500"
-                                >
-                                  <span className="sr-only">New comments </span>
-                                  {att.split(/(?!.)/g).slice(1)}
-                                </span>
-                              </div>
+                    {/* Answer section */}
+                    <div className="h-max rounded-lg border-4 border-gray-200 mt-6">
+                      <div className="ml-3 text-sm font-semibold">
+                        Answer Attempt:{" "}
+                        {probShow.answerAttempt?.map((att: any) => (
+                          <div className="relative flex items-start">
+                            <div className="ml-3 text-sm">
+                              <label
+                                htmlFor="comments"
+                                className="font-medium text-gray-700"
+                              >
+                                {att.split(/(?!.)/g).slice(0, 1) + " "}
+                              </label>
+                              <span
+                                id="comments-description"
+                                className="text-gray-500"
+                              >
+                                <span className="sr-only">New comments </span>
+                                {att.split(/(?!.)/g).slice(1)}
+                              </span>
                             </div>
-                          ))
-                        }
+                          </div>
+                        ))}
                       </div>
-                      <div className="ml-3 text-sm">
-                        CorrectAnswer: {
-                          probShow.answer?.map((ans: any) => (
-                            < div className="relative flex items-start" >
-                              <div className="ml-3 text-sm" >
-                                <label
-                                  htmlFor="comments"
-                                  className="font-medium text-gray-700"
-                                >
-                                  {ans.split(/(?!.)/g).slice(0, 1) + ' '}
-                                </label>
-                                <span
-                                  id="comments-description"
-                                  className="text-gray-500"
-                                >
-                                  <span className="sr-only">New comments </span>
-                                  {ans.split(/(?!.)/g).slice(1)}
-                                </span>
-                              </div>
+                      <div className="mt-2 ml-3 text-sm font-semibold text-green-600">
+                        Correct Answer:{" "}
+                        {probShow.answer?.map((ans: any) => (
+                          <div className="relative flex items-start">
+                            <div className="ml-3 text-sm">
+                              <label
+                                htmlFor="comments"
+                                className="font-medium text-gray-700"
+                              >
+                                {ans.split(/(?!.)/g).slice(0, 1) + " "}
+                              </label>
+                              <span
+                                id="comments-description"
+                                className="text-gray-500"
+                              >
+                                <span className="sr-only">New comments </span>
+                                {ans.split(/(?!.)/g).slice(1)}
+                              </span>
                             </div>
-                          ))
-                        }
+                          </div>
+                        ))}
                       </div>
-                      <button
-                        type="button"
-                        className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        onClick={() => {
-                          //assessmentAttemptsList/10/Topic%206/6/quiz1/1/a
-                          routeChange(
-                            '/assessmentAttemptsList' +
-                            '/' +
-                            param.enrollId +
-                            '/' +
-                            param.topicName +
-                            '/' +
-                            param.topicId +
-                            '/' +
-                            param.assessmentName +
-                            '/' +
-                            param.assessmentId +
-                            '/' +
-                            'a'
-                          )
-                        }}
-                      >
-                        Back
-                      </button>
+                      {/* <button
+                                                type="button"
+                                                className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                onClick={() => {
+                                                    //assessmentAttemptsList/10/Topic%206/6/quiz1/1/a
+                                                    routeChange(
+                                                        '/assessmentAttemptsList' +
+                                                        '/' +
+                                                        param.enrollId +
+                                                        '/' +
+                                                        param.topicName +
+                                                        '/' +
+                                                        param.topicId +
+                                                        '/' +
+                                                        param.assessmentName +
+                                                        '/' +
+                                                        param.assessmentId +
+                                                        '/' +
+                                                        'a'
+                                                    )
+                                                }}
+                                            >
+                                                Back
+                                            </button> */}
                     </div>
                   </div>
                   {/* /End replace */}
                 </div>
-
+                <div className="flex flex-row justify-between">
+                  <button
+                    type="button"
+                    // the last effect is not working, hence add one duplicate hover effect to avoid the problem
+                    className={`${problem[0] == probShow ? "invisible" : ""
+                      } inline-flex items-center justify-center rounded-md border border-transparent text-indigo-600 px-3 py-2 text-sm font-medium leading-4 shadow-md hover:bg-indigo-700 hover:text-white hover:text-white}`}
+                    onClick={() => {
+                      const currentIndex = problem.findIndex(
+                        (item) => item.questionID === probShow.questionID
+                      );
+                      if (currentIndex > 0) {
+                        const prevQuestion = problem[currentIndex - 1];
+                        setIsActive(prevQuestion.questionID);
+                        setProbShow(prevQuestion);
+                      }
+                    }}
+                  >
+                    <ChevronLeftIcon className="h-6 w-6"></ChevronLeftIcon>
+                    <p>Prev</p>
+                  </button>
+                  <button
+                    type="button"
+                    // the last effect is not working, hence add one duplicate hover effect to avoid the problem
+                    className={`${problem[problem.length - 1] == probShow ? "invisible" : ""
+                      } inline-flex items-center justify-center rounded-md border border-transparent text-indigo-600 px-3 py-2 text-sm font-medium leading-4 shadow-md hover:bg-indigo-700 hover:text-white hover:text-white}`}
+                    onClick={() => {
+                      const currentIndex = problem.findIndex(
+                        (item) => item.questionID === probShow.questionID
+                      );
+                      7;
+                      if (currentIndex < problem.length - 1) {
+                        const nextQuestion = problem[currentIndex + 1];
+                        setIsActive(nextQuestion.questionID);
+                        setProbShow(nextQuestion);
+                      }
+                    }}
+                  >
+                    <p>Next</p>
+                    <ChevronRightIcon className="h-6 w-6"></ChevronRightIcon>
+                  </button>
+                </div>
               </div>
             </main>
           </div>
-        </div >
-      </div >
+        </div>
+      </div>
     </>
   );
 }

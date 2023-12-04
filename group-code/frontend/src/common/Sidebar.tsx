@@ -43,7 +43,8 @@ export default function Sidebar() {
     //     setSidebarOpen(!sidebarOpen)
     // }
 
-    const { sidebarOpen,
+    const {
+        sidebarOpen,
         toggleSidebar,
         topicsShow,
         setTopicsShow,
@@ -77,12 +78,95 @@ export default function Sidebar() {
     };
     return (
         <>
-            {/* <div className='container flex flex-row items-center'> */}
             <div>
                 {
                     sidebarOpen
                         ?
                         <>
+                            {localStorage.getItem("admin") === null &&
+                                <div className="flex flex-1 flex-col overflow-y-auto border-r-2 pt-5 h-screen top-16 left-0 fixed w-60 bg-white">
+                                    <div className="flex flex-1 flex-col space-y-10 px-2 pb-4">
+                                        <button>
+                                            <div className={
+                                                topicsShow
+                                                    ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
+                                                    : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
+                                                onClick={() => {
+                                                    setTopicsShow(true);
+                                                    setAdminShow(false);
+                                                    setConversationShow(false);
+                                                    setUsersShow(false);
+                                                    setMaterialShow(false);
+                                                    routeChange("/adminuser")
+                                                }}
+                                            >
+                                                <HomeIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
+                                                Dashboard
+                                            </div>
+                                        </button>
+                                        <button>
+                                            <div className={
+                                                conversationShow
+                                                    ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
+                                                    : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
+                                                onClick={() => {
+                                                    const param = { id: localStorage.getItem('user_id') };
+
+                                                    AccountService.getConversations(param)
+                                                        .then((response) => {
+                                                            console.log('users got: ');
+                                                            console.log(response.data);
+                                                            localStorage.setItem('friends', response.data);
+                                                            console.log(response.data.length);
+                                                            setFriendsList(response.data.friends);
+                                                        })
+                                                        .catch((error) => {
+                                                            console.log('error');
+                                                        });
+                                                    setTopicsShow(false);
+                                                    setAdminShow(false);
+                                                    setConversationShow(true);
+                                                    setUsersShow(false);
+                                                    setMaterialShow(false);
+                                                    routeChange("/adminuser")
+                                                }}
+                                            >
+                                                <ChatBubbleBottomCenterTextIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
+                                                Message
+                                            </div>
+                                        </button>
+                                        <button>
+                                            <div className={
+                                                usersShow
+                                                    ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
+                                                    : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
+                                                onClick={() => {
+                                                    AccountService.loadUsers({ search: '@' })
+                                                        .then((response) => {
+                                                            // console.log('users got: ');
+                                                            // console.log(response.data);
+                                                            // let i = 0;
+                                                            // console.log(response.data.length);
+                                                            setUsersList(response.data);
+                                                        })
+                                                        .catch((error) => {
+                                                            console.error('error');
+                                                        });
+                                                    setTopicsShow(false);
+                                                    setAdminShow(false);
+                                                    setConversationShow(false);
+                                                    setUsersShow(true);
+                                                    setMaterialShow(false);
+                                                    routeChange("/adminuser")
+                                                }}
+                                            >
+                                                <UsersIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
+                                                Users
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
                             {localStorage.getItem("admin") === "true" &&
                                 (
                                     <div className="flex flex-1 flex-col overflow-y-auto border-r-2 pt-5 h-screen top-16 left-0 fixed w-60 bg-white">
@@ -129,16 +213,16 @@ export default function Sidebar() {
                                                         ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
                                                         : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
                                                     onClick={() => {
-                                                        AccountService.loadUsers()
+                                                        AccountService.loadUsers({ search: '@' })
                                                             .then((response) => {
-                                                                console.log('users got: ');
-                                                                console.log(response.data);
-                                                                // let i = 0
-                                                                console.log(response.data.length);
+                                                                // console.log('users got: ');
+                                                                // console.log(response.data);
+                                                                // let i = 0;
+                                                                // console.log(response.data.length);
                                                                 setUsersList(response.data);
                                                             })
                                                             .catch((error) => {
-                                                                console.log('error');
+                                                                console.error('error');
                                                             });
                                                         setTopicsShow(false);
                                                         setAdminShow(true);
@@ -189,21 +273,16 @@ export default function Sidebar() {
                                                         ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
                                                         : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
                                                     onClick={() => {
-                                                        AccountService.loadUsers()
+                                                        AccountService.loadUsers({ search: '@' })
                                                             .then((response) => {
-                                                                console.log('users got: ');
-                                                                console.log(response.data);
-                                                                let i = 0;
-                                                                console.log(response.data.length);
-                                                                while (i < response.data.length) {
-                                                                    console.log(response.data[i]);
-
-                                                                    i += 1;
-                                                                }
+                                                                // console.log('users got: ');
+                                                                // console.log(response.data);
+                                                                // let i = 0;
+                                                                // console.log(response.data.length);
                                                                 setUsersList(response.data);
                                                             })
                                                             .catch((error) => {
-                                                                console.log('error');
+                                                                console.error('error');
                                                             });
                                                         setTopicsShow(false);
                                                         setAdminShow(false);
@@ -235,6 +314,7 @@ export default function Sidebar() {
                                                         setDeadlineShow(false);
                                                         setConversationShow(false);
                                                         setResultShow(false)
+                                                        setUsersShow(false)
                                                         routeChange("/user")
                                                     }}
                                                 >
@@ -252,6 +332,7 @@ export default function Sidebar() {
                                                         setDeadlineShow(true);
                                                         setConversationShow(false);
                                                         setResultShow(false)
+                                                        setUsersShow(false)
                                                         routeChange("/user")
                                                     }}
                                                 >
@@ -280,9 +361,9 @@ export default function Sidebar() {
                                                             });
                                                         setTopicsShow(false);
                                                         setDeadlineShow(false);
-                                                        // setAssessmentShow(false);
                                                         setConversationShow(true);
                                                         setResultShow(false);
+                                                        setUsersShow(false)
                                                         routeChange("/user")
                                                     }}
                                                 >
@@ -298,265 +379,14 @@ export default function Sidebar() {
                                                     onClick={() => {
                                                         setTopicsShow(false);
                                                         setDeadlineShow(false);
-                                                        // setAssessmentShow(false);
                                                         setConversationShow(false);
                                                         setResultShow(true);
+                                                        setUsersShow(false)
                                                         routeChange("/user")
                                                     }}
                                                 >
                                                     <ChartBarIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
                                                     Results
-                                                </div>
-                                            </button>
-                                            {/* <button>
-                                                <div className={
-                                                    assessmentShow
-                                                        ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
-                                                        : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
-                                                    onClick={() => {
-                                                        setTopicsShow(false);
-                                                        setDeadlineShow(false);
-                                                        setAssessmentShow(true);
-                                                        setConversationShow(false);
-                                                        setResultShow(false);
-                                                        setUsersShow(false);
-                                                        routeChange('/assessmentMain');
-                                                    }}
-                                                >
-                                                    <AssignmentOutlinedIcon sx={{ height: 32, width: 32, stroke: "white", strokeWidth: 0.5 }} className='flex-shrink-0' aria-hidden="true"></AssignmentOutlinedIcon>
-                                                    Assessment
-                                                </div>
-                                            </button> */}
-                                        </div>
-                                    </div>
-                                )
-                            }
-                            {/* {location.pathname === '/assessmentMain' &&
-                                <div className="flex flex-1 flex-col overflow-y-auto border-r-2 pt-5 h-screen top-16 left-0 fixed w-60 bg-white">
-                                    <div className="flex flex-1 flex-col space-y-10 px-2 pb-4">
-                                        <button>
-                                            <div className={
-                                                topicsShow
-                                                    ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
-                                                    : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
-                                                onClick={() => {
-                                                    setTopicsShow(true);
-                                                    setAdminShow(false);
-                                                    setConversationShow(false);
-                                                    setUsersShow(false);
-                                                    setMaterialShow(false);
-                                                }}
-                                            >
-                                                <HomeIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
-                                                Dashboard
-                                            </div>
-                                        </button>
-                                        <button>
-                                            <div className={
-                                                materialShow
-                                                    ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
-                                                    : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
-                                                onClick={() => {
-                                                    setTopicsShow(false);
-                                                    setAdminShow(false);
-                                                    setConversationShow(false);
-                                                    setUsersShow(false);
-                                                    setMaterialShow(true);
-                                                }}
-                                            >
-                                                <FolderIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
-                                                Resources
-                                            </div>
-                                        </button>
-                                        <button>
-                                            <div className={
-                                                adminShow
-                                                    ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
-                                                    : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
-                                                onClick={() => {
-                                                    AccountService.loadUsers()
-                                                        .then((response) => {
-                                                            console.log('users got: ');
-                                                            console.log(response.data);
-                                                            // let i = 0
-                                                            console.log(response.data.length);
-                                                            setUsersList(response.data);
-                                                        })
-                                                        .catch((error) => {
-                                                            console.log('error');
-                                                        });
-                                                    setTopicsShow(false);
-                                                    setAdminShow(true);
-                                                    setConversationShow(false);
-                                                    setUsersShow(false);
-                                                    setMaterialShow(false);
-                                                }}
-                                            >
-                                                <ManageAccountsOutlinedIcon sx={{ height: 32, width: 32, stroke: "white", strokeWidth: 0.5, marginRight: 1 }} className='flex-shrink-0' aria-hidden="true" />
-                                                Admin
-                                            </div>
-                                        </button>
-                                        <button>
-                                            <div className={
-                                                conversationShow
-                                                    ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
-                                                    : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
-                                                onClick={() => {
-                                                    const param = { id: localStorage.getItem('user_id') };
-
-                                                    AccountService.getConversations(param)
-                                                        .then((response) => {
-                                                            console.log('users got: ');
-                                                            console.log(response.data);
-                                                            localStorage.setItem('friends', response.data);
-                                                            console.log(response.data.length);
-                                                            setFriendsList(response.data.friends);
-                                                        })
-                                                        .catch((error) => {
-                                                            console.log('error');
-                                                        });
-                                                    setTopicsShow(false);
-                                                    setAdminShow(false);
-                                                    setConversationShow(true);
-                                                    setUsersShow(false);
-                                                    setMaterialShow(false);
-                                                }}
-                                            >
-                                                <ChatBubbleBottomCenterTextIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
-                                                Message
-                                            </div>
-                                        </button>
-                                        <button>
-                                            <div className={
-                                                usersShow
-                                                    ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
-                                                    : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
-                                                onClick={() => {
-                                                    AccountService.loadUsers()
-                                                        .then((response) => {
-                                                            console.log('users got: ');
-                                                            console.log(response.data);
-                                                            let i = 0;
-                                                            console.log(response.data.length);
-                                                            while (i < response.data.length) {
-                                                                console.log(response.data[i]);
-
-                                                                i += 1;
-                                                            }
-                                                            setUsersList(response.data);
-                                                        })
-                                                        .catch((error) => {
-                                                            console.log('error');
-                                                        });
-                                                    setTopicsShow(false);
-                                                    setAdminShow(false);
-                                                    setConversationShow(false);
-                                                    setUsersShow(true);
-                                                    setMaterialShow(false);
-                                                }}
-                                            >
-                                                <UsersIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
-                                                Users
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-
-                            }
-                            {(location.pathname === '/assessmentOverviewEdit' || location.pathname.includes('/assessmentDetail/')) &&
-                                (
-                                    <div className="flex flex-1 flex-col overflow-y-auto border-r-2 pt-5 h-screen top-16 left-0 fixed w-60 bg-white">
-                                        <div className="flex flex-1 flex-col space-y-10 px-2 pb-4">
-                                            <button>
-                                                <div className={
-                                                    topicsShow
-                                                        ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
-                                                        : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
-                                                    onClick={() => {
-                                                        setTopicsShow(true);
-                                                        setAdminShow(false);
-                                                        setConversationShow(false);
-                                                        setUsersShow(false);
-                                                        setMaterialShow(false);
-                                                    }}
-                                                >
-                                                    <HomeIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
-                                                    Dashboard
-                                                </div>
-                                            </button>
-                                            <button>
-                                                <div className={
-                                                    materialShow
-                                                        ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
-                                                        : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
-                                                    onClick={() => {
-                                                        setTopicsShow(false);
-                                                        setAdminShow(false);
-                                                        setConversationShow(false);
-                                                        setUsersShow(false);
-                                                        setMaterialShow(true);
-                                                    }}
-                                                >
-                                                    <FolderIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
-                                                    Resources
-                                                </div>
-                                            </button>
-                                            <button>
-                                                <div className={
-                                                    adminShow
-                                                        ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
-                                                        : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
-                                                    onClick={() => {
-                                                        AccountService.loadUsers()
-                                                            .then((response) => {
-                                                                console.log('users got: ');
-                                                                console.log(response.data);
-                                                                // let i = 0
-                                                                console.log(response.data.length);
-                                                                setUsersList(response.data);
-                                                            })
-                                                            .catch((error) => {
-                                                                console.log('error');
-                                                            });
-                                                        setTopicsShow(false);
-                                                        setAdminShow(true);
-                                                        setConversationShow(false);
-                                                        setUsersShow(false);
-                                                        setMaterialShow(false);
-                                                    }}
-                                                >
-                                                    <ManageAccountsOutlinedIcon sx={{ height: 32, width: 32, stroke: "white", strokeWidth: 0.5, marginRight: 1 }} className='flex-shrink-0' aria-hidden="true" />
-                                                    Admin
-                                                </div>
-                                            </button>
-                                            <button>
-                                                <div className={
-                                                    conversationShow
-                                                        ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
-                                                        : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
-                                                    onClick={() => {
-                                                        const param = { id: localStorage.getItem('user_id') };
-
-                                                        AccountService.getConversations(param)
-                                                            .then((response) => {
-                                                                console.log('users got: ');
-                                                                console.log(response.data);
-                                                                localStorage.setItem('friends', response.data);
-                                                                console.log(response.data.length);
-                                                                setFriendsList(response.data.friends);
-                                                            })
-                                                            .catch((error) => {
-                                                                console.log('error');
-                                                            });
-                                                        setTopicsShow(false);
-                                                        setAdminShow(false);
-                                                        setConversationShow(true);
-                                                        setUsersShow(false);
-                                                        setMaterialShow(false);
-                                                    }}
-                                                >
-                                                    <ChatBubbleBottomCenterTextIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
-                                                    Message
                                                 </div>
                                             </button>
                                             <button>
@@ -565,27 +395,12 @@ export default function Sidebar() {
                                                         ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
                                                         : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
                                                     onClick={() => {
-                                                        AccountService.loadUsers()
-                                                            .then((response) => {
-                                                                console.log('users got: ');
-                                                                console.log(response.data);
-                                                                let i = 0;
-                                                                console.log(response.data.length);
-                                                                while (i < response.data.length) {
-                                                                    console.log(response.data[i]);
-
-                                                                    i += 1;
-                                                                }
-                                                                setUsersList(response.data);
-                                                            })
-                                                            .catch((error) => {
-                                                                console.log('error');
-                                                            });
                                                         setTopicsShow(false);
-                                                        setAdminShow(false);
+                                                        setDeadlineShow(false);
                                                         setConversationShow(false);
+                                                        setResultShow(false);
                                                         setUsersShow(true);
-                                                        setMaterialShow(false);
+                                                        routeChange('/user');
                                                     }}
                                                 >
                                                     <UsersIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
@@ -596,12 +411,70 @@ export default function Sidebar() {
                                     </div>
                                 )
                             }
-                            {location.pathname === "/topictree" &&
-                                <></>
-                            } */}
                         </>
                         :
                         <>
+                            {localStorage.getItem("admin") === null &&
+                                <div className="flex flex-1 flex-col overflow-y-auto border-r-2 pt-5 h-screen top-16 left-0 fixed w-16 bg-white">
+                                    <div className="flex-1 flex-col space-y-10 px-2 pb-4">
+                                        <button className={
+                                            topicsShow
+                                                ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center pl-2 py-1 rounded-md'
+                                                : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center pl-2 py-1 rounded-md'}
+                                            onClick={() => {
+                                                setTopicsShow(true);
+                                                setAdminShow(false);
+                                                setConversationShow(false);
+                                                setUsersShow(false);
+                                                setMaterialShow(false);
+                                                routeChange("/adminuser")
+                                            }}>
+                                            <HomeIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
+                                        </button>
+                                        <button className={
+                                            conversationShow
+                                                ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center pl-2 py-1 rounded-md'
+                                                : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center pl-2 py-1 rounded-md'}
+                                            onClick={() => {
+                                                const param = { id: localStorage.getItem('user_id') };
+
+                                                AccountService.getConversations(param)
+                                                    .then((response) => {
+                                                        console.log('users got: ');
+                                                        console.log(response.data);
+                                                        localStorage.setItem('friends', response.data);
+                                                        console.log(response.data.length);
+                                                        setFriendsList(response.data.friends);
+                                                    })
+                                                    .catch((error) => {
+                                                        console.log('error');
+                                                    });
+                                                setTopicsShow(false);
+                                                setAdminShow(false);
+                                                setConversationShow(true);
+                                                setUsersShow(false);
+                                                setMaterialShow(false);
+                                                routeChange("/adminuser")
+                                            }}>
+                                            <ChatBubbleBottomCenterTextIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
+                                        </button>
+                                        <button className={
+                                            usersShow
+                                                ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center pl-2 py-1 rounded-md'
+                                                : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center pl-2 py-1 rounded-md'}
+                                            onClick={() => {
+                                                setTopicsShow(false);
+                                                setAdminShow(false);
+                                                setConversationShow(false);
+                                                setUsersShow(true);
+                                                setMaterialShow(false);
+                                                routeChange("/adminuser")
+                                            }}>
+                                            <UsersIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
+                                        </button>
+                                    </div>
+                                </div>
+                            }
                             {localStorage.getItem("admin") === "true" &&
                                 <div className="flex flex-1 flex-col overflow-y-auto border-r-2 pt-5 h-screen top-16 left-0 fixed w-16 bg-white">
                                     <div className="flex-1 flex-col space-y-10 px-2 pb-4">
@@ -638,16 +511,16 @@ export default function Sidebar() {
                                                 ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 rounded-md'
                                                 : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 rounded-md'}
                                             onClick={() => {
-                                                AccountService.loadUsers()
+                                                AccountService.loadUsers({ search: '@' })
                                                     .then((response) => {
-                                                        console.log('users got: ');
-                                                        console.log(response.data);
-                                                        // let i = 0
-                                                        console.log(response.data.length);
+                                                        // console.log('users got: ');
+                                                        // console.log(response.data);
+                                                        // let i = 0;
+                                                        // console.log(response.data.length);
                                                         setUsersList(response.data);
                                                     })
                                                     .catch((error) => {
-                                                        console.log('error');
+                                                        console.error('error');
                                                     });
                                                 setTopicsShow(false);
                                                 setAdminShow(true);
@@ -691,22 +564,6 @@ export default function Sidebar() {
                                                 ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center pl-2 py-1 rounded-md'
                                                 : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center pl-2 py-1 rounded-md'}
                                             onClick={() => {
-                                                AccountService.loadUsers()
-                                                    .then((response) => {
-                                                        console.log('users got: ');
-                                                        console.log(response.data);
-                                                        let i = 0;
-                                                        console.log(response.data.length);
-                                                        while (i < response.data.length) {
-                                                            console.log(response.data[i]);
-
-                                                            i += 1;
-                                                        }
-                                                        setUsersList(response.data);
-                                                    })
-                                                    .catch((error) => {
-                                                        console.log('error');
-                                                    });
                                                 setTopicsShow(false);
                                                 setAdminShow(false);
                                                 setConversationShow(false);
@@ -729,9 +586,9 @@ export default function Sidebar() {
                                             onClick={() => {
                                                 setTopicsShow(true);
                                                 setDeadlineShow(false);
-                                                // setAssessmentShow(false);
                                                 setConversationShow(false);
                                                 setResultShow(false);
+                                                setUsersShow(false)
                                                 routeChange("/user")
                                             }}>
                                             <HomeIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
@@ -743,37 +600,12 @@ export default function Sidebar() {
                                             onClick={() => {
                                                 setTopicsShow(false);
                                                 setDeadlineShow(true);
-                                                // setAssessmentShow(false);
                                                 setConversationShow(false);
                                                 setResultShow(false);
+                                                setUsersShow(false)
                                                 routeChange("/user")
                                             }}>
                                             <CalendarIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
-                                        </button>
-                                        <button className={
-                                            resultShow
-                                                ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center pl-2 py-1 rounded-md'
-                                                : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 rounded-md'}
-                                            onClick={() => {
-                                                AccountService.loadUsers()
-                                                    .then((response) => {
-                                                        console.log('users got: ');
-                                                        console.log(response.data);
-                                                        // let i = 0
-                                                        console.log(response.data.length);
-                                                        setUsersList(response.data);
-                                                    })
-                                                    .catch((error) => {
-                                                        console.log('error');
-                                                    });
-                                                setTopicsShow(false);
-                                                setDeadlineShow(false);
-                                                // setAssessmentShow(false);
-                                                setConversationShow(false);
-                                                setResultShow(true);
-                                                routeChange("/user")
-                                            }}>
-                                            <ChatBubbleBottomCenterTextIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
                                         </button>
                                         <button className={
                                             conversationShow
@@ -788,35 +620,48 @@ export default function Sidebar() {
                                                         console.log(response.data);
                                                         localStorage.setItem('friends', response.data);
                                                         console.log(response.data.length);
-                                                        setFriendsList(response.data.friends);
+                                                        setConversationList(response.data.friends);
                                                     })
                                                     .catch((error) => {
                                                         console.log('error');
                                                     });
                                                 setTopicsShow(false);
                                                 setDeadlineShow(false);
-                                                // setAssessmentShow(false);
                                                 setConversationShow(true);
                                                 setResultShow(false);
+                                                setUsersShow(false)
+                                                routeChange("/user")
+                                            }}>
+                                            <ChatBubbleBottomCenterTextIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
+                                        </button>
+                                        <button className={
+                                            resultShow
+                                                ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center pl-2 py-1 rounded-md'
+                                                : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center pl-2 py-1 rounded-md'}
+                                            onClick={() => {
+                                                setTopicsShow(false);
+                                                setDeadlineShow(false);
+                                                setConversationShow(false);
+                                                setResultShow(true);
+                                                setUsersShow(false)
                                                 routeChange("/user")
                                             }}>
                                             <ChartBarIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
                                         </button>
-                                        {/* <button className={
-                                            assessmentShow
-                                                ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'
-                                                : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center px-2 py-1 text-sm font-medium rounded-md'}
+                                        <button className={
+                                            usersShow
+                                                ? 'bg-slate-200 text-indigo-700 group flex flex-row items-center pl-2 py-1 text-sm font-medium rounded-md'
+                                                : 'bg-white text-black hover:bg-slate-200 group flex flex-row items-center pl-2 py-1 text-sm font-medium rounded-md'}
                                             onClick={() => {
                                                 setTopicsShow(false);
                                                 setDeadlineShow(false);
-                                                setAssessmentShow(true);
                                                 setConversationShow(false);
                                                 setResultShow(false);
-                                                setUsersShow(false);
-                                                routeChange('/assessmentMain');
+                                                setUsersShow(true);
+                                                routeChange('/user');
                                             }}>
-                                            <AssignmentOutlinedIcon sx={{ height: 32, width: 32, stroke: "white", strokeWidth: 0.5 }} className='flex-shrink-0' aria-hidden="true"></AssignmentOutlinedIcon>
-                                        </button> */}
+                                            <UsersIcon className='h-8 w-8 flex-shrink-0 mr-2' aria-hidden="true" />
+                                        </button>
                                     </div>
                                 </div>
                             }

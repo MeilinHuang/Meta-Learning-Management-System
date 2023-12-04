@@ -228,14 +228,18 @@ export default function AdminUserPage() {
         <Sidebar></Sidebar>
         {/* </div> */}
       </div>
-
       <div className={`absolute w-full top-16 flex flex-col md:w-auto px-4 ${sidebarOpen ? 'ml-60' : 'ml-16'}`}>
         <main className={topicsShow ? '' : 'hidden'}>
           <div className="py-10">
             <div className="mx-auto max-w-full px-4 sm:px-6 md:px-8">
               <h1 className="text-3xl font-semibold text-gray-900">Topics</h1>
             </div>
-            <EnrolledTopics />
+            {localStorage.getItem("admin") === null ?
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 py-4">
+                An error has occured, please contact the site admin
+              </div>
+              : <EnrolledTopics />
+            }
           </div>
         </main>
 
@@ -243,7 +247,7 @@ export default function AdminUserPage() {
         <main className={materialShow ? '' : 'hidden'}>
           <div className="py-10">
             <div className="mx-auto max-w-full px-4 sm:px-6 md:px-8">
-              <h1 className="text-2xl font-semibold text-gray-900">
+              <h1 className="text-3xl font-semibold text-gray-900">
                 Resources
               </h1>
             </div>
@@ -260,7 +264,7 @@ export default function AdminUserPage() {
         <main className={adminShow ? '' : 'hidden'}>
           <div className="py-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-              <h1 className="text-2xl font-semibold text-gray-900">
+              <h1 className="text-3xl font-semibold text-gray-900">
                 Admin Management
               </h1>
             </div>
@@ -489,18 +493,24 @@ export default function AdminUserPage() {
         <main className={conversationShow ? '' : 'hidden'}>
           <div className="py-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-              <h1 className="text-2xl font-semibold text-gray-900">Conversation</h1>
+              <h1 className="text-3xl font-semibold text-gray-900">Conversation</h1>
             </div>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
               <div></div>
               <div className="py-4">
-                <div className="rounded-lg border-4 border-dashed border-gray-200">
-                  <div className="overflow-hidden bg-white shadow sm:rounded-lg">
-                    <div className="border-t border-gray-200">
-                      {loadConversationList()}
+                {localStorage.getItem("admin") === null ?
+                  <div>
+                    An error has occured, please contact the site admin
+                  </div>
+                  :
+                  <div className="rounded-lg border-4 border-dashed border-gray-200">
+                    <div className="overflow-hidden bg-white shadow sm:rounded-lg">
+                      <div className="border-t border-gray-200">
+                        {loadConversationList()}
+                      </div>
                     </div>
                   </div>
-                </div>
+                }
               </div>
               {/* /End replace */}
             </div>
@@ -510,36 +520,44 @@ export default function AdminUserPage() {
         <main className={usersShow ? '' : 'hidden'}>
           <div className="py-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-              <h1 className="text-2xl font-semibold text-gray-900">Users</h1>
+              <h1 className="text-3xl font-semibold text-gray-900">Users</h1>
             </div>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 flex margin-left h-15 mt-4">
-              <input
-                className="text-sm text-gray-900 sm:col-span-2 sm:mt-0"
-                placeholder="Enter Username"
-                onChange={handleInputSearch}
-                id="searchBar"
-              ></input>
-              <button
-                type="submit"
-                className="ml-4 flex justify-right rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
-                onClick={clearSearch}
-              >
-                Clear
-              </button>
-            </div>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-              <div></div>
-              <div className="py-4">
-                <div className="rounded-lg border-4 border-dashed border-gray-200">
-                  <div className="overflow-hidden bg-white shadow sm:rounded-lg">
-                    <div className="border-t border-gray-200">
-                      {loadUsersList()}
+            {localStorage.getItem("admin") === null ?
+              <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8 flex margin-left h-15 mt-4'>
+                An error has occured, please contact the site admin
+              </div>
+              :
+              <div>
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 flex margin-left h-15 mt-4">
+                  <input
+                    className="text-sm text-gray-900 sm:col-span-2 sm:mt-0"
+                    placeholder="Enter Username"
+                    onChange={handleInputSearch}
+                    id="searchBar"
+                  ></input>
+                  <button
+                    type="submit"
+                    className="ml-4 flex justify-right rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 gap-3"
+                    onClick={clearSearch}
+                  >
+                    Clear
+                  </button>
+                </div>
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+                  <div></div>
+                  <div className="py-4">
+                    <div className="rounded-lg border-4 border-dashed border-gray-200">
+                      <div className="overflow-hidden bg-white shadow sm:rounded-lg">
+                        <div className="border-t border-gray-200">
+                          {loadUsersList()}
+                        </div>
+                      </div>
                     </div>
                   </div>
+                  {/* /End replace */}
                 </div>
               </div>
-              {/* /End replace */}
-            </div>
+            }
           </div>
         </main>
       </div>

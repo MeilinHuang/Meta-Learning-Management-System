@@ -185,22 +185,22 @@ export default function AssessmentDetail() {
         //     proportion: '0.5',
         //     timeRange: '2023-1.18 to 2023-1.18'
         //   }
-          //   {
-          //     assessmentID: '1',
-          //     name: 'quiz 1',
-          //     type: 'quiz',
-          //     status: 'open',
-          //     proportion: '0.1',
-          //     timeRange: '2022/11/1 to 2022/11/7'
-          //   },
-          //   {
-          //     assessmentID: '2',
-          //     name: 'quiz 2',
-          //     type: 'quiz',
-          //     status: 'open',
-          //     proportion: '0.1',
-          //     timeRange: '2022/11/18 to 2022/11/26'
-          //   }
+        //   {
+        //     assessmentID: '1',
+        //     name: 'quiz 1',
+        //     type: 'quiz',
+        //     status: 'open',
+        //     proportion: '0.1',
+        //     timeRange: '2022/11/1 to 2022/11/7'
+        //   },
+        //   {
+        //     assessmentID: '2',
+        //     name: 'quiz 2',
+        //     type: 'quiz',
+        //     status: 'open',
+        //     proportion: '0.1',
+        //     timeRange: '2022/11/18 to 2022/11/26'
+        //   }
         // ]
 
         // newData.map((elem) => {

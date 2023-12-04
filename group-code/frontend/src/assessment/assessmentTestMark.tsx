@@ -170,6 +170,26 @@ export default function AssessmentTestMark() {
         //console.log(question)
         arr.push(question);
       }
+
+      // const newData = [
+      //   {
+      //     questionID: "1",
+      //     problemDescription:
+      //       'What is a correct syntax to output "Hello World" in C++?',
+      //     type: "singleChoice",
+      //     choice: [
+      //       'A. cout << "Hello World";',
+      //       'B. Console.WriteLine("Hello World");',
+      //       'C. print ("Hello World");',
+      //       'D. System.out.println("Hello World");',
+      //     ],
+      //     answerAttempt: ['A. cout << "Hello World";'],
+      //     answer: ['A. cout << "Hello World";'],
+      //     mark: "0",
+      //     feedback: ""
+      //   },
+      // ]
+      // arr.push(newData[0])
       setProblem(arr);
       console.log("arr: ", arr)
       setLoaded(!loaded);
@@ -187,11 +207,13 @@ export default function AssessmentTestMark() {
 
   useEffect(() => {
     // console.log("After update" + JSON.stringify(problem))
-    setProbShow(problem[0]);
-    setIsActive(parseInt(problem[0].questionID));
-    setAttempt(probShow.answerAttempt);
-    setResult(probShow.answer);
-    setStatus(attempt === result);
+    if (problem[0].problemDescription !== "") {
+      setProbShow(problem[0]);
+      setIsActive(parseInt(problem[0].questionID));
+      setAttempt(probShow.answerAttempt);
+      setResult(probShow.answer);
+      setStatus(attempt === result);
+    }
     // console.log("probShow: " + JSON.stringify(probShow))
   }, [loaded]);
 

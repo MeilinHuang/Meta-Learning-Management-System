@@ -71,12 +71,12 @@ export default function AssessmentAttemptsList() {
                     item["feedback"] = res.data[index].feedback
                     arr.push(item)
                 }
-                const newData = {
-                    assessmentAttemptID: '1',
-                    mark: '80',
-                    feedback: 'great',
-                }
-                arr.push(newData)
+                // const newData = {
+                //     assessmentAttemptID: '3',
+                //     mark: '80',
+                //     feedback: 'great',
+                // }
+                // arr.push(newData)
                 setItems(arr)
             })
     }, []);

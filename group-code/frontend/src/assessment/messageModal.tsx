@@ -7,14 +7,14 @@ import { Modal as AntdModal } from 'antd';
 const MessageModal = (props: { show: any; close: any; message: any }) => {
   return (
     <>
-      <AntdModal title="Error" open={props.show} footer={[]} onCancel={props.close}>
+      {/* <AntdModal title="Error" open={props.show} footer={[]} onCancel={props.close}>
         <h4 className="text-lg font-medium leading-6 text-gray-900">
           {props.message}
         </h4>
       </AntdModal>
       {props.show && (
         <div className="z-10 fixed inset-0 opacity-50 z-50"></div>
-      )}
+      )} */}
       <Modal
         show={props.show}
         onHide={props.close}
