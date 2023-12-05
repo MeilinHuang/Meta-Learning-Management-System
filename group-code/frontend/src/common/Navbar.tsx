@@ -95,7 +95,7 @@ export default function Navbar() {
                   <Link
                     className={
                       path === "/user" || path === "/adminuser"
-                        ? "inline-flex items-center border-b-4 border-indigo-500 px-1 pt-1 text-sm font-bold text-base text-white border-b-white"
+                        ? "inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-bold text-base text-white border-b-white"
                         : "inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-base text-gray-300 hover:border-b-gray-300 hover:text-white"
                     }
                     to={isSuperuser ? "/adminuser" : "/user"}
